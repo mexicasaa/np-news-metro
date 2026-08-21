@@ -165,11 +165,45 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     setBoxesOpen(prev => ({ ...prev, [box]: !prev[box] }));
   };
 
+  // Auto-generate slug from title
   useEffect(() => {
     if (!initialPost && title && !slug) {
       setSlug(title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 60));
     }
   }, [title, initialPost, slug]);
+
+  // Synchronize state when initialPost changes (editing different articles)
+  useEffect(() => {
+    if (initialPost) {
+      setTitle(initialPost.title || '');
+      setDek(initialPost.dek || '');
+      if (initialPost.blocks && initialPost.blocks.length > 0) {
+        setContent(initialPost.blocks.map(b => {
+          if (b.type === 'image') return `![${b.imageCaption || 'Image'}](${b.imageUrl || ''})`;
+          if (b.type === 'heading') return `## ${b.content}`;
+          if (b.type === 'pullquote') return `> "${b.content}"`;
+          return b.content;
+        }).join('\n\n'));
+      } else {
+        setContent(initialPost.dek || '');
+      }
+      setCategory((initialPost.category as EditorialCategorySlug) || 'india');
+      setTags(initialPost.tags || ['National News', 'Policy', 'Breaking']);
+      setAuthorType(initialPost.customAuthor?.name ? 'external' : 'staff');
+      setAuthorId(initialPost.authorId || currentAuthorId || 'author-1');
+      setCustomAuthorName(initialPost.customAuthor?.name || '');
+      setCustomAuthorRole(initialPost.customAuthor?.role || 'Guest Contributor');
+      setCustomAuthorAvatar(initialPost.customAuthor?.avatar || '');
+      setIsBreaking(initialPost.isBreaking || false);
+      setFeaturedImage(initialPost.featuredImage || '');
+      setImageCredit(initialPost.imageCredit || 'NP News Metro Photo Desk');
+      setImageCaption(initialPost.imageCaption || '');
+      setImageAlt(initialPost.imageAlt || '');
+      setSeoTitle(initialPost.seoTitle || '');
+      setMetaDescription(initialPost.seoDescription || '');
+      setSlug(initialPost.slug || '');
+    }
+  }, [initialPost?.id]);
 
   const handleFeaturedImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {

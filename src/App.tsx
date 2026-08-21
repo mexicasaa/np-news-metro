@@ -493,7 +493,7 @@ function AppContent() {
     setPublishOrchestratorOpen(true);
 
     const newOpId = `PUB-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.floor(1000 + Math.random() * 9000)}`;
-    const newPostId = postData.id || `post-${Date.now()}`;
+    const newPostId = postData.id || activeEditingPost?.id || `post-${Date.now()}`;
 
     const operation: PublishingOperation = {
       operationId: newOpId,
@@ -749,7 +749,36 @@ function AppContent() {
               userRole={currentUserRole}
               currentAuthorId={currentUser.id}
               onSaveDraft={(postData) => {
-                alert('Draft copy autosaved to memory and localStorage.');
+                const postId = postData.id || activeEditingPost?.id || `post-${Date.now()}`;
+                const fullPost: WpPost = {
+                  id: postId,
+                  title: postData.title || 'Untitled News Story',
+                  titleHi: postData.titleHi || postData.title || '',
+                  dek: postData.dek || '',
+                  category: (postData.category as any) || 'india',
+                  authorId: postData.authorId || 'author-1',
+                  customAuthor: postData.customAuthor,
+                  featuredImage: postData.featuredImage || 'https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&q=80&w=1200',
+                  imageAlt: postData.imageAlt || postData.title || '',
+                  imageCredit: postData.imageCredit || 'NP News Metro Photo Desk',
+                  imageCaption: postData.imageCaption || '',
+                  publishedAt: postData.publishedAt || new Date().toISOString(),
+                  readTime: postData.readTime || '3 min read',
+                  viewsCount: activeEditingPost?.viewsCount || 100,
+                  commentCount: activeEditingPost?.commentCount || 0,
+                  sharesCount: activeEditingPost?.sharesCount || 0,
+                  isLead: activeEditingPost?.isLead || false,
+                  isFeatured: true,
+                  isBreaking: postData.isBreaking || false,
+                  slug: postData.slug || 'story',
+                  tags: postData.tags || ['National', 'Policy'],
+                  blocks: postData.blocks || [
+                    { id: 'b1', type: 'paragraph', content: postData.dek || 'Draft content.' }
+                  ],
+                };
+                const updated = savePublishedPost(fullPost);
+                setPosts(updated);
+                alert('Story changes saved successfully in memory & persistent storage.');
               }}
               onSubmitForReview={(postData) => {
                 alert('Article successfully submitted to Copy Editor review queue.');

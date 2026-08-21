@@ -34,23 +34,36 @@ export const savePublishedPost = (post: WpPost): WpPost[] => {
   if (typeof window === 'undefined') return [post, ...defaultMockPosts];
   try {
     const currentPosts = getStoredPosts();
-    // Filter out existing instance if editing
-    const filtered = currentPosts.filter(p => p.id !== post.id);
-    
-    // Ensure the newly published post is marked for lead & featured visibility on the homepage slider
-    const enrichedPost: WpPost = {
-      ...post,
-      isLead: true,
-      isFeatured: true,
-      publishedAt: post.publishedAt || new Date().toISOString(),
-      viewsCount: post.viewsCount || 1,
-    };
+    const existingIndex = currentPosts.findIndex(p => p.id === post.id);
 
-    // Also mark older posts as non-lead if this new one is the primary lead
-    const updated = [
-      enrichedPost,
-      ...filtered.map(p => ({ ...p, isLead: false }))
-    ];
+    let updated: WpPost[];
+    if (existingIndex >= 0) {
+      // Editing existing post: update in place with new fields
+      const existing = currentPosts[existingIndex];
+      const mergedPost: WpPost = {
+        ...existing,
+        ...post,
+        titleHi: post.titleHi || post.title || existing.titleHi,
+        updatedAt: new Date().toISOString(),
+      };
+      updated = [
+        mergedPost,
+        ...currentPosts.filter((_, idx) => idx !== existingIndex)
+      ];
+    } else {
+      // Creating new post: prepend as primary lead
+      const enrichedPost: WpPost = {
+        ...post,
+        isLead: true,
+        isFeatured: true,
+        publishedAt: post.publishedAt || new Date().toISOString(),
+        viewsCount: post.viewsCount || 1,
+      };
+      updated = [
+        enrichedPost,
+        ...currentPosts.map(p => ({ ...p, isLead: false }))
+      ];
+    }
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
 
@@ -58,7 +71,7 @@ export const savePublishedPost = (post: WpPost): WpPost[] => {
     try {
       if (typeof BroadcastChannel !== 'undefined') {
         const channel = new BroadcastChannel(BROADCAST_CHANNEL_NAME);
-        channel.postMessage({ type: 'NEWS_PUBLISHED', post: enrichedPost });
+        channel.postMessage({ type: 'NEWS_PUBLISHED', post });
         channel.close();
       }
     } catch (e) {}
