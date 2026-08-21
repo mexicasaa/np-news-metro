@@ -176,6 +176,48 @@ function AppContent() {
   const [publishingTab, setPublishingTab] = useState<PublishingTab>('all');
   const [activeEditingPost, setActiveEditingPost] = useState<WpPost | undefined>(undefined);
 
+  // URL Routing & /admin Route Detection
+  React.useEffect(() => {
+    const checkUrlRoute = () => {
+      if (typeof window === 'undefined') return;
+      const path = window.location.pathname.toLowerCase();
+      const hash = window.location.hash.toLowerCase();
+
+      if (path === '/admin' || path.startsWith('/admin/') || path === '/wp-admin' || hash === '#admin') {
+        const isAuth = localStorage.getItem('np_news_admin_auth') === 'true' || sessionStorage.getItem('np_news_admin_auth') === 'true';
+        if (isAuth) {
+          setIsAdminAuthenticated(true);
+          setViewMode('admin');
+        } else {
+          setPendingAdminSection('publishing');
+          setAdminLoginModalOpen(true);
+        }
+      }
+    };
+
+    checkUrlRoute();
+
+    const handlePopState = () => {
+      checkUrlRoute();
+    };
+
+    // Keyboard shortcut Ctrl+Shift+A or Alt+A to trigger Admin from anywhere
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) || (e.altKey && (e.key === 'a' || e.key === 'A'))) {
+        e.preventDefault();
+        handleOpenAdmin('publishing');
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
   // Modals & Drawers
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -269,6 +311,11 @@ function AppContent() {
     setAdminSection(section);
     if (tab) setPublishingTab(tab);
     setViewMode('admin');
+    try {
+      if (typeof window !== 'undefined' && window.location.pathname !== '/admin') {
+        window.history.pushState({ view: 'admin' }, '', '/admin');
+      }
+    } catch (e) {}
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -276,8 +323,21 @@ function AppContent() {
     try {
       localStorage.removeItem('np_news_admin_auth');
       sessionStorage.removeItem('np_news_admin_auth');
+      if (typeof window !== 'undefined' && (window.location.pathname === '/admin' || window.location.pathname.startsWith('/admin') || window.location.hash === '#admin')) {
+        window.history.pushState({ view: 'public' }, '', '/');
+      }
     } catch (e) {}
     setIsAdminAuthenticated(false);
+    setViewMode('public');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleExitToPublicSite = () => {
+    try {
+      if (typeof window !== 'undefined' && (window.location.pathname === '/admin' || window.location.pathname.startsWith('/admin') || window.location.hash === '#admin')) {
+        window.history.pushState({ view: 'public' }, '', '/');
+      }
+    } catch (e) {}
     setViewMode('public');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -290,6 +350,11 @@ function AppContent() {
     }
     setActiveEditingPost(undefined);
     setAdminSection('new-article');
+    try {
+      if (typeof window !== 'undefined' && window.location.pathname !== '/admin') {
+        window.history.pushState({ view: 'admin' }, '', '/admin');
+      }
+    } catch (e) {}
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -301,6 +366,11 @@ function AppContent() {
     }
     setActiveEditingPost(post);
     setAdminSection('edit-article');
+    try {
+      if (typeof window !== 'undefined' && window.location.pathname !== '/admin') {
+        window.history.pushState({ view: 'admin' }, '', '/admin');
+      }
+    } catch (e) {}
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -627,7 +697,7 @@ function AppContent() {
           }}
           currentUser={currentUser}
           onChangeUserRole={(role) => setCurrentUserRole(role)}
-          onExitToPublicSite={() => setViewMode('public')}
+          onExitToPublicSite={handleExitToPublicSite}
           onLogout={handleAdminLogout}
           onQuickCreate={handleStartNewArticle}
           activeEnvironment={activeEnvironment}
@@ -1102,13 +1172,25 @@ function AppContent() {
       {/* 5. Secure Admin Login Modal */}
       <AdminLoginModal
         isOpen={adminLoginModalOpen}
-        onClose={() => setAdminLoginModalOpen(false)}
+        onClose={() => {
+          setAdminLoginModalOpen(false);
+          if (typeof window !== 'undefined' && (window.location.pathname === '/admin' || window.location.pathname.startsWith('/admin') || window.location.hash === '#admin')) {
+            try {
+              window.history.pushState({ view: 'public' }, '', '/');
+            } catch (e) {}
+          }
+        }}
         onSuccess={() => {
           setIsAdminAuthenticated(true);
           setAdminLoginModalOpen(false);
           setAdminSection(pendingAdminSection);
           if (pendingPublishingTab) setPublishingTab(pendingPublishingTab);
           setViewMode('admin');
+          try {
+            if (typeof window !== 'undefined' && window.location.pathname !== '/admin') {
+              window.history.pushState({ view: 'admin' }, '', '/admin');
+            }
+          } catch (e) {}
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
       />

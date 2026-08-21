@@ -114,16 +114,6 @@ export const UtilityBar: React.FC<UtilityBarProps> = ({
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
             <span>{t.factCheckDesk}</span>
           </button>
-
-          {onOpenAdmin && (
-            <button
-              onClick={onOpenAdmin}
-              className="flex items-center gap-1 bg-red-50 hover:bg-red-100 text-editorial-red border border-red-200 px-2 py-0.5 rounded text-[10px] font-bold transition-colors cursor-pointer"
-              title="Open Daily Publishing Center"
-            >
-              <span>⚡ Admin</span>
-            </button>
-          )}
         </div>
       </div>
     </div>

@@ -180,14 +180,6 @@ export const SiteFooter: React.FC<SiteFooterProps> = ({
             <button onClick={() => onNavigateStatic('sitemap')} className="hover:text-white transition-colors">
               {isHindi ? 'समाचार साइटमैप' : 'News Sitemap'}
             </button>
-            {onOpenAdmin && (
-              <>
-                <span>•</span>
-                <button onClick={onOpenAdmin} className="text-secondary-gold font-bold hover:underline">
-                  ⚡ Editorial Admin
-                </button>
-              </>
-            )}
           </div>
         </div>
 

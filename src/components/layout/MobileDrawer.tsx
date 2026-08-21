@@ -194,24 +194,6 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
               <TrendingUp className="w-4 h-4 text-editorial-red" />
               <span>{t.nav_trending}</span>
             </button>
-
-            {onOpenAdmin && (
-              <div className="pt-2">
-                <button
-                  onClick={() => {
-                    onOpenAdmin();
-                    onClose();
-                  }}
-                  className="w-full flex items-center justify-between p-2.5 bg-red-50 hover:bg-red-100 text-editorial-red border border-red-200 rounded-sm font-bold text-xs transition-colors cursor-pointer"
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-editorial-red animate-ping"></span>
-                    <span>⚡ Daily Publishing Center (Admin)</span>
-                  </div>
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            )}
           </div>
         </div>
 
