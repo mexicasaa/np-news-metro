@@ -4,7 +4,8 @@ import {
   ChevronRight, Sparkles, Flame, CheckCircle2, Clock 
 } from 'lucide-react';
 import { WpPost, WpVideo } from '../types/wordpress';
-import { mockPosts, mockVideos, mockAuthors } from '../data/mockWpData';
+import { mockVideos, mockAuthors } from '../data/mockWpData';
+import { getStoredPosts } from '../utils/newsStorage';
 import { HeroStory } from '../components/cards/HeroStory';
 import { LargeStoryCard } from '../components/cards/LargeStoryCard';
 import { MediumStoryCard } from '../components/cards/MediumStoryCard';
@@ -18,6 +19,7 @@ import { NewsletterModule } from '../components/common/NewsletterModule';
 import { useLanguage } from '../context/LanguageContext';
 
 interface HomepageProps {
+  posts?: WpPost[];
   onSelectPost: (post: WpPost) => void;
   onSelectVideo: (video: WpVideo) => void;
   onSelectCategory: (category: string) => void;
@@ -29,6 +31,7 @@ interface HomepageProps {
 }
 
 export const Homepage: React.FC<HomepageProps> = ({
+  posts: externalPosts,
   onSelectPost,
   onSelectVideo,
   onSelectCategory,
@@ -39,14 +42,17 @@ export const Homepage: React.FC<HomepageProps> = ({
   showAds = false,
 }) => {
   const { t, isHindi } = useLanguage();
-  const leadPost = mockPosts.find((p) => p.isLead) || mockPosts[0];
-  const featuredPosts = mockPosts.filter((p) => p.isFeatured || p.isLead);
-  const supportingLeadPosts = mockPosts.filter((p) => p.id !== leadPost.id).slice(0, 3);
-  const latestPosts = mockPosts.slice(0, 5);
-  const indiaPosts = mockPosts.filter((p) => p.category === 'india' || p.category === 'politics');
-  const businessPosts = mockPosts.filter((p) => p.category === 'business' || p.category === 'economy');
-  const techWorldPosts = mockPosts.filter((p) => p.category === 'technology' || p.category === 'world');
-  const trendingRanking = [...mockPosts].sort((a, b) => b.viewsCount - a.viewsCount).slice(0, 5);
+  const allPosts = externalPosts && externalPosts.length > 0 ? externalPosts : getStoredPosts();
+  
+  // Hero Lead & Slider feeds
+  const leadPost = allPosts.find((p) => p.isLead) || allPosts[0];
+  const featuredPosts = allPosts.filter((p) => p.isFeatured || p.isLead);
+  const supportingLeadPosts = allPosts.filter((p) => p.id !== leadPost.id).slice(0, 3);
+  const latestPosts = allPosts.slice(0, 8);
+  const indiaPosts = allPosts.filter((p) => p.category === 'india' || p.category === 'politics');
+  const businessPosts = allPosts.filter((p) => p.category === 'business' || p.category === 'economy');
+  const techWorldPosts = allPosts.filter((p) => p.category === 'technology' || p.category === 'world');
+  const trendingRanking = [...allPosts].sort((a, b) => (b.viewsCount || 0) - (a.viewsCount || 0)).slice(0, 5);
 
   return (
     <main className="max-w-site mx-auto px-3 sm:px-4 py-4 sm:py-6 space-y-6 sm:space-y-8">
@@ -68,7 +74,7 @@ export const Homepage: React.FC<HomepageProps> = ({
           </div>
 
           {/* Right Column: Key Supporting News Cluster */}
-          <div className="lg:col-span-4 flex flex-col justify-between space-y-3">
+          <div className="lg:col-span-4 flex flex-col space-y-3">
             <div className="flex items-center justify-between pb-2 border-b-2 border-primary">
               <span className="font-serif text-sm font-bold uppercase tracking-wider text-ink flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-secondary" />
@@ -81,7 +87,7 @@ export const Homepage: React.FC<HomepageProps> = ({
 
             <div className="space-y-3">
               {supportingLeadPosts.map((post) => (
-                <div key={post.id} className="bg-surface-lowest p-3.5 rounded-sm border border-border-subtle shadow-subtle hover:border-border-strong transition-all">
+                <div key={post.id} className="bg-surface-lowest rounded-sm border border-border-subtle shadow-subtle hover:border-border-strong transition-all overflow-hidden">
                   <CompactStoryCard
                     post={post}
                     onSelect={onSelectPost}

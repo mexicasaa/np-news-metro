@@ -30,7 +30,19 @@ export const BreakingArticleTemplate: React.FC<BreakingArticleTemplateProps> = (
 }) => {
   const { language, t, isHindi } = useLanguage();
   const localized = getLocalizedPost(post, language);
-  const author = mockAuthors[post.authorId];
+  const author = post.customAuthor?.name ? {
+    id: 'guest',
+    name: post.customAuthor.name,
+    role: post.customAuthor.role || 'Guest Contributor',
+    avatar: post.customAuthor.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
+    bio: '',
+    twitter: '',
+    email: '',
+    beats: ['National News'],
+    social: {},
+    verified: false,
+    slug: 'guest'
+  } : mockAuthors[post.authorId];
   const relatedBreaking = mockPosts.filter((p) => p.id !== post.id && p.isBreaking);
   const trendingRanking = [...mockPosts].sort((a, b) => b.viewsCount - a.viewsCount).slice(0, 5);
 

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Filter, Flame, ChevronRight, Newspaper, ArrowRight } from 'lucide-react';
 import { WpCategory, WpPost } from '../types/wordpress';
-import { mockCategories, mockPosts } from '../data/mockWpData';
+import { mockCategories } from '../data/mockWpData';
+import { getStoredPosts } from '../utils/newsStorage';
 import { HeroStory } from '../components/cards/HeroStory';
 import { LargeStoryCard } from '../components/cards/LargeStoryCard';
 import { MediumStoryCard } from '../components/cards/MediumStoryCard';
@@ -14,6 +15,7 @@ import { Pagination } from '../components/common/Pagination';
 import { useLanguage } from '../context/LanguageContext';
 
 interface CategoryTemplateProps {
+  posts?: WpPost[];
   categorySlug: string;
   onSelectPost: (post: WpPost) => void;
   onNavigateHome: () => void;
@@ -23,6 +25,7 @@ interface CategoryTemplateProps {
 }
 
 export const CategoryTemplate: React.FC<CategoryTemplateProps> = ({
+  posts: externalPosts,
   categorySlug,
   onSelectPost,
   onNavigateHome,
@@ -34,6 +37,7 @@ export const CategoryTemplate: React.FC<CategoryTemplateProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const { t, isHindi } = useLanguage();
 
+  const allPosts = externalPosts && externalPosts.length > 0 ? externalPosts : getStoredPosts();
   const foundCategory = mockCategories.find((c) => c.slug === categorySlug);
   const categoryName = isHindi && foundCategory?.nameHi ? foundCategory.nameHi : (foundCategory?.name || (categorySlug.charAt(0).toUpperCase() + categorySlug.slice(1)));
 
@@ -50,12 +54,12 @@ export const CategoryTemplate: React.FC<CategoryTemplateProps> = ({
     'सभी', 'राष्ट्रीय', 'विश्लेषण', 'साक्षात्कार', 'विशेष रिपोर्ट'
   ] : (category.subcategories || ['All', 'National', 'Analysis', 'Interviews', 'Special Reports']);
 
-  const categoryPosts = mockPosts.filter((p) => p.category === categorySlug);
-  const displayPosts = categoryPosts.length > 0 ? categoryPosts : mockPosts;
-  const heroPost = displayPosts[0] || mockPosts[0];
+  const categoryPosts = allPosts.filter((p) => p.category === categorySlug);
+  const displayPosts = categoryPosts.length > 0 ? categoryPosts : allPosts;
+  const heroPost = displayPosts[0] || allPosts[0];
   const topGridPosts = displayPosts.slice(1, 4);
   const feedPosts = displayPosts.slice(4);
-  const trendingRanking = [...mockPosts].sort((a, b) => b.viewsCount - a.viewsCount).slice(0, 5);
+  const trendingRanking = [...allPosts].sort((a, b) => (b.viewsCount || 0) - (a.viewsCount || 0)).slice(0, 5);
 
   return (
     <div className="bg-canvas min-h-screen">
@@ -153,7 +157,7 @@ export const CategoryTemplate: React.FC<CategoryTemplateProps> = ({
             </div>
 
             <div className="space-y-4">
-              {(feedPosts.length > 0 ? feedPosts : mockPosts.slice(0, 4)).map((post) => (
+              {(feedPosts.length > 0 ? feedPosts : allPosts.slice(0, 4)).map((post: WpPost) => (
                 <HorizontalStoryCard
                   key={post.id}
                   post={post}

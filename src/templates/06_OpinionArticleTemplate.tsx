@@ -28,7 +28,19 @@ export const OpinionArticleTemplate: React.FC<OpinionArticleTemplateProps> = ({
 }) => {
   const { language, t, isHindi } = useLanguage();
   const localized = getLocalizedPost(post, language);
-  const author = mockAuthors[post.authorId] || mockAuthors['author-4'];
+  const author = post.customAuthor?.name ? {
+    id: 'guest',
+    name: post.customAuthor.name,
+    role: post.customAuthor.role || 'Columnist & Contributor',
+    avatar: post.customAuthor.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
+    bio: `${post.customAuthor.name} writes opinions and analytical columns for NP News Metro.`,
+    twitter: '',
+    email: '',
+    beats: ['Opinion & Analysis'],
+    social: {},
+    verified: false,
+    slug: 'guest'
+  } : mockAuthors[post.authorId] || mockAuthors['author-4'];
   const otherOpinions = mockPosts.filter((p) => p.id !== post.id && (p.isOpinion || p.category === 'opinion'));
   const trendingRanking = [...mockPosts].sort((a, b) => b.viewsCount - a.viewsCount).slice(0, 5);
 

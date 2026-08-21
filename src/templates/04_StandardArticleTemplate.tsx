@@ -37,7 +37,17 @@ export const StandardArticleTemplate: React.FC<StandardArticleTemplateProps> = (
   const [commentsOpen, setCommentsOpen] = useState(false);
   const { language, t, isHindi } = useLanguage();
   const localized = getLocalizedPost(post, language);
-  const author = mockAuthors[post.authorId];
+  const author = post.customAuthor?.name ? {
+    id: 'guest-author',
+    name: post.customAuthor.name,
+    slug: 'guest',
+    role: post.customAuthor.role || (isHindi ? 'अतिथि लेखक / विशेष संवाददाता' : 'Guest Contributor / Wire Reporter'),
+    avatar: post.customAuthor.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
+    bio: `${post.customAuthor.name} is an external writer and contributor for NP News Metro.`,
+    verified: false,
+    beats: ['Guest Editorial'],
+    social: {}
+  } : mockAuthors[post.authorId];
   const relatedPosts = mockPosts.filter((p) => p.id !== post.id && (p.category === post.category || p.tags.some(t => post.tags.includes(t))));
   const trendingRanking = [...mockPosts].sort((a, b) => b.viewsCount - a.viewsCount).slice(0, 5);
 

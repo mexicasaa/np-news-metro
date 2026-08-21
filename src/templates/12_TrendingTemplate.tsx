@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Flame, TrendingUp, Calendar, Share2, Eye, Award } from 'lucide-react';
 import { WpPost } from '../types/wordpress';
-import { mockPosts, getLocalizedPost } from '../data/mockWpData';
+import { getLocalizedPost } from '../data/mockWpData';
+import { getStoredPosts } from '../utils/newsStorage';
 import { RankingItem } from '../components/cards/RankingItem';
 import { LargeStoryCard } from '../components/cards/LargeStoryCard';
 import { AdSlot } from '../components/commercial/AdSlot';
@@ -9,6 +10,7 @@ import { Breadcrumbs } from '../components/layout/Breadcrumbs';
 import { useLanguage } from '../context/LanguageContext';
 
 interface TrendingTemplateProps {
+  posts?: WpPost[];
   onSelectPost: (post: WpPost) => void;
   onNavigateHome: () => void;
   onSelectCategory: (category: string) => void;
@@ -16,6 +18,7 @@ interface TrendingTemplateProps {
 }
 
 export const TrendingTemplate: React.FC<TrendingTemplateProps> = ({
+  posts: externalPosts,
   onSelectPost,
   onNavigateHome,
   onSelectCategory,
@@ -24,13 +27,15 @@ export const TrendingTemplate: React.FC<TrendingTemplateProps> = ({
   const [timeframe, setTimeframe] = useState<'today' | 'week' | 'shared'>('today');
   const { language, t, isHindi } = useLanguage();
 
+  const allPosts = externalPosts && externalPosts.length > 0 ? externalPosts : getStoredPosts();
+
   // Sorted list for top 10
-  const sortedPosts = [...mockPosts].sort((a, b) => {
-    if (timeframe === 'shared') return b.sharesCount - a.sharesCount;
-    return b.viewsCount - a.viewsCount;
+  const sortedPosts = [...allPosts].sort((a, b) => {
+    if (timeframe === 'shared') return (b.sharesCount || 0) - (a.sharesCount || 0);
+    return (b.viewsCount || 0) - (a.viewsCount || 0);
   });
 
-  const top1Story = sortedPosts[0];
+  const top1Story = sortedPosts[0] || allPosts[0];
   const locTop1 = top1Story ? getLocalizedPost(top1Story, language) : null;
   const rankingList = sortedPosts.slice(0, 10);
 

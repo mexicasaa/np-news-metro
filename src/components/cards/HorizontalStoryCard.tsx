@@ -18,7 +18,11 @@ export const HorizontalStoryCard: React.FC<HorizontalStoryCardProps> = ({
 }) => {
   const { language, t, isHindi } = useLanguage();
   const localized = getLocalizedPost(post, language);
-  const author = mockAuthors[post.authorId];
+  const author = post.customAuthor?.name ? {
+    name: post.customAuthor.name,
+    role: post.customAuthor.role || 'Guest Contributor',
+    avatar: post.customAuthor.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400'
+  } : mockAuthors[post.authorId];
 
   return (
     <article 

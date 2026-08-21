@@ -1,0 +1,233 @@
+import { 
+  UserProfile, 
+  ArticleRevision, 
+  PublishingOperation, 
+  HomepageSlotConfig, 
+  SectionModuleConfig, 
+  AuditLogEntry 
+} from '../types/admin';
+
+export const mockAdminUsers: UserProfile[] = [
+  {
+    id: 'user-admin',
+    name: 'Siddharth Varma',
+    email: 'siddharth.admin@npnewsmetro.in',
+    role: 'admin',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
+    department: 'Executive Editorial',
+  },
+  {
+    id: 'user-editor',
+    name: 'Priya Sharma',
+    email: 'priya.editor@npnewsmetro.in',
+    role: 'editor',
+    avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=400',
+    department: 'National & Metro Desk',
+  },
+  {
+    id: 'user-copy',
+    name: 'David Chen',
+    email: 'david.copy@npnewsmetro.in',
+    role: 'copy_editor',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400',
+    department: 'Copy & Fact-Checking',
+  },
+  {
+    id: 'user-reporter',
+    name: 'Sarah Jenkins',
+    email: 'sarah.reporter@npnewsmetro.in',
+    role: 'reporter',
+    avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=400',
+    department: 'Investigative Bureau',
+  },
+  {
+    id: 'user-seo',
+    name: 'Rahul Mehta',
+    email: 'rahul.seo@npnewsmetro.in',
+    role: 'seo_manager',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=400',
+    department: 'Audience & Discovery',
+  },
+  {
+    id: 'user-ads',
+    name: 'Vikram Rao',
+    email: 'vikram.ads@npnewsmetro.in',
+    role: 'ad_manager',
+    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=400',
+    department: 'Revenue & Commercial Partnerships',
+  },
+];
+
+export const mockRevisionsList: ArticleRevision[] = [
+  {
+    id: 'rev-4',
+    version: 4,
+    timestamp: '2026-08-21 19:15 IST',
+    editorName: 'Priya Sharma',
+    editorRole: 'Senior Editor',
+    headline: 'City Council Passes New Zoning Regulations for Downtown Metro Area',
+    summaryOfChanges: 'Validated legal references, approved for publication, attached SEO schema.',
+  },
+  {
+    id: 'rev-3',
+    version: 3,
+    timestamp: '2026-08-21 17:40 IST',
+    editorName: 'David Chen',
+    editorRole: 'Copy Editor',
+    headline: 'City Council Passes Comprehensive Zoning Reform for Metro Downtown',
+    summaryOfChanges: 'Corrected council voting tally to 7-2, verified councillor quotes.',
+  },
+  {
+    id: 'rev-2',
+    version: 2,
+    timestamp: '2026-08-21 15:20 IST',
+    editorName: 'Sarah Jenkins',
+    editorRole: 'Reporter',
+    headline: 'City Council Debates New Zoning Laws for Downtown Business District',
+    summaryOfChanges: 'Added hero photo and interview quotes from urban development director.',
+  },
+  {
+    id: 'rev-1',
+    version: 1,
+    timestamp: '2026-08-21 14:02 IST',
+    editorName: 'Sarah Jenkins',
+    editorRole: 'Reporter',
+    headline: 'Draft: Zoning Regulations Downtown',
+    summaryOfChanges: 'Initial story copy draft created from press release and hearing transcript.',
+  },
+];
+
+export const mockAuditLogs: AuditLogEntry[] = [
+  {
+    id: 'log-1',
+    timestamp: '2 mins ago',
+    user: 'Rahul Mehta',
+    action: 'published article',
+    target: 'City Council Approves New Zoning Laws',
+    details: 'Operation ID: PUB-20260821-001248 • CDN Invalidation triggered for /politics and /home',
+    badgeType: 'success',
+  },
+  {
+    id: 'log-2',
+    timestamp: '15 mins ago',
+    user: 'Priya Sharma',
+    action: 'scheduled article',
+    target: 'Weekend Tech Review: Latest AI Gadgets',
+    details: 'Scheduled for tomorrow at 08:00 AM IST. Slot: Tech Section Featured',
+    badgeType: 'info',
+  },
+  {
+    id: 'log-3',
+    timestamp: '42 mins ago',
+    user: 'System Security',
+    action: 'WAF security alert',
+    target: 'Multiple failed login attempts detected for user ID: 1042',
+    details: 'IP 182.74.19.42 rate-limited for 60 minutes.',
+    badgeType: 'danger',
+  },
+  {
+    id: 'log-4',
+    timestamp: '1 hour ago',
+    user: 'System Bot',
+    action: 'updated caching rules',
+    target: 'Frontpage Dynamic API cache TTL reset to 180s',
+    details: 'Edge CDN distribution cache purged for index and news-sitemap.xml',
+    badgeType: 'primary',
+  },
+  {
+    id: 'log-5',
+    timestamp: '2 hours ago',
+    user: 'David Chen',
+    action: 'approved copy',
+    target: 'Tech Sector Sees Unexpected Growth in Q3 Earnings Reports',
+    details: 'Submitted to editor queue with verified corporate financial filings.',
+    badgeType: 'warning',
+  },
+];
+
+export const mockFailedOperations: PublishingOperation[] = [
+  {
+    operationId: 'PUB-20260821-000842',
+    articleId: '8970-FAIL',
+    articleTitle: 'Global Supply Chain Disruptions Impact Domestic Automobile Manufacturing',
+    initiatedBy: 'Sarah Jenkins',
+    userRole: 'reporter',
+    startedAt: '2026-08-21 16:45:10 IST',
+    completedAt: '2026-08-21 16:45:22 IST',
+    status: 'published_warnings',
+    steps: [
+      { stepNumber: 1, name: 'Validate permissions', status: 'success', isCritical: true, durationMs: 45 },
+      { stepNumber: 2, name: 'Validate required fields', status: 'success', isCritical: true, durationMs: 80 },
+      { stepNumber: 3, name: 'Save article content to WordPress', status: 'success', isCritical: true, durationMs: 220 },
+      { stepNumber: 4, name: 'Save taxonomy & tags', status: 'success', isCritical: true, durationMs: 95 },
+      { stepNumber: 5, name: 'Save media relationships', status: 'success', isCritical: true, durationMs: 140 },
+      { stepNumber: 6, name: 'Save SEO metadata & schema', status: 'success', isCritical: true, durationMs: 85 },
+      { stepNumber: 7, name: 'Save article settings & ad profile', status: 'success', isCritical: true, durationMs: 60 },
+      { stepNumber: 8, name: 'Publish WordPress post', status: 'success', isCritical: true, durationMs: 310 },
+      { stepNumber: 9, name: 'Update homepage & category feeds', status: 'success', isCritical: true, durationMs: 190 },
+      { stepNumber: 10, name: 'Invalidate targeted CDN cache', status: 'success', isCritical: true, durationMs: 150 },
+      { stepNumber: 11, name: 'Update News Sitemap & RSS', status: 'success', isCritical: true, durationMs: 210 },
+      { stepNumber: 12, name: 'Record deduplicated analytics event', status: 'success', isCritical: true, durationMs: 110 },
+      { stepNumber: 13, name: 'Trigger social distribution (X/LinkedIn)', status: 'failed', isCritical: false, message: 'X API OAuth rate limit exceeded (HTTP 429)', durationMs: 1200, retryable: true },
+      { stepNumber: 14, name: 'Automated frontend live verification', status: 'success', isCritical: true, durationMs: 340 },
+      { stepNumber: 15, name: 'Compile publishing health status', status: 'success', isCritical: true, durationMs: 50 },
+    ],
+    errorLog: [
+      '[16:45:18] WARNING: Social API Gateway returned 429 Too Many Requests.',
+      '[16:45:19] Website published successfully on core WordPress. Downstream social task queued for retry.',
+    ],
+    verificationReport: {
+      url: 'https://npnewsmetro.in/business/global-supply-chain-disruptions-auto',
+      httpStatus: 200,
+      headlineMatch: true,
+      heroImageLoaded: true,
+      canonicalValid: true,
+      schemaValid: true,
+      authorVerified: true,
+      categoryVerified: true,
+      mobileRenderPassed: true,
+      distribution: {
+        homepage: true,
+        category: true,
+        latest: true,
+        search: true,
+        sitemap: true,
+        rss: true,
+        analytics: true,
+        cache: true,
+        social: 'failed',
+      },
+    },
+  },
+];
+
+export const initialHeroSlots: HomepageSlotConfig[] = [
+  { slotNumber: 1, type: 'pinned', articleId: 'post-1', label: 'Pinned Lead', customHeadline: 'Global Markets Rally as Tech Sector Rebounds Strongly' },
+  { slotNumber: 2, type: 'auto', articleId: 'post-2', label: 'Slot 2', customHeadline: 'New Policy Shifts in Urban Development' },
+  { slotNumber: 3, type: 'auto', articleId: 'post-3', label: 'Slot 3', customHeadline: 'Healthcare Reforms: What Citizens Need to Know' },
+];
+
+export const initialSectionModules: SectionModuleConfig[] = [
+  {
+    id: 'mod-india',
+    sectionSlug: 'india',
+    title: 'India (National News)',
+    slots: [
+      { slotNumber: 1, type: 'pinned', articleId: 'post-1', label: 'Slot 1 • Pinned', customHeadline: 'Parliament Monsoon Session Begins With Heated Debate' },
+      { slotNumber: 2, type: 'auto', articleId: 'post-2', label: 'Slot 2 • Auto', customHeadline: 'New Highway Project to Connect Major Southern Cities' },
+      { slotNumber: 3, type: 'auto', label: 'Empty Slot' },
+      { slotNumber: 4, type: 'auto', label: 'Empty Slot' },
+    ],
+  },
+  {
+    id: 'mod-business',
+    sectionSlug: 'business',
+    title: 'Business & Markets',
+    slots: [
+      { slotNumber: 1, type: 'pinned', articleId: 'post-3', label: 'Slot 1 • Pinned', customHeadline: 'Central Bank Holds Interest Rates Steady Amid Growth' },
+      { slotNumber: 2, type: 'auto', articleId: 'post-4', label: 'Slot 2 • Auto', customHeadline: 'Startup Funding Climbs 18% in Q2 Fiscal Cycle' },
+      { slotNumber: 3, type: 'auto', label: 'Empty Slot' },
+      { slotNumber: 4, type: 'auto', label: 'Empty Slot' },
+    ],
+  },
+];

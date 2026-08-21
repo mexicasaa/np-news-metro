@@ -67,6 +67,13 @@ export interface WpPost {
   categoryHi?: string;
   tags: string[];
   authorId: string;
+  customAuthor?: {
+    name: string;
+    role?: string;
+    avatar?: string;
+    organization?: string;
+    isGuest?: boolean;
+  };
   publishedAt: string;
   updatedAt?: string;
   readTime: string;

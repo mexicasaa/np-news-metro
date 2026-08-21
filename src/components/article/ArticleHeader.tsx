@@ -19,7 +19,17 @@ export const ArticleHeader: React.FC<ArticleHeaderProps> = ({
 }) => {
   const { language, t, isHindi } = useLanguage();
   const localized = getLocalizedPost(post, language);
-  const author = mockAuthors[post.authorId];
+  const author = post.customAuthor?.name ? {
+    id: 'guest-author',
+    name: post.customAuthor.name,
+    slug: 'guest',
+    role: post.customAuthor.role || (isHindi ? 'अतिथि लेखक / विशेष संवाददाता' : 'Guest Contributor / Wire Reporter'),
+    avatar: post.customAuthor.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
+    bio: `${post.customAuthor.name} is a guest contributor for NP News Metro.`,
+    verified: false,
+    beats: ['Guest Editorial'],
+    social: {}
+  } : mockAuthors[post.authorId];
 
   const formatDateTime = (dateStr: string) => {
     try {
@@ -70,7 +80,7 @@ export const ArticleHeader: React.FC<ArticleHeaderProps> = ({
       </div>
 
       {/* Primary Headline (Playfair Display) */}
-      <h1 className="font-serif text-3xl sm:text-4xl lg:text-[44px] font-bold text-ink leading-[1.18] tracking-tight mb-4">
+      <h1 className={`font-serif text-3xl sm:text-4xl lg:text-[44px] font-bold text-ink tracking-tight mb-4 ${isHindi ? 'leading-[1.4]' : 'leading-[1.18]'}`}>
         {localized.title}
       </h1>
 

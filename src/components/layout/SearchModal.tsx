@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, X, Calendar, User, Tag, ArrowRight, Sparkles } from 'lucide-react';
 import { WpPost } from '../../types/wordpress';
-import { mockPosts, mockAuthors, mockCategories, getLocalizedPost } from '../../data/mockWpData';
+import { mockAuthors, mockCategories, getLocalizedPost } from '../../data/mockWpData';
+import { getStoredPosts } from '../../utils/newsStorage';
 import { useLanguage } from '../../context/LanguageContext';
 
 interface SearchModalProps {
+  posts?: WpPost[];
   isOpen: boolean;
   onClose: () => void;
   onSelectPost: (post: WpPost) => void;
@@ -12,6 +14,7 @@ interface SearchModalProps {
 }
 
 export const SearchModal: React.FC<SearchModalProps> = ({
+  posts: externalPosts,
   isOpen,
   onClose,
   onSelectPost,
@@ -33,7 +36,9 @@ export const SearchModal: React.FC<SearchModalProps> = ({
 
   if (!isOpen) return null;
 
-  const filteredPosts = mockPosts.filter((post) => {
+  const allPosts = externalPosts && externalPosts.length > 0 ? externalPosts : getStoredPosts();
+
+  const filteredPosts = allPosts.filter((post) => {
     const localized = getLocalizedPost(post, language);
     const matchesQuery =
       query.trim() === '' ||
@@ -169,7 +174,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                 {isHindi ? 'हालिया प्रमुख समाचार' : 'Recent Lead Stories'}
               </p>
               <div className="space-y-2">
-                {mockPosts.slice(0, 3).map((post) => {
+                {allPosts.slice(0, 3).map((post: WpPost) => {
                   const locPost = getLocalizedPost(post, language);
                   return (
                     <div

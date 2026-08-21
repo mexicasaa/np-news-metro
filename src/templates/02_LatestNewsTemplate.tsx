@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Clock, Filter, Radio, Calendar, Flame, ArrowUpDown, ChevronRight } from 'lucide-react';
 import { WpPost } from '../types/wordpress';
-import { mockPosts, mockCategories } from '../data/mockWpData';
+import { mockCategories } from '../data/mockWpData';
+import { getStoredPosts } from '../utils/newsStorage';
 import { LatestNewsRow } from '../components/cards/LatestNewsRow';
 import { LargeStoryCard } from '../components/cards/LargeStoryCard';
 import { RankingItem } from '../components/cards/RankingItem';
@@ -11,6 +12,7 @@ import { Pagination } from '../components/common/Pagination';
 import { useLanguage } from '../context/LanguageContext';
 
 interface LatestNewsTemplateProps {
+  posts?: WpPost[];
   onSelectPost: (post: WpPost) => void;
   onNavigateHome: () => void;
   onNavigateTrending: () => void;
@@ -18,6 +20,7 @@ interface LatestNewsTemplateProps {
 }
 
 export const LatestNewsTemplate: React.FC<LatestNewsTemplateProps> = ({
+  posts: externalPosts,
   onSelectPost,
   onNavigateHome,
   onNavigateTrending,
@@ -27,13 +30,14 @@ export const LatestNewsTemplate: React.FC<LatestNewsTemplateProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const { t, isHindi } = useLanguage();
 
-  const filteredPosts = mockPosts.filter(
+  const allPosts = externalPosts && externalPosts.length > 0 ? externalPosts : getStoredPosts();
+  const filteredPosts = allPosts.filter(
     (p) => selectedCategory === 'all' || p.category === selectedCategory
   );
 
-  const featuredLatest = filteredPosts[0] || mockPosts[0];
+  const featuredLatest = filteredPosts[0] || allPosts[0];
   const streamPosts = filteredPosts.slice(1);
-  const trendingRanking = [...mockPosts].sort((a, b) => b.viewsCount - a.viewsCount).slice(0, 5);
+  const trendingRanking = [...allPosts].sort((a, b) => (b.viewsCount || 0) - (a.viewsCount || 0)).slice(0, 5);
 
   return (
     <div className="bg-canvas min-h-screen">

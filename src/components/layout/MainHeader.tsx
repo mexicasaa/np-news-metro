@@ -7,6 +7,7 @@ interface MainHeaderProps {
   onOpenSearch: () => void;
   onOpenNewsletter: () => void;
   onNavigateHome: () => void;
+  onOpenAdmin?: () => void;
   savedArticlesCount?: number;
 }
 
@@ -15,6 +16,7 @@ export const MainHeader: React.FC<MainHeaderProps> = ({
   onOpenSearch,
   onOpenNewsletter,
   onNavigateHome,
+  onOpenAdmin,
   savedArticlesCount = 0,
 }) => {
   const { t } = useLanguage();
@@ -89,6 +91,17 @@ export const MainHeader: React.FC<MainHeaderProps> = ({
             <Sparkles className="w-3.5 h-3.5 text-secondary-gold hidden xs:inline" />
             <span>{t.subscribe}</span>
           </button>
+
+          {onOpenAdmin && (
+            <button
+              onClick={onOpenAdmin}
+              className="bg-red-50 hover:bg-red-100 text-editorial-red border-2 border-editorial-red/40 px-2 sm:px-3 py-1.5 rounded-sm text-[11px] sm:text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-2xs hover:shadow-xs cursor-pointer"
+              title="Open Daily Publishing Center (P0 Admin)"
+            >
+              <span className="w-2 h-2 rounded-full bg-editorial-red animate-ping hidden xs:inline-block"></span>
+              <span>Admin Portal</span>
+            </button>
+          )}
         </div>
       </div>
     </header>

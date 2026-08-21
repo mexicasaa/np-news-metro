@@ -35,7 +35,15 @@ export const HeroStory: React.FC<HeroStoryProps> = ({
 
   const rawStory = storyList[activeSlideIndex] || post;
   const currentStory = getLocalizedPost(rawStory, language);
-  const author = mockAuthors[currentStory.authorId];
+  const author = rawStory.customAuthor?.name ? {
+    id: 'custom-author',
+    name: rawStory.customAuthor.name,
+    role: rawStory.customAuthor.role || 'Guest Contributor',
+    avatar: rawStory.customAuthor.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
+    bio: '',
+    twitter: '',
+    email: ''
+  } : mockAuthors[currentStory.authorId] || mockAuthors['author-1'];
 
   // Auto-slide carousel when not hovered
   useEffect(() => {
@@ -268,7 +276,7 @@ export const HeroStory: React.FC<HeroStoryProps> = ({
         <div>
           <h1
             onClick={() => onSelect(rawStory)}
-            className="font-serif text-2xl sm:text-3xl lg:text-[34px] xl:text-[36px] font-extrabold text-ink leading-[1.2] cursor-pointer hover:text-editorial-red transition-colors tracking-tight mb-3"
+            className={`font-serif text-2xl sm:text-3xl lg:text-[34px] xl:text-[36px] font-extrabold text-ink cursor-pointer hover:text-editorial-red transition-colors tracking-tight mb-3 ${isHindi ? 'leading-[1.4]' : 'leading-[1.2]'}`}
           >
             {currentStory.title}
           </h1>

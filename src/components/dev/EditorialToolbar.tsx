@@ -19,6 +19,7 @@ interface EditorialToolbarProps {
   onToggleCorrections: () => void;
   isLoadingSkeleton: boolean;
   onToggleSkeleton: () => void;
+  onOpenAdmin?: () => void;
 }
 
 export const EditorialToolbar: React.FC<EditorialToolbarProps> = ({
@@ -34,6 +35,7 @@ export const EditorialToolbar: React.FC<EditorialToolbarProps> = ({
   onToggleCorrections,
   isLoadingSkeleton,
   onToggleSkeleton,
+  onOpenAdmin,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
@@ -80,9 +82,15 @@ export const EditorialToolbar: React.FC<EditorialToolbarProps> = ({
             <span className="font-serif font-bold text-xs sm:text-sm tracking-wide text-white">
               NP NEWS METRO
             </span>
-            <span className="hidden sm:inline-block bg-secondary-gold/20 text-secondary-gold px-1.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase">
-              WP Editorial Suite
-            </span>
+            {onOpenAdmin && (
+              <button
+                onClick={onOpenAdmin}
+                className="bg-editorial-red hover:bg-red-800 text-white px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase transition-colors cursor-pointer flex items-center gap-1"
+                title="Launch Daily Publishing Center (P0 Admin Dashboard)"
+              >
+                <span>⚡ Daily Publishing Center</span>
+              </button>
+            )}
           </div>
 
           {/* Center: Template Dropdown */}
