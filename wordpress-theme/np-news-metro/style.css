@@ -1,0 +1,52 @@
+/*
+Theme Name: NP News Metro
+Theme URI: https://npnewsmetro.in
+Author: NP News Media Team
+Author URI: https://npnewsmetro.in
+Description: A high-performance, editorial-first WordPress news theme designed for Indian newsrooms with multi-format publishing (breaking news, opinions, video hubs, photo galleries, live timelines, commercial ad zones, and bilingual support).
+Version: 1.0.1
+Tested up to: 6.7
+Requires at least: 6.0
+Requires PHP: 7.4
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: np-news-metro
+Tags: news, newspaper, blog, grid-layout, custom-header, custom-menu, featured-images, translation-ready, full-width-template
+*/
+
+/* ==========================================================================
+   Base Fallback & Core Styles (Main Styles loaded via assets/css/theme.css)
+   ========================================================================== */
+
+:root {
+  --color-canvas: #FDFCFB;
+  --color-ink: #1A1A1A;
+  --color-ink-secondary: #4B5563;
+  --color-primary: #162839;
+  --color-primary-container: #2C3E50;
+  --color-secondary-gold: #C5A059;
+  --color-secondary-dark: #775A19;
+  --color-editorial-red: #BA1A1A;
+  --color-border-subtle: #E5E7EB;
+  --color-surface-card: #FFFFFF;
+}
+
+body {
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Accessibility Focus States */
+a:focus-visible, 
+button:focus-visible, 
+input:focus-visible, 
+select:focus-visible, 
+textarea:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}

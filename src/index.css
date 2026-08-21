@@ -1,0 +1,149 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-canvas: #FDFCFB;
+  --color-ink: #1A1A1A;
+  --color-ink-secondary: #4B5563;
+  --color-primary: #162839;
+  --color-primary-container: #2C3E50;
+  --color-secondary-gold: #C5A059;
+  --color-secondary-dark: #775A19;
+  --color-editorial-red: #BA1A1A;
+  --color-border-subtle: #E5E7EB;
+  --color-surface-card: #FFFFFF;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', Georgia, serif;
+    color: #1A1A1A;
+    font-weight: 700;
+  }
+
+  /* Custom subtle focus styles for WCAG accessibility */
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 2px solid #162839;
+    outline-offset: 2px;
+  }
+}
+
+/* Editorial Newspaper Lines & Decorative Elements */
+.newspaper-rule {
+  border-top: 1px solid #E5E7EB;
+}
+
+.newspaper-rule-double {
+  border-top: 3px double #162839;
+}
+
+.newspaper-rule-accent {
+  border-top: 2px solid #BA1A1A;
+}
+
+.newspaper-rule-gold {
+  border-top: 2px solid #C5A059;
+}
+
+.newspaper-col-divider {
+  border-right: 1px solid #E5E7EB;
+}
+
+/* Drop cap for editorial articles */
+.editorial-dropcap:first-letter {
+  font-family: 'Playfair Display', Georgia, serif;
+  float: left;
+  font-size: 4.25rem;
+  line-height: 0.85;
+  padding-top: 4px;
+  padding-right: 10px;
+  padding-bottom: 2px;
+  color: #162839;
+  font-weight: 700;
+}
+
+/* Gutenberg block styles for single article */
+.gutenberg-content p {
+  margin-bottom: 1.5rem;
+  font-size: 1.125rem;
+  line-height: 1.8;
+  color: #2D3748;
+}
+
+.gutenberg-content h2 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.875rem;
+  line-height: 1.3;
+  font-weight: 700;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  color: #1A1A1A;
+}
+
+.gutenberg-content h3 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.4rem;
+  line-height: 1.4;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  color: #1A1A1A;
+}
+
+.gutenberg-content ul, .gutenberg-content ol {
+  margin-bottom: 1.5rem;
+  padding-left: 1.5rem;
+  color: #2D3748;
+}
+
+.gutenberg-content li {
+  margin-bottom: 0.5rem;
+  line-height: 1.7;
+}
+
+.gutenberg-content blockquote {
+  border-left: 3px solid #162839;
+  padding-left: 1.25rem;
+  margin: 2rem 0;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.35rem;
+  font-style: italic;
+  line-height: 1.6;
+  color: #162839;
+}
+
+/* Smooth animations only for micro-interactions */
+.transition-editorial {
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Ad Reserved Dimensions (prevent CLS) */
+.ad-slot-leaderboard {
+  min-height: 90px;
+}
+
+.ad-slot-sidebar {
+  min-height: 250px;
+}
+
+.ad-slot-incontent {
+  min-height: 120px;
+}
+
+/* Custom Scrollbar for Horizontal Chips & Tickers */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
