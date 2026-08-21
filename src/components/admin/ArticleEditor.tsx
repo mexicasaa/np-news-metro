@@ -273,52 +273,52 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
   };
 
   const parseBlocks = (textContent: string): GutenbergBlock[] => {
-    return textContent.split('\n\n').filter(p => p.trim()).map((chunk, i) => {
-      const imgMatch = chunk.match(/^!\[(.*?)\]\((.*?)\)$/);
+    return textContent.split(/\n\n+/).map(p => p.trim()).filter(Boolean).map((chunk, i) => {
+      const imgMatch = chunk.match(/^!\[([\s\S]*?)\]\(([\s\S]*?)\)$/);
       if (imgMatch) {
         return {
-          id: `img-${i}`,
+          id: `img-${i}-${Date.now()}`,
           type: 'image',
-          imageUrl: imgMatch[2],
-          imageCaption: imgMatch[1],
-          imageCredit: 'NP News Metro Photo Archive',
+          imageUrl: imgMatch[2].trim(),
+          imageCaption: imgMatch[1].trim(),
+          imageCredit: imageCredit || 'NP News Metro Photo Desk',
           content: '',
         } as GutenbergBlock;
       }
       
-      const h2Match = chunk.match(/^##\s+(.*)$/);
+      const h2Match = chunk.match(/^##\s+([\s\S]*)$/);
       if (h2Match) {
         return {
           id: `h2-${i}`,
           type: 'heading',
           level: 2,
-          content: h2Match[1],
+          content: h2Match[1].trim(),
         } as GutenbergBlock;
       }
 
-      const h3Match = chunk.match(/^###\s+(.*)$/);
+      const h3Match = chunk.match(/^###\s+([\s\S]*)$/);
       if (h3Match) {
         return {
           id: `h3-${i}`,
           type: 'heading',
           level: 3,
-          content: h3Match[1],
+          content: h3Match[1].trim(),
         } as GutenbergBlock;
       }
 
-      const quoteMatch = chunk.match(/^>\s+"?(.*?)"?$/);
+      const quoteMatch = chunk.match(/^>\s+"?([\s\S]*?)"?$/);
       if (quoteMatch) {
         return {
           id: `quote-${i}`,
           type: 'pullquote',
-          content: quoteMatch[1],
+          content: quoteMatch[1].trim(),
         } as GutenbergBlock;
       }
       
       return {
         id: `p-${i}`,
         type: 'paragraph',
-        content: chunk.trim(),
+        content: chunk,
       } as GutenbergBlock;
     });
   };
@@ -363,36 +363,43 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     return new Date().toISOString();
   };
 
-  const getPostData = (): Partial<WpPost> => ({
-    id: initialPost?.id || `post-${Date.now()}`,
-    title: title || 'Auto Draft',
-    titleHi: title || 'Auto Draft',
-    slug: slug || 'auto-draft',
-    category,
-    authorId: authorId,
-    customAuthor: authorType === 'external' && customAuthorName.trim() ? {
-      name: customAuthorName.trim(),
-      role: customAuthorRole.trim() || 'Guest Contributor',
-      avatar: customAuthorAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
-      isGuest: true
-    } : undefined,
-    tags,
-    featuredImage: featuredImage || 'https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&q=80&w=1200',
-    imageCredit: imageCredit,
-    imageCaption: imageCaption,
-    imageAlt: imageAlt || title,
-    isBreaking: isBreaking,
-    seoTitle: seoTitle || title,
-    seoDescription: metaDescription || dek || title,
-    blocks: parsedBlocks,
-    publishedAt: getCalculatedPublishDate(),
-    updatedAt: new Date().toISOString(),
-    viewsCount: 0,
-    commentCount: 0,
-    dek: dek || '',
-    readTime: `${readTimeMin} min read`,
-    sharesCount: 0
-  });
+  const getPostData = (): Partial<WpPost> => {
+    const blocks = parseBlocks(content);
+    return {
+      id: initialPost?.id || `post-${Date.now()}`,
+      title: title || 'Auto Draft',
+      titleHi: title || 'Auto Draft',
+      slug: slug || 'auto-draft',
+      category,
+      authorId: authorId,
+      customAuthor: authorType === 'external' && customAuthorName.trim() ? {
+        name: customAuthorName.trim(),
+        role: customAuthorRole.trim() || 'Guest Contributor',
+        avatar: customAuthorAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
+        isGuest: true
+      } : undefined,
+      tags,
+      featuredImage: featuredImage || 'https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&q=80&w=1200',
+      imageCredit: imageCredit || 'NP News Metro Photo Desk',
+      imageCaption: imageCaption || '',
+      imageAlt: imageAlt || title,
+      isBreaking: isBreaking,
+      seoTitle: seoTitle || title,
+      seoDescription: metaDescription || dek || title,
+      blocks: blocks.length > 0 ? blocks : [
+        { id: 'b1', type: 'paragraph', content: dek || title }
+      ],
+      publishedAt: getCalculatedPublishDate(),
+      updatedAt: new Date().toISOString(),
+      viewsCount: initialPost?.viewsCount || 0,
+      commentCount: initialPost?.commentCount || 0,
+      dek: dek || '',
+      readTime: `${readTimeMin} min read`,
+      sharesCount: initialPost?.sharesCount || 0,
+      isLead: initialPost?.isLead !== undefined ? initialPost.isLead : true,
+      isFeatured: true,
+    };
+  };
 
   useEffect(() => {
     setIsSaving(true);
@@ -516,7 +523,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
               className="px-5 py-2 bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white rounded-lg text-xs sm:text-sm font-bold shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
             >
               <Sparkles className="w-4 h-4" />
-              <span>Publish Story</span>
+              <span>{initialPost ? 'Update Story (संपादित करें)' : 'Publish Story'}</span>
             </button>
           </div>
 
@@ -954,7 +961,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                       className="w-full py-3 bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white rounded-xl font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <Sparkles className="w-4 h-4" />
-                      <span>Publish Story</span>
+                      <span>{initialPost ? 'Update Story (संपादित करें)' : 'Publish Story'}</span>
                     </button>
                   </div>
 

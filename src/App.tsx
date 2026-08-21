@@ -574,6 +574,9 @@ function AppContent() {
         // Persist to temporary localStorage database & broadcast
         const updatedPosts = savePublishedPost(fullPost);
         setPosts(updatedPosts);
+        if (selectedPost && selectedPost.id === fullPost.id) {
+          setSelectedPost(fullPost);
+        }
 
         if (fullPost.isBreaking) {
           setIsEmergencyBreaking(true);
@@ -1154,7 +1157,8 @@ function AppContent() {
           operation={currentOperation}
           onViewLiveStory={(id) => {
             setPublishOrchestratorOpen(false);
-            const found = posts.find(p => p.id === id) || posts[0];
+            const freshPosts = getStoredPosts();
+            const found = freshPosts.find(p => p.id === id) || posts.find(p => p.id === id) || freshPosts[0];
             handleSelectPost(found);
           }}
           onViewHomepage={() => {
