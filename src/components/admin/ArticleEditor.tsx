@@ -10,6 +10,7 @@ import {
 import { WpPost, EditorialCategorySlug, GutenbergBlock } from '../../types/wordpress';
 import { UserRole, EditorialStatus } from '../../types/admin';
 import { StandardArticleTemplate } from '../../templates/04_StandardArticleTemplate';
+import { compressImageFile, compressAvatarFile } from '../../utils/imageCompressor';
 
 export interface EditorBlock {
   id: string;
@@ -205,27 +206,25 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     }
   }, [initialPost?.id]);
 
-  const handleFeaturedImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFeaturedImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        if (ev.target?.result) {
-          setFeaturedImage(ev.target.result as string);
-        }
-      };
-      reader.readAsDataURL(e.target.files[0]);
+      try {
+        const compressed = await compressImageFile(e.target.files[0], { maxWidth: 1400, quality: 0.84 });
+        setFeaturedImage(compressed);
+      } catch (err) {
+        console.error('Error compressing featured image:', err);
+      }
     }
   };
 
-  const handleAuthorAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAuthorAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        if (ev.target?.result) {
-          setCustomAuthorAvatar(ev.target.result as string);
-        }
-      };
-      reader.readAsDataURL(e.target.files[0]);
+      try {
+        const compressed = await compressAvatarFile(e.target.files[0]);
+        setCustomAuthorAvatar(compressed);
+      } catch (err) {
+        console.error('Error compressing author avatar:', err);
+      }
     }
   };
 
@@ -236,22 +235,20 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     inlineImageInputRef.current?.click();
   };
 
-  const handleInlineImageSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInlineImageSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       const cleanCaption = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        if (ev.target?.result) {
-          const objectUrl = ev.target.result as string;
-          const imageTag = `\n\n![${cleanCaption}](${objectUrl})\n\n`;
-          const pos = cursorPos !== null ? cursorPos : (textareaRef.current?.selectionStart ?? content.length);
-          const newContent = content.substring(0, pos) + imageTag + content.substring(pos);
-          setContent(newContent);
-          setCursorPos(null);
-        }
-      };
-      reader.readAsDataURL(file);
+      try {
+        const compressed = await compressImageFile(file, { maxWidth: 1200, quality: 0.82 });
+        const imageTag = `\n\n![${cleanCaption}](${compressed})\n\n`;
+        const pos = cursorPos !== null ? cursorPos : (textareaRef.current?.selectionStart ?? content.length);
+        const newContent = content.substring(0, pos) + imageTag + content.substring(pos);
+        setContent(newContent);
+        setCursorPos(null);
+      } catch (err) {
+        console.error('Error compressing inline image:', err);
+      }
       e.target.value = '';
     }
   };

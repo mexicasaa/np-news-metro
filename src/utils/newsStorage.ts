@@ -38,17 +38,20 @@ export const savePublishedPost = (post: WpPost): WpPost[] => {
 
     let updated: WpPost[];
     if (existingIndex >= 0) {
-      // Editing existing post: update in place with new fields
+      // Editing existing post: update in place with new fields and elevate to lead
       const existing = currentPosts[existingIndex];
       const mergedPost: WpPost = {
         ...existing,
         ...post,
         titleHi: post.titleHi || post.title || existing.titleHi,
+        isFeatured: true,
+        isLead: true,
+        featuredImage: post.featuredImage || existing.featuredImage,
         updatedAt: new Date().toISOString(),
       };
       updated = [
         mergedPost,
-        ...currentPosts.filter((_, idx) => idx !== existingIndex)
+        ...currentPosts.filter((_, idx) => idx !== existingIndex).map(p => ({ ...p, isLead: false }))
       ];
     } else {
       // Creating new post: prepend as primary lead
@@ -65,7 +68,17 @@ export const savePublishedPost = (post: WpPost): WpPost[] => {
       ];
     }
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    } catch (storageErr) {
+      console.warn('LocalStorage quota issue, attempting trimmed store:', storageErr);
+      try {
+        const trimmed = updated.slice(0, 30);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed));
+      } catch (e) {
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      }
+    }
 
     // Broadcast change across all browser tabs
     try {
