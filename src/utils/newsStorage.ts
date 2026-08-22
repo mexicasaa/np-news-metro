@@ -28,15 +28,23 @@ export const getStoredPosts = (): WpPost[] => {
 
       for (const defPost of defaultMockPosts) {
         if (!parsedIds.has(defPost.id)) {
-          // If the default post is our permanent sugarcane article, place it prominently
-          if (defPost.id === 'post-sugarcane-ethanol-future') {
+          // Place our headline articles prominently
+          if (defPost.id === 'post-nayab-saini-attacks-bhagwant-mann') {
             reconciled.unshift(defPost);
+          } else if (defPost.id === 'post-iskcon-noida-janmashtami-2026') {
+            reconciled.splice(1, 0, defPost);
+          } else if (defPost.id === 'post-sugarcane-ethanol-future') {
+            reconciled.splice(2, 0, defPost);
           } else {
             reconciled.push(defPost);
           }
           needsResave = true;
-        } else if (defPost.id === 'post-sugarcane-ethanol-future') {
-          // Keep the sugarcane article fresh with latest title, image, author, blocks & features
+        } else if (
+          defPost.id === 'post-nayab-saini-attacks-bhagwant-mann' ||
+          defPost.id === 'post-iskcon-noida-janmashtami-2026' ||
+          defPost.id === 'post-sugarcane-ethanol-future'
+        ) {
+          // Keep the articles fresh with latest title, image, author, blocks & features
           const idx = reconciled.findIndex(p => p.id === defPost.id);
           if (idx !== -1) {
             reconciled[idx] = {
@@ -46,6 +54,7 @@ export const getStoredPosts = (): WpPost[] => {
               titleHi: defPost.titleHi,
               dek: defPost.dek,
               dekHi: defPost.dekHi,
+              location: defPost.location,
               featuredImage: defPost.featuredImage,
               authorId: defPost.authorId,
               customAuthor: defPost.customAuthor,
@@ -54,7 +63,9 @@ export const getStoredPosts = (): WpPost[] => {
               keyTakeaways: defPost.keyTakeaways,
               keyTakeawaysHi: defPost.keyTakeawaysHi,
               isFeatured: true,
+              isLead: defPost.isLead || reconciled[idx].isLead,
             };
+            needsResave = true;
           }
         }
       }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Clock, Calendar, ShieldCheck, Share2, Bookmark, Printer, MessageSquare, AlertCircle } from 'lucide-react';
+import { Clock, Calendar, ShieldCheck, Share2, Bookmark, Printer, MessageSquare, AlertCircle, MapPin } from 'lucide-react';
 import { WpPost } from '../../types/wordpress';
 import { mockAuthors, getLocalizedPost } from '../../data/mockWpData';
 import { useLanguage } from '../../context/LanguageContext';
@@ -57,6 +57,13 @@ export const ArticleHeader: React.FC<ArticleHeaderProps> = ({
         >
           {localized.category}
         </button>
+
+        {post.location && (
+          <span className="bg-slate-100 text-slate-800 text-xs font-semibold px-2 py-0.5 rounded-sm border border-slate-300 flex items-center gap-1">
+            <MapPin className="w-3 h-3 text-secondary flex-shrink-0" />
+            <span>{post.location}</span>
+          </span>
+        )}
 
         {post.isBreaking && (
           <span className="bg-editorial-red text-white text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-sm flex items-center gap-1.5">

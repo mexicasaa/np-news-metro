@@ -65,6 +65,7 @@ export interface WpPost {
   dekHi?: string;
   category: EditorialCategorySlug;
   categoryHi?: string;
+  location?: string;
   tags: string[];
   authorId: string;
   customAuthor?: {
