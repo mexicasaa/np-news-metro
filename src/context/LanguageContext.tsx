@@ -11,7 +11,7 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-const STORAGE_KEY = 'np_news_language_preference';
+const STORAGE_KEY = 'np_news_language_preference_v2';
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [language, setLanguageState] = useState<Language>(() => {
@@ -21,7 +21,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     } catch {
       // ignore
     }
-    return 'en';
+    return 'hi'; // Default permanent language is Hindi
   });
 
   const setLanguage = (lang: Language) => {
