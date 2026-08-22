@@ -21,7 +21,51 @@ export const getStoredPosts = (): WpPost[] => {
     }
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed) && parsed.length > 0) {
-      return parsed;
+      // Reconcile with default mock posts to ensure permanent stories are always present
+      const parsedIds = new Set(parsed.map((p: WpPost) => p.id));
+      let needsResave = false;
+      const reconciled = [...parsed];
+
+      for (const defPost of defaultMockPosts) {
+        if (!parsedIds.has(defPost.id)) {
+          // If the default post is our permanent sugarcane article, place it prominently
+          if (defPost.id === 'post-sugarcane-ethanol-future') {
+            reconciled.unshift(defPost);
+          } else {
+            reconciled.push(defPost);
+          }
+          needsResave = true;
+        } else if (defPost.id === 'post-sugarcane-ethanol-future') {
+          // Keep the sugarcane article fresh with latest title, image, author, blocks & features
+          const idx = reconciled.findIndex(p => p.id === defPost.id);
+          if (idx !== -1) {
+            reconciled[idx] = {
+              ...defPost,
+              ...reconciled[idx],
+              title: defPost.title,
+              titleHi: defPost.titleHi,
+              dek: defPost.dek,
+              dekHi: defPost.dekHi,
+              featuredImage: defPost.featuredImage,
+              authorId: defPost.authorId,
+              customAuthor: defPost.customAuthor,
+              blocks: defPost.blocks,
+              blocksHi: defPost.blocksHi,
+              keyTakeaways: defPost.keyTakeaways,
+              keyTakeawaysHi: defPost.keyTakeawaysHi,
+              isFeatured: true,
+            };
+          }
+        }
+      }
+
+      if (needsResave) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(reconciled));
+        } catch (e) {}
+      }
+
+      return reconciled;
     }
     return defaultMockPosts;
   } catch (err) {

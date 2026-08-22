@@ -75,6 +75,19 @@ export const mockAuthors: Record<string, WpAuthor> = {
       email: 'meera.iyer@npnewsmetro.in',
     },
   },
+  'author-deepak-goswami': {
+    id: 'author-deepak-goswami',
+    name: 'डॉ. दीपक गोस्वामी',
+    slug: 'dr-deepak-goswami',
+    role: 'मानवीय व्यवहार वैज्ञानिक | समन्वयक – आदर्श संस्कार शाला, भारत',
+    avatar: '/uploads/dr-deepak-goswami.jpg',
+    bio: 'डॉ. दीपक गोस्वामी मानवीय व्यवहार वैज्ञानिक तथा आदर्श संस्कार शाला (भारत) के राष्ट्रीय समन्वयक हैं। वे कृषि अर्थशास्त्र, ऊर्जा नीति, जन-संस्कृति और सामाजिक-आर्थिक संतुलन पर विचारोत्तेजक शोध व लेखन करते हैं।',
+    verified: true,
+    beats: ['मानवीय व्यवहार व समाज', 'कृषि अर्थशास्त्र', 'पर्यावरण एवं ऊर्जा नीति'],
+    social: {
+      email: 'dr.deepakgoswami@npnewsmetro.in',
+    },
+  },
 };
 
 export const mockCategories: WpCategory[] = [
@@ -93,6 +106,263 @@ export const mockCategories: WpCategory[] = [
 ];
 
 export const mockPosts: WpPost[] = [
+  // 0. Special In-Depth Featured Investigation: Sugarcane & Ethanol Crisis by Dr. Deepak Goswami
+  {
+    id: 'post-sugarcane-ethanol-future',
+    title: 'Tangled in a Single Drop of Sugarcane Juice: The Future of the Nation',
+    titleHi: 'गन्ने के रस की एक बूंद में उलझा देश का भविष्य',
+    slug: 'ganne-ke-ras-ki-ek-boond-me-uljha-desh-ka-bhavishya',
+    dek: 'From the cane field to the cup of tea, and from village pathways to national energy policy—a single drop of sugarcane juice is writing a defining chapter in India’s future, balancing food security and biofuel transition.',
+    dekHi: 'गन्ने के खेत से लेकर चाय की प्याली तक और गांव की पगडंडी से लेकर देश की ऊर्जा नीति तक—गन्ने के रस की एक बूंद आज भारत के भविष्य की बड़ी कहानी लिख रही है। यही रस कभी थाली में मिठास घोलता है और अब एथेनॉल बनकर पेट्रोल में मिल रहा है।',
+    category: 'economy',
+    categoryHi: 'अर्थव्यवस्था',
+    tags: ['गन्ना किसान', 'एथेनॉल', 'ऊर्जा नीति', 'चीनी उद्योग', 'डॉ. दीपक गोस्वामी', 'Sugarcane', 'Ethanol', 'Agriculture', 'Economy', 'Food Security'],
+    authorId: 'author-deepak-goswami',
+    customAuthor: {
+      name: 'डॉ. दीपक गोस्वामी',
+      role: 'मानवीय व्यवहार वैज्ञानिक | समन्वयक – आदर्श संस्कार शाला, भारत',
+      avatar: '/uploads/dr-deepak-goswami.jpg',
+    },
+    publishedAt: '2026-08-22T08:00:00+05:30',
+    updatedAt: '2026-08-22T12:00:00+05:30',
+    readTime: '6 min read',
+    featuredImage: '/uploads/sugarcane-ethanol-future-featured.jpg',
+    imageCaption: 'गन्ने के खेत, चीनी उत्पादन और देश की एथेनॉल ऊर्जा नीति के बीच संतुलन का महामंथन।',
+    imageCaptionHi: 'गन्ने के खेत, चीनी उत्पादन और देश की एथेनॉल ऊर्जा नीति के बीच संतुलन का महामंथन।',
+    imageCredit: 'डॉ. दीपक गोस्वामी / NP News Metro',
+    imageAlt: 'गन्ने के रस और एथेनॉल बायो-रिफाइनरी के बीच भारतीय कृषि अर्थव्यवस्था',
+    isLead: false,
+    isFeatured: true,
+    viewsCount: 98500,
+    sharesCount: 16200,
+    commentCount: 412,
+    keyTakeaways: [
+      'Food vs. Energy Challenge: Sugarcane juice sweetens domestic households while fueling the nation’s 20% ethanol blending mandate.',
+      'Policy and Market Equilibrium: Balancing fuel ethanol goals with domestic sugar availability requires reliable forecasting and regulatory stability.',
+      'Groundwater and Agrarian Realities: Water-intensive sugarcane farming calls for micro-drip irrigation and scaling multi-feedstock 2G ethanol from maize and crop residue.',
+      'Sustainable Farmer and Mill Economy: Assured timely payments to farmers and economic viability for sugar mills are essential for long-term rural prosperity.',
+    ],
+    keyTakeawaysHi: [
+      'भोजन बनाम ईंधन की चुनौती: गन्ने का रस जहां घरेलू थाली में मिठास घोलता है, वहीं एथेनॉल बनकर देश की ऊर्जा सुरक्षा और विदेशी मुद्रा की बचत में योगदान दे रहा है।',
+      'नीति और बाजार का संतुलन: एथेनॉल सम्मिश्रण बढ़ाने और घरेलू चीनी की कीमतों को स्थिर रखने के लिए सटीक पूर्वानुमान और नीतिगत स्थिरता अनिवार्य है।',
+      'भूजल और पर्यावरण का प्रश्न: पानी की भारी खपत वाले गन्ने की खेती में सूक्ष्म सिंचाई (ड्रिप) और मक्का व कृषि अवशेषों से एथेनॉल उत्पादन पर जोर देना होगा।',
+      'किसान और उद्योग की स्थिरता: किसान को समय पर पारदर्शी भुगतान और चीनी मिलों की वित्तीय मजबूती ही इस ग्रामीण चक्र को सशक्त बना सकती है।',
+    ],
+    blocks: [
+      {
+        id: 'b-cane-en-1',
+        type: 'paragraph',
+        content: 'From the sugarcane field to the cup of tea, and from the village pathway to the nation’s energy policy—a single drop of sugarcane juice is writing a momentous chapter in India’s future. The very juice that once dissolved sweetness into our plates as sugar is now blending into petrol as ethanol. The question is not merely about rising sugar prices. The real question is: Can India fulfill both its food and fuel demands from its fields in the coming years?',
+      },
+      {
+        id: 'b-cane-en-2',
+        type: 'paragraph',
+        content: 'When this drop of sugarcane juice reaches the sugar mill, it yields sugar, molasses, and other by-products. When diverted toward ethanol, it blends into petrol and powers national energy needs. Two monumental national imperatives—food and energy—stand before a single agricultural resource. That is the core knot of this narrative.',
+      },
+      {
+        id: 'b-cane-en-3',
+        type: 'pullquote',
+        content: 'The field is the same, the farmer is the same, the water is the same, and the drop of sugarcane juice is the same—yet national necessities pull in two different directions.',
+        author: 'Dr. Deepak Goswami',
+        citation: 'Human Behaviour Scientist | Coordinator – Aadarsh Sanskar Shala, India',
+      },
+      {
+        id: 'b-cane-en-4',
+        type: 'keypoints',
+      },
+      {
+        id: 'b-cane-en-5',
+        type: 'heading',
+        level: 2,
+        content: 'Energy Security vs Food Availability: The Sweet Trilemma',
+      },
+      {
+        id: 'b-cane-en-6',
+        type: 'paragraph',
+        content: 'India ranks among the world’s largest sugar producers and consumers. Millions of cups of tea, sweetshops, religious offerings, weddings, and household kitchens depend on sugar. On the other hand, India’s energy economy relies heavily on crude oil imports. Blending ethanol with petrol is a strategic effort to trim this import dependency, save foreign exchange, and curb fossil fuel consumption. Thus, ethanol blending is not just a fuel policy, but an energy security blueprint.',
+      },
+      {
+        id: 'b-cane-en-7',
+        type: 'paragraph',
+        content: 'Ethanol can be distilled from sugarcane juice, B-heavy molasses, C-heavy molasses, maize, and other agricultural feedstocks. When direct juice or B-heavy molasses is diverted to fuel, the volume available for sugar production shrinks. Here begins the true test of balance between policy and market dynamics.',
+      },
+      {
+        id: 'b-cane-en-8',
+        type: 'heading',
+        level: 2,
+        content: 'Monsoon Dependency, Farm Economics, and Inflation',
+      },
+      {
+        id: 'b-cane-en-9',
+        type: 'paragraph',
+        content: 'Sugarcane is heavily water-reliant. In key growing belts like Maharashtra and Karnataka, weak rainfall raises irrigation pressure, escalates production costs, and constrains cane availability. For the sugarcane farmer, every stalk represents months of sweat, rising costs of fertilizers, electricity, diesel, and labor. The farmer needs fair remunerative pricing and timely dues.',
+      },
+      {
+        id: 'b-cane-en-10',
+        type: 'ad_slot',
+        adZone: 'A4',
+      },
+      {
+        id: 'b-cane-en-11',
+        type: 'paragraph',
+        content: 'Meanwhile, sugar mills face cash flow strains if sugar retail realizations remain depressed. When sugar prices rise, inflation ripples through bakeries, confectioneries, beverages, and local pilgrimage economies where sweets and prasad sustain community livelihoods.',
+      },
+      {
+        id: 'b-cane-en-12',
+        type: 'heading',
+        level: 2,
+        content: 'Five Strategic Pathways Forward',
+      },
+      {
+        id: 'b-cane-en-13',
+        type: 'paragraph',
+        content: 'The sustainable solution lies in five actionable pillars:\n1. More Crop Per Drop: Institutionalizing micro-drip irrigation and advanced crop varieties as mandatory standards.\n2. Feedstock Diversification: Expanding ethanol distillation from maize, crop residues, and biomass to unburden sugarcane.\n3. Transparent Seasonal Allocation: Annual quota blueprints balancing domestic food security reserves before energy diversion.\n4. Timely Farmer Settlements: Ensuring assured, frictionless settlement timelines for cane growers.\n5. Calibrated Consumer Habits: Promoting balanced dietary sugar consumption across the food processing sector.',
+      },
+      {
+        id: 'b-cane-en-14',
+        type: 'pullquote',
+        content: 'A single drop of sugarcane juice holds farmer prosperity, consumer kitchens, fuel prices, forex savings, groundwater reserves, and the fine line between food and energy security.',
+        author: 'Dr. Deepak Goswami',
+        citation: 'Human Behaviour Scientist | Coordinator – Aadarsh Sanskar Shala, India',
+      },
+    ],
+    blocksHi: [
+      {
+        id: 'b-hi-1',
+        type: 'paragraph',
+        content: 'गन्ने के खेत से लेकर चाय की प्याली तक और गांव की पगडंडी से लेकर देश की ऊर्जा नीति तक—गन्ने के रस की एक बूंद आज भारत के भविष्य की बड़ी कहानी लिख रही है। यही रस कभी चीनी बनकर हमारी थाली में मिठास घोलता है और अब उसका एक हिस्सा एथेनॉल बनकर पेट्रोल में मिल रहा है। सवाल केवल चीनी के महंगे होने का नहीं है। असली सवाल यह है कि क्या भारत आने वाले वर्षों में अपने खेतों से भोजन और ईंधन—दोनों की जरूरतें एक साथ पूरी कर पाएगा?',
+      },
+      {
+        id: 'b-hi-2',
+        type: 'paragraph',
+        content: 'गन्ने के रस की यही बूंद जब चीनी मिल में पहुंचती है तो उससे चीनी, शीरा और अन्य उत्पाद निकलते हैं। यही रस जब एथेनॉल की दिशा में मोड़ दिया जाता है तो वह पेट्रोल में मिलकर देश की ऊर्जा जरूरतों का हिस्सा बन जाता है। यानी एक ही कृषि संसाधन के सामने दो बड़ी राष्ट्रीय आवश्यकताएं खड़ी हैं—भोजन और ऊर्जा।',
+      },
+      {
+        id: 'b-hi-3',
+        type: 'pullquote',
+        content: 'गन्ने का खेत वही है, किसान वही है, पानी वही है और गन्ने के रस की बूंद भी वही है—लेकिन राष्ट्रीय जरूरतें दो दिशाओं में खड़ी हैं।',
+        author: 'डॉ. दीपक गोस्वामी',
+        citation: 'मानवीय व्यवहार वैज्ञानिक | समन्वयक – आदर्श संस्कार शाला, भारत',
+      },
+      {
+        id: 'b-hi-4',
+        type: 'keypoints',
+      },
+      {
+        id: 'b-hi-5',
+        type: 'heading',
+        level: 2,
+        content: 'ऊर्जा सुरक्षा बनाम खाद्य मिठास: सबसे बड़ी उलझन',
+      },
+      {
+        id: 'b-hi-6',
+        type: 'paragraph',
+        content: 'भारत दुनिया के सबसे बड़े चीनी उत्पादक और उपभोक्ता देशों में है। देश की करोड़ों चाय की प्यालियां, मिठाई की दुकानें, धार्मिक प्रसाद, विवाह समारोह और घरेलू रसोई चीनी पर निर्भर हैं। दूसरी ओर भारत की ऊर्जा अर्थव्यवस्था कच्चे तेल के आयात पर भारी निर्भर है। पेट्रोल में एथेनॉल मिलाने की नीति इसी निर्भरता को कम करने की कोशिश है।',
+      },
+      {
+        id: 'b-hi-7',
+        type: 'paragraph',
+        content: 'एथेनॉल गन्ने के रस, शीरे, मक्का और अन्य कृषि स्रोतों से बनाया जा सकता है। पेट्रोल में एथेनॉल मिलाने से आयातित पेट्रोल की आवश्यकता कुछ कम होती है, विदेशी मुद्रा की बचत होती है और जीवाश्म ईंधन पर निर्भरता घटाने में मदद मिलती है। इसलिए एथेनॉल मिश्रण केवल ईंधन नीति नहीं, बल्कि ऊर्जा सुरक्षा की रणनीति भी है।',
+      },
+      {
+        id: 'b-hi-8',
+        type: 'paragraph',
+        content: 'लेकिन यहीं से कहानी कठिन हो जाती है। गन्ने के रस की वही बूंद जो चीनी की मिठास बन सकती है, वही बूंद देश के वाहनों के लिए ऊर्जा भी बन सकती है। गन्ने से एथेनॉल उत्पादन के लिए गन्ने का रस, बी-भारी शीरा और सी-भारी शीरा जैसे रास्ते सामने आते हैं। जब गन्ने के रस या बी-भारी शीरे का अधिक हिस्सा एथेनॉल की ओर जाता है, तो संभावित रूप से चीनी उत्पादन के लिए उपलब्ध मात्रा घट सकती है। यहीं नीति और बाजार के बीच संतुलन की असली परीक्षा शुरू होती है।',
+      },
+      {
+        id: 'b-hi-9',
+        type: 'heading',
+        level: 2,
+        content: 'मौसम, मानसून और किसान का आर्थिक पक्ष',
+      },
+      {
+        id: 'b-hi-10',
+        type: 'paragraph',
+        content: 'भारत को एक तरफ पेट्रोल में एथेनॉल मिश्रण बढ़ाना है, दूसरी तरफ घरेलू बाजार में चीनी की पर्याप्त उपलब्धता भी सुनिश्चित करनी है। यदि एथेनॉल के लिए बहुत अधिक गन्ना मोड़ दिया गया तो चीनी की आपूर्ति घट सकती है। यदि चीनी उत्पादन को प्राथमिकता दी गई तो एथेनॉल मिश्रण के लक्ष्य पर दबाव आ सकता है।',
+      },
+      {
+        id: 'b-hi-11',
+        type: 'paragraph',
+        content: 'इस समस्या में मौसम की भूमिका और भी महत्वपूर्ण हो जाती है। गन्ना पानी पर निर्भर फसल है। महाराष्ट्र और कर्नाटक जैसे प्रमुख गन्ना उत्पादक क्षेत्रों में वर्षा की स्थिति उत्पादन को प्रभावित करती है। मानसून कमजोर हुआ तो सिंचाई का दबाव बढ़ता है, लागत बढ़ती है और फसल प्रभावित हो सकती है। उत्पादन घटने पर चीनी की उपलब्धता पहले से ही सीमित हो जाती है।',
+      },
+      {
+        id: 'b-hi-12',
+        type: 'paragraph',
+        content: 'इसके बाद आता है किसान का पक्ष। गन्ना किसान के लिए खेत में पैदा होने वाला प्रत्येक गन्ना उसकी मेहनत, लागत और परिवार की उम्मीद है। उसके लिए गन्ने के रस की हर बूंद केवल औद्योगिक कच्चा माल नहीं, बल्कि उसकी आय का आधार है। खाद, बीज, सिंचाई, बिजली, डीजल, मजदूरी और परिवहन की लागत बढ़ती है। इसलिए किसान चाहता है कि उसे गन्ने का उचित मूल्य मिले और भुगतान समय पर हो।',
+      },
+      {
+        id: 'b-hi-13',
+        type: 'ad_slot',
+        adZone: 'A4',
+      },
+      {
+        id: 'b-hi-14',
+        type: 'heading',
+        level: 2,
+        content: 'चीनी मिलों पर दबाव और आम उपभोक्ता पर महंगाई का असर',
+      },
+      {
+        id: 'b-hi-15',
+        type: 'paragraph',
+        content: 'दूसरी तरफ चीनी मिलों पर आर्थिक दबाव होता है। महंगा गन्ना खरीदना, चीनी बनाना, भंडारण करना और बाजार में बेचना—इन सबके बीच यदि चीनी का भाव पर्याप्त नहीं है तो मिलों की नकदी स्थिति कमजोर हो सकती है। यही कारण है कि चीनी की कीमत का सवाल केवल उपभोक्ता का सवाल नहीं है। इसके पीछे किसान, चीनी मिल, सरकार, पेट्रोलियम उद्योग और अंततः पूरा उपभोक्ता बाजार जुड़ा हुआ है।',
+      },
+      {
+        id: 'b-hi-16',
+        type: 'paragraph',
+        content: 'और जब चीनी महंगी होती है तो असर केवल चाय तक सीमित नहीं रहता। मिठाई महंगी होती है। बेकरी उत्पाद महंगे होते हैं। पेय पदार्थों की लागत बढ़ती है। हलवाई अपनी लागत निकालने के लिए कीमत बढ़ाता है। छोटे दुकानदार की बिक्री प्रभावित होती है। धार्मिक नगरों और पर्यटन क्षेत्रों में, जहां प्रसाद और मिठाइयों की खपत अधिक है, इसका प्रभाव और स्पष्ट दिखाई देता है। तीर्थ स्थल इसका जीवंत उदाहरण हो सकते हैं। यहां एक तरफ गन्ना किसान है, दूसरी तरफ मिठाई और प्रसाद का कारोबार। एक तरफ पेट्रोल पंप है, दूसरी तरफ रोजमर्रा की महंगाई से जूझता परिवार। हर व्यक्ति की आवश्यकता अलग है, लेकिन सबकी डोर कहीं न कहीं उसी कृषि अर्थव्यवस्था से जुड़ी है।',
+      },
+      {
+        id: 'b-hi-17',
+        type: 'heading',
+        level: 2,
+        content: 'सरकार के सामने नीतिगत चुनौतियां और वैश्विक अनुभव',
+      },
+      {
+        id: 'b-hi-18',
+        type: 'paragraph',
+        content: 'सरकार के सामने इसलिए सबसे कठिन प्रश्न है—गन्ने के रस की इस बूंद को किस दिशा में बहाया जाए? यदि चीनी सस्ती रखी जाती है तो किसान और मिलों की अर्थव्यवस्था पर दबाव बढ़ सकता है। यदि एथेनॉल उत्पादन को तेजी से बढ़ाया जाता है तो चीनी की उपलब्धता प्रभावित होने का खतरा रहता है। यदि निर्यात बढ़ाया जाता है तो विदेशी मुद्रा मिल सकती है, लेकिन घरेलू बाजार में आपूर्ति घट सकती है। यदि निर्यात रोक दिया जाता है तो घरेलू उपभोक्ता को राहत मिल सकती है, लेकिन चीनी उद्योग की आय और वैश्विक बाजार में भारत की स्थिति प्रभावित हो सकती है।',
+      },
+      {
+        id: 'b-hi-19',
+        type: 'paragraph',
+        content: 'इसलिए चीनी नीति में अचानक निर्णयों से अधिक जरूरी है—पूर्वानुमान और स्थिरता। सरकार को मानसून, गन्ने का क्षेत्रफल, चीनी उत्पादन, घरेलू खपत, एथेनॉल की आवश्यकता और निर्यात की संभावनाओं को एक साथ देखकर निर्णय लेना होगा। एथेनॉल की कहानी में चावल और मक्का भी महत्वपूर्ण हो जाते हैं। यदि अनाज आधारित एथेनॉल का उत्पादन बढ़ता है तो गन्ने पर दबाव कुछ कम किया जा सकता है। लेकिन यहां भी सावधानी आवश्यक है। भोजन योग्य अनाज का उपयोग ऊर्जा उत्पादन में कितना किया जाए, यह केवल आर्थिक नहीं बल्कि खाद्य सुरक्षा का प्रश्न भी है।',
+      },
+      {
+        id: 'b-hi-20',
+        type: 'paragraph',
+        content: 'ब्राजील ने गन्ने और एथेनॉल को एक साथ साधने का बड़ा अनुभव विकसित किया है। भारत के लिए यह अनुभव उपयोगी हो सकता है, लेकिन भारत की कृषि संरचना, जल संसाधन और किसानों की परिस्थितियां अलग हैं। इसलिए किसी दूसरे देश की व्यवस्था को ज्यों का त्यों अपनाना समाधान नहीं हो सकता। भारत को अपना रास्ता स्वयं बनाना होगा।',
+      },
+      {
+        id: 'b-hi-21',
+        type: 'heading',
+        level: 2,
+        content: 'सबसे बड़ा प्रश्न पानी का और समाधान की 5 स्पष्ट दिशाएं',
+      },
+      {
+        id: 'b-hi-22',
+        type: 'paragraph',
+        content: 'सबसे बड़ा प्रश्न पानी का है। गन्ना आर्थिक रूप से महत्वपूर्ण फसल है, लेकिन यह पानी की मांग करने वाली फसल भी है। ऐसे क्षेत्रों में जहां भूजल पहले से दबाव में है, वहां गन्ने का लगातार विस्तार दीर्घकाल में गंभीर समस्या पैदा कर सकता है। इसलिए भविष्य की गन्ना नीति केवल यह नहीं पूछ सकती कि एक हेक्टेयर में कितना गन्ना पैदा हुआ। उसे यह भी पूछना होगा: एक किलो गन्ना पैदा करने में कितना पानी लगा? गन्ने के रस की एक बूंद को एथेनॉल में बदलने के पीछे कितने संसाधन लगे? एक किसान की आय कितनी बढ़ी? और उपभोक्ता की थाली पर कितना बोझ पड़ा?',
+      },
+      {
+        id: 'b-hi-23',
+        type: 'paragraph',
+        content: 'यहीं से समाधान की पांच प्रमुख दिशाएं दिखाई देती हैं:\n1. प्रति बूंद अधिक फसल: सूक्ष्म सिंचाई, उन्नत किस्में, वैज्ञानिक खेती और जल संरक्षण को गन्ने की खेती का अनिवार्य हिस्सा बनाना होगा।\n2. गन्ने पर निर्भरता कम करना: मक्का, कृषि अवशेष और दूसरी उपयुक्त जैविक सामग्री से एथेनॉल उत्पादन की क्षमता बढ़ानी होगी, ताकि ऊर्जा नीति का पूरा भार गन्ने पर न आए।\n3. चीनी और एथेनॉल के लिए स्पष्ट संतुलन: सरकार को हर वर्ष उत्पादन के अनुमान के आधार पर पहले से तय करना चाहिए कि कितनी मात्रा खाद्य बाजार के लिए सुरक्षित रहेगी और कितनी ऊर्जा उत्पादन में जाएगी।\n4. किसान को समय पर भुगतान: किसान को केवल अधिक मूल्य नहीं, बल्कि निश्चित और समयबद्ध भुगतान चाहिए।\n5. उपभोक्ता की आदतों में बदलाव: अत्यधिक चीनी का सेवन स्वास्थ्य के लिए भी उचित नहीं है। यदि खाद्य उद्योग और उपभोक्ता दोनों धीरे-धीरे अतिरिक्त चीनी पर निर्भरता घटाएं तो इससे स्वास्थ्य और अर्थव्यवस्था दोनों को लाभ मिल सकता है।',
+      },
+      {
+        id: 'b-hi-24',
+        type: 'pullquote',
+        content: 'आज गन्ने के रस की एक बूंद केवल मिठास की कहानी नहीं है। वह किसान की आय है, उपभोक्ता की रसोई है, पेट्रोल की कीमत है, विदेशी मुद्रा की बचत है, भूजल का भविष्य है और भारत की खाद्य तथा ऊर्जा सुरक्षा के बीच खिंची हुई एक महीन रेखा भी है।',
+        author: 'डॉ. दीपक गोस्वामी',
+        citation: 'मानवीय व्यवहार वैज्ञानिक | समन्वयक – आदर्श संस्कार शाला, भारत',
+      },
+      {
+        id: 'b-hi-25',
+        type: 'paragraph',
+        content: 'भारत को यह तय करना होगा कि गन्ने के रस की उस एक बूंद को किस दिशा में बहाना है। क्योंकि यदि खेत की मिठास और देश की ऊर्जा सुरक्षा के बीच संतुलन बिगड़ा, तो समस्या केवल चीनी के दाम तक सीमित नहीं रहेगी। और यदि यह संतुलन समझदारी से साध लिया गया, तो गन्ने के रस की यही एक बूंद भारत के किसान, ऊर्जा सुरक्षा और ग्रामीण अर्थव्यवस्था—तीनों के लिए भविष्य की नई ताकत बन सकती है। गन्ने के रस की एक बूंद छोटी है, लेकिन उसमें भारत के भविष्य का सवाल बहुत बड़ा है।',
+      },
+    ],
+  },
+
   // 1. Primary Lead Story
   {
     id: 'post-1',
@@ -848,6 +1118,8 @@ export const getLocalizedPost = (post: WpPost, lang: 'en' | 'hi'): WpPost => {
       dek: post.dekHi || post.dek,
       category: (post.categoryHi || post.category) as any,
       imageCaption: post.imageCaptionHi || post.imageCaption,
+      keyTakeaways: post.keyTakeawaysHi || post.keyTakeaways,
+      blocks: post.blocksHi || post.blocks,
     };
   }
   return post;

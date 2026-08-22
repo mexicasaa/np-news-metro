@@ -32,13 +32,23 @@ export const SearchResultsTemplate: React.FC<SearchResultsTemplateProps> = ({
 
   const filteredPosts = allPosts.filter((post) => {
     const localized = getLocalizedPost(post, language);
+    const q = query.trim().toLowerCase();
+    if (!q) {
+      return selectedCategory === 'all' || post.category === selectedCategory;
+    }
+
     const matchesQuery =
-      query.trim() === '' ||
-      localized.title.toLowerCase().includes(query.toLowerCase()) ||
-      localized.dek.toLowerCase().includes(query.toLowerCase()) ||
-      post.title.toLowerCase().includes(query.toLowerCase()) ||
-      post.dek.toLowerCase().includes(query.toLowerCase()) ||
-      post.tags.some((t) => t.toLowerCase().includes(query.toLowerCase()));
+      (localized.title && localized.title.toLowerCase().includes(q)) ||
+      (localized.dek && localized.dek.toLowerCase().includes(q)) ||
+      (post.title && post.title.toLowerCase().includes(q)) ||
+      (post.titleHi && post.titleHi.toLowerCase().includes(q)) ||
+      (post.dek && post.dek.toLowerCase().includes(q)) ||
+      (post.dekHi && post.dekHi.toLowerCase().includes(q)) ||
+      post.tags.some((t) => t.toLowerCase().includes(q)) ||
+      post.blocks?.some((b) => b.content && b.content.toLowerCase().includes(q)) ||
+      post.blocksHi?.some((b) => b.content && b.content.toLowerCase().includes(q)) ||
+      post.keyTakeaways?.some((k) => k.toLowerCase().includes(q)) ||
+      post.keyTakeawaysHi?.some((k) => k.toLowerCase().includes(q));
 
     const matchesCategory =
       selectedCategory === 'all' || post.category === selectedCategory;
@@ -47,18 +57,19 @@ export const SearchResultsTemplate: React.FC<SearchResultsTemplateProps> = ({
   });
 
   const popularSearches = isHindi ? [
+    'गन्ने के रस में देश का भविष्य',
+    'गन्ना एवं इथेनॉल',
     'इंफ्रास्ट्रक्चर',
     'चुनाव आयोग',
     'सेमीकंडक्टर',
     'मुद्रास्फीति',
-    'वाराणसी',
     'पश्चिमी घाट',
   ] : [
+    'Sugarcane Ethanol Blending',
     'Infrastructure',
     'Election Commission',
     'Semiconductor',
     'Inflation',
-    'Varanasi',
     'Western Ghats',
   ];
 

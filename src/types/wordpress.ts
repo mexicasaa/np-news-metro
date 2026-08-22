@@ -93,7 +93,9 @@ export interface WpPost {
     text: string;
   };
   keyTakeaways?: string[];
+  keyTakeawaysHi?: string[];
   blocks: GutenbergBlock[];
+  blocksHi?: GutenbergBlock[];
   viewsCount: number;
   sharesCount: number;
   commentCount: number;

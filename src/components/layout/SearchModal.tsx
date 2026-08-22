@@ -40,13 +40,23 @@ export const SearchModal: React.FC<SearchModalProps> = ({
 
   const filteredPosts = allPosts.filter((post) => {
     const localized = getLocalizedPost(post, language);
+    const q = query.trim().toLowerCase();
+    if (!q) {
+      return selectedCategory === 'all' || post.category === selectedCategory;
+    }
+
     const matchesQuery =
-      query.trim() === '' ||
-      localized.title.toLowerCase().includes(query.toLowerCase()) ||
-      localized.dek.toLowerCase().includes(query.toLowerCase()) ||
-      post.title.toLowerCase().includes(query.toLowerCase()) ||
-      post.dek.toLowerCase().includes(query.toLowerCase()) ||
-      post.tags.some((t) => t.toLowerCase().includes(query.toLowerCase()));
+      (localized.title && localized.title.toLowerCase().includes(q)) ||
+      (localized.dek && localized.dek.toLowerCase().includes(q)) ||
+      (post.title && post.title.toLowerCase().includes(q)) ||
+      (post.titleHi && post.titleHi.toLowerCase().includes(q)) ||
+      (post.dek && post.dek.toLowerCase().includes(q)) ||
+      (post.dekHi && post.dekHi.toLowerCase().includes(q)) ||
+      post.tags.some((t) => t.toLowerCase().includes(q)) ||
+      post.blocks?.some((b) => b.content && b.content.toLowerCase().includes(q)) ||
+      post.blocksHi?.some((b) => b.content && b.content.toLowerCase().includes(q)) ||
+      post.keyTakeaways?.some((k) => k.toLowerCase().includes(q)) ||
+      post.keyTakeawaysHi?.some((k) => k.toLowerCase().includes(q));
 
     const matchesCategory =
       selectedCategory === 'all' || post.category === selectedCategory;
@@ -55,18 +65,19 @@ export const SearchModal: React.FC<SearchModalProps> = ({
   });
 
   const popularSearches = isHindi ? [
+    'गन्ने के रस की एक बूंद में उलझा देश का भविष्य',
+    'गन्ना एवं इथेनॉल सम्मिश्रण नीति',
     'मल्टी-मॉडल इंफ्रास्ट्रक्चर कॉरिडोर',
     'चुनाव आयोग विधानसभा कार्यक्रम',
     'सेमीकंडक्टर प्लांट धोलेरा',
     'खुदरा मुद्रास्फीति आरबीआई',
-    'वाराणसी घाट जीर्णोद्धार',
     'पश्चिमी घाट देवराई वन',
   ] : [
+    'Sugarcane Ethanol Blending Policy',
     'Infrastructure Corridor',
     'Election Commission',
     'Semiconductor Dholera',
     'Retail Inflation RBI',
-    'Varanasi Ghats',
     'Western Ghats Sacred Groves',
   ];
 

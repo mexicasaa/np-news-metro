@@ -4,6 +4,8 @@ import { KeyPointsBlock } from './KeyPointsBlock';
 import { PullQuote } from './PullQuote';
 import { AdSlot } from '../commercial/AdSlot';
 import { handleImageError } from '../../utils/imageFallback';
+import { useLanguage } from '../../context/LanguageContext';
+import { getLocalizedPost } from '../../data/mockWpData';
 
 interface ArticleBodyProps {
   post: WpPost;
@@ -16,9 +18,12 @@ export const ArticleBody: React.FC<ArticleBodyProps> = ({
   onSelectRelatedStory,
   showAds = false,
 }) => {
+  const { language } = useLanguage();
+  const localized = getLocalizedPost(post, language);
+
   return (
     <div className="gutenberg-content font-sans text-ink leading-relaxed">
-      {post.blocks.map((block, index) => {
+      {(localized.blocks || post.blocks).map((block, index) => {
         switch (block.type) {
           case 'paragraph': {
             const isFirstParagraph = index === 0;
@@ -52,8 +57,9 @@ export const ArticleBody: React.FC<ArticleBodyProps> = ({
           }
 
           case 'keypoints': {
-            if (!post.keyTakeaways || post.keyTakeaways.length === 0) return null;
-            return <KeyPointsBlock key={block.id} points={post.keyTakeaways} />;
+            const points = localized.keyTakeaways || post.keyTakeaways;
+            if (!points || points.length === 0) return null;
+            return <KeyPointsBlock key={block.id} points={points} />;
           }
 
           case 'pullquote': {
