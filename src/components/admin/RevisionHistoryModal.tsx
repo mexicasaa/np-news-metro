@@ -21,9 +21,9 @@ export const RevisionHistoryModal: React.FC<RevisionHistoryModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fadeIn">
-      <div className="bg-surface-lowest border border-border-subtle rounded-md shadow-2xl max-w-3xl w-full max-h-[85vh] flex flex-col overflow-hidden">
+      <div className="bg-surface-lowest border border-border-subtle rounded-md shadow-2xl max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="p-5 border-b border-border-subtle flex items-center justify-between bg-slate-50">
+        <div className="p-3.5 sm:p-5 border-b border-border-subtle flex items-center justify-between bg-slate-50">
           <div className="flex items-center gap-2.5">
             <div className="p-2 rounded-full bg-primary-container text-primary">
               <History className="w-5 h-5" />

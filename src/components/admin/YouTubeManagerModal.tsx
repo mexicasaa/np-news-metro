@@ -99,7 +99,7 @@ export const YouTubeManagerModal: React.FC<YouTubeManagerModalProps> = ({
         </button>
 
         {/* Modal Header */}
-        <div className="p-6 pb-4 border-b border-slate-100 flex items-center gap-3">
+        <div className="p-4 sm:p-6 pb-3 sm:pb-4 border-b border-slate-100 flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center border border-red-200">
             <Youtube className="w-5 h-5" />
           </div>
@@ -114,13 +114,13 @@ export const YouTubeManagerModal: React.FC<YouTubeManagerModalProps> = ({
         </div>
 
         {/* Body Content */}
-        <div className="p-6 overflow-y-auto space-y-5 flex-1">
+        <div className="p-4 sm:p-6 overflow-y-auto space-y-4 sm:space-y-5 flex-1">
           {/* URL Input */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
               YouTube Video URL or Video ID
             </label>
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <input
                 type="text"
                 value={urlInput}
@@ -171,7 +171,7 @@ export const YouTubeManagerModal: React.FC<YouTubeManagerModalProps> = ({
               </div>
 
               {/* Thumbnail & Video Details */}
-              <div className="flex gap-4 bg-slate-50 p-3 rounded-xl border border-slate-200 items-start">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 bg-slate-50 p-3 rounded-xl border border-slate-200 items-start">
                 <div className="w-40 aspect-video rounded-lg overflow-hidden relative shrink-0 bg-black">
                   <img src={metadata.thumbnailUrl} alt={title} className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
@@ -216,7 +216,7 @@ export const YouTubeManagerModal: React.FC<YouTubeManagerModalProps> = ({
         </div>
 
         {/* Modal Footer Actions */}
-        <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2.5">
+        <div className="p-3.5 sm:p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2 sm:gap-2.5 flex-wrap sm:flex-nowrap">
           <button
             onClick={onClose}
             className="px-4 py-2 bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors cursor-pointer"

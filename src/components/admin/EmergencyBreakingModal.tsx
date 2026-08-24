@@ -54,7 +54,7 @@ export const EmergencyBreakingModal: React.FC<EmergencyBreakingModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs p-4 animate-fadeIn">
-      <div className="bg-surface-lowest border-2 border-editorial-red rounded-md shadow-2xl max-w-lg w-full overflow-hidden">
+      <div className="bg-surface-lowest border-2 border-editorial-red rounded-md shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
         {/* Header with High-Urgency Red Branding */}
         <div className="p-4 sm:p-5 bg-editorial-red text-white flex items-center justify-between">
           <div className="flex items-center gap-2.5">
@@ -83,7 +83,7 @@ export const EmergencyBreakingModal: React.FC<EmergencyBreakingModalProps> = ({
         </div>
 
         {/* Fast Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 text-xs">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 text-xs">
           <div>
             <label className="block font-mono uppercase font-bold text-editorial-red mb-1 text-[11px]">
               Breaking Headline * (Broadcast Live)

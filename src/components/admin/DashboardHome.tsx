@@ -67,7 +67,7 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap sm:flex-nowrap w-full sm:w-auto">
           <button
             onClick={() => onOpenPublishingCenter('all')}
             className="px-4 py-2 bg-surface-lowest border border-border-subtle hover:border-slate-400 rounded-sm text-xs font-bold text-ink shadow-2xs hover:shadow-xs flex items-center gap-2 transition-all cursor-pointer"
@@ -95,16 +95,16 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
       {/* ======================================================================
           1. PUBLISHING TODAY METRIC CARDS (Matching Screenshot 1)
           ====================================================================== */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
         {/* Published Today */}
         <div 
           onClick={() => onOpenPublishingCenter('published')}
-          className="bg-surface-lowest p-5 rounded-xs border border-border-subtle shadow-subtle hover:border-slate-400 transition-all cursor-pointer group"
+          className="bg-surface-lowest p-3.5 sm:p-5 rounded-xs border border-border-subtle shadow-subtle hover:border-slate-400 transition-all cursor-pointer group"
         >
           <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-ink-muted group-hover:text-ink transition-colors">
             Published Today
           </div>
-          <div className="text-3xl font-serif font-black text-ink mt-2">
+          <div className="text-2xl sm:text-3xl font-serif font-black text-ink mt-2">
             {publishedCount}
           </div>
           <div className="text-[11px] text-emerald-600 font-semibold mt-1 flex items-center gap-1">
@@ -115,12 +115,12 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
         {/* Awaiting Review */}
         <div 
           onClick={() => onOpenPublishingCenter('review')}
-          className="bg-surface-lowest p-5 rounded-xs border border-border-subtle shadow-subtle hover:border-slate-400 transition-all cursor-pointer group"
+          className="bg-surface-lowest p-3.5 sm:p-5 rounded-xs border border-border-subtle shadow-subtle hover:border-slate-400 transition-all cursor-pointer group"
         >
           <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-ink-muted group-hover:text-ink transition-colors">
             Awaiting Review
           </div>
-          <div className="text-3xl font-serif font-black text-ink mt-2">
+          <div className="text-2xl sm:text-3xl font-serif font-black text-ink mt-2">
             {awaitingReviewCount}
           </div>
           <div className="text-[11px] text-amber-600 font-semibold mt-1">
@@ -131,12 +131,12 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
         {/* Scheduled */}
         <div 
           onClick={() => onOpenPublishingCenter('scheduled')}
-          className="bg-surface-lowest p-5 rounded-xs border border-border-subtle shadow-subtle hover:border-slate-400 transition-all cursor-pointer group"
+          className="bg-surface-lowest p-3.5 sm:p-5 rounded-xs border border-border-subtle shadow-subtle hover:border-slate-400 transition-all cursor-pointer group"
         >
           <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-ink-muted group-hover:text-ink transition-colors">
             Scheduled
           </div>
-          <div className="text-3xl font-serif font-black text-ink mt-2">
+          <div className="text-2xl sm:text-3xl font-serif font-black text-ink mt-2">
             {scheduledCount}
           </div>
           <div className="text-[11px] text-primary font-semibold mt-1">
@@ -147,13 +147,13 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
         {/* Breaking News (With prominent red accent) */}
         <div 
           onClick={() => onOpenPublishingCenter('breaking')}
-          className="bg-surface-lowest p-5 rounded-xs border-y border-l border-border-subtle border-r-4 border-r-editorial-red shadow-subtle hover:border-slate-400 transition-all cursor-pointer group relative overflow-hidden"
+          className="bg-surface-lowest p-3.5 sm:p-5 rounded-xs border-y border-l border-border-subtle border-r-4 border-r-editorial-red shadow-subtle hover:border-slate-400 transition-all cursor-pointer group relative overflow-hidden"
         >
           <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-editorial-red group-hover:text-red-800 transition-colors flex items-center justify-between">
             <span>Breaking News</span>
             <span className="w-2 h-2 rounded-full bg-editorial-red animate-ping"></span>
           </div>
-          <div className="text-3xl font-serif font-black text-editorial-red mt-2">
+          <div className="text-2xl sm:text-3xl font-serif font-black text-editorial-red mt-2">
             {breakingCount}
           </div>
           <div className="text-[11px] text-editorial-red font-semibold mt-1">
@@ -164,12 +164,12 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
         {/* Site Health / Failed Operations */}
         <div 
           onClick={() => onOpenPublishingCenter(failedCount > 0 ? 'failed' : 'all')}
-          className="bg-surface-lowest p-5 rounded-xs border border-border-subtle shadow-subtle hover:border-slate-400 transition-all cursor-pointer group"
+          className="bg-surface-lowest p-3.5 sm:p-5 rounded-xs border border-border-subtle shadow-subtle hover:border-slate-400 transition-all cursor-pointer group"
         >
           <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-ink-muted group-hover:text-ink transition-colors">
             Site Health
           </div>
-          <div className="text-3xl font-serif font-black text-ink mt-2 flex items-center gap-2">
+          <div className="text-2xl sm:text-3xl font-serif font-black text-ink mt-2 flex items-center gap-2">
             <span>98%</span>
             <CheckCircle2 className="w-5 h-5 text-emerald-600" />
           </div>

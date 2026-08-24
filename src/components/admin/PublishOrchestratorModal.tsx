@@ -35,7 +35,7 @@ export const PublishOrchestratorModal: React.FC<PublishOrchestratorModalProps> =
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fadeIn">
       <div className="bg-surface-lowest border border-border-subtle rounded-md shadow-2xl max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden">
         {/* Modal Header */}
-        <div className="p-5 border-b border-border-subtle flex items-center justify-between bg-slate-50/80">
+        <div className="p-3.5 sm:p-5 border-b border-border-subtle flex items-center justify-between bg-slate-50/80">
           <div className="flex items-center gap-3">
             <div className={`p-2 rounded-full ${
               isCompleted 
@@ -79,7 +79,7 @@ export const PublishOrchestratorModal: React.FC<PublishOrchestratorModalProps> =
         </div>
 
         {/* Status Header Banner */}
-        <div className={`p-3.5 px-6 border-b text-xs font-semibold flex items-center justify-between ${
+        <div className={`p-2.5 sm:p-3.5 px-3 sm:px-6 border-b text-xs font-semibold flex items-center justify-between flex-wrap gap-2 ${
           operation.status === 'published_healthy'
             ? 'bg-emerald-50 text-emerald-900 border-emerald-200'
             : operation.status === 'published_warnings'
@@ -118,7 +118,7 @@ export const PublishOrchestratorModal: React.FC<PublishOrchestratorModalProps> =
         </div>
 
         {/* Scrollable Pipeline Content */}
-        <div className="p-6 overflow-y-auto space-y-6 flex-1 text-xs">
+        <div className="p-3.5 sm:p-6 overflow-y-auto space-y-4 sm:space-y-6 flex-1 text-xs">
           {/* Post-Publish Single Truth Health Panel (When Completed) */}
           {isCompleted && operation.verificationReport && (
             <div className="bg-white border-2 border-emerald-200 rounded-md p-5 shadow-xs space-y-4 animate-fadeIn">

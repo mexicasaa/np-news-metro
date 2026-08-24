@@ -173,7 +173,7 @@ export const PublishingCenter: React.FC<PublishingCenterProps> = ({
       {/* ======================================================================
           1. HEADER & PRIMARY ACTIONS
           ====================================================================== */}
-      <div className="bg-white border border-slate-200 rounded-lg p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white border border-slate-200 rounded-lg p-4 sm:p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
             <h1 className="font-serif font-bold text-2xl sm:text-3xl text-slate-900">
@@ -297,7 +297,7 @@ export const PublishingCenter: React.FC<PublishingCenterProps> = ({
       {/* ======================================================================
           4. SEARCH & FILTER STRIP
           ====================================================================== */}
-      <div className="bg-white border border-slate-200 rounded-lg p-4 shadow-sm flex flex-col md:flex-row items-center justify-between gap-3 text-xs">
+      <div className="bg-white border border-slate-200 rounded-lg p-3.5 sm:p-4 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 text-xs">
         {/* Search Bar */}
         <div className="relative w-full md:w-80">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -319,7 +319,7 @@ export const PublishingCenter: React.FC<PublishingCenterProps> = ({
         </div>
 
         {/* Dropdown Filters */}
-        <div className="flex items-center gap-3 w-full md:w-auto flex-wrap">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:flex items-center gap-2.5 sm:gap-3 w-full md:w-auto">
           {/* Section Filter */}
           <div className="flex items-center gap-1.5">
             <span className="text-slate-500 font-bold uppercase text-[10px]">Section:</span>
@@ -380,7 +380,7 @@ export const PublishingCenter: React.FC<PublishingCenterProps> = ({
           filteredPosts.map((post) => (
             <div
               key={post.id}
-              className="bg-white border border-slate-200 hover:border-slate-400 rounded-lg p-4 sm:p-5 shadow-2xs hover:shadow-xs transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
+              className="bg-white border border-slate-200 hover:border-slate-400 rounded-lg p-3.5 sm:p-5 shadow-2xs hover:shadow-xs transition-all flex flex-col md:flex-row md:items-center justify-between gap-3.5 sm:gap-4"
             >
               {/* Left Details: Thumbnail, Title, Category, Author, Meta */}
               <div className="flex items-start gap-4 flex-1 min-w-0">

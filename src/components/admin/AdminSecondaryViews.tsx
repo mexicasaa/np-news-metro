@@ -102,7 +102,7 @@ export const MediaLibraryView: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
         {mediaItems.map((item) => (
           <div key={item.id} className="bg-surface-lowest border border-border-subtle rounded-sm overflow-hidden shadow-subtle group">
             <div className="aspect-[16/9] w-full bg-slate-900 overflow-hidden relative">

@@ -100,7 +100,7 @@ export const HomepageLayoutManager: React.FC<HomepageLayoutManagerProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap sm:flex-nowrap w-full sm:w-auto justify-end">
           <button
             onClick={() => setVersionModalOpen(true)}
             className="px-3.5 py-2 bg-white hover:bg-slate-100 border border-border-subtle rounded-xs text-xs font-bold text-ink flex items-center gap-1.5 transition-colors cursor-pointer"
@@ -136,7 +136,7 @@ export const HomepageLayoutManager: React.FC<HomepageLayoutManagerProps> = ({
           ====================================================================== */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left: Hero Package (8 cols) */}
-        <div className="lg:col-span-8 bg-surface-lowest border border-border-subtle rounded-xs shadow-subtle p-5 space-y-4">
+        <div className="lg:col-span-8 bg-surface-lowest border border-border-subtle rounded-xs shadow-subtle p-3.5 sm:p-5 space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-border-subtle">
             <div className="flex items-center gap-2">
               <GripVertical className="w-4 h-4 text-slate-400" />
@@ -200,7 +200,7 @@ export const HomepageLayoutManager: React.FC<HomepageLayoutManagerProps> = ({
         </div>
 
         {/* Right: Latest / Trending Auto-Feed (4 cols) */}
-        <div className="lg:col-span-4 bg-surface-lowest border border-border-subtle rounded-xs shadow-subtle p-5 space-y-4">
+        <div className="lg:col-span-4 bg-surface-lowest border border-border-subtle rounded-xs shadow-subtle p-3.5 sm:p-5 space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-border-subtle">
             <div className="flex items-center gap-2">
               <GripVertical className="w-4 h-4 text-slate-400" />
@@ -261,7 +261,7 @@ export const HomepageLayoutManager: React.FC<HomepageLayoutManagerProps> = ({
           SECTION MODULES (India, Business, etc. matching Screenshot 3)
           ====================================================================== */}
       {sectionModules.map((module) => (
-        <div key={module.id} className="bg-surface-lowest border border-border-subtle rounded-xs shadow-subtle p-5 space-y-4">
+        <div key={module.id} className="bg-surface-lowest border border-border-subtle rounded-xs shadow-subtle p-3.5 sm:p-5 space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-border-subtle">
             <div className="flex items-center gap-2">
               <GripVertical className="w-4 h-4 text-slate-400" />

@@ -153,6 +153,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [cursorPos, setCursorPos] = useState<number | null>(null);
+  const [mobileTab, setMobileTab] = useState<"content" | "settings">("content");
 
   const [boxesOpen, setBoxesOpen] = useState({
     publish: true,
@@ -483,7 +484,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       <input type="file" ref={authorAvatarInputRef} onChange={handleAuthorAvatarUpload} accept="image/*" className="hidden" />
 
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-2xs">
-        <div className="max-w-[1340px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+        <div className="max-w-[1340px] mx-auto px-3 sm:px-6 min-h-14 sm:h-16 py-2 sm:py-0 flex items-center justify-between gap-2 sm:gap-4 flex-wrap sm:flex-nowrap">
           
           <div className="flex items-center gap-3">
             {onBack && (
@@ -552,14 +553,34 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
         </div>
       </header>
 
-      <main className="max-w-[1340px] mx-auto px-4 sm:px-6 pt-6">
+      <main className="max-w-[1340px] mx-auto px-3 sm:px-6 pt-3 sm:pt-6 pb-12">
+        {/* Mobile Segmented Switcher (Visible on <lg screens) */}
+        <div className="lg:hidden mb-4 bg-slate-200/80 p-1 rounded-xl flex items-center gap-1 text-xs font-bold shadow-inner">
+          <button
+            type="button"
+            onClick={() => setMobileTab('content')}
+            className={"flex-1 py-2 px-3 rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer " + (mobileTab === 'content' ? "bg-white text-blue-700 shadow-xs" : "text-slate-600 hover:text-slate-900")}
+          >
+            <FileText className="w-3.5 h-3.5" />
+            <span>Story Writing (लेखन)</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setMobileTab('settings')}
+            className={"flex-1 py-2 px-3 rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer " + (mobileTab === 'settings' ? "bg-white text-blue-700 shadow-xs" : "text-slate-600 hover:text-slate-900")}
+          >
+            <Settings className="w-3.5 h-3.5" />
+            <span>Settings & SEO ({seoPassedCount}/{seoChecklist.length})</span>
+          </button>
+        </div>
+
         <div className="flex flex-col lg:flex-row gap-6 items-start">
           
-          <div className="flex-1 w-full space-y-6">
+          <div className={"flex-1 w-full space-y-6 " + (mobileTab === 'content' ? "block" : "hidden lg:block")}>
             
             <div className="bg-white rounded-2xl shadow-xs border border-slate-200/80 overflow-hidden focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-100 transition-all">
               
-              <div className="p-6 sm:p-8 pb-4 space-y-4">
+              <div className="p-4 sm:p-8 pb-4 space-y-4">
                 
                 <div>
                   <div className="flex items-center justify-between text-xs text-slate-400 mb-1.5 font-medium">
@@ -600,7 +621,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                 )}
               </div>
 
-              <div className="sticky top-16 z-30 flex flex-wrap items-center justify-between gap-2 px-4 sm:px-6 py-2.5 border-y border-slate-100 bg-slate-50/95 backdrop-blur-xs">
+              <div className="sticky top-14 sm:top-16 z-30 flex items-center justify-between gap-2 px-3 sm:px-6 py-2 border-y border-slate-100 bg-slate-50/95 backdrop-blur-xs overflow-x-auto whitespace-nowrap scrollbar-none">
                 <div className="flex flex-wrap items-center gap-1">
                   
                   <button
@@ -847,7 +868,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
 
           </div>
 
-          <div className="w-full lg:w-[360px] shrink-0 space-y-5">
+          <div className={"w-full lg:w-[360px] shrink-0 space-y-5 " + (mobileTab === "settings" ? "block" : "hidden lg:block")}>
             
             <div className="bg-white rounded-2xl shadow-xs border border-slate-200/80 overflow-hidden">
               <div 

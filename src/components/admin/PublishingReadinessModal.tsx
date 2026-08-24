@@ -38,7 +38,7 @@ export const PublishingReadinessModal: React.FC<PublishingReadinessModalProps> =
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fadeIn">
       <div className="bg-surface-lowest border border-border-subtle rounded-md shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden">
         {/* Modal Header */}
-        <div className="p-5 border-b border-border-subtle flex items-center justify-between bg-slate-50/80">
+        <div className="p-3.5 sm:p-5 border-b border-border-subtle flex items-center justify-between bg-slate-50/80">
           <div className="flex items-center gap-2.5">
             <div className={`p-2 rounded-full ${allRequiredPassed ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-editorial-red'}`}>
               {allRequiredPassed ? <ShieldCheck className="w-5 h-5" /> : <AlertTriangle className="w-5 h-5" />}

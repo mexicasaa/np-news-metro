@@ -76,7 +76,7 @@ export const EditorialListView: React.FC<EditorialListViewProps> = ({
       </div>
 
       {/* Filter Toolbar (Matching Screenshot 2) */}
-      <div className="flex flex-wrap items-center justify-end gap-3 text-xs">
+      <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center justify-end gap-2 text-xs">
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
@@ -126,7 +126,93 @@ export const EditorialListView: React.FC<EditorialListViewProps> = ({
           EDITORIAL TABLE (Exact layout & styling from Screenshot 2)
           ====================================================================== */}
       <div className="bg-surface-lowest border border-border-subtle rounded-xs shadow-subtle overflow-hidden">
-        <div className="overflow-x-auto">
+                {/* Mobile Cards View (<md) */}
+        <div className="md:hidden divide-y divide-border-subtle">
+          {editorialArticles.map((article) => {
+            const isSelected = selectedIds.includes(article.id);
+            return (
+              <div 
+                key={article.id} 
+                className={"p-3.5 space-y-2.5 transition-colors " + (isSelected ? "bg-red-50/30" : "bg-surface-lowest")}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-2.5 flex-1 min-w-0">
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => toggleSelectRow(article.id)}
+                      className="w-4 h-4 mt-0.5 rounded border-slate-300 text-editorial-red cursor-pointer shrink-0"
+                    />
+                    <div className="space-y-1 min-w-0 flex-1">
+                      <p 
+                        onClick={() => onEditArticle(article.rawPost)}
+                        className="font-serif font-bold text-sm text-ink hover:text-editorial-red transition-colors cursor-pointer leading-snug"
+                      >
+                        {article.title}
+                      </p>
+                      <div className="flex items-center gap-2 text-[10px] font-mono text-ink-muted flex-wrap">
+                        <span className="font-semibold text-slate-700">{article.section}</span>
+                        <span>•</span>
+                        <span>{article.author}</span>
+                        <span>•</span>
+                        <span>{article.date}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Status Badge */}
+                  <div className="shrink-0">
+                    {article.statusType === 'published' && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-red-50 text-editorial-red border border-red-200 rounded-sm text-[10px] font-mono font-bold">
+                        <span className="w-1.5 h-1.5 rounded-full bg-editorial-red"></span>
+                        <span>Published</span>
+                      </span>
+                    )}
+                    {article.statusType === 'review' && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 text-amber-900 border border-amber-300 rounded-sm text-[10px] font-mono font-bold">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                        <span>Review</span>
+                      </span>
+                    )}
+                    {article.statusType === 'scheduled' && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-900 border border-blue-200 rounded-sm text-[10px] font-mono font-bold">
+                        <span className="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+                        <span>Scheduled</span>
+                      </span>
+                    )}
+                    {article.statusType === 'draft' && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-slate-100 text-slate-700 border border-slate-300 rounded-sm text-[10px] font-mono font-bold">
+                        <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                        <span>Draft</span>
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Mobile Action Buttons */}
+                <div className="flex items-center justify-end gap-2 pt-1 border-t border-slate-100">
+                  <button
+                    onClick={() => onEditArticle(article.rawPost)}
+                    className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Edit className="w-3.5 h-3.5 text-slate-600" />
+                    <span>Edit</span>
+                  </button>
+                  <button
+                    onClick={() => onViewLiveArticle(article.rawPost)}
+                    className="px-3 py-1.5 bg-white hover:bg-slate-100 border border-border-subtle text-slate-700 rounded text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Eye className="w-3.5 h-3.5 text-slate-500" />
+                    <span>View</span>
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Desktop / Tablet Table View (hidden on mobile) */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="bg-slate-50/70 border-b border-border-subtle font-mono text-[11px] font-bold text-ink-muted uppercase">
