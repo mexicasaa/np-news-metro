@@ -389,12 +389,17 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       slug: slug || 'auto-draft',
       category,
       authorId: authorId,
-      customAuthor: authorType === 'external' && customAuthorName.trim() ? {
-        name: customAuthorName.trim(),
-        role: customAuthorRole.trim() || 'Guest Contributor',
-        avatar: customAuthorAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
-        isGuest: true
-      } : undefined,
+      customAuthor: {
+        name: authorType === 'external' && customAuthorName.trim() 
+          ? customAuthorName.trim() 
+          : (customAuthorName.trim() || selectedAuthor.name),
+        role: authorType === 'external' && customAuthorRole.trim() 
+          ? customAuthorRole.trim() 
+          : (customAuthorRole.trim() && customAuthorRole !== 'Guest Contributor' ? customAuthorRole.trim() : selectedAuthor.role),
+        avatar: customAuthorAvatar || selectedAuthor.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
+        bio: (selectedAuthor as any)?.bio || '',
+        isGuest: authorType === 'external',
+      },
       tags,
       featuredImage: featuredImage || 'https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&q=80&w=1200',
       imageCredit: imageCredit || 'NP News Metro Photo Desk',

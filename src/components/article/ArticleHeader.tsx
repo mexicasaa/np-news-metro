@@ -20,14 +20,14 @@ export const ArticleHeader: React.FC<ArticleHeaderProps> = ({
   const { language, t, isHindi } = useLanguage();
   const localized = getLocalizedPost(post, language);
   const author = post.customAuthor?.name ? {
-    id: 'guest-author',
+    id: post.authorId || 'staff-author',
     name: post.customAuthor.name,
-    slug: 'guest',
-    role: post.customAuthor.role || (isHindi ? 'अतिथि लेखक / विशेष संवाददाता' : 'Guest Contributor / Wire Reporter'),
+    slug: 'author',
+    role: post.customAuthor.role || (isHindi ? 'विशेष संवाददाता एवं पत्रकार' : 'Staff Journalist & Reporter'),
     avatar: post.customAuthor.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
-    bio: `${post.customAuthor.name} is a guest contributor for NP News Metro.`,
-    verified: false,
-    beats: ['Guest Editorial'],
+    bio: post.customAuthor.bio || `${post.customAuthor.name} serves as ${post.customAuthor.role || 'Staff Journalist'} at NP News Metro.`,
+    verified: true,
+    beats: ['National News', 'Editorial Reporting'],
     social: {}
   } : mockAuthors[post.authorId];
 

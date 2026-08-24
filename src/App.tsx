@@ -622,7 +622,11 @@ function AppContent() {
           if (error) {
             console.warn('Supabase publish note:', error);
           } else if (post) {
-            setPosts(prev => [post, ...prev.filter(p => p.id !== post.id && p.id !== newPostId)]);
+            savePublishedPost(post);
+            setPosts(prev => [post, ...prev.filter(p => p.id !== post.id && p.id !== newPostId && p.slug !== post.slug)]);
+            if (selectedPost && (selectedPost.id === fullPost.id || selectedPost.slug === fullPost.slug || selectedPost.id === newPostId)) {
+              setSelectedPost(post);
+            }
           }
         });
 

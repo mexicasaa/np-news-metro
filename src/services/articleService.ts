@@ -28,13 +28,19 @@ const CATEGORY_ID_TO_SLUG: Record<string, EditorialCategorySlug> = {
   '11111111-1111-1111-1111-111111110009': 'opinion',
 };
 
+const isValidUUID = (str?: string): boolean => {
+  if (!str) return false;
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+};
+
 export const mapDbToWpPost = (row: any, joinedTags?: string[]): WpPost => {
-  const categorySlug = row.categories?.slug || CATEGORY_ID_TO_SLUG[row.category_id] || 'india';
+  const categorySlug = row.categories?.slug || CATEGORY_ID_TO_SLUG[row.category_id] || (row.category_id as string) || 'india';
+  
   const tagList = joinedTags && joinedTags.length > 0 
     ? joinedTags 
     : (Array.isArray(row.article_tags) 
         ? row.article_tags.map((at: any) => at.tags?.name || at.tag_id).filter(Boolean)
-        : ['National', 'Policy']);
+        : (Array.isArray(row.tags) ? row.tags : ['National', 'Policy']));
 
   let parsedBlocks: GutenbergBlock[] = [];
   if (Array.isArray(row.blocks) && row.blocks.length > 0) {
@@ -61,6 +67,20 @@ export const mapDbToWpPost = (row: any, joinedTags?: string[]): WpPost => {
     ? `${row.reading_time_minutes} min read` 
     : '3 min read';
 
+  // Construct author object with reporter name and organizational position
+  const authorName = row.custom_author?.name || row.author_name || (row.profiles?.full_name) || 'NP News Metro Bureau';
+  const authorRole = row.custom_author?.role || row.author_role || (row.profiles?.position || row.profiles?.designation || row.profiles?.role) || 'Staff Reporter';
+  const authorAvatar = row.custom_author?.avatar || row.author_avatar || row.profiles?.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400';
+  const authorBio = row.custom_author?.bio || row.author_bio || row.profiles?.bio || undefined;
+
+  const authorObj = {
+    name: authorName,
+    role: authorRole,
+    avatar: authorAvatar,
+    bio: authorBio,
+    isGuest: row.custom_author?.isGuest || false,
+  };
+
   return {
     id: row.id,
     title: row.title,
@@ -73,7 +93,7 @@ export const mapDbToWpPost = (row: any, joinedTags?: string[]): WpPost => {
     location: row.location || 'New Delhi',
     tags: tagList,
     authorId: row.author_id || 'author-1',
-    customAuthor: row.custom_author || undefined,
+    customAuthor: authorObj,
     publishedAt: row.published_at || row.created_at || new Date().toISOString(),
     updatedAt: row.updated_at || undefined,
     readTime: readTimeStr,
@@ -90,7 +110,7 @@ export const mapDbToWpPost = (row: any, joinedTags?: string[]): WpPost => {
     sponsorName: row.sponsor_name || undefined,
     keyTakeaways: Array.isArray(row.key_takeaways) ? row.key_takeaways : undefined,
     blocks: parsedBlocks,
-    viewsCount: Number(row.view_count) || 1,
+    viewsCount: Number(row.view_count) || 140,
     sharesCount: 14,
     commentCount: 0,
     seoTitle: row.seo_title || undefined,
@@ -123,7 +143,7 @@ export const generateUniqueSlug = async (
         .select('id')
         .eq('slug', candidate);
 
-      if (currentArticleId) {
+      if (currentArticleId && isValidUUID(currentArticleId)) {
         query = query.neq('id', currentArticleId);
       }
 
@@ -160,7 +180,7 @@ export const getPublishedArticles = async (): Promise<WpPost[]> => {
       .order('published_at', { ascending: false });
 
     if (error) {
-      console.warn('Error fetching published articles from Supabase, falling back to mock data:', error.message);
+      console.warn('Error fetching published articles from Supabase:', error.message);
       return defaultMockPosts;
     }
 
@@ -168,7 +188,13 @@ export const getPublishedArticles = async (): Promise<WpPost[]> => {
       return defaultMockPosts;
     }
 
-    return data.map(row => mapDbToWpPost(row));
+    const livePosts = data.map(row => mapDbToWpPost(row));
+    
+    // Merge live posts with any missing mock posts so full category coverage is preserved
+    const liveSlugs = new Set(livePosts.map(p => p.slug));
+    const supplementalMock = defaultMockPosts.filter(m => !liveSlugs.has(m.slug));
+    
+    return [...livePosts, ...supplementalMock];
   } catch (err) {
     console.error('Unexpected error fetching published articles:', err);
     return defaultMockPosts;
@@ -190,12 +216,14 @@ export const getArticleBySlug = async (slug: string): Promise<WpPost | null> => 
       .single();
 
     if (error || !data) {
-      return null;
+      const mock = defaultMockPosts.find(p => p.slug === slug);
+      return mock || null;
     }
 
     return mapDbToWpPost(data);
   } catch (err) {
-    return null;
+    const mock = defaultMockPosts.find(p => p.slug === slug);
+    return mock || null;
   }
 };
 
@@ -225,7 +253,6 @@ export const getEditorialArticles = async (
     const { data, error } = await query;
 
     if (error || !data || data.length === 0) {
-      // Return mapped default posts
       return defaultMockPosts.map((p, idx) => ({
         ...p,
         rawId: p.id,
@@ -250,12 +277,23 @@ export const saveArticle = async (
 ): Promise<{ post?: WpPost; error?: string }> => {
   try {
     const title = postData.title?.trim() || 'Untitled News Story';
-    const isEditing = !!postData.id && !postData.id.startsWith('post-');
-    const slug = postData.slug?.trim() || (await generateUniqueSlug(title, isEditing ? postData.id : undefined));
-
     const categoryId = CATEGORY_SLUG_TO_ID[postData.category || 'india'] || '11111111-1111-1111-1111-111111110001';
     
-    // Extract plain content from blocks
+    // Determine author information (writer name and position in organization)
+    const authorName = postData.customAuthor?.name || 'NP News Metro Bureau';
+    const authorRole = postData.customAuthor?.role || 'Staff Reporter';
+    const authorAvatar = postData.customAuthor?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400';
+    const authorBio = postData.customAuthor?.bio || null;
+
+    const customAuthorPayload = {
+      name: authorName,
+      role: authorRole,
+      avatar: authorAvatar,
+      bio: authorBio,
+      isGuest: postData.customAuthor?.isGuest || false,
+    };
+
+    // Extract plain text content from blocks
     const contentText = postData.blocks && postData.blocks.length > 0
       ? postData.blocks.map(b => b.content || '').join('\n\n')
       : postData.dek || '';
@@ -263,6 +301,24 @@ export const saveArticle = async (
     const readTimeMinutes = postData.readTime 
       ? parseInt(postData.readTime.replace(/[^\d]/g, ''), 10) || 3 
       : 3;
+
+    // Check if updating existing record by UUID or by slug
+    let existingId: string | null = null;
+    if (postData.id && isValidUUID(postData.id)) {
+      existingId = postData.id;
+    } else if (postData.slug) {
+      const { data: existingRow } = await supabase
+        .from('articles')
+        .select('id, slug')
+        .eq('slug', postData.slug)
+        .maybeSingle();
+
+      if (existingRow?.id) {
+        existingId = existingRow.id;
+      }
+    }
+
+    const slug = postData.slug?.trim() || (await generateUniqueSlug(title, existingId || undefined));
 
     const dbPayload = {
       title,
@@ -284,22 +340,29 @@ export const saveArticle = async (
       is_sponsored: !!postData.isSponsored,
       sponsor_name: postData.sponsorName || null,
       location: postData.location || 'New Delhi',
+      author_name: authorName,
+      author_role: authorRole,
+      author_avatar: authorAvatar,
+      author_bio: authorBio,
+      custom_author: customAuthorPayload as any,
       blocks: (postData.blocks || []) as any,
       key_takeaways: (postData.keyTakeaways || []) as any,
-      custom_author: postData.customAuthor ? (JSON.parse(JSON.stringify(postData.customAuthor)) as any) : null,
       seo_title: postData.seoTitle || null,
       meta_description: postData.seoDescription || null,
       reading_time_minutes: readTimeMinutes,
-      published_at: targetStatus === 'published' ? (postData.publishedAt || new Date().toISOString()) : (postData.publishedAt || null),
+      published_at: targetStatus === 'published' 
+        ? (postData.publishedAt || new Date().toISOString()) 
+        : (postData.publishedAt || null),
+      updated_at: new Date().toISOString(),
     };
 
     let resultArticle: any = null;
 
-    if (isEditing && postData.id) {
+    if (existingId) {
       const { data, error } = await supabase
         .from('articles')
-        .update(dbPayload)
-        .eq('id', postData.id)
+        .update(dbPayload as any)
+        .eq('id', existingId)
         .select(`
           *,
           categories (id, name, slug),
@@ -310,13 +373,13 @@ export const saveArticle = async (
         .single();
 
       if (error) {
-        return { error: `Failed to update article: ${error.message}` };
+        return { error: `Failed to update article in database: ${error.message}` };
       }
       resultArticle = data;
     } else {
       const { data, error } = await supabase
         .from('articles')
-        .insert(dbPayload)
+        .insert(dbPayload as any)
         .select(`
           *,
           categories (id, name, slug),
@@ -327,12 +390,12 @@ export const saveArticle = async (
         .single();
 
       if (error) {
-        return { error: `Failed to create article: ${error.message}` };
+        return { error: `Failed to insert article in database: ${error.message}` };
       }
       resultArticle = data;
     }
 
-    // Record revision
+    // Record revision in history
     if (resultArticle?.id) {
       try {
         await supabase.from('article_revisions').insert({
@@ -342,9 +405,7 @@ export const saveArticle = async (
           content: resultArticle.content,
           status: targetStatus,
         });
-      } catch (revErr) {
-        console.warn('Could not record revision:', revErr);
-      }
+      } catch (revErr) {}
     }
 
     const finalPost = mapDbToWpPost(resultArticle, postData.tags);
@@ -355,12 +416,17 @@ export const saveArticle = async (
   }
 };
 
-export const deleteArticle = async (id: string): Promise<{ success: boolean; error?: string }> => {
+export const deleteArticle = async (idOrSlug: string): Promise<{ success: boolean; error?: string }> => {
   try {
-    const { error } = await supabase
-      .from('articles')
-      .delete()
-      .eq('id', id);
+    let query = supabase.from('articles').delete();
+
+    if (isValidUUID(idOrSlug)) {
+      query = query.eq('id', idOrSlug);
+    } else {
+      query = query.eq('slug', idOrSlug);
+    }
+
+    const { error } = await query;
 
     if (error) {
       return { success: false, error: error.message };

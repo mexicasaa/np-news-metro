@@ -72,6 +72,7 @@ export interface WpPost {
     name: string;
     role?: string;
     avatar?: string;
+    bio?: string;
     organization?: string;
     isGuest?: boolean;
   };

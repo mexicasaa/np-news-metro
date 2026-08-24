@@ -62,22 +62,13 @@ export const PublishingCenter: React.FC<PublishingCenterProps> = ({
   const allPosts = externalPosts && externalPosts.length > 0 ? externalPosts : getStoredPosts();
 
   // Extended posts with status & word counts
-  const extendedPosts = allPosts.map((post: any, idx) => {
-    let status: EditorialStatus = post.editorialStatus || 'published';
-    if (!post.editorialStatus) {
-      if (idx === 0) status = 'published';
-      else if (idx === 1) status = 'review';
-      else if (idx === 2) status = 'scheduled';
-      else if (idx === 3) status = 'draft';
-      else if (idx === 4) status = 'approved';
-      else if (idx === 5) status = 'published';
-      else if (idx === 6) status = 'corrected';
-    }
+  const extendedPosts = allPosts.map((post: any) => {
+    const status: EditorialStatus = post.editorialStatus || post.status || 'published';
     return {
       ...post,
       editorialStatus: status as EditorialStatus,
       wordCount: post.blocks ? post.blocks.reduce((acc: number, b: any) => acc + (b.content?.split(/\s+/).length || 0), 0) : Math.floor((post.dek?.length || 80) * 3),
-      scheduledFor: status === 'scheduled' ? 'Today, 21:30 IST' : undefined,
+      scheduledFor: status === 'scheduled' ? (post.scheduledAt ? new Date(post.scheduledAt).toLocaleString() : 'Scheduled') : undefined,
     };
   });
 
