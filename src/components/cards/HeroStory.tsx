@@ -25,13 +25,21 @@ export const HeroStory: React.FC<HeroStoryProps> = ({
   onSelectCategory,
 }) => {
   const { language, t, isHindi } = useLanguage();
-  // Use either the array of featured posts or a single post
-  const storyList = featuredPosts && featuredPosts.length > 0 ? featuredPosts : [post];
+  // Use either the array of featured posts (strictly capped to latest 10) or a single post
+  const rawList = featuredPosts && featuredPosts.length > 0 ? featuredPosts : [post];
+  const storyList = rawList.slice(0, 10);
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [isListening, setIsListening] = useState(false);
+
+  // Keep activeSlideIndex within bounds
+  useEffect(() => {
+    if (activeSlideIndex >= storyList.length && storyList.length > 0) {
+      setActiveSlideIndex(0);
+    }
+  }, [storyList.length, activeSlideIndex]);
 
   const rawStory = storyList[activeSlideIndex] || post;
   const currentStory = getLocalizedPost(rawStory, language);

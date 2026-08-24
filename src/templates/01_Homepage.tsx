@@ -44,10 +44,18 @@ export const Homepage: React.FC<HomepageProps> = ({
   const { t, isHindi } = useLanguage();
   const allPosts = externalPosts && externalPosts.length > 0 ? externalPosts : getStoredPosts();
   
-  // Hero Lead & Slider feeds
-  const leadPost = allPosts.find((p) => p.isLead) || allPosts[0];
-  const featuredPosts = allPosts.filter((p) => p.isFeatured || p.isLead);
-  const supportingLeadPosts = allPosts.filter((p) => p.id !== leadPost.id).slice(0, 3);
+  // Sort all posts by publishedAt (latest news first)
+  const sortedPosts = [...allPosts].sort((a, b) => {
+    const timeA = new Date(a.publishedAt || 0).getTime();
+    const timeB = new Date(b.publishedAt || 0).getTime();
+    return timeB - timeA;
+  });
+
+  // Hero Lead & Slider feeds (strictly latest 10 articles only)
+  const latestTenPosts = sortedPosts.slice(0, 10);
+  const leadPost = latestTenPosts.find((p) => p.isLead) || latestTenPosts[0] || sortedPosts[0];
+  const featuredPosts = latestTenPosts;
+  const supportingLeadPosts = sortedPosts.filter((p) => p.id !== leadPost?.id).slice(0, 3);
   const latestPosts = allPosts.slice(0, 8);
   const indiaPosts = allPosts.filter((p) => p.category === 'india' || p.category === 'politics');
   const businessPosts = allPosts.filter((p) => p.category === 'business' || p.category === 'economy');
