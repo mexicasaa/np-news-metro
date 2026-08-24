@@ -10,12 +10,14 @@ import { NewsletterModule } from '../components/common/NewsletterModule';
 import { useLanguage } from '../context/LanguageContext';
 
 interface VideoHubTemplateProps {
+  videos?: WpVideo[];
   onSelectVideo: (video: WpVideo) => void;
   onNavigateHome: () => void;
   showAds?: boolean;
 }
 
 export const VideoHubTemplate: React.FC<VideoHubTemplateProps> = ({
+  videos,
   onSelectVideo,
   onNavigateHome,
   showAds = false,
@@ -27,13 +29,15 @@ export const VideoHubTemplate: React.FC<VideoHubTemplateProps> = ({
     ? ['सभी', 'व्याख्यात्मक', 'ग्राउंड रिपोर्ट', 'साक्षात्कार', 'व्यापार', 'राजनीति', 'शॉर्ट्स']
     : ['All', 'Explainers', 'Field Reports', 'Interviews', 'Business', 'Politics', 'Shorts'];
 
-  const filteredVideos = mockVideos.filter((v) => {
+  const activeVideos = videos && videos.length > 0 ? videos : mockVideos;
+
+  const filteredVideos = activeVideos.filter((v) => {
     if (selectedCategory === 'All' || selectedCategory === 'सभी') return true;
     return v.category.toLowerCase() === selectedCategory.toLowerCase();
   });
 
-  const featuredVideo = mockVideos[0];
-  const gridVideos = filteredVideos.length > 0 ? filteredVideos : mockVideos;
+  const featuredVideo = activeVideos[0];
+  const gridVideos = filteredVideos.length > 0 ? filteredVideos : activeVideos;
 
   return (
     <div className="bg-canvas min-h-screen">

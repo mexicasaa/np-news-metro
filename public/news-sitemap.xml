@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
+  <url>
+    <loc>https://npnewsmetro.in/politics/nayab-saini-attacks-bhagwant-mann</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>en</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-24T09:00:00Z</news:publication_date>
+      <news:title>Haryana CM Nayab Saini Attacks Bhagwant Mann: "No Ground Work in Punjab, Only Ads on TV"</news:title>
+      <news:keywords>National News, Policy, Governance, Politics</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://npnewsmetro.in/technology/india-strategic-ai-infrastructure-corridor</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>en</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-24T06:00:00Z</news:publication_date>
+      <news:title>India Announces Strategic AI Infrastructure Corridor With $12B Clean Energy Backing</news:title>
+      <news:keywords>Technology, Artificial Intelligence, Energy, Infrastructure</news:keywords>
+    </news:news>
+  </url>
+</urlset>

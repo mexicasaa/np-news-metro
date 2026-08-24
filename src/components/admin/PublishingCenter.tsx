@@ -61,35 +61,44 @@ export const PublishingCenter: React.FC<PublishingCenterProps> = ({
   const permissions = ROLE_PERMISSIONS[userRole];
   const allPosts = externalPosts && externalPosts.length > 0 ? externalPosts : getStoredPosts();
 
-  // Tab definitions with counts and human-friendly icons
-  const tabs: { id: PublishingTab; label: string; count: number; badgeColor?: string; dotColor: string }[] = [
-    { id: 'all', label: 'All Stories (सभी खबरें)', count: allPosts.length, dotColor: 'bg-slate-500' },
-    { id: 'drafts', label: 'Drafts (ड्राफ्ट)', count: 4, dotColor: 'bg-slate-400' },
-    { id: 'review', label: 'Needs Review (रिव्यू बाकी)', count: 8, badgeColor: 'bg-amber-100 text-amber-900 border-amber-300', dotColor: 'bg-amber-500' },
-    { id: 'approved', label: 'Approved (मंजूर)', count: 4, badgeColor: 'bg-emerald-100 text-emerald-900 border-emerald-300', dotColor: 'bg-emerald-500' },
-    { id: 'scheduled', label: 'Scheduled (शेड्यूल)', count: 13, badgeColor: 'bg-blue-100 text-blue-900 border-blue-300', dotColor: 'bg-blue-500' },
-    { id: 'published', label: 'Published (लाइव)', count: allPosts.length, dotColor: 'bg-emerald-600' },
-    { id: 'breaking', label: 'Breaking News (ब्रेकिंग)', count: allPosts.filter(p => p.isBreaking).length, badgeColor: 'bg-red-100 text-editorial-red border-red-300', dotColor: 'bg-editorial-red' },
-    { id: 'failed', label: 'Failed Retries (पुनः प्रयास)', count: mockFailedOperations.length, badgeColor: 'bg-rose-100 text-rose-800 border-rose-300', dotColor: 'bg-rose-600' },
-  ];
-
   // Extended posts with status & word counts
-  const extendedPosts = allPosts.map((post, idx) => {
-    let status: EditorialStatus = 'published';
-    if (idx === 0) status = 'published';
-    else if (idx === 1) status = 'review';
-    else if (idx === 2) status = 'scheduled';
-    else if (idx === 3) status = 'draft';
-    else if (idx === 4) status = 'approved';
-    else if (idx === 5) status = 'published';
-    else if (idx === 6) status = 'corrected';
+  const extendedPosts = allPosts.map((post: any, idx) => {
+    let status: EditorialStatus = post.editorialStatus || 'published';
+    if (!post.editorialStatus) {
+      if (idx === 0) status = 'published';
+      else if (idx === 1) status = 'review';
+      else if (idx === 2) status = 'scheduled';
+      else if (idx === 3) status = 'draft';
+      else if (idx === 4) status = 'approved';
+      else if (idx === 5) status = 'published';
+      else if (idx === 6) status = 'corrected';
+    }
     return {
       ...post,
       editorialStatus: status as EditorialStatus,
-      wordCount: post.blocks ? post.blocks.reduce((acc, b) => acc + (b.content?.split(/\s+/).length || 0), 0) : Math.floor((post.dek?.length || 80) * 3),
+      wordCount: post.blocks ? post.blocks.reduce((acc: number, b: any) => acc + (b.content?.split(/\s+/).length || 0), 0) : Math.floor((post.dek?.length || 80) * 3),
       scheduledFor: status === 'scheduled' ? 'Today, 21:30 IST' : undefined,
     };
   });
+
+  const draftsCount = extendedPosts.filter(p => p.editorialStatus === 'draft').length;
+  const reviewCount = extendedPosts.filter(p => p.editorialStatus === 'review').length;
+  const approvedCount = extendedPosts.filter(p => p.editorialStatus === 'approved').length;
+  const scheduledCount = extendedPosts.filter(p => p.editorialStatus === 'scheduled').length;
+  const publishedCount = extendedPosts.filter(p => p.editorialStatus === 'published').length;
+  const breakingCount = extendedPosts.filter(p => p.isBreaking || p.isLead).length;
+
+  // Tab definitions with counts and human-friendly icons
+  const tabs: { id: PublishingTab; label: string; count: number; badgeColor?: string; dotColor: string }[] = [
+    { id: 'all', label: 'All Stories (सभी खबरें)', count: extendedPosts.length, dotColor: 'bg-slate-500' },
+    { id: 'drafts', label: 'Drafts (ड्राफ्ट)', count: draftsCount, dotColor: 'bg-slate-400' },
+    { id: 'review', label: 'Needs Review (रिव्यू बाकी)', count: reviewCount, badgeColor: 'bg-amber-100 text-amber-900 border-amber-300', dotColor: 'bg-amber-500' },
+    { id: 'approved', label: 'Approved (मंजूर)', count: approvedCount, badgeColor: 'bg-emerald-100 text-emerald-900 border-emerald-300', dotColor: 'bg-emerald-500' },
+    { id: 'scheduled', label: 'Scheduled (शेड्यूल)', count: scheduledCount, badgeColor: 'bg-blue-100 text-blue-900 border-blue-300', dotColor: 'bg-blue-500' },
+    { id: 'published', label: 'Published (लाइव)', count: publishedCount, dotColor: 'bg-emerald-600' },
+    { id: 'breaking', label: 'Breaking News (ब्रेकिंग)', count: breakingCount, badgeColor: 'bg-red-100 text-editorial-red border-red-300', dotColor: 'bg-editorial-red' },
+    { id: 'failed', label: 'Failed Retries (पुनः प्रयास)', count: mockFailedOperations.length, badgeColor: 'bg-rose-100 text-rose-800 border-rose-300', dotColor: 'bg-rose-600' },
+  ];
 
   const filteredPosts = extendedPosts.filter((post) => {
     // Tab Filter
@@ -105,7 +114,7 @@ export const PublishingCenter: React.FC<PublishingCenterProps> = ({
       const q = searchQuery.toLowerCase();
       const titleMatch = post.title.toLowerCase().includes(q);
       const dekMatch = post.dek.toLowerCase().includes(q);
-      const tagMatch = post.tags.some((t) => t.toLowerCase().includes(q));
+      const tagMatch = post.tags.some((t: string) => t.toLowerCase().includes(q));
       if (!titleMatch && !dekMatch && !tagMatch) return false;
     }
 

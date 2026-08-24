@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Image as ImageIcon, Search, DollarSign, Users, BarChart3, 
   Settings, CheckCircle2, AlertTriangle, ShieldCheck, RefreshCw, 
@@ -6,66 +6,100 @@ import {
 } from 'lucide-react';
 import { mockAuthors, mockCategories } from '../../data/mockWpData';
 import { mockAdminUsers } from '../../data/mockAdminData';
-import { ROLE_PERMISSIONS } from '../../types/admin';
+import { ROLE_PERMISSIONS, UserProfile } from '../../types/admin';
+import { getMediaLibrary, uploadMedia, MediaAsset } from '../../services/mediaService';
+import { getProfilesList } from '../../services/authService';
+
+import { YouTubeManagerModal } from './YouTubeManagerModal';
 
 /* ======================================================================
    1. MEDIA LIBRARY VIEW
    ====================================================================== */
 export const MediaLibraryView: React.FC = () => {
-  const mediaItems = [
-    {
-      id: 'med-1',
-      title: 'Parliament House New Delhi Session',
-      url: 'https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&q=80&w=600',
-      dimensions: '1920 × 1080',
-      credit: 'PTI / Vijay Verma',
-      alt: 'Parliament building exterior during winter session',
-      focal: 'Center (50%, 50%)',
-    },
-    {
-      id: 'med-2',
-      title: 'Western Port Maritime Corridor Freight Yard',
-      url: 'https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&q=80&w=600',
-      dimensions: '2400 × 1350',
-      credit: 'Reuters / Amit Dave',
-      alt: 'Container logistics and ship freight loading',
-      focal: 'Top-Right (65%, 35%)',
-    },
-    {
-      id: 'med-3',
-      title: 'Dal Lake Srinagar Ecological Drone Panorama',
-      url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=600',
-      dimensions: '1920 × 1080',
-      credit: 'Meera Iyer / NP News',
-      alt: 'Aerial perspective of Dal Lake and houseboats',
-      focal: 'Center (50%, 50%)',
-    },
-    {
-      id: 'med-4',
-      title: 'Supreme Court of India Constitution Bench',
-      url: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&q=80&w=600',
-      dimensions: '1600 × 900',
-      credit: 'Express Archives',
-      alt: 'Gavel and legal volumes in courtroom library',
-      focal: 'Center (50%, 50%)',
-    },
-  ];
+  const [mediaItems, setMediaItems] = useState<MediaAsset[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isYouTubeModalOpen, setIsYouTubeModalOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    loadMedia();
+  }, []);
+
+  const loadMedia = async () => {
+    setIsLoading(true);
+    const items = await getMediaLibrary();
+    setMediaItems(items);
+    setIsLoading(false);
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setIsUploading(true);
+      const res = await uploadMedia(file, file.name, 'NP News Metro Media Desk');
+      if (res.asset) {
+        setMediaItems(prev => [res.asset!, ...prev]);
+      } else if (res.error) {
+        alert(`Upload error: ${res.error}`);
+      }
+      setIsUploading(false);
+      e.target.value = '';
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 animate-fadeIn">
-      <div className="flex items-center justify-between">
+      <YouTubeManagerModal
+        isOpen={isYouTubeModalOpen}
+        onClose={() => setIsYouTubeModalOpen(false)}
+        onVideoSaved={(video) => {
+          alert(`Video "${video.title}" saved and published to Video Hub.`);
+          loadMedia();
+        }}
+      />
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileUpload}
+        accept="image/*,video/*,application/pdf"
+        className="hidden"
+      />
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="font-serif text-2xl sm:text-3xl font-extrabold text-ink">
             Media Library & Asset Management
           </h1>
           <p className="text-xs sm:text-sm text-ink-secondary mt-1">
-            Canonical WordPress media synchronization with reserved dimensions and focal-point verification.
+            Supabase Storage synchronization with reserved dimensions and metadata verification.
           </p>
         </div>
-        <button className="px-4 py-2 bg-editorial-red text-white text-xs font-bold rounded-sm shadow-xs hover:bg-red-800 transition-colors flex items-center gap-1.5 cursor-pointer">
-          <Plus className="w-3.5 h-3.5" />
-          <span>Upload Asset</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsYouTubeModalOpen(true)}
+            className="px-3.5 py-2 bg-slate-900 text-white text-xs font-bold rounded-sm shadow-xs hover:bg-slate-800 transition-colors flex items-center gap-1.5 cursor-pointer"
+          >
+            <Globe className="w-3.5 h-3.5 text-red-400" />
+            <span>Import YouTube Video</span>
+          </button>
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isUploading}
+            className="px-4 py-2 bg-editorial-red text-white text-xs font-bold rounded-sm shadow-xs hover:bg-red-800 transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+          >
+            {isUploading ? (
+              <>
+                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                <span>Uploading...</span>
+              </>
+            ) : (
+              <>
+                <Plus className="w-3.5 h-3.5" />
+                <span>Upload Asset</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -81,7 +115,7 @@ export const MediaLibraryView: React.FC = () => {
               <h4 className="font-bold text-ink truncate">{item.title}</h4>
               <p className="text-[11px] text-ink-muted">Credit: {item.credit}</p>
               <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-[10px] font-mono text-emerald-700 font-bold">
-                <span>Alt Text ✓</span>
+                <span>Alt Text ?</span>
                 <span>{item.focal}</span>
               </div>
             </div>
@@ -173,6 +207,16 @@ export const SeoHealthView: React.FC = () => {
    4. USERS & ROLES VIEW
    ====================================================================== */
 export const UsersView: React.FC = () => {
+  const [users, setUsers] = useState<UserProfile[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getProfilesList().then(data => {
+      setUsers(data);
+      setLoading(false);
+    });
+  }, []);
+
   return (
     <div className="max-w-7xl mx-auto space-y-6 animate-fadeIn">
       <div>
@@ -180,7 +224,7 @@ export const UsersView: React.FC = () => {
           Newsroom Users & Role Permissions
         </h1>
         <p className="text-xs sm:text-sm text-ink-secondary mt-1">
-          Enforced server-side least-privilege role matrix across authoring, reviewing, publishing, and curation.
+          Enforced server-side least-privilege role matrix across authoring, reviewing, publishing, and curation (Supabase Auth & Profiles).
         </p>
       </div>
 
@@ -195,8 +239,8 @@ export const UsersView: React.FC = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-border-subtle">
-            {mockAdminUsers.map((u) => {
-              const perms = ROLE_PERMISSIONS[u.role];
+            {users.map((u) => {
+              const perms = ROLE_PERMISSIONS[u.role] || ROLE_PERMISSIONS.reporter;
               return (
                 <tr key={u.id} className="hover:bg-slate-50">
                   <td className="p-3.5 pl-4 flex items-center gap-3">
@@ -239,7 +283,7 @@ export const SystemView: React.FC = () => {
     setTimeout(() => {
       setClearing(false);
       setPurged(true);
-      setTimeout(() => setPurged(false), 3000);
+      setTimeout(() => setPurged(false), 800);
     }, 800);
   };
 
@@ -250,7 +294,7 @@ export const SystemView: React.FC = () => {
           System Infrastructure & Edge Cache
         </h1>
         <p className="text-xs sm:text-sm text-ink-secondary mt-1">
-          Server health, Redis object caching, selective CDN invalidation, and background workers.
+          Server health, Supabase PostgreSQL, Storage Buckets, and edge distribution nodes.
         </p>
       </div>
 
@@ -279,20 +323,20 @@ export const SystemView: React.FC = () => {
 
         <div className="bg-surface-lowest border border-border-subtle p-5 rounded-sm shadow-subtle space-y-4">
           <h3 className="font-serif font-bold text-base text-ink pb-2 border-b border-slate-100">
-            WordPress REST API Status
+            Supabase Backend Health
           </h3>
           <div className="space-y-2 font-mono text-xs">
             <div className="flex items-center justify-between">
-              <span className="text-ink">REST Endpoint /wp/v2/posts</span>
-              <span className="text-emerald-700 font-bold">200 OK (38ms)</span>
+              <span className="text-ink">PostgreSQL Database</span>
+              <span className="text-emerald-700 font-bold">Connected (Active Healthy)</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-ink">Media Upload REST /wp/v2/media</span>
-              <span className="text-emerald-700 font-bold">200 OK (82ms)</span>
+              <span className="text-ink">Supabase Storage Buckets</span>
+              <span className="text-emerald-700 font-bold">Mounted (article-images, media, avatars)</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-ink">Database Replication</span>
-              <span className="text-emerald-700 font-bold">Synced (0s lag)</span>
+              <span className="text-ink">Row Level Security</span>
+              <span className="text-emerald-700 font-bold">Enforced (11 Tables)</span>
             </div>
           </div>
         </div>

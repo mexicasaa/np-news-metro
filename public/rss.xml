@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>NP News Metro</title>
+    <link>https://npnewsmetro.in</link>
+    <description>National News, Policy, Governance &amp; Investigative Journalism</description>
+    <language>en-IN</language>
+    <lastBuildDate>Mon, 24 Aug 2026 11:00:00 GMT</lastBuildDate>
+    <atom:link href="https://npnewsmetro.in/rss.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Haryana CM Nayab Saini Attacks Bhagwant Mann: &quot;No Ground Work in Punjab, Only Ads on TV&quot;</title>
+      <link>https://npnewsmetro.in/politics/nayab-saini-attacks-bhagwant-mann</link>
+      <guid isPermaLink="true">https://npnewsmetro.in/politics/nayab-saini-attacks-bhagwant-mann</guid>
+      <pubDate>Mon, 24 Aug 2026 09:00:00 GMT</pubDate>
+      <description>Haryana Chief Minister questions the governance model of the AAP government in Punjab.</description>
+      <dc:creator>Siddharth Varma</dc:creator>
+      <category>POLITICS</category>
+    </item>
+    <item>
+      <title>India Announces Strategic AI Infrastructure Corridor With $12B Clean Energy Backing</title>
+      <link>https://npnewsmetro.in/technology/india-strategic-ai-infrastructure-corridor</link>
+      <guid isPermaLink="true">https://npnewsmetro.in/technology/india-strategic-ai-infrastructure-corridor</guid>
+      <pubDate>Mon, 24 Aug 2026 06:00:00 GMT</pubDate>
+      <description>Ministry of Electronics and Information Technology reveals high-compute GPU clusters powered by 100% dedicated microgrids.</description>
+      <dc:creator>Rohan Sen</dc:creator>
+      <category>TECHNOLOGY</category>
+    </item>
+  </channel>
+</rss>

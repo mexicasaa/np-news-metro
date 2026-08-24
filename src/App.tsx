@@ -17,6 +17,9 @@ import { AdminLoginModal } from './components/admin/AdminLoginModal';
 import { WpPost, WpVideo, WpGallery } from './types/wordpress';
 import { mockPosts as initialMockPosts, mockVideos, mockGalleries } from './data/mockWpData';
 import { getStoredPosts, savePublishedPost } from './utils/newsStorage';
+import { getPublishedArticles, saveArticle, deleteArticle } from './services/articleService';
+import { getCurrentUserProfile, signOut as authSignOut } from './services/authService';
+import { getVideos } from './services/taxonomyService';
 import { LanguageProvider } from './context/LanguageContext';
 
 // 14 Public Reader Templates
@@ -49,6 +52,14 @@ import { RevisionHistoryModal } from './components/admin/RevisionHistoryModal';
 import { 
   MediaLibraryView, MonetizationView, SeoHealthView, UsersView, SystemView 
 } from './components/admin/AdminSecondaryViews';
+import { YouTubeManagerModal } from './components/admin/YouTubeManagerModal';
+import { SeoHead } from './components/common/SeoHead';
+import { 
+  generateArticleStructuredData, 
+  generateVideoStructuredData, 
+  generateWebsiteStructuredData 
+} from './services/seoService';
+import { getPublishedVideos } from './services/videoService';
 import { 
   UserRole, UserProfile, PublishingOperation, ReadinessCheckResult, 
   DuplicateMatch, ArticleRevision 
@@ -72,8 +83,42 @@ function AppContent() {
     return 'public';
   });
 
-  // Reactive Posts State (Seeded from localStorage database for persistence)
+  // Reactive Posts State (Seeded from localStorage and synced with Supabase backend)
   const [posts, setPosts] = useState<WpPost[]>(getStoredPosts);
+  const [videos, setVideos] = useState<WpVideo[]>(mockVideos);
+  const [isYouTubeModalOpen, setIsYouTubeModalOpen] = useState(false);
+
+  // Load published articles & video content directly from Supabase
+  React.useEffect(() => {
+    let isMounted = true;
+    const fetchSupabaseContent = async () => {
+      try {
+        const [livePosts, liveVideos] = await Promise.all([
+          getPublishedArticles(),
+          getPublishedVideos(),
+        ]);
+        if (isMounted) {
+          if (livePosts && livePosts.length > 0) {
+            setPosts(livePosts);
+            if (!isPreviewTab) {
+              setSelectedPost(livePosts[0]);
+            }
+          }
+          if (liveVideos && liveVideos.length > 0) {
+            setVideos(liveVideos);
+            setSelectedVideo(liveVideos[0]);
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching Supabase content:', err);
+      }
+    };
+    fetchSupabaseContent();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isPreviewTab]);
 
   // Cross-tab real-time listener for newly published news
   React.useEffect(() => {
@@ -319,8 +364,9 @@ function AppContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleAdminLogout = () => {
+  const handleAdminLogout = async () => {
     try {
+      await authSignOut();
       localStorage.removeItem('np_news_admin_auth');
       sessionStorage.removeItem('np_news_admin_auth');
       if (typeof window !== 'undefined' && (window.location.pathname === '/admin' || window.location.pathname.startsWith('/admin') || window.location.hash === '#admin')) {
@@ -571,7 +617,15 @@ function AppContent() {
           ],
         };
 
-        // Persist to temporary localStorage database & broadcast
+        // Persist to Supabase database & local storage broadcast
+        saveArticle(fullPost, 'published').then(({ post, error }) => {
+          if (error) {
+            console.warn('Supabase publish note:', error);
+          } else if (post) {
+            setPosts(prev => [post, ...prev.filter(p => p.id !== post.id && p.id !== newPostId)]);
+          }
+        });
+
         const updatedPosts = savePublishedPost(fullPost);
         setPosts(updatedPosts);
         if (selectedPost && selectedPost.id === fullPost.id) {
@@ -652,6 +706,12 @@ function AppContent() {
       ],
     };
 
+    saveArticle(breakingPost, 'published').then(({ post }) => {
+      if (post) {
+        setPosts(prev => [post, ...prev.filter(p => p.id !== post.id && p.id !== breakingPost.id)]);
+      }
+    });
+
     setPosts(prev => [breakingPost, ...prev]);
     if (data.activateBreakingStrip) {
       setIsEmergencyBreaking(true);
@@ -661,8 +721,100 @@ function AppContent() {
     handleSelectPost(breakingPost);
   };
 
+  // Dynamic SEO metadata & JSON-LD Structured Data computation
+  const getDynamicSeo = () => {
+    if (viewMode === 'admin') {
+      return {
+        metadata: {
+          title: 'NP Newsroom CMS & Editorial Suite',
+          noIndex: true,
+          noFollow: true,
+        },
+        structuredData: undefined,
+      };
+    }
+
+    if (currentTemplate === 'article-standard' || currentTemplate === 'article-breaking' || currentTemplate === 'article-opinion') {
+      return {
+        metadata: {
+          title: selectedPost.seoTitle || selectedPost.title,
+          description: selectedPost.seoDescription || selectedPost.dek || selectedPost.title,
+          canonicalUrl: `https://npnewsmetro.in/${selectedPost.category}/${selectedPost.slug}`,
+          ogType: 'article' as const,
+          ogImage: selectedPost.featuredImage,
+          publishedTime: selectedPost.publishedAt,
+          modifiedTime: selectedPost.updatedAt || selectedPost.publishedAt,
+          authorName: selectedPost.customAuthor?.name || 'NP News Metro Bureau',
+          section: selectedPost.category,
+        },
+        structuredData: generateArticleStructuredData(selectedPost),
+      };
+    }
+
+    if (currentTemplate === 'video-detail') {
+      return {
+        metadata: {
+          title: selectedVideo.title,
+          description: selectedVideo.caption || selectedVideo.title,
+          canonicalUrl: `https://npnewsmetro.in/videos/${selectedVideo.slug}`,
+          ogType: 'video.other' as const,
+          ogImage: selectedVideo.posterUrl,
+          publishedTime: selectedVideo.publishedAt,
+        },
+        structuredData: generateVideoStructuredData(selectedVideo),
+      };
+    }
+
+    if (currentTemplate === 'video-hub') {
+      return {
+        metadata: {
+          title: 'Video Hub & Investigative Documentaries',
+          description: 'Watch deep dive documentary broadcasts, ground reports, policy explainers, and leadership interviews.',
+          canonicalUrl: 'https://npnewsmetro.in/videos',
+        },
+        structuredData: generateWebsiteStructuredData(),
+      };
+    }
+
+    if (currentTemplate === 'category') {
+      return {
+        metadata: {
+          title: `${selectedCategory.toUpperCase()} News & Latest Analysis`,
+          description: `Latest breaking headlines, reports, and exclusive analysis in ${selectedCategory}.`,
+          canonicalUrl: `https://npnewsmetro.in/category/${selectedCategory}`,
+        },
+        structuredData: generateWebsiteStructuredData(),
+      };
+    }
+
+    // Default: Homepage
+    return {
+      metadata: {
+        title: 'NP News Metro — Latest Breaking News, India, Politics & Business',
+        description: 'Fast, verified, and in-depth national news coverage, policy analysis, investigative journalism, and live market updates.',
+        canonicalUrl: 'https://npnewsmetro.in/',
+        ogType: 'website' as const,
+      },
+      structuredData: generateWebsiteStructuredData(),
+    };
+  };
+
+  const { metadata: currentSeoMetadata, structuredData: currentStructuredData } = getDynamicSeo();
+
   return (
     <div className="min-h-screen bg-canvas flex flex-col font-sans antialiased text-ink selection:bg-secondary-gold/20 selection:text-ink overflow-x-hidden w-full max-w-full">
+      {/* Dynamic SEO Head Manager */}
+      <SeoHead metadata={currentSeoMetadata} structuredData={currentStructuredData} />
+
+      {/* YouTube Video Manager Modal */}
+      <YouTubeManagerModal
+        isOpen={isYouTubeModalOpen}
+        onClose={() => setIsYouTubeModalOpen(false)}
+        onVideoSaved={(v) => {
+          setVideos(prev => [v, ...prev]);
+          setSelectedVideo(v);
+        }}
+      />
       {/* Live Preview Notification Banner (Active only when previewing in new tab) */}
       {isPreviewTab && (
         <div className="bg-slate-900 border-b-2 border-amber-500 text-white px-4 py-2.5 flex items-center justify-between sticky top-0 z-[1000] shadow-xl text-xs sm:text-sm">
@@ -781,19 +933,35 @@ function AppContent() {
                 };
                 const updated = savePublishedPost(fullPost);
                 setPosts(updated);
-                alert('Story changes saved successfully in memory & persistent storage.');
+                saveArticle(fullPost, 'draft').then(({ post, error }) => {
+                  if (error) {
+                    console.warn('Backend draft warning:', error);
+                  } else if (post) {
+                    setPosts(prev => [post, ...prev.filter(p => p.id !== post.id && p.id !== postId)]);
+                  }
+                });
+                alert('Story draft saved successfully.');
               }}
               onSubmitForReview={(postData) => {
+                saveArticle(postData, 'review').then(({ post }) => {
+                  if (post) setPosts(prev => [post, ...prev.filter(p => p.id !== post.id)]);
+                });
                 alert('Article successfully submitted to Copy Editor review queue.');
                 setAdminSection('publishing');
                 setPublishingTab('review');
               }}
               onApproveCopy={(postData) => {
+                saveArticle(postData, 'approved').then(({ post }) => {
+                  if (post) setPosts(prev => [post, ...prev.filter(p => p.id !== post.id)]);
+                });
                 alert('Copy approved by Editor. Article moved to Approved queue.');
                 setAdminSection('publishing');
                 setPublishingTab('approved');
               }}
               onSchedulePost={(postData, scheduleTime) => {
+                saveArticle(postData, 'scheduled').then(({ post }) => {
+                  if (post) setPosts(prev => [post, ...prev.filter(p => p.id !== post.id)]);
+                });
                 alert(`Article scheduled for publication at ${scheduleTime}.`);
                 setAdminSection('publishing');
                 setPublishingTab('scheduled');
@@ -1006,6 +1174,7 @@ function AppContent() {
 
               {currentTemplate === 'video-hub' && (
                 <VideoHubTemplate
+                  videos={videos}
                   onSelectVideo={handleSelectVideo}
                   onNavigateHome={() => setCurrentTemplate('homepage')}
                   showAds={showAds}
