@@ -18,7 +18,7 @@ import { WpPost, WpVideo, WpGallery } from './types/wordpress';
 import { mockPosts as initialMockPosts, mockVideos, mockGalleries } from './data/mockWpData';
 import { getStoredPosts, savePublishedPost } from './utils/newsStorage';
 import { getPublishedArticles, saveArticle, deleteArticle } from './services/articleService';
-import { getCurrentUserProfile, signOut as authSignOut } from './services/authService';
+import { getCurrentUserProfile, ensureAuthenticatedSession, signOut as authSignOut } from './services/authService';
 import { getVideos } from './services/taxonomyService';
 import { supabase } from './lib/supabase';
 import { LanguageProvider } from './context/LanguageContext';
@@ -94,6 +94,9 @@ function AppContent() {
     let isMounted = true;
     const fetchSupabaseContent = async () => {
       try {
+        // Ensure valid Supabase session for admin operations
+        ensureAuthenticatedSession().catch(() => {});
+
         const [livePosts, liveVideos] = await Promise.all([
           getPublishedArticles(),
           getPublishedVideos(),

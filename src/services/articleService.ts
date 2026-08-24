@@ -2,6 +2,7 @@ import { supabase } from '../lib/supabase';
 import { WpPost, GutenbergBlock, EditorialCategorySlug } from '../types/wordpress';
 import { EditorialStatus } from '../types/admin';
 import { mockPosts as defaultMockPosts } from '../data/mockWpData';
+import { ensureAuthenticatedSession } from './authService';
 
 // Category mapping helper
 const CATEGORY_SLUG_TO_ID: Record<string, string> = {
@@ -279,9 +280,8 @@ export const saveArticle = async (
     const title = postData.title?.trim() || 'Untitled News Story';
     const categoryId = CATEGORY_SLUG_TO_ID[postData.category || 'india'] || '11111111-1111-1111-1111-111111110001';
     
-    // Determine active author session
-    const { data: { session } } = await supabase.auth.getSession();
-    const activeUserId = session?.user?.id || '04ad79d9-d871-4099-a633-bcb7a1e35055';
+    // Ensure active authenticated session before Supabase write
+    const activeUserId = (await ensureAuthenticatedSession()) || '04ad79d9-d871-4099-a633-bcb7a1e35055';
 
     // Determine author information (writer name and position in organization)
     const authorName = postData.customAuthor?.name || 'Umang Sharma';
@@ -429,6 +429,7 @@ export const saveArticle = async (
 
 export const deleteArticle = async (idOrSlug: string): Promise<{ success: boolean; error?: string }> => {
   try {
+    await ensureAuthenticatedSession();
     let query = supabase.from('articles').delete();
 
     if (isValidUUID(idOrSlug)) {
