@@ -145,6 +145,7 @@ export const SiteFooter: React.FC<SiteFooterProps> = ({
               <li><button onClick={() => onNavigateStatic('corrections')} className="hover:text-secondary-gold transition-colors">{isHindi ? 'संशोधन एवं निवारण' : 'Corrections & Redressal'}</button></li>
               <li><button onClick={() => onNavigateStatic('advertise')} className="hover:text-secondary-gold transition-colors">{isHindi ? 'विज्ञापन दें' : 'Advertise with Us'}</button></li>
               <li><button onClick={() => onNavigateStatic('contact')} className="hover:text-secondary-gold transition-colors">{isHindi ? 'न्यूज़रूम से संपर्क करें' : 'Contact Newsroom'}</button></li>
+              <li><a href="/sitemap.xml" target="_blank" rel="noopener noreferrer" className="hover:text-secondary-gold transition-colors">{isHindi ? 'साइटमैप (XML)' : 'Sitemap (XML)'}</a></li>
             </ul>
           </div>
         </div>
@@ -172,10 +173,18 @@ export const SiteFooter: React.FC<SiteFooterProps> = ({
           </div>
 
           <div className="flex items-center gap-3">
-            <button onClick={() => onNavigateStatic('rss')} className="flex items-center gap-1 hover:text-white transition-colors">
+            <a href="/rss.xml" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-white transition-colors">
               <Rss className="w-3 h-3 text-amber-500" />
               <span>{isHindi ? 'आरएसएस फ़ीड' : 'RSS Feeds'}</span>
-            </button>
+            </a>
+            <span>•</span>
+            <a href="/sitemap.xml" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+              {isHindi ? 'साइटमैप' : 'Sitemap'}
+            </a>
+            <span>•</span>
+            <a href="/news-sitemap.xml" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+              {isHindi ? 'समाचार साइटमैप' : 'News Sitemap'}
+            </a>
           </div>
         </div>
 
@@ -194,6 +203,7 @@ export const SiteFooter: React.FC<SiteFooterProps> = ({
             <button onClick={() => onNavigateStatic('cookie-policy')} className="hover:text-white underline">{isHindi ? 'कुकी सेटिंग्स' : 'Cookie Settings'}</button>
             <button onClick={() => onNavigateStatic('ethics')} className="hover:text-white underline">{t.editorialPolicy}</button>
             <button onClick={() => onNavigateStatic('corrections')} className="hover:text-white underline">{isHindi ? 'शिकायत निवारण' : 'Grievance Officer'}</button>
+            <a href="/sitemap.xml" target="_blank" rel="noopener noreferrer" className="hover:text-white underline">{isHindi ? 'साइटमैप' : 'Sitemap'}</a>
           </div>
         </div>
       </div>
