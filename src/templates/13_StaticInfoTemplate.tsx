@@ -17,6 +17,7 @@ export type StaticPageType =
   | 'advertise' 
   | 'privacy' 
   | 'terms'
+  | 'cookie-policy'
   | 'sitemap'
   | 'epaper';
 

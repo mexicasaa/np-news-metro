@@ -67,6 +67,248 @@ import {
 } from './types/admin';
 import { mockAdminUsers, mockFailedOperations } from './data/mockAdminData';
 
+interface ParsedRoute {
+  viewMode: 'public' | 'admin';
+  template: string;
+  category: string;
+  post?: WpPost;
+  video?: WpVideo;
+  authorId: string;
+  staticPage: StaticPageType;
+  searchQuery: string;
+  isAdminLoginModalOpen: boolean;
+}
+
+const parseUrlRoute = (currentPosts: WpPost[], currentVideos: WpVideo[]): ParsedRoute => {
+  if (typeof window === 'undefined') {
+    return {
+      viewMode: 'public',
+      template: 'homepage',
+      category: 'india',
+      authorId: 'author-1',
+      staticPage: 'about',
+      searchQuery: '',
+      isAdminLoginModalOpen: false,
+    };
+  }
+
+  const rawPath = window.location.pathname;
+  const cleanPath = rawPath.replace(/^\/+|\/+$/g, '').toLowerCase();
+  const hash = window.location.hash.toLowerCase();
+  const search = window.location.search;
+
+  // 1. Admin
+  if (cleanPath === 'admin' || cleanPath.startsWith('admin/') || cleanPath === 'wp-admin' || hash === '#admin') {
+    const isAuth = localStorage.getItem('np_news_admin_auth') === 'true' || sessionStorage.getItem('np_news_admin_auth') === 'true';
+    return {
+      viewMode: isAuth ? 'admin' : 'public',
+      template: 'homepage',
+      category: 'india',
+      authorId: 'author-1',
+      staticPage: 'about',
+      searchQuery: '',
+      isAdminLoginModalOpen: !isAuth,
+    };
+  }
+
+  // 2. Preview mode
+  if (search.includes('preview=true') || hash.includes('preview')) {
+    let draftPost: WpPost | undefined;
+    const draft = localStorage.getItem('np_news_preview_draft');
+    if (draft) {
+      try { draftPost = JSON.parse(draft); } catch (e) {}
+    }
+    return {
+      viewMode: 'public',
+      template: 'article-standard',
+      category: 'india',
+      post: draftPost || currentPosts[0] || initialMockPosts[0],
+      authorId: 'author-1',
+      staticPage: 'about',
+      searchQuery: '',
+      isAdminLoginModalOpen: false,
+    };
+  }
+
+  // 3. Homepage
+  if (!cleanPath) {
+    return {
+      viewMode: 'public',
+      template: 'homepage',
+      category: 'india',
+      authorId: 'author-1',
+      staticPage: 'about',
+      searchQuery: '',
+      isAdminLoginModalOpen: false,
+    };
+  }
+
+  // 4. Fixed routes
+  if (cleanPath === 'latest') {
+    return {
+      viewMode: 'public',
+      template: 'latest',
+      category: 'india',
+      authorId: 'author-1',
+      staticPage: 'about',
+      searchQuery: '',
+      isAdminLoginModalOpen: false,
+    };
+  }
+
+  if (cleanPath === 'trending') {
+    return {
+      viewMode: 'public',
+      template: 'trending',
+      category: 'india',
+      authorId: 'author-1',
+      staticPage: 'about',
+      searchQuery: '',
+      isAdminLoginModalOpen: false,
+    };
+  }
+
+  if (cleanPath === 'videos') {
+    return {
+      viewMode: 'public',
+      template: 'video-hub',
+      category: 'videos',
+      authorId: 'author-1',
+      staticPage: 'about',
+      searchQuery: '',
+      isAdminLoginModalOpen: false,
+    };
+  }
+
+  if (cleanPath === 'photos' || cleanPath === 'gallery') {
+    return {
+      viewMode: 'public',
+      template: 'gallery',
+      category: 'photos',
+      authorId: 'author-1',
+      staticPage: 'about',
+      searchQuery: '',
+      isAdminLoginModalOpen: false,
+    };
+  }
+
+  if (cleanPath === 'search') {
+    const params = new URLSearchParams(window.location.search);
+    return {
+      viewMode: 'public',
+      template: 'search',
+      category: 'india',
+      authorId: 'author-1',
+      staticPage: 'about',
+      searchQuery: params.get('q') || '',
+      isAdminLoginModalOpen: false,
+    };
+  }
+
+  // 5. Static Pages
+  const staticPages: StaticPageType[] = ['about', 'privacy', 'terms', 'cookie-policy', 'ethics', 'editorial-team', 'corrections', 'advertise', 'contact', 'sitemap'];
+  if (staticPages.includes(cleanPath as StaticPageType)) {
+    return {
+      viewMode: 'public',
+      template: 'static',
+      category: 'india',
+      authorId: 'author-1',
+      staticPage: cleanPath as StaticPageType,
+      searchQuery: '',
+      isAdminLoginModalOpen: false,
+    };
+  }
+
+  // 6. Video Detail (/videos/:slug)
+  if (cleanPath.startsWith('videos/')) {
+    const vSlug = cleanPath.replace(/^videos\//, '');
+    const foundVideo = currentVideos.find(v => v.slug?.toLowerCase() === vSlug.toLowerCase());
+    return {
+      viewMode: 'public',
+      template: foundVideo ? 'video-detail' : 'not-found',
+      category: 'videos',
+      video: foundVideo,
+      authorId: 'author-1',
+      staticPage: 'about',
+      searchQuery: '',
+      isAdminLoginModalOpen: false,
+    };
+  }
+
+  // 7. Category Desk (/category/:slug)
+  if (cleanPath.startsWith('category/')) {
+    const cSlug = cleanPath.replace(/^category\//, '');
+    return {
+      viewMode: 'public',
+      template: 'category',
+      category: cSlug,
+      authorId: 'author-1',
+      staticPage: 'about',
+      searchQuery: '',
+      isAdminLoginModalOpen: false,
+    };
+  }
+
+  // 8. Author Profile (/author/:id)
+  if (cleanPath.startsWith('author/')) {
+    const aId = cleanPath.replace(/^author\//, '');
+    return {
+      viewMode: 'public',
+      template: 'author',
+      category: 'india',
+      authorId: aId,
+      staticPage: 'about',
+      searchQuery: '',
+      isAdminLoginModalOpen: false,
+    };
+  }
+
+  // 9. Single category slug directly: /india, /politics, /business, /economy, /technology, /world, /sports, /entertainment, /lifestyle, /opinion
+  const knownDeskSlugs = ['india', 'politics', 'business', 'economy', 'technology', 'world', 'sports', 'entertainment', 'lifestyle', 'opinion'];
+  if (knownDeskSlugs.includes(cleanPath)) {
+    return {
+      viewMode: 'public',
+      template: 'category',
+      category: cleanPath,
+      authorId: 'author-1',
+      staticPage: 'about',
+      searchQuery: '',
+      isAdminLoginModalOpen: false,
+    };
+  }
+
+  // 10. Article: /:category/:slug OR /:slug
+  const segments = cleanPath.split('/');
+  const candidateSlug = segments[segments.length - 1];
+  const allPosts = [...currentPosts, ...initialMockPosts];
+  const foundPost = allPosts.find(p => p.slug?.toLowerCase() === candidateSlug.toLowerCase() || p.id === candidateSlug);
+
+  if (foundPost) {
+    const tpl = foundPost.isBreaking ? 'article-breaking' : (foundPost.isOpinion ? 'article-opinion' : 'article-standard');
+    return {
+      viewMode: 'public',
+      template: tpl,
+      category: foundPost.category || 'india',
+      post: foundPost,
+      authorId: foundPost.authorId || 'author-1',
+      staticPage: 'about',
+      searchQuery: '',
+      isAdminLoginModalOpen: false,
+    };
+  }
+
+  // 11. Fallback / 404
+  return {
+    viewMode: 'public',
+    template: 'not-found',
+    category: 'india',
+    authorId: 'author-1',
+    staticPage: 'about',
+    searchQuery: '',
+    isAdminLoginModalOpen: false,
+  };
+};
+
 function AppContent() {
   // Check if we are in preview mode from URL query or hash
   const [isPreviewTab, setIsPreviewTab] = useState<boolean>(() => {
@@ -76,18 +318,55 @@ function AppContent() {
     );
   });
 
-  // Global View Mode: 'public' reader or 'admin' dashboard
-  const [viewMode, setViewMode] = useState<'public' | 'admin'>(() => {
-    if (typeof window !== 'undefined' && (window.location.search.includes('preview=true') || window.location.hash.includes('preview'))) {
-      return 'public';
-    }
-    return 'public';
-  });
-
   // Reactive Posts State (Seeded from localStorage and synced with Supabase backend)
   const [posts, setPosts] = useState<WpPost[]>(getStoredPosts);
   const [videos, setVideos] = useState<WpVideo[]>(mockVideos);
   const [isYouTubeModalOpen, setIsYouTubeModalOpen] = useState(false);
+
+  // Compute Initial Route from URL
+  const initialRoute = React.useMemo(() => parseUrlRoute(posts, videos), []);
+
+  // Global View Mode: 'public' reader or 'admin' dashboard
+  const [viewMode, setViewMode] = useState<'public' | 'admin'>(initialRoute.viewMode);
+  const [currentTemplate, setCurrentTemplate] = useState<string>(initialRoute.template);
+  const [selectedCategory, setSelectedCategory] = useState<string>(initialRoute.category);
+  const [selectedPost, setSelectedPost] = useState<WpPost>(initialRoute.post || posts[0] || initialMockPosts[0]);
+  const [selectedVideo, setSelectedVideo] = useState<WpVideo>(initialRoute.video || videos[0] || mockVideos[0]);
+  const [selectedGallery, setSelectedGallery] = useState<WpGallery>(mockGalleries[0]);
+  const [selectedAuthorId, setSelectedAuthorId] = useState<string>(initialRoute.authorId);
+  const [staticPage, setStaticPage] = useState<StaticPageType>(initialRoute.staticPage);
+  const [searchQuery, setSearchQuery] = useState<string>(initialRoute.searchQuery || 'Infrastructure Corridor');
+
+  // Admin Authentication & Security
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return localStorage.getItem('np_news_admin_auth') === 'true' || sessionStorage.getItem('np_news_admin_auth') === 'true';
+  });
+  const [adminLoginModalOpen, setAdminLoginModalOpen] = useState<boolean>(initialRoute.isAdminLoginModalOpen);
+  const [pendingAdminSection, setPendingAdminSection] = useState<AdminSection>('publishing');
+  const [pendingPublishingTab, setPendingPublishingTab] = useState<PublishingTab | undefined>(undefined);
+
+  // Admin Workspace State
+  const [adminSection, setAdminSection] = useState<AdminSection>('dashboard');
+  const [currentUserRole, setCurrentUserRole] = useState<UserRole>('editor');
+  const [activeEnvironment, setActiveEnvironment] = useState<'production' | 'staging'>('production');
+  const [publishingTab, setPublishingTab] = useState<PublishingTab>('all');
+  const [activeEditingPost, setActiveEditingPost] = useState<WpPost | undefined>(undefined);
+  const [deletedArticles, setDeletedArticles] = useState<DeletedArticle[]>([]);
+
+  // Apply route from current window.location
+  const applyRouteFromUrl = React.useCallback((currentPosts: WpPost[], currentVideos: WpVideo[]) => {
+    const route = parseUrlRoute(currentPosts, currentVideos);
+    setViewMode(route.viewMode);
+    setCurrentTemplate(route.template);
+    if (route.category) setSelectedCategory(route.category);
+    if (route.post) setSelectedPost(route.post);
+    if (route.video) setSelectedVideo(route.video);
+    if (route.authorId) setSelectedAuthorId(route.authorId);
+    if (route.staticPage) setStaticPage(route.staticPage);
+    if (route.searchQuery) setSearchQuery(route.searchQuery);
+    if (route.isAdminLoginModalOpen) setAdminLoginModalOpen(true);
+  }, []);
 
   // Load published articles & video content directly from Supabase
   React.useEffect(() => {
@@ -104,14 +383,12 @@ function AppContent() {
         if (isMounted) {
           if (livePosts && livePosts.length > 0) {
             setPosts(livePosts);
-            if (!isPreviewTab) {
-              setSelectedPost(livePosts[0]);
-            }
           }
           if (liveVideos && liveVideos.length > 0) {
             setVideos(liveVideos);
-            setSelectedVideo(liveVideos[0]);
           }
+          // Re-evaluate URL route with newly loaded database content
+          applyRouteFromUrl(livePosts || posts, liveVideos || videos);
         }
       } catch (err) {
         console.error('Error fetching Supabase content:', err);
@@ -122,7 +399,7 @@ function AppContent() {
     return () => {
       isMounted = false;
     };
-  }, [isPreviewTab]);
+  }, [isPreviewTab, applyRouteFromUrl]);
 
   // Cross-tab and multi-device Realtime listener for newly published/updated news from Supabase
   React.useEffect(() => {
@@ -158,26 +435,6 @@ function AppContent() {
       supabase.removeChannel(realtimeChannel);
     };
   }, []);
-
-  // Public Reader Navigation & Active Template State
-  const [currentTemplate, setCurrentTemplate] = useState<string>(() => {
-    if (typeof window !== 'undefined' && (window.location.search.includes('preview=true') || window.location.hash.includes('preview'))) {
-      return 'article-standard';
-    }
-    return 'homepage';
-  });
-  const [selectedCategory, setSelectedCategory] = useState<string>('india');
-  const [selectedPost, setSelectedPost] = useState<WpPost>(() => {
-    if (typeof window !== 'undefined' && (window.location.search.includes('preview=true') || window.location.hash.includes('preview'))) {
-      const draft = localStorage.getItem('np_news_preview_draft');
-      if (draft) {
-        try {
-          return JSON.parse(draft);
-        } catch (e) {}
-      }
-    }
-    return initialMockPosts[0];
-  });
 
   // Live Cross-Tab Synchronization for Preview
   React.useEffect(() => {
@@ -219,52 +476,11 @@ function AppContent() {
       channel?.close();
     };
   }, [isPreviewTab]);
-  const [selectedVideo, setSelectedVideo] = useState<WpVideo>(mockVideos[0]);
-  const [selectedGallery, setSelectedGallery] = useState<WpGallery>(mockGalleries[0]);
-  const [selectedAuthorId, setSelectedAuthorId] = useState<string>('author-1');
-  const [staticPage, setStaticPage] = useState<StaticPageType>('about');
-  const [searchQuery, setSearchQuery] = useState<string>('Infrastructure Corridor');
 
-  // Admin Authentication & Security
-  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return false;
-    return localStorage.getItem('np_news_admin_auth') === 'true' || sessionStorage.getItem('np_news_admin_auth') === 'true';
-  });
-  const [adminLoginModalOpen, setAdminLoginModalOpen] = useState<boolean>(false);
-  const [pendingAdminSection, setPendingAdminSection] = useState<AdminSection>('publishing');
-  const [pendingPublishingTab, setPendingPublishingTab] = useState<PublishingTab | undefined>(undefined);
-
-  // Admin Workspace State
-  const [adminSection, setAdminSection] = useState<AdminSection>('dashboard');
-  const [currentUserRole, setCurrentUserRole] = useState<UserRole>('editor');
-  const [activeEnvironment, setActiveEnvironment] = useState<'production' | 'staging'>('production');
-  const [publishingTab, setPublishingTab] = useState<PublishingTab>('all');
-  const [activeEditingPost, setActiveEditingPost] = useState<WpPost | undefined>(undefined);
-  const [deletedArticles, setDeletedArticles] = useState<DeletedArticle[]>([]);
-
-  // URL Routing & /admin Route Detection
+  // URL Popstate Listener & Shortcuts
   React.useEffect(() => {
-    const checkUrlRoute = () => {
-      if (typeof window === 'undefined') return;
-      const path = window.location.pathname.toLowerCase();
-      const hash = window.location.hash.toLowerCase();
-
-      if (path === '/admin' || path.startsWith('/admin/') || path === '/wp-admin' || hash === '#admin') {
-        const isAuth = localStorage.getItem('np_news_admin_auth') === 'true' || sessionStorage.getItem('np_news_admin_auth') === 'true';
-        if (isAuth) {
-          setIsAdminAuthenticated(true);
-          setViewMode('admin');
-        } else {
-          setPendingAdminSection('publishing');
-          setAdminLoginModalOpen(true);
-        }
-      }
-    };
-
-    checkUrlRoute();
-
     const handlePopState = () => {
-      checkUrlRoute();
+      applyRouteFromUrl(posts, videos);
     };
 
     // Keyboard shortcut Ctrl+Shift+A or Alt+A to trigger Admin from anywhere
@@ -282,7 +498,7 @@ function AppContent() {
       window.removeEventListener('popstate', handlePopState);
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [posts, videos, applyRouteFromUrl]);
 
   // Modals & Drawers
   const [menuOpen, setMenuOpen] = useState(false);
@@ -305,7 +521,16 @@ function AppContent() {
 
   const currentUser: UserProfile = mockAdminUsers.find(u => u.role === currentUserRole) || mockAdminUsers[0];
 
-  // Helper Navigation Handlers (Public)
+  // Helper Navigation Handlers (Public with PushState)
+  const handleNavigateHome = () => {
+    setCurrentTemplate('homepage');
+    setViewMode('public');
+    if (typeof window !== 'undefined') {
+      window.history.pushState({ view: 'public' }, '', '/');
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleSelectPost = (post: WpPost) => {
     setSelectedPost(post);
     if (post.isBreaking) {
@@ -316,25 +541,35 @@ function AppContent() {
       setCurrentTemplate('article-standard');
     }
     setViewMode('public');
+    if (typeof window !== 'undefined') {
+      const categorySlug = post.category || 'india';
+      window.history.pushState({ view: 'public', type: 'article', slug: post.slug }, '', `/${categorySlug}/${post.slug}`);
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleSelectCategory = (slug: string) => {
+    setViewMode('public');
     if (slug === 'home') {
       setCurrentTemplate('homepage');
+      if (typeof window !== 'undefined') window.history.pushState({ view: 'public' }, '', '/');
     } else if (slug === 'latest') {
       setCurrentTemplate('latest');
+      if (typeof window !== 'undefined') window.history.pushState({ view: 'public' }, '', '/latest');
     } else if (slug === 'videos') {
       setCurrentTemplate('video-hub');
+      if (typeof window !== 'undefined') window.history.pushState({ view: 'public' }, '', '/videos');
     } else if (slug === 'photos') {
       setCurrentTemplate('gallery');
+      if (typeof window !== 'undefined') window.history.pushState({ view: 'public' }, '', '/photos');
     } else if (slug === 'trending') {
       setCurrentTemplate('trending');
+      if (typeof window !== 'undefined') window.history.pushState({ view: 'public' }, '', '/trending');
     } else {
       setSelectedCategory(slug);
       setCurrentTemplate('category');
+      if (typeof window !== 'undefined') window.history.pushState({ view: 'public', category: slug }, '', `/category/${slug}`);
     }
-    setViewMode('public');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -342,6 +577,9 @@ function AppContent() {
     setSelectedVideo(video);
     setCurrentTemplate('video-detail');
     setViewMode('public');
+    if (typeof window !== 'undefined') {
+      window.history.pushState({ view: 'public', video: video.slug }, '', `/videos/${video.slug}`);
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -349,6 +587,9 @@ function AppContent() {
     setSelectedAuthorId(authorId);
     setCurrentTemplate('author');
     setViewMode('public');
+    if (typeof window !== 'undefined') {
+      window.history.pushState({ view: 'public', author: authorId }, '', `/author/${authorId}`);
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -356,6 +597,9 @@ function AppContent() {
     setStaticPage(page as StaticPageType);
     setCurrentTemplate('static');
     setViewMode('public');
+    if (typeof window !== 'undefined') {
+      window.history.pushState({ view: 'public', static: page }, '', `/${page}`);
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -363,6 +607,37 @@ function AppContent() {
     setSearchQuery(queryText);
     setCurrentTemplate('search');
     setViewMode('public');
+    if (typeof window !== 'undefined') {
+      window.history.pushState({ view: 'public', query: queryText }, '', `/search?q=${encodeURIComponent(queryText)}`);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleNavigateTrending = () => {
+    setCurrentTemplate('trending');
+    setViewMode('public');
+    if (typeof window !== 'undefined') window.history.pushState({ view: 'public' }, '', '/trending');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleNavigateVideos = () => {
+    setCurrentTemplate('video-hub');
+    setViewMode('public');
+    if (typeof window !== 'undefined') window.history.pushState({ view: 'public' }, '', '/videos');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleNavigatePhotos = () => {
+    setCurrentTemplate('gallery');
+    setViewMode('public');
+    if (typeof window !== 'undefined') window.history.pushState({ view: 'public' }, '', '/photos');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleNavigateLatest = () => {
+    setCurrentTemplate('latest');
+    setViewMode('public');
+    if (typeof window !== 'undefined') window.history.pushState({ view: 'public' }, '', '/latest');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -1124,10 +1399,7 @@ function AppContent() {
             onOpenMenu={() => setMenuOpen(true)}
             onOpenSearch={() => setSearchOpen(true)}
             onOpenNewsletter={() => setNewsletterOpen(true)}
-            onNavigateHome={() => {
-              setCurrentTemplate('homepage');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
+            onNavigateHome={handleNavigateHome}
             onOpenAdmin={() => handleOpenAdmin('publishing')}
           />
 
@@ -1147,14 +1419,8 @@ function AppContent() {
                 : selectedCategory
             }
             onSelectCategory={handleSelectCategory}
-            onNavigateTrending={() => {
-              setCurrentTemplate('trending');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            onNavigatePhotos={() => {
-              setCurrentTemplate('gallery');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
+            onNavigateTrending={handleNavigateTrending}
+            onNavigatePhotos={handleNavigatePhotos}
           />
 
           {/* GLOBAL SHELL 4: Financial Markets Live Ticker */}
@@ -1193,8 +1459,8 @@ function AppContent() {
                   onSelectVideo={handleSelectVideo}
                   onSelectCategory={handleSelectCategory}
                   onSelectAuthor={handleSelectAuthor}
-                  onNavigateTrending={() => setCurrentTemplate('trending')}
-                  onNavigateVideos={() => setCurrentTemplate('video-hub')}
+                  onNavigateTrending={handleNavigateTrending}
+                  onNavigateVideos={handleNavigateVideos}
                   onOpenNewsletter={() => setNewsletterOpen(true)}
                   showAds={showAds}
                 />
@@ -1204,8 +1470,8 @@ function AppContent() {
                 <LatestNewsTemplate
                   posts={posts}
                   onSelectPost={handleSelectPost}
-                  onNavigateHome={() => setCurrentTemplate('homepage')}
-                  onNavigateTrending={() => setCurrentTemplate('trending')}
+                  onNavigateHome={handleNavigateHome}
+                  onNavigateTrending={handleNavigateTrending}
                   showAds={showAds}
                 />
               )}
@@ -1215,9 +1481,9 @@ function AppContent() {
                   posts={posts}
                   categorySlug={selectedCategory}
                   onSelectPost={handleSelectPost}
-                  onNavigateHome={() => setCurrentTemplate('homepage')}
+                  onNavigateHome={handleNavigateHome}
                   onSelectCategory={handleSelectCategory}
-                  onNavigateTrending={() => setCurrentTemplate('trending')}
+                  onNavigateTrending={handleNavigateTrending}
                   showAds={showAds}
                 />
               )}
@@ -1226,7 +1492,7 @@ function AppContent() {
                 <StandardArticleTemplate
                   post={selectedPost}
                   onSelectPost={handleSelectPost}
-                  onNavigateHome={() => setCurrentTemplate('homepage')}
+                  onNavigateHome={handleNavigateHome}
                   onSelectCategory={handleSelectCategory}
                   onSelectAuthor={handleSelectAuthor}
                   showCorrections={showCorrections}
@@ -1238,7 +1504,7 @@ function AppContent() {
                 <BreakingArticleTemplate
                   post={selectedPost}
                   onSelectPost={handleSelectPost}
-                  onNavigateHome={() => setCurrentTemplate('homepage')}
+                  onNavigateHome={handleNavigateHome}
                   onSelectCategory={handleSelectCategory}
                   onSelectAuthor={handleSelectAuthor}
                 />
@@ -1248,7 +1514,7 @@ function AppContent() {
                 <OpinionArticleTemplate
                   post={selectedPost}
                   onSelectPost={handleSelectPost}
-                  onNavigateHome={() => setCurrentTemplate('homepage')}
+                  onNavigateHome={handleNavigateHome}
                   onSelectCategory={handleSelectCategory}
                   onSelectAuthor={handleSelectAuthor}
                 />
@@ -1258,7 +1524,7 @@ function AppContent() {
                 <VideoHubTemplate
                   videos={videos}
                   onSelectVideo={handleSelectVideo}
-                  onNavigateHome={() => setCurrentTemplate('homepage')}
+                  onNavigateHome={handleNavigateHome}
                   showAds={showAds}
                 />
               )}
@@ -1268,8 +1534,8 @@ function AppContent() {
                   video={selectedVideo}
                   onSelectVideo={handleSelectVideo}
                   onSelectPost={handleSelectPost}
-                  onNavigateHome={() => setCurrentTemplate('homepage')}
-                  onNavigateVideos={() => setCurrentTemplate('video-hub')}
+                  onNavigateHome={handleNavigateHome}
+                  onNavigateVideos={handleNavigateVideos}
                   showAds={showAds}
                 />
               )}
@@ -1278,7 +1544,7 @@ function AppContent() {
                 <PhotoGalleryTemplate
                   gallery={selectedGallery}
                   onSelectPost={handleSelectPost}
-                  onNavigateHome={() => setCurrentTemplate('homepage')}
+                  onNavigateHome={handleNavigateHome}
                   onSelectCategory={handleSelectCategory}
                   showAds={showAds}
                 />
@@ -1289,7 +1555,7 @@ function AppContent() {
                   posts={posts}
                   initialQuery={searchQuery}
                   onSelectPost={handleSelectPost}
-                  onNavigateHome={() => setCurrentTemplate('homepage')}
+                  onNavigateHome={handleNavigateHome}
                   onSelectCategory={handleSelectCategory}
                 />
               )}
@@ -1298,7 +1564,7 @@ function AppContent() {
                 <AuthorProfileTemplate
                   authorId={selectedAuthorId}
                   onSelectPost={handleSelectPost}
-                  onNavigateHome={() => setCurrentTemplate('homepage')}
+                  onNavigateHome={handleNavigateHome}
                   onSelectCategory={handleSelectCategory}
                 />
               )}
@@ -1307,7 +1573,7 @@ function AppContent() {
                 <TrendingTemplate
                   posts={posts}
                   onSelectPost={handleSelectPost}
-                  onNavigateHome={() => setCurrentTemplate('homepage')}
+                  onNavigateHome={handleNavigateHome}
                   onSelectCategory={handleSelectCategory}
                 />
               )}
@@ -1315,16 +1581,16 @@ function AppContent() {
               {currentTemplate === 'static' && (
                 <StaticInfoTemplate
                   initialPage={staticPage}
-                  onNavigateHome={() => setCurrentTemplate('homepage')}
+                  onNavigateHome={handleNavigateHome}
                   onSelectAuthor={handleSelectAuthor}
                 />
               )}
 
               {currentTemplate === 'not-found' && (
                 <NotFoundTemplate
-                  onNavigateHome={() => setCurrentTemplate('homepage')}
-                  onNavigateLatest={() => setCurrentTemplate('latest')}
-                  onNavigateTrending={() => setCurrentTemplate('trending')}
+                  onNavigateHome={handleNavigateHome}
+                  onNavigateLatest={handleNavigateLatest}
+                  onNavigateTrending={handleNavigateTrending}
                   onSelectPost={handleSelectPost}
                   onSelectCategory={handleSelectCategory}
                   onExecuteSearch={(q) => handleExecuteSearch(q)}
@@ -1348,11 +1614,11 @@ function AppContent() {
             onSelectCategory={handleSelectCategory}
             onOpenSearch={() => setSearchOpen(true)}
             onNavigateTrending={() => {
-              setCurrentTemplate('trending');
+              handleNavigateTrending();
               setMenuOpen(false);
             }}
             onNavigatePhotos={() => {
-              setCurrentTemplate('gallery');
+              handleNavigatePhotos();
               setMenuOpen(false);
             }}
             onNavigateStatic={(page) => {
