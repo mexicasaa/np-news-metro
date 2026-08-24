@@ -33,17 +33,6 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
       const { profile, error: authError } = await signInWithCredentials(cleanUser, cleanPass);
 
       if (authError || !profile) {
-        // Check fallback for local admin credential
-        if (cleanUser.toLowerCase() === 'admin' && cleanPass === 'umang1512') {
-          try {
-            localStorage.setItem('np_news_admin_auth', 'true');
-            sessionStorage.setItem('np_news_admin_auth', 'true');
-          } catch (e) {}
-          setIsSubmitting(false);
-          onSuccess();
-          return;
-        }
-
         setIsSubmitting(false);
         setError(authError || 'Invalid username or password. Please verify your credentials.');
         return;
@@ -53,6 +42,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
         localStorage.setItem('np_news_admin_auth', 'true');
         sessionStorage.setItem('np_news_admin_auth', 'true');
       } catch (e) {}
+      
       setIsSubmitting(false);
       onSuccess();
     } catch (err: any) {
@@ -88,7 +78,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
               Newsroom Staff Login
             </h2>
             <p className="text-xs text-slate-500 mt-1">
-              NP News Metro • Editorial Management Suite
+              NP News Metro — Editorial Management Suite
             </p>
           </div>
 
@@ -161,7 +151,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
               className="w-full py-3 bg-[#162839] hover:bg-[#2C3E50] active:scale-[0.99] text-white rounded-xl font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer mt-2 disabled:opacity-50"
             >
               {isSubmitting ? (
-                <span>Authenticating...</span>
+                <span>Authenticating with Supabase...</span>
               ) : (
                 <>
                   <span>Sign In to Admin Panel</span>

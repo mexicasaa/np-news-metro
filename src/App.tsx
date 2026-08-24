@@ -20,6 +20,7 @@ import { getStoredPosts, savePublishedPost } from './utils/newsStorage';
 import { getPublishedArticles, saveArticle, deleteArticle } from './services/articleService';
 import { getCurrentUserProfile, signOut as authSignOut } from './services/authService';
 import { getVideos } from './services/taxonomyService';
+import { supabase } from './lib/supabase';
 import { LanguageProvider } from './context/LanguageContext';
 
 // 14 Public Reader Templates
@@ -120,22 +121,38 @@ function AppContent() {
     };
   }, [isPreviewTab]);
 
-  // Cross-tab real-time listener for newly published news
+  // Cross-tab and multi-device Realtime listener for newly published/updated news from Supabase
   React.useEffect(() => {
     let feedChannel: BroadcastChannel | null = null;
     try {
       if (typeof BroadcastChannel !== 'undefined') {
         feedChannel = new BroadcastChannel('np_news_feed_channel');
-        feedChannel.onmessage = (event) => {
+        feedChannel.onmessage = async (event) => {
           if (event.data?.type === 'NEWS_PUBLISHED') {
-            setPosts(getStoredPosts());
+            const fresh = await getPublishedArticles();
+            setPosts(fresh);
           }
         };
       }
     } catch (e) {}
 
+    // Supabase Realtime Channel for Cross-Browser/Cross-Device Instant Sync
+    const realtimeChannel = supabase
+      .channel('public:articles')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'articles' },
+        async (payload) => {
+          console.log('[Realtime] Database change detected:', payload.eventType);
+          const freshPosts = await getPublishedArticles();
+          setPosts(freshPosts);
+        }
+      )
+      .subscribe();
+
     return () => {
       feedChannel?.close();
+      supabase.removeChannel(realtimeChannel);
     };
   }, []);
 
@@ -534,7 +551,7 @@ function AppContent() {
   };
 
   // 15-Step Safe Publish Orchestration Execution
-  const handleExecutePublish = (postData: Partial<WpPost>) => {
+  const handleExecutePublish = async (postData: Partial<WpPost>) => {
     setReadinessModalOpen(false);
     setPublishOrchestratorOpen(true);
 
@@ -570,109 +587,92 @@ function AppContent() {
 
     setCurrentOperation(operation);
 
-    // Animate execution of the 15 pipeline steps
-    let currentStep = 1;
-    const interval = setInterval(() => {
-      currentStep++;
-      if (currentStep <= 15) {
-        setCurrentOperation(prev => {
-          if (!prev) return null;
-          const updatedSteps = prev.steps.map(s => {
-            if (s.stepNumber < currentStep) {
-              return { ...s, status: 'success' as const, durationMs: Math.floor(40 + Math.random() * 80) };
-            } else if (s.stepNumber === currentStep) {
-              return { ...s, status: 'running' as const };
-            }
-            return s;
-          });
-          return { ...prev, steps: updatedSteps };
-        });
-      } else {
-        clearInterval(interval);
-        // Completed pipeline!
-        const fullPost: WpPost = {
-          id: newPostId,
-          title: postData.title || 'Untitled News Story',
-          titleHi: postData.titleHi || postData.title || '',
-          dek: postData.dek || '',
-          category: (postData.category as any) || 'india',
-          authorId: postData.authorId || 'author-1',
-          customAuthor: postData.customAuthor,
-          featuredImage: postData.featuredImage || 'https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&q=80&w=1200',
-          imageAlt: postData.imageAlt || postData.title || '',
-          imageCredit: postData.imageCredit || 'NP News Metro Photo Desk',
-          imageCaption: postData.imageCaption || '',
-          publishedAt: postData.publishedAt || new Date().toISOString(),
-          readTime: postData.readTime || '3 min read',
-          viewsCount: 140,
-          commentCount: 0,
-          sharesCount: 12,
-          isLead: true,
-          isFeatured: true,
-          isBreaking: postData.isBreaking || false,
-          slug: postData.slug || 'live-story',
-          tags: postData.tags || ['National', 'Policy'],
-          blocks: postData.blocks || [
-            { id: 'b1', type: 'paragraph', content: postData.dek || 'Latest dispatch from newsroom.' }
-          ],
-        };
+    const fullPost: WpPost = {
+      id: newPostId,
+      title: postData.title || 'Untitled News Story',
+      titleHi: postData.titleHi || postData.title || '',
+      dek: postData.dek || '',
+      category: (postData.category as any) || 'india',
+      authorId: postData.authorId || '04ad79d9-d871-4099-a633-bcb7a1e35055',
+      customAuthor: postData.customAuthor,
+      featuredImage: postData.featuredImage || 'https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&q=80&w=1200',
+      imageAlt: postData.imageAlt || postData.title || '',
+      imageCredit: postData.imageCredit || 'NP News Metro Photo Desk',
+      imageCaption: postData.imageCaption || '',
+      publishedAt: postData.publishedAt || new Date().toISOString(),
+      readTime: postData.readTime || '3 min read',
+      viewsCount: 140,
+      commentCount: 0,
+      sharesCount: 12,
+      isLead: true,
+      isFeatured: true,
+      isBreaking: postData.isBreaking || false,
+      slug: postData.slug || 'live-story',
+      tags: postData.tags || ['National', 'Policy'],
+      blocks: postData.blocks || [
+        { id: 'b1', type: 'paragraph', content: postData.dek || 'Latest dispatch from newsroom.' }
+      ],
+    };
 
-        // Persist to Supabase database & local storage broadcast
-        saveArticle(fullPost, 'published').then(({ post, error }) => {
-          if (error) {
-            console.warn('Supabase publish note:', error);
-          } else if (post) {
-            savePublishedPost(post);
-            setPosts(prev => [post, ...prev.filter(p => p.id !== post.id && p.id !== newPostId && p.slug !== post.slug)]);
-            if (selectedPost && (selectedPost.id === fullPost.id || selectedPost.slug === fullPost.slug || selectedPost.id === newPostId)) {
-              setSelectedPost(post);
-            }
-          }
-        });
+    try {
+      const { post: savedDbPost, error: dbError } = await saveArticle(fullPost, 'published');
 
-        const updatedPosts = savePublishedPost(fullPost);
-        setPosts(updatedPosts);
-        if (selectedPost && selectedPost.id === fullPost.id) {
-          setSelectedPost(fullPost);
-        }
-
-        if (fullPost.isBreaking) {
-          setIsEmergencyBreaking(true);
-        }
-
-        setCurrentOperation(prev => {
-          if (!prev) return null;
-          return {
-            ...prev,
-            status: 'published_healthy',
-            completedAt: new Date().toLocaleTimeString() + ' IST',
-            steps: prev.steps.map(s => ({ ...s, status: 'success' as const, durationMs: Math.floor(40 + Math.random() * 80) })),
-            verificationReport: {
-              url: `https://npnewsmetro.in/${fullPost.category}/${fullPost.slug}`,
-              httpStatus: 200,
-              headlineMatch: true,
-              heroImageLoaded: true,
-              canonicalValid: true,
-              schemaValid: true,
-              authorVerified: true,
-              categoryVerified: true,
-              mobileRenderPassed: true,
-              distribution: {
-                homepage: true,
-                category: true,
-                latest: true,
-                search: true,
-                sitemap: true,
-                rss: true,
-                analytics: true,
-                cache: true,
-                social: 'success',
-              },
-            },
-          };
-        });
+      if (dbError || !savedDbPost) {
+        setCurrentOperation(prev => prev ? {
+          ...prev,
+          status: 'failed',
+          completedAt: new Date().toLocaleTimeString() + ' IST',
+          steps: prev.steps.map((s, idx) => idx === 7 ? { ...s, status: 'failed' as const, message: dbError || 'Database write rejected' } : s)
+        } : null);
+        alert(`Database publication failed: ${dbError || 'Unknown error'}`);
+        return;
       }
-    }, 160);
+
+      savePublishedPost(savedDbPost);
+      setPosts(prev => [savedDbPost, ...prev.filter(p => p.id !== savedDbPost.id && p.id !== newPostId && p.slug !== savedDbPost.slug)]);
+      setSelectedPost(savedDbPost);
+
+      if (savedDbPost.isBreaking) {
+        setIsEmergencyBreaking(true);
+      }
+
+      setCurrentOperation(prev => prev ? {
+        ...prev,
+        status: 'published_healthy',
+        completedAt: new Date().toLocaleTimeString() + ' IST',
+        steps: prev.steps.map(s => ({ ...s, status: 'success' as const, durationMs: Math.floor(40 + Math.random() * 80) })),
+        verificationReport: {
+          url: `https://npnewsmetro.in/${savedDbPost.category}/${savedDbPost.slug}`,
+          httpStatus: 200,
+          headlineMatch: true,
+          heroImageLoaded: true,
+          canonicalValid: true,
+          schemaValid: true,
+          authorVerified: true,
+          categoryVerified: true,
+          mobileRenderPassed: true,
+          distribution: {
+            homepage: true,
+            category: true,
+            latest: true,
+            search: true,
+            sitemap: true,
+            rss: true,
+            analytics: true,
+            cache: true,
+            social: 'success',
+          },
+        },
+      } : null);
+    } catch (err: any) {
+      setCurrentOperation(prev => prev ? {
+        ...prev,
+        status: 'failed',
+        completedAt: new Date().toLocaleTimeString() + ' IST',
+        steps: prev.steps.map((s, idx) => idx === 7 ? { ...s, status: 'failed' as const, message: err?.message || 'Network failure' } : s)
+      } : null);
+      alert(`Publication error: ${err?.message || 'Failed to publish story.'}`);
+    }
   };
 
   // Emergency Breaking Handler
@@ -907,7 +907,7 @@ function AppContent() {
               initialPost={activeEditingPost}
               userRole={currentUserRole}
               currentAuthorId={currentUser.id}
-              onSaveDraft={(postData) => {
+              onSaveDraft={async (postData) => {
                 const postId = postData.id || activeEditingPost?.id || `post-${Date.now()}`;
                 const fullPost: WpPost = {
                   id: postId,
@@ -915,7 +915,7 @@ function AppContent() {
                   titleHi: postData.titleHi || postData.title || '',
                   dek: postData.dek || '',
                   category: (postData.category as any) || 'india',
-                  authorId: postData.authorId || 'author-1',
+                  authorId: postData.authorId || '04ad79d9-d871-4099-a633-bcb7a1e35055',
                   customAuthor: postData.customAuthor,
                   featuredImage: postData.featuredImage || 'https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&q=80&w=1200',
                   imageAlt: postData.imageAlt || postData.title || '',
@@ -935,37 +935,46 @@ function AppContent() {
                     { id: 'b1', type: 'paragraph', content: postData.dek || 'Draft content.' }
                   ],
                 };
-                const updated = savePublishedPost(fullPost);
-                setPosts(updated);
-                saveArticle(fullPost, 'draft').then(({ post, error }) => {
-                  if (error) {
-                    console.warn('Backend draft warning:', error);
-                  } else if (post) {
-                    setPosts(prev => [post, ...prev.filter(p => p.id !== post.id && p.id !== postId)]);
-                  }
-                });
-                alert('Story draft saved successfully.');
+
+                const { post, error } = await saveArticle(fullPost, 'draft');
+                if (error || !post) {
+                  alert(`Failed to save draft to database: ${error || 'Unknown error'}`);
+                  return;
+                }
+
+                savePublishedPost(post);
+                setPosts(prev => [post, ...prev.filter(p => p.id !== post.id && p.id !== postId)]);
+                alert('Story draft saved successfully in database.');
               }}
-              onSubmitForReview={(postData) => {
-                saveArticle(postData, 'review').then(({ post }) => {
-                  if (post) setPosts(prev => [post, ...prev.filter(p => p.id !== post.id)]);
-                });
+              onSubmitForReview={async (postData) => {
+                const { post, error } = await saveArticle(postData, 'review');
+                if (error || !post) {
+                  alert(`Failed to submit article for review: ${error || 'Database write error'}`);
+                  return;
+                }
+                setPosts(prev => [post, ...prev.filter(p => p.id !== post.id)]);
                 alert('Article successfully submitted to Copy Editor review queue.');
                 setAdminSection('publishing');
                 setPublishingTab('review');
               }}
-              onApproveCopy={(postData) => {
-                saveArticle(postData, 'approved').then(({ post }) => {
-                  if (post) setPosts(prev => [post, ...prev.filter(p => p.id !== post.id)]);
-                });
+              onApproveCopy={async (postData) => {
+                const { post, error } = await saveArticle(postData, 'approved');
+                if (error || !post) {
+                  alert(`Failed to approve copy: ${error || 'Database write error'}`);
+                  return;
+                }
+                setPosts(prev => [post, ...prev.filter(p => p.id !== post.id)]);
                 alert('Copy approved by Editor. Article moved to Approved queue.');
                 setAdminSection('publishing');
                 setPublishingTab('approved');
               }}
-              onSchedulePost={(postData, scheduleTime) => {
-                saveArticle(postData, 'scheduled').then(({ post }) => {
-                  if (post) setPosts(prev => [post, ...prev.filter(p => p.id !== post.id)]);
-                });
+              onSchedulePost={async (postData, scheduleTime) => {
+                const { post, error } = await saveArticle(postData, 'scheduled');
+                if (error || !post) {
+                  alert(`Failed to schedule article: ${error || 'Database write error'}`);
+                  return;
+                }
+                setPosts(prev => [post, ...prev.filter(p => p.id !== post.id)]);
                 alert(`Article scheduled for publication at ${scheduleTime}.`);
                 setAdminSection('publishing');
                 setPublishingTab('scheduled');

@@ -92,7 +92,7 @@ export const mapDbToWpPost = (row: any, joinedTags?: string[]): WpPost => {
     categoryHi: undefined,
     location: row.location || 'New Delhi',
     tags: tagList,
-    authorId: row.author_id || 'author-1',
+    authorId: row.author_id || '04ad79d9-d871-4099-a633-bcb7a1e35055',
     customAuthor: authorObj,
     publishedAt: row.published_at || row.created_at || new Date().toISOString(),
     updatedAt: row.updated_at || undefined,
@@ -190,7 +190,7 @@ export const getPublishedArticles = async (): Promise<WpPost[]> => {
 
     const livePosts = data.map(row => mapDbToWpPost(row));
     
-    // Merge live posts with any missing mock posts so full category coverage is preserved
+    // Merge live posts with missing mock posts only to preserve category sample breadth if few articles exist
     const liveSlugs = new Set(livePosts.map(p => p.slug));
     const supplementalMock = defaultMockPosts.filter(m => !liveSlugs.has(m.slug));
     
@@ -279,9 +279,13 @@ export const saveArticle = async (
     const title = postData.title?.trim() || 'Untitled News Story';
     const categoryId = CATEGORY_SLUG_TO_ID[postData.category || 'india'] || '11111111-1111-1111-1111-111111110001';
     
+    // Determine active author session
+    const { data: { session } } = await supabase.auth.getSession();
+    const activeUserId = session?.user?.id || '04ad79d9-d871-4099-a633-bcb7a1e35055';
+
     // Determine author information (writer name and position in organization)
-    const authorName = postData.customAuthor?.name || 'NP News Metro Bureau';
-    const authorRole = postData.customAuthor?.role || 'Staff Reporter';
+    const authorName = postData.customAuthor?.name || 'Umang Sharma';
+    const authorRole = postData.customAuthor?.role || 'Editor-in-Chief';
     const authorAvatar = postData.customAuthor?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400';
     const authorBio = postData.customAuthor?.bio || null;
 
@@ -320,7 +324,7 @@ export const saveArticle = async (
 
     const slug = postData.slug?.trim() || (await generateUniqueSlug(title, existingId || undefined));
 
-    const dbPayload = {
+    const dbPayload: any = {
       title,
       title_hi: postData.titleHi || null,
       slug,
@@ -340,13 +344,14 @@ export const saveArticle = async (
       is_sponsored: !!postData.isSponsored,
       sponsor_name: postData.sponsorName || null,
       location: postData.location || 'New Delhi',
+      author_id: activeUserId,
       author_name: authorName,
       author_role: authorRole,
       author_avatar: authorAvatar,
       author_bio: authorBio,
-      custom_author: customAuthorPayload as any,
-      blocks: (postData.blocks || []) as any,
-      key_takeaways: (postData.keyTakeaways || []) as any,
+      custom_author: customAuthorPayload,
+      blocks: postData.blocks || [],
+      key_takeaways: postData.keyTakeaways || [],
       seo_title: postData.seoTitle || null,
       meta_description: postData.seoDescription || null,
       reading_time_minutes: readTimeMinutes,
@@ -361,7 +366,7 @@ export const saveArticle = async (
     if (existingId) {
       const { data, error } = await supabase
         .from('articles')
-        .update(dbPayload as any)
+        .update(dbPayload)
         .eq('id', existingId)
         .select(`
           *,
@@ -373,13 +378,16 @@ export const saveArticle = async (
         .single();
 
       if (error) {
-        return { error: `Failed to update article in database: ${error.message}` };
+        return { error: `Database update error: ${error.message}` };
+      }
+      if (!data) {
+        return { error: 'Database update failed: No article row returned from Supabase.' };
       }
       resultArticle = data;
     } else {
       const { data, error } = await supabase
         .from('articles')
-        .insert(dbPayload as any)
+        .insert(dbPayload)
         .select(`
           *,
           categories (id, name, slug),
@@ -390,7 +398,10 @@ export const saveArticle = async (
         .single();
 
       if (error) {
-        return { error: `Failed to insert article in database: ${error.message}` };
+        return { error: `Database insert error: ${error.message}` };
+      }
+      if (!data) {
+        return { error: 'Database insert failed: No article row created in Supabase.' };
       }
       resultArticle = data;
     }
@@ -412,7 +423,7 @@ export const saveArticle = async (
     return { post: finalPost };
   } catch (err: any) {
     console.error('Unexpected error in saveArticle:', err);
-    return { error: err?.message || 'Failed to save article.' };
+    return { error: err?.message || 'Failed to save article in database.' };
   }
 };
 
@@ -426,14 +437,18 @@ export const deleteArticle = async (idOrSlug: string): Promise<{ success: boolea
       query = query.eq('slug', idOrSlug);
     }
 
-    const { error } = await query;
+    const { data, error } = await query.select('id');
 
     if (error) {
       return { success: false, error: error.message };
     }
 
+    if (!data || data.length === 0) {
+      return { success: false, error: 'Article delete failed: Record not found or permission denied.' };
+    }
+
     return { success: true };
   } catch (err: any) {
-    return { success: false, error: err?.message || 'Delete failed.' };
+    return { success: false, error: err?.message || 'Delete operation failed.' };
   }
 };
