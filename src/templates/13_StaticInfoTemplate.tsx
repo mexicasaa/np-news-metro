@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   ShieldCheck, Award, Mail, Phone, MapPin, Send, CheckCircle2, 
-  FileText, Users, DollarSign, AlertCircle, Sparkles, Building 
+  FileText, Users, DollarSign, AlertCircle, Sparkles, Building, Globe, ExternalLink, Rss 
 } from 'lucide-react';
 import { mockAuthors } from '../data/mockWpData';
 import { AuthorCard } from '../components/cards/AuthorCard';
@@ -17,6 +17,7 @@ export type StaticPageType =
   | 'advertise' 
   | 'privacy' 
   | 'terms'
+  | 'sitemap'
   | 'epaper';
 
 interface StaticInfoTemplateProps {
@@ -43,6 +44,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
     { id: 'advertise', label: isHindi ? 'विज्ञापन एवं साझेदारी' : 'Advertise with Us', icon: DollarSign },
     { id: 'privacy', label: isHindi ? 'गोपनीयता नीति' : 'Privacy Policy', icon: FileText },
     { id: 'terms', label: isHindi ? 'सेवा की शर्तें' : 'Terms of Service', icon: FileText },
+    { id: 'sitemap', label: isHindi ? 'साइटमैप एवं संपूर्ण डायरेक्टरी' : 'Sitemap & Directory', icon: Globe },
   ];
 
   const handleFormSubmit = (e: React.FormEvent) => {

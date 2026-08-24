@@ -145,7 +145,7 @@ export const SiteFooter: React.FC<SiteFooterProps> = ({
               <li><button onClick={() => onNavigateStatic('corrections')} className="hover:text-secondary-gold transition-colors">{isHindi ? 'संशोधन एवं निवारण' : 'Corrections & Redressal'}</button></li>
               <li><button onClick={() => onNavigateStatic('advertise')} className="hover:text-secondary-gold transition-colors">{isHindi ? 'विज्ञापन दें' : 'Advertise with Us'}</button></li>
               <li><button onClick={() => onNavigateStatic('contact')} className="hover:text-secondary-gold transition-colors">{isHindi ? 'न्यूज़रूम से संपर्क करें' : 'Contact Newsroom'}</button></li>
-              <li><a href="/sitemap.xml" target="_blank" rel="noopener noreferrer" className="hover:text-secondary-gold transition-colors">{isHindi ? 'साइटमैप (XML)' : 'Sitemap (XML)'}</a></li>
+              <li><button onClick={() => onNavigateStatic('sitemap')} className="hover:text-secondary-gold transition-colors">{isHindi ? 'साइटमैप (Sitemap)' : 'Sitemap'}</button></li>
             </ul>
           </div>
         </div>
@@ -172,18 +172,23 @@ export const SiteFooter: React.FC<SiteFooterProps> = ({
             <span>{isHindi ? 'अहमदाबाद' : 'Ahmedabad'}</span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
+            <button onClick={() => onNavigateStatic('sitemap')} className="flex items-center gap-1 hover:text-white transition-colors font-bold text-slate-200 cursor-pointer">
+              <Globe className="w-3.5 h-3.5 text-secondary-gold" />
+              <span>{isHindi ? 'साइटमैप (Sitemap)' : 'Sitemap Directory'}</span>
+            </button>
+            <span>•</span>
+            <a href="/sitemap.xml" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors" title="Main XML Sitemap for Search Engines">
+              {isHindi ? 'एक्सएमएल साइटमैप' : 'XML Sitemap'}
+            </a>
+            <span>•</span>
+            <a href="/news-sitemap.xml" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors" title="Google News XML Sitemap">
+              {isHindi ? 'गूगल न्यूज़' : 'Google News XML'}
+            </a>
+            <span>•</span>
             <a href="/rss.xml" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-white transition-colors">
               <Rss className="w-3 h-3 text-amber-500" />
               <span>{isHindi ? 'आरएसएस फ़ीड' : 'RSS Feeds'}</span>
-            </a>
-            <span>•</span>
-            <a href="/sitemap.xml" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
-              {isHindi ? 'साइटमैप' : 'Sitemap'}
-            </a>
-            <span>•</span>
-            <a href="/news-sitemap.xml" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
-              {isHindi ? 'समाचार साइटमैप' : 'News Sitemap'}
             </a>
           </div>
         </div>
@@ -203,7 +208,7 @@ export const SiteFooter: React.FC<SiteFooterProps> = ({
             <button onClick={() => onNavigateStatic('cookie-policy')} className="hover:text-white underline">{isHindi ? 'कुकी सेटिंग्स' : 'Cookie Settings'}</button>
             <button onClick={() => onNavigateStatic('ethics')} className="hover:text-white underline">{t.editorialPolicy}</button>
             <button onClick={() => onNavigateStatic('corrections')} className="hover:text-white underline">{isHindi ? 'शिकायत निवारण' : 'Grievance Officer'}</button>
-            <a href="/sitemap.xml" target="_blank" rel="noopener noreferrer" className="hover:text-white underline">{isHindi ? 'साइटमैप' : 'Sitemap'}</a>
+            <button onClick={() => onNavigateStatic('sitemap')} className="hover:text-white underline">{isHindi ? 'साइटमैप' : 'Sitemap'}</button>
           </div>
         </div>
       </div>

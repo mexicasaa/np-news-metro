@@ -1,11 +1,8 @@
 ﻿{
   "rewrites": [
-    { "source": "/sitemap.xml", "destination": "/api/sitemap" },
-    { "source": "/news-sitemap.xml", "destination": "/api/news-sitemap" },
-    { "source": "/image-sitemap.xml", "destination": "/api/image-sitemap" },
-    { "source": "/video-sitemap.xml", "destination": "/api/video-sitemap" },
-    { "source": "/robots.txt", "destination": "/api/robots" },
-    { "source": "/rss.xml", "destination": "/api/rss" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/((?!assets|uploads|sitemap\\.xml|news-sitemap\\.xml|image-sitemap\\.xml|video-sitemap\\.xml|robots\\.txt|rss\\.xml|sitemap\\.xsl|ads\\.txt|logo\\.png).*)",
+      "destination": "/index.html"
+    }
   ]
 }
