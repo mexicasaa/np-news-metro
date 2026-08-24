@@ -70,6 +70,9 @@ $categories = get_categories(array('number' => 8, 'hide_empty' => false));
                         <li><a href="<?php echo esc_url(home_url('/privacy-policy')); ?>" class="hover:text-white"><?php esc_html_e('Privacy & Cookie Policy', 'np-news-metro'); ?></a></li>
                         <li><a href="<?php echo esc_url(home_url('/terms')); ?>" class="hover:text-white"><?php esc_html_e('Terms of Service', 'np-news-metro'); ?></a></li>
                         <li><a href="<?php echo esc_url(home_url('/contact')); ?>" class="hover:text-white"><?php esc_html_e('Contact Grievance Officer', 'np-news-metro'); ?></a></li>
+                        <li><a href="<?php echo esc_url(home_url('/sitemap.xml')); ?>" target="_blank" class="hover:text-white"><?php esc_html_e('XML Sitemap (साइटमैप)', 'np-news-metro'); ?></a></li>
+                        <li><a href="<?php echo esc_url(home_url('/news-sitemap.xml')); ?>" target="_blank" class="hover:text-white"><?php esc_html_e('Google News Sitemap', 'np-news-metro'); ?></a></li>
+                        <li><a href="<?php echo esc_url(home_url('/rss.xml')); ?>" target="_blank" class="hover:text-white"><?php esc_html_e('RSS Feeds (आरएसएस फ़ीड)', 'np-news-metro'); ?></a></li>
                     </ul>
                 </div>
 
@@ -97,6 +100,8 @@ $categories = get_categories(array('number' => 8, 'hide_empty' => false));
                     &copy; <?php echo date('Y'); ?> <?php bloginfo('name'); ?>. <?php esc_html_e('All rights reserved. Reproduction in whole or in part without permission is prohibited.', 'np-news-metro'); ?>
                 </p>
                 <div class="flex items-center gap-4">
+                    <a href="<?php echo esc_url(home_url('/sitemap.xml')); ?>" target="_blank" class="hover:text-white underline"><?php esc_html_e('Sitemap', 'np-news-metro'); ?></a>
+                    <a href="<?php echo esc_url(home_url('/rss.xml')); ?>" target="_blank" class="hover:text-white underline"><?php esc_html_e('RSS Feeds', 'np-news-metro'); ?></a>
                     <a href="#page" class="hover:text-white font-semibold flex items-center gap-1">
                         <span><?php esc_html_e('Back to Top', 'np-news-metro'); ?></span>
                         <span>&uarr;</span>
