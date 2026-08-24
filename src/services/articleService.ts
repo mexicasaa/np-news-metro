@@ -3,6 +3,7 @@ import { WpPost, GutenbergBlock, EditorialCategorySlug } from '../types/wordpres
 import { EditorialStatus } from '../types/admin';
 import { mockPosts as defaultMockPosts } from '../data/mockWpData';
 import { ensureAuthenticatedSession } from './authService';
+import { slugifyText } from '../utils/slugify';
 
 // Category mapping helper
 const CATEGORY_SLUG_TO_ID: Record<string, string> = {
@@ -120,25 +121,17 @@ export const mapDbToWpPost = (row: any, joinedTags?: string[]): WpPost => {
 };
 
 export const generateUniqueSlug = async (
-  title: string,
+  titleOrSlug: string,
   currentArticleId?: string
 ): Promise<string> => {
-  let baseSlug = title
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/[\s_-]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 60);
-
-  if (!baseSlug) baseSlug = `story-${Date.now().toString(36)}`;
+  const baseSlug = slugifyText(titleOrSlug, 65);
 
   try {
     let candidate = baseSlug;
     let counter = 1;
     let isUnique = false;
 
-    while (!isUnique && counter <= 20) {
+    while (!isUnique && counter <= 50) {
       let query = supabase
         .from('articles')
         .select('id')
@@ -273,7 +266,7 @@ export const getEditorialArticles = async (
 };
 
 export const saveArticle = async (
-  postData: Partial<WpPost>,
+  postData: Partial<WpPost> & { isEdit?: boolean },
   targetStatus: EditorialStatus = 'draft'
 ): Promise<{ post?: WpPost; error?: string }> => {
   try {
@@ -306,27 +299,24 @@ export const saveArticle = async (
       ? parseInt(postData.readTime.replace(/[^\d]/g, ''), 10) || 3 
       : 3;
 
-    // Check if updating existing record by UUID or by slug
+    // STRICT CHECK: An UPDATE only occurs if an existing valid UUID is provided
+    // and isEdit is true (user explicitly editing an existing story).
+    // Creating a new article MUST NEVER update or replace an existing article!
     let existingId: string | null = null;
-    if (postData.id && isValidUUID(postData.id)) {
+    if (postData.id && isValidUUID(postData.id) && postData.isEdit) {
       existingId = postData.id;
-    } else if (postData.slug) {
-      const { data: existingRow } = await supabase
-        .from('articles')
-        .select('id, slug')
-        .eq('slug', postData.slug)
-        .maybeSingle();
-
-      if (existingRow?.id) {
-        existingId = existingRow.id;
-      }
     }
 
-    const slug = postData.slug?.trim() || (await generateUniqueSlug(title, existingId || undefined));
+    // Always generate a unique slug to guarantee no duplicates or collisions
+    const rawSlugCandidate = postData.slug && postData.slug !== 'auto-draft' && postData.slug.trim().length > 1
+      ? postData.slug.trim()
+      : title;
+
+    const slug = await generateUniqueSlug(rawSlugCandidate, existingId || undefined);
 
     const dbPayload: any = {
       title,
-      title_hi: postData.titleHi || null,
+      title_hi: postData.titleHi || title,
       slug,
       excerpt: postData.dek || null,
       dek_hi: postData.dekHi || null,
@@ -338,8 +328,8 @@ export const saveArticle = async (
       featured_image_caption: postData.imageCaption || null,
       image_credit: postData.imageCredit || 'NP News Metro Photo Desk',
       is_breaking_news: !!postData.isBreaking,
-      is_lead: !!postData.isLead,
-      is_featured: !!postData.isFeatured,
+      is_lead: postData.isLead !== undefined ? !!postData.isLead : true,
+      is_featured: postData.isFeatured !== undefined ? !!postData.isFeatured : true,
       is_opinion: !!postData.isOpinion,
       is_sponsored: !!postData.isSponsored,
       sponsor_name: postData.sponsorName || null,
@@ -418,6 +408,15 @@ export const saveArticle = async (
         });
       } catch (revErr) {}
     }
+
+    // Broadcast across tabs/windows for instant live sync
+    try {
+      if (typeof BroadcastChannel !== 'undefined') {
+        const channel = new BroadcastChannel('np_news_feed_channel');
+        channel.postMessage({ type: 'NEWS_PUBLISHED', articleId: resultArticle.id });
+        channel.close();
+      }
+    } catch (e) {}
 
     const finalPost = mapDbToWpPost(resultArticle, postData.tags);
     return { post: finalPost };

@@ -13,6 +13,7 @@ import { StandardArticleTemplate } from '../../templates/04_StandardArticleTempl
 import { compressImageFile, compressAvatarFile } from '../../utils/imageCompressor';
 import { uploadArticleImage } from '../../services/mediaService';
 import { generateUniqueSlug } from '../../services/articleService';
+import { slugifyText } from '../../utils/slugify';
 
 export interface EditorBlock {
   id: string;
@@ -173,12 +174,12 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
 
   // Auto-generate slug from title
   useEffect(() => {
-    if (!initialPost && title && !slug) {
-      setSlug(title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 60));
+    if (!initialPost && title) {
+      setSlug(slugifyText(title));
     }
-  }, [title, initialPost, slug]);
+  }, [title, initialPost]);
 
-  // Synchronize state when initialPost changes (editing different articles)
+  // Synchronize state when initialPost changes (editing different articles or creating new)
   useEffect(() => {
     if (initialPost) {
       setTitle(initialPost.title || '');
@@ -208,6 +209,20 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       setSeoTitle(initialPost.seoTitle || '');
       setMetaDescription(initialPost.seoDescription || '');
       setSlug(initialPost.slug || '');
+    } else {
+      // Clear form when starting a brand new article
+      setTitle('');
+      setDek('');
+      setContent('');
+      setSlug('');
+      setCategory('india');
+      setTags(['National News', 'Policy', 'Breaking']);
+      setFeaturedImage('');
+      setImageCaption('');
+      setImageAlt('');
+      setSeoTitle('');
+      setMetaDescription('');
+      setIsBreaking(false);
     }
   }, [initialPost?.id]);
 
@@ -383,13 +398,15 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     return new Date().toISOString();
   };
 
-  const getPostData = (): Partial<WpPost> => {
+  const getPostData = (): Partial<WpPost> & { isEdit?: boolean } => {
     const blocks = parseBlocks(content);
+    const effectiveSlug = slug && slug !== 'auto-draft' ? slug : slugifyText(title || 'story');
     return {
       id: initialPost?.id || `post-${Date.now()}`,
-      title: title || 'Auto Draft',
-      titleHi: title || 'Auto Draft',
-      slug: slug || 'auto-draft',
+      isEdit: !!initialPost?.id,
+      title: title || 'Untitled News Story',
+      titleHi: title || 'Untitled News Story',
+      slug: effectiveSlug,
       category,
       authorId: authorId,
       customAuthor: {

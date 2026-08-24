@@ -949,7 +949,8 @@ function AppContent() {
     };
 
     try {
-      const { post: savedDbPost, error: dbError } = await saveArticle(fullPost, 'published');
+      const isEditingExisting = (postData as any)?.isEdit ?? (!!activeEditingPost?.id && activeEditingPost.id === newPostId);
+      const { post: savedDbPost, error: dbError } = await saveArticle({ ...fullPost, isEdit: isEditingExisting }, 'published');
 
       if (dbError || !savedDbPost) {
         setCurrentOperation(prev => prev ? {
@@ -963,7 +964,15 @@ function AppContent() {
       }
 
       savePublishedPost(savedDbPost);
-      setPosts(prev => [savedDbPost, ...prev.filter(p => p.id !== savedDbPost.id && p.id !== newPostId && p.slug !== savedDbPost.slug)]);
+      setPosts(prev => {
+        const existingIdx = prev.findIndex(p => p.id === savedDbPost.id);
+        if (existingIdx !== -1) {
+          const updated = [...prev];
+          updated[existingIdx] = savedDbPost;
+          return updated;
+        }
+        return [savedDbPost, ...prev.filter(p => p.id !== newPostId)];
+      });
       setSelectedPost(savedDbPost);
 
       if (savedDbPost.isBreaking) {
@@ -1274,45 +1283,81 @@ function AppContent() {
                   ],
                 };
 
-                const { post, error } = await saveArticle(fullPost, 'draft');
+                const isEditingExisting = (postData as any)?.isEdit ?? (!!activeEditingPost?.id && activeEditingPost.id === postId);
+                const { post, error } = await saveArticle({ ...fullPost, isEdit: isEditingExisting }, 'draft');
                 if (error || !post) {
                   alert(`Failed to save draft to database: ${error || 'Unknown error'}`);
                   return;
                 }
 
                 savePublishedPost(post);
-                setPosts(prev => [post, ...prev.filter(p => p.id !== post.id && p.id !== postId)]);
+                setPosts(prev => {
+                  const existingIdx = prev.findIndex(p => p.id === post.id);
+                  if (existingIdx !== -1) {
+                    const updated = [...prev];
+                    updated[existingIdx] = post;
+                    return updated;
+                  }
+                  return [post, ...prev.filter(p => p.id !== postId)];
+                });
                 alert('Story draft saved successfully in database.');
               }}
               onSubmitForReview={async (postData) => {
-                const { post, error } = await saveArticle(postData, 'review');
+                const isEditingExisting = (postData as any)?.isEdit ?? (!!activeEditingPost?.id);
+                const { post, error } = await saveArticle({ ...postData, isEdit: isEditingExisting }, 'review');
                 if (error || !post) {
                   alert(`Failed to submit article for review: ${error || 'Database write error'}`);
                   return;
                 }
-                setPosts(prev => [post, ...prev.filter(p => p.id !== post.id)]);
+                setPosts(prev => {
+                  const existingIdx = prev.findIndex(p => p.id === post.id);
+                  if (existingIdx !== -1) {
+                    const updated = [...prev];
+                    updated[existingIdx] = post;
+                    return updated;
+                  }
+                  return [post, ...prev];
+                });
                 alert('Article successfully submitted to Copy Editor review queue.');
                 setAdminSection('publishing');
                 setPublishingTab('review');
               }}
               onApproveCopy={async (postData) => {
-                const { post, error } = await saveArticle(postData, 'approved');
+                const isEditingExisting = (postData as any)?.isEdit ?? (!!activeEditingPost?.id);
+                const { post, error } = await saveArticle({ ...postData, isEdit: isEditingExisting }, 'approved');
                 if (error || !post) {
                   alert(`Failed to approve copy: ${error || 'Database write error'}`);
                   return;
                 }
-                setPosts(prev => [post, ...prev.filter(p => p.id !== post.id)]);
+                setPosts(prev => {
+                  const existingIdx = prev.findIndex(p => p.id === post.id);
+                  if (existingIdx !== -1) {
+                    const updated = [...prev];
+                    updated[existingIdx] = post;
+                    return updated;
+                  }
+                  return [post, ...prev];
+                });
                 alert('Copy approved by Editor. Article moved to Approved queue.');
                 setAdminSection('publishing');
                 setPublishingTab('approved');
               }}
               onSchedulePost={async (postData, scheduleTime) => {
-                const { post, error } = await saveArticle(postData, 'scheduled');
+                const isEditingExisting = (postData as any)?.isEdit ?? (!!activeEditingPost?.id);
+                const { post, error } = await saveArticle({ ...postData, isEdit: isEditingExisting }, 'scheduled');
                 if (error || !post) {
                   alert(`Failed to schedule article: ${error || 'Database write error'}`);
                   return;
                 }
-                setPosts(prev => [post, ...prev.filter(p => p.id !== post.id)]);
+                setPosts(prev => {
+                  const existingIdx = prev.findIndex(p => p.id === post.id);
+                  if (existingIdx !== -1) {
+                    const updated = [...prev];
+                    updated[existingIdx] = post;
+                    return updated;
+                  }
+                  return [post, ...prev];
+                });
                 alert(`Article scheduled for publication at ${scheduleTime}.`);
                 setAdminSection('publishing');
                 setPublishingTab('scheduled');

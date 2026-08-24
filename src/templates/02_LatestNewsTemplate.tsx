@@ -30,13 +30,24 @@ export const LatestNewsTemplate: React.FC<LatestNewsTemplateProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const { t, isHindi } = useLanguage();
 
+  const itemsPerPage = 10;
   const allPosts = externalPosts && externalPosts.length > 0 ? externalPosts : getStoredPosts();
-  const filteredPosts = allPosts.filter(
+  
+  // Sort all posts chronologically
+  const sortedPosts = [...allPosts].sort((a, b) => {
+    const timeA = new Date(a.publishedAt || 0).getTime();
+    const timeB = new Date(b.publishedAt || 0).getTime();
+    return timeB - timeA;
+  });
+
+  const filteredPosts = sortedPosts.filter(
     (p) => selectedCategory === 'all' || p.category === selectedCategory
   );
 
-  const featuredLatest = filteredPosts[0] || allPosts[0];
-  const streamPosts = filteredPosts.slice(1);
+  const totalPages = Math.max(1, Math.ceil(filteredPosts.length / itemsPerPage));
+  const paginatedPosts = filteredPosts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const featuredLatest = currentPage === 1 ? paginatedPosts[0] : null;
+  const streamPosts = currentPage === 1 ? paginatedPosts.slice(1) : paginatedPosts;
   const trendingRanking = [...allPosts].sort((a, b) => (b.viewsCount || 0) - (a.viewsCount || 0)).slice(0, 5);
 
   return (
@@ -136,11 +147,13 @@ export const LatestNewsTemplate: React.FC<LatestNewsTemplateProps> = ({
               ))}
             </div>
 
-            <Pagination
-              currentPage={currentPage}
-              totalPages={3}
-              onPageChange={setCurrentPage}
-            />
+            {totalPages > 1 && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            )}
           </div>
 
           {/* Right Rail Sidebar */}

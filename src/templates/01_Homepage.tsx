@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   TrendingUp, Video, Newspaper, ArrowRight, ShieldCheck, 
   ChevronRight, Sparkles, Flame, CheckCircle2, Clock 
@@ -51,15 +51,17 @@ export const Homepage: React.FC<HomepageProps> = ({
     return timeB - timeA;
   });
 
+  const [visibleLatestCount, setVisibleLatestCount] = useState(10);
+
   // Hero Lead & Slider feeds (strictly latest 10 articles only)
   const latestTenPosts = sortedPosts.slice(0, 10);
   const leadPost = latestTenPosts.find((p) => p.isLead) || latestTenPosts[0] || sortedPosts[0];
   const featuredPosts = latestTenPosts;
   const supportingLeadPosts = sortedPosts.filter((p) => p.id !== leadPost?.id).slice(0, 3);
-  const latestPosts = allPosts.slice(0, 8);
-  const indiaPosts = allPosts.filter((p) => p.category === 'india' || p.category === 'politics');
-  const businessPosts = allPosts.filter((p) => p.category === 'business' || p.category === 'economy');
-  const techWorldPosts = allPosts.filter((p) => p.category === 'technology' || p.category === 'world');
+  const latestPosts = sortedPosts.slice(0, visibleLatestCount);
+  const indiaPosts = sortedPosts.filter((p) => p.category === 'india' || p.category === 'politics');
+  const businessPosts = sortedPosts.filter((p) => p.category === 'business' || p.category === 'economy');
+  const techWorldPosts = sortedPosts.filter((p) => p.category === 'technology' || p.category === 'world');
   const trendingRanking = [...allPosts].sort((a, b) => (b.viewsCount || 0) - (a.viewsCount || 0)).slice(0, 5);
 
   return (
@@ -140,6 +142,18 @@ export const Homepage: React.FC<HomepageProps> = ({
                 />
               ))}
             </div>
+
+            {sortedPosts.length > visibleLatestCount && (
+              <div className="text-center pt-2">
+                <button
+                  onClick={() => setVisibleLatestCount((prev: number) => prev + 10)}
+                  className="px-4 py-2 bg-surface-lowest border border-border-subtle hover:border-primary text-xs font-bold uppercase tracking-wider text-primary hover:text-secondary rounded-sm transition-all shadow-2xs cursor-pointer inline-flex items-center gap-1.5"
+                >
+                  <span>{isHindi ? `और ताज़ा खबरें देखें (${sortedPosts.length - visibleLatestCount} बाकी)` : `Load More Stories (${sortedPosts.length - visibleLatestCount} remaining)`}</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Most Read Ranking (01-05) */}
