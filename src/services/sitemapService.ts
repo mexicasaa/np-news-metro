@@ -1,11 +1,24 @@
-﻿import { WpPost, WpVideo, WpCategory } from '../types/wordpress';
+import { WpPost, WpVideo, WpCategory } from '../types/wordpress';
 import { supabase } from '../lib/supabase';
 import { getPublishedArticles } from './articleService';
 import { getPublishedVideos } from './videoService';
 
 export const getBaseSiteUrl = (): string => {
-  const base = import.meta.env?.VITE_SITE_URL || import.meta.env?.NEXT_PUBLIC_SITE_URL || 'https://npnewsmetro.com';
-  return base.replace(/\/+$/, '');
+  try {
+    if (typeof import.meta !== 'undefined' && (import.meta as any)?.env?.VITE_SITE_URL) {
+      return String((import.meta as any).env.VITE_SITE_URL).replace(/\/+$/, '');
+    }
+  } catch (e) {
+    // Ignore in non-ESM
+  }
+  try {
+    if (typeof process !== 'undefined' && (process?.env?.VITE_SITE_URL || process?.env?.NEXT_PUBLIC_SITE_URL)) {
+      return String(process.env.VITE_SITE_URL || process.env.NEXT_PUBLIC_SITE_URL).replace(/\/+$/, '');
+    }
+  } catch (e) {
+    // Ignore
+  }
+  return 'https://npnewsmetro.com';
 };
 
 const escapeXml = (unsafe: string): string => {
