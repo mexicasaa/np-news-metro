@@ -1,3 +1,4 @@
+import { ensureAuthenticatedSession } from './authService';
 import { supabase } from '../lib/supabase';
 import { WpVideo } from '../types/wordpress';
 import { mockVideos } from '../data/mockWpData';
@@ -224,6 +225,7 @@ export const saveVideo = async (
   }
 ): Promise<{ video?: WpVideo; error?: string }> => {
   try {
+    await ensureAuthenticatedSession();
     const cleanTitle = videoData.title.trim();
     const cleanSlug = videoData.slug?.trim() || cleanTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 60);
 
