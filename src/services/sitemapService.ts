@@ -4,7 +4,7 @@ import { getPublishedArticles } from './articleService';
 import { getPublishedVideos } from './videoService';
 
 export const getBaseSiteUrl = (): string => {
-  const base = import.meta.env?.VITE_SITE_URL || import.meta.env?.NEXT_PUBLIC_SITE_URL || 'https://npnewsmetro.in';
+  const base = import.meta.env?.VITE_SITE_URL || import.meta.env?.NEXT_PUBLIC_SITE_URL || 'https://npnewsmetro.com';
   return base.replace(/\/+$/, '');
 };
 
@@ -64,7 +64,7 @@ export const generateSitemapXml = (
   const indexableArticles = filterIndexableArticles(articles);
   const seenUrls = new Set<string>();
 
-  let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+  let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>\n`;
   xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
 
   // 1. Homepage
@@ -229,7 +229,7 @@ export const generateVideoSitemapXml = (videos: WpVideo[]): string => {
         xml += `  <url>\n`;
         xml += `    <loc>${videoUrl}</loc>\n`;
         xml += `    <video:video>\n`;
-        xml += `      <video:thumbnail_loc>${escapeXml(video.posterUrl || 'https://npnewsmetro.in/logo.png')}</video:thumbnail_loc>\n`;
+        xml += `      <video:thumbnail_loc>${escapeXml(video.posterUrl || 'https://npnewsmetro.com/logo.png')}</video:thumbnail_loc>\n`;
         xml += `      <video:title>${escapeXml(video.title)}</video:title>\n`;
         xml += `      <video:description>${escapeXml(video.caption || video.title)}</video:description>\n`;
         xml += `      <video:player_loc>${escapeXml(video.videoUrl)}</video:player_loc>\n`;

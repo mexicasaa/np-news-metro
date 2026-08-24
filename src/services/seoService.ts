@@ -30,7 +30,7 @@ export interface ExternalLinkCheckResult {
   message?: string;
 }
 
-const SITE_ORIGIN = typeof window !== 'undefined' ? window.location.origin : 'https://npnewsmetro.in';
+const SITE_ORIGIN = typeof window !== 'undefined' ? window.location.origin : 'https://npnewsmetro.com';
 
 export const generateArticleStructuredData = (
   post: WpPost,

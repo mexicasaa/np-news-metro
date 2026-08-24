@@ -78,7 +78,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
               Newsroom Staff Login
             </h2>
             <p className="text-xs text-slate-500 mt-1">
-              NP News Metro — Editorial Management Suite
+              NP News Metro ï¿½ Editorial Management Suite
             </p>
           </div>
 
@@ -109,7 +109,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
                     setUsername(e.target.value);
                     if (error) setError('');
                   }}
-                  placeholder="admin or admin@npnewsmetro.in"
+                  placeholder="admin or admin@npnewsmetro.com"
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2.5 text-sm font-medium text-slate-900 focus:bg-white focus:border-[#162839] focus:outline-hidden transition-colors"
                 />
               </div>
@@ -131,7 +131,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
                     setPassword(e.target.value);
                     if (error) setError('');
                   }}
-                  placeholder="••••••••"
+                  placeholder="ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-10 py-2.5 text-sm font-medium text-slate-900 focus:bg-white focus:border-[#162839] focus:outline-hidden transition-colors font-mono"
                 />
                 <button

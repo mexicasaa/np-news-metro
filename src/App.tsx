@@ -530,7 +530,7 @@ function AppContent() {
       {
         category: 'required',
         title: 'Slug & URL Format Safe',
-        description: `https://npnewsmetro.in/${postData.category}/${postData.slug || 'story'}`,
+        description: `https://npnewsmetro.com/${postData.category}/${postData.slug || 'story'}`,
         passed: !!postData.slug,
         code: 'REQ_SLUG',
       },
@@ -701,7 +701,7 @@ function AppContent() {
         completedAt: new Date().toLocaleTimeString() + ' IST',
         steps: prev.steps.map(s => ({ ...s, status: 'success' as const, durationMs: Math.floor(40 + Math.random() * 80) })),
         verificationReport: {
-          url: `https://npnewsmetro.in/${savedDbPost.category}/${savedDbPost.slug}`,
+          url: `https://npnewsmetro.com/${savedDbPost.category}/${savedDbPost.slug}`,
           httpStatus: 200,
           headlineMatch: true,
           heroImageLoaded: true,
@@ -802,7 +802,7 @@ function AppContent() {
         metadata: {
           title: selectedPost.seoTitle || selectedPost.title,
           description: selectedPost.seoDescription || selectedPost.dek || selectedPost.title,
-          canonicalUrl: `https://npnewsmetro.in/${selectedPost.category}/${selectedPost.slug}`,
+          canonicalUrl: `https://npnewsmetro.com/${selectedPost.category}/${selectedPost.slug}`,
           ogType: 'article' as const,
           ogImage: selectedPost.featuredImage,
           publishedTime: selectedPost.publishedAt,
@@ -819,7 +819,7 @@ function AppContent() {
         metadata: {
           title: selectedVideo.title,
           description: selectedVideo.caption || selectedVideo.title,
-          canonicalUrl: `https://npnewsmetro.in/videos/${selectedVideo.slug}`,
+          canonicalUrl: `https://npnewsmetro.com/videos/${selectedVideo.slug}`,
           ogType: 'video.other' as const,
           ogImage: selectedVideo.posterUrl,
           publishedTime: selectedVideo.publishedAt,
@@ -833,7 +833,7 @@ function AppContent() {
         metadata: {
           title: 'Video Hub & Investigative Documentaries',
           description: 'Watch deep dive documentary broadcasts, ground reports, policy explainers, and leadership interviews.',
-          canonicalUrl: 'https://npnewsmetro.in/videos',
+          canonicalUrl: 'https://npnewsmetro.com/videos',
         },
         structuredData: generateWebsiteStructuredData(),
       };
@@ -844,7 +844,7 @@ function AppContent() {
         metadata: {
           title: `${selectedCategory.toUpperCase()} News & Latest Analysis`,
           description: `Latest breaking headlines, reports, and exclusive analysis in ${selectedCategory}.`,
-          canonicalUrl: `https://npnewsmetro.in/category/${selectedCategory}`,
+          canonicalUrl: `https://npnewsmetro.com/category/${selectedCategory}`,
         },
         structuredData: generateWebsiteStructuredData(),
       };
@@ -855,7 +855,7 @@ function AppContent() {
       metadata: {
         title: 'NP News Metro — Latest Breaking News, India, Politics & Business',
         description: 'Fast, verified, and in-depth national news coverage, policy analysis, investigative journalism, and live market updates.',
-        canonicalUrl: 'https://npnewsmetro.in/',
+        canonicalUrl: 'https://npnewsmetro.com/',
         ogType: 'website' as const,
       },
       structuredData: generateWebsiteStructuredData(),

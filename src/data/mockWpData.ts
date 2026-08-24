@@ -13,7 +13,7 @@ export const mockAuthors: Record<string, WpAuthor> = {
     social: {
       twitter: 'siddharth_np',
       linkedin: 'siddharth-varma-news',
-      email: 'siddharth.varma@npnewsmetro.in',
+      email: 'siddharth.varma@npnewsmetro.com',
     },
   },
   'author-2': {
@@ -28,7 +28,7 @@ export const mockAuthors: Record<string, WpAuthor> = {
     social: {
       twitter: 'ananya_eco',
       linkedin: 'ananya-deshmukh',
-      email: 'ananya.deshmukh@npnewsmetro.in',
+      email: 'ananya.deshmukh@npnewsmetro.com',
     },
   },
   'author-3': {
@@ -43,7 +43,7 @@ export const mockAuthors: Record<string, WpAuthor> = {
     social: {
       twitter: 'rohansentech',
       linkedin: 'rohan-sen-tech',
-      email: 'rohan.sen@npnewsmetro.in',
+      email: 'rohan.sen@npnewsmetro.com',
     },
   },
   'author-4': {
@@ -57,7 +57,7 @@ export const mockAuthors: Record<string, WpAuthor> = {
     beats: ['Urban Planning', 'Public Policy', 'Federalism'],
     social: {
       twitter: 'kr_nambiar_opinion',
-      email: 'kr.nambiar@npnewsmetro.in',
+      email: 'kr.nambiar@npnewsmetro.com',
     },
   },
   'author-5': {
@@ -72,7 +72,7 @@ export const mockAuthors: Record<string, WpAuthor> = {
     social: {
       twitter: 'meera_iyer_journo',
       linkedin: 'meera-iyer',
-      email: 'meera.iyer@npnewsmetro.in',
+      email: 'meera.iyer@npnewsmetro.com',
     },
   },
   'author-deepak-goswami': {
@@ -85,7 +85,7 @@ export const mockAuthors: Record<string, WpAuthor> = {
     verified: true,
     beats: ['मानवीय व्यवहार व समाज', 'कृषि अर्थशास्त्र', 'पर्यावरण एवं ऊर्जा नीति'],
     social: {
-      email: 'dr.deepakgoswami@npnewsmetro.in',
+      email: 'dr.deepakgoswami@npnewsmetro.com',
     },
   },
   'author-neeraj-pandey': {
@@ -99,7 +99,7 @@ export const mockAuthors: Record<string, WpAuthor> = {
     beats: ['नोएडा व एनसीआर', 'धार्मिक-सांस्कृतिक महोत्सव', 'राष्ट्रीय मामले'],
     social: {
       twitter: 'neeraj_npnews',
-      email: 'neeraj.pandey@npnewsmetro.in',
+      email: 'neeraj.pandey@npnewsmetro.com',
     },
   },
 };

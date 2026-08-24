@@ -118,7 +118,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
 
             <div className="pt-4 mt-4 border-t border-border-subtle p-3 bg-surface-container/50 rounded-sm text-[11px] text-ink-secondary">
               <span className="font-bold text-ink block mb-1">{isHindi ? 'शिकायत निवारण' : 'Grievance Redressal'}</span>
-              <p>{isHindi ? 'डिजिटल मीडिया आचार संहिता के तहत शिकायतों हेतु: grievance@npnewsmetro.in' : 'For complaints under Digital Media Ethics Code: grievance@npnewsmetro.in'}</p>
+              <p>{isHindi ? 'डिजिटल मीडिया आचार संहिता के तहत शिकायतों हेतु: grievance@npnewsmetro.com' : 'For complaints under Digital Media Ethics Code: grievance@npnewsmetro.com'}</p>
             </div>
           </aside>
 
@@ -283,7 +283,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
 
                   <p>
                     {isHindi ? 'पाठक सीधे सुधार अनुरोध प्रस्तुत कर सकते हैं:' : 'Readers can submit correction requests directly to:'}{' '}
-                    <span className="font-mono text-primary font-bold">corrections@npnewsmetro.in</span>
+                    <span className="font-mono text-primary font-bold">corrections@npnewsmetro.com</span>
                   </p>
                 </div>
               </div>
@@ -411,7 +411,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
 
                 <p className="text-xs text-ink-secondary">
                   {isHindi ? 'मीडिया किट और विशेष प्रायोजन समाधान के लिए संपर्क करें:' : 'For media kits and custom sponsorship solutions, reach our commercial desk at:'}{' '}
-                  <strong className="text-ink">advertise@npnewsmetro.in</strong>
+                  <strong className="text-ink">advertise@npnewsmetro.com</strong>
                 </p>
               </div>
             )}

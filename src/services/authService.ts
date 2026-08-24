@@ -9,15 +9,15 @@ export const signInWithCredentials = async (
   const cleanInput = usernameOrEmail.trim().toLowerCase();
   
   let email = cleanInput;
-  if (cleanInput === 'admin' || cleanInput === 'admin@npnewsmetro.in' || cleanInput === 'admin@npnews.com') {
+  if (cleanInput === 'admin' || cleanInput === 'admin@npnewsmetro.com' || cleanInput === 'admin@npnews.com') {
     email = 'admin@npnews.com';
-  } else if (cleanInput === 'siddharth' || cleanInput === 'siddharth@npnewsmetro.in') {
+  } else if (cleanInput === 'siddharth' || cleanInput === 'siddharth@npnewsmetro.com') {
     email = 'siddharth.npnews@gmail.com';
-  } else if (cleanInput === 'ananya' || cleanInput === 'ananya@npnewsmetro.in') {
+  } else if (cleanInput === 'ananya' || cleanInput === 'ananya@npnewsmetro.com') {
     email = 'ananya.npnews@gmail.com';
-  } else if (cleanInput === 'rohan' || cleanInput === 'rohan@npnewsmetro.in') {
+  } else if (cleanInput === 'rohan' || cleanInput === 'rohan@npnewsmetro.com') {
     email = 'rohan.npnews@gmail.com';
-  } else if (cleanInput === 'nambiar' || cleanInput === 'nambiar@npnewsmetro.in') {
+  } else if (cleanInput === 'nambiar' || cleanInput === 'nambiar@npnewsmetro.com') {
     email = 'nambiar.npnews@gmail.com';
   } else if (!cleanInput.includes('@')) {
     email = `${cleanInput}@npnews.com`;
@@ -121,7 +121,7 @@ export const getUserProfile = async (userId: string): Promise<UserProfile | null
     return {
       id: data.id,
       name: data.full_name || data.display_name || 'Newsroom Staff',
-      email: `${data.display_name?.toLowerCase() || 'staff'}@npnewsmetro.in`,
+      email: `${data.display_name?.toLowerCase() || 'staff'}@npnewsmetro.com`,
       role: (data.role as UserRole) || 'author',
       avatar: data.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
       department: data.department || 'Editorial Desk',
@@ -146,7 +146,7 @@ export const getProfilesList = async (): Promise<UserProfile[]> => {
     return data.map((p) => ({
       id: p.id,
       name: p.full_name || p.display_name || 'Newsroom Staff',
-      email: `${p.display_name?.toLowerCase().replace(/\s+/g, '') || 'staff'}@npnewsmetro.in`,
+      email: `${p.display_name?.toLowerCase().replace(/\s+/g, '') || 'staff'}@npnewsmetro.com`,
       role: (p.role as UserRole) || 'author',
       avatar: p.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
       department: p.department || 'Editorial Bureau',

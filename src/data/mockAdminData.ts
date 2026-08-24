@@ -11,7 +11,7 @@ export const mockAdminUsers: UserProfile[] = [
   {
     id: 'user-admin',
     name: 'Siddharth Varma',
-    email: 'siddharth.admin@npnewsmetro.in',
+    email: 'siddharth.admin@npnewsmetro.com',
     role: 'admin',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
     department: 'Executive Editorial',
@@ -19,7 +19,7 @@ export const mockAdminUsers: UserProfile[] = [
   {
     id: 'user-editor',
     name: 'Priya Sharma',
-    email: 'priya.editor@npnewsmetro.in',
+    email: 'priya.editor@npnewsmetro.com',
     role: 'editor',
     avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=400',
     department: 'National & Metro Desk',
@@ -27,7 +27,7 @@ export const mockAdminUsers: UserProfile[] = [
   {
     id: 'user-copy',
     name: 'David Chen',
-    email: 'david.copy@npnewsmetro.in',
+    email: 'david.copy@npnewsmetro.com',
     role: 'copy_editor',
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400',
     department: 'Copy & Fact-Checking',
@@ -35,7 +35,7 @@ export const mockAdminUsers: UserProfile[] = [
   {
     id: 'user-reporter',
     name: 'Sarah Jenkins',
-    email: 'sarah.reporter@npnewsmetro.in',
+    email: 'sarah.reporter@npnewsmetro.com',
     role: 'reporter',
     avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=400',
     department: 'Investigative Bureau',
@@ -43,7 +43,7 @@ export const mockAdminUsers: UserProfile[] = [
   {
     id: 'user-seo',
     name: 'Rahul Mehta',
-    email: 'rahul.seo@npnewsmetro.in',
+    email: 'rahul.seo@npnewsmetro.com',
     role: 'seo_manager',
     avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=400',
     department: 'Audience & Discovery',
@@ -51,7 +51,7 @@ export const mockAdminUsers: UserProfile[] = [
   {
     id: 'user-ads',
     name: 'Vikram Rao',
-    email: 'vikram.ads@npnewsmetro.in',
+    email: 'vikram.ads@npnewsmetro.com',
     role: 'ad_manager',
     avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=400',
     department: 'Revenue & Commercial Partnerships',
@@ -177,7 +177,7 @@ export const mockFailedOperations: PublishingOperation[] = [
       '[16:45:19] Website published successfully on core WordPress. Downstream social task queued for retry.',
     ],
     verificationReport: {
-      url: 'https://npnewsmetro.in/business/global-supply-chain-disruptions-auto',
+      url: 'https://npnewsmetro.com/business/global-supply-chain-disruptions-auto',
       httpStatus: 200,
       headlineMatch: true,
       heroImageLoaded: true,

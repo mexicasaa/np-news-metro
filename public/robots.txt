@@ -12,7 +12,7 @@ User-agent: Googlebot-News
 Allow: /
 
 # XML Sitemaps
-Sitemap: https://npnewsmetro.in/sitemap.xml
-Sitemap: https://npnewsmetro.in/news-sitemap.xml
-Sitemap: https://npnewsmetro.in/image-sitemap.xml
-Sitemap: https://npnewsmetro.in/video-sitemap.xml
+Sitemap: https://npnewsmetro.com/sitemap.xml
+Sitemap: https://npnewsmetro.com/news-sitemap.xml
+Sitemap: https://npnewsmetro.com/image-sitemap.xml
+Sitemap: https://npnewsmetro.com/video-sitemap.xml

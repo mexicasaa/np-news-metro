@@ -335,7 +335,7 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
                 <input
                   type="email"
                   required
-                  placeholder="editor.name@npnewsmetro.in"
+                  placeholder="editor.name@npnewsmetro.com"
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
                   className="w-full text-xs p-2.5 border border-border-subtle rounded-sm focus:outline-hidden focus:border-editorial-red"
