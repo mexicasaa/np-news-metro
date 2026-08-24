@@ -33,3 +33,14 @@ Thumbs.db
 *.njsproj
 *.sln
 *.sw?
+
+# Explicitly ensure Sitemaps, Feeds, and SEO crawler directives are always tracked & accessible
+!public/*.xml
+!public/*.xsl
+!public/robots.txt
+!public/ads.txt
+!public/_redirects
+!api/*-sitemap.ts
+!api/sitemap.ts
+!api/robots.ts
+!api/rss.ts
