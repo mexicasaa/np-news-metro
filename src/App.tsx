@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   UtilityBar 
 } from './components/layout/UtilityBar';
@@ -17,7 +17,7 @@ import { AdminLoginModal } from './components/admin/AdminLoginModal';
 import { WpPost, WpVideo, WpGallery } from './types/wordpress';
 import { mockPosts as initialMockPosts, mockVideos, mockGalleries } from './data/mockWpData';
 import { getStoredPosts, savePublishedPost } from './utils/newsStorage';
-import { getPublishedArticles, saveArticle, deleteArticle } from './services/articleService';
+import { getPublishedArticles, saveArticle, deleteArticle, getDeletedArticles, restoreDeletedArticle, permanentDeleteArticle, DeletedArticle } from './services/articleService';
 import { getCurrentUserProfile, ensureAuthenticatedSession, signOut as authSignOut } from './services/authService';
 import { getVideos } from './services/taxonomyService';
 import { supabase } from './lib/supabase';
@@ -240,6 +240,7 @@ function AppContent() {
   const [activeEnvironment, setActiveEnvironment] = useState<'production' | 'staging'>('production');
   const [publishingTab, setPublishingTab] = useState<PublishingTab>('all');
   const [activeEditingPost, setActiveEditingPost] = useState<WpPost | undefined>(undefined);
+  const [deletedArticles, setDeletedArticles] = useState<DeletedArticle[]>([]);
 
   // URL Routing & /admin Route Detection
   React.useEffect(() => {
@@ -406,6 +407,61 @@ function AppContent() {
     } catch (e) {}
     setViewMode('public');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  
+  const loadDeletedArticles = async () => {
+    try {
+      const list = await getDeletedArticles();
+      setDeletedArticles(list);
+    } catch (err) {
+      console.error('Error loading deleted articles:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (isAdminAuthenticated) {
+      loadDeletedArticles();
+    }
+  }, [isAdminAuthenticated]);
+
+  const handleDeleteArticle = async (post: WpPost) => {
+    const res = await deleteArticle(post.id);
+    if (!res.success) {
+      alert(`Failed to delete article: ${res.error || 'Unknown error'}`);
+      return;
+    }
+
+    setPosts(prev => prev.filter(p => p.id !== post.id));
+    if (activeEditingPost?.id === post.id) {
+      setActiveEditingPost(undefined);
+      setAdminSection('publishing');
+    }
+    loadDeletedArticles();
+    alert(`Article "${post.title.slice(0, 40)}..." successfully moved to Trash / Database Recovery archive.`);
+  };
+
+  const handleRestoreArticle = async (recoveryId: string) => {
+    const res = await restoreDeletedArticle(recoveryId);
+    if (!res.success || !res.post) {
+      alert(`Failed to restore article: ${res.error || 'Unknown error'}`);
+      return;
+    }
+
+    savePublishedPost(res.post);
+    setPosts(prev => [res.post!, ...prev.filter(p => p.id !== res.post!.id)]);
+    loadDeletedArticles();
+    alert(`Article "${res.post.title.slice(0, 40)}..." successfully restored back to active database!`);
+  };
+
+  const handlePermanentDeleteArticle = async (recoveryId: string) => {
+    const res = await permanentDeleteArticle(recoveryId);
+    if (!res.success) {
+      alert(`Failed to delete article permanently: ${res.error || 'Unknown error'}`);
+      return;
+    }
+    setDeletedArticles(prev => prev.filter(d => d.id !== recoveryId));
+    alert('Article permanently removed from database.');
   };
 
   const handleStartNewArticle = () => {
@@ -902,6 +958,10 @@ function AppContent() {
               onRetryFailedOp={(opId) => {
                 alert(`Idempotent retry initiated for Operation ${opId}. Retrying Step 13 (Social Distribution)... Task succeeded!`);
               }}
+              onDeleteArticle={handleDeleteArticle}
+              deletedArticles={deletedArticles}
+              onRestoreArticle={handleRestoreArticle}
+              onPermanentDelete={handlePermanentDeleteArticle}
             />
           )}
 
@@ -992,6 +1052,7 @@ function AppContent() {
               }}
               onBack={() => setAdminSection('publishing')}
               onOpenRevisions={() => setRevisionsModalOpen(true)}
+              onDeleteArticle={handleDeleteArticle}
             />
           )}
 
@@ -1000,6 +1061,7 @@ function AppContent() {
               posts={posts}
               onEditArticle={handleStartEditArticle}
               onViewLiveArticle={handleSelectPost}
+              onDeleteArticle={handleDeleteArticle}
             />
           )}
 
@@ -1016,6 +1078,10 @@ function AppContent() {
               onApprovePost={() => {}}
               onSchedulePostModal={() => {}}
               onRetryFailedOp={() => {}}
+              onDeleteArticle={handleDeleteArticle}
+              deletedArticles={deletedArticles}
+              onRestoreArticle={handleRestoreArticle}
+              onPermanentDelete={handlePermanentDeleteArticle}
             />
           )}
 

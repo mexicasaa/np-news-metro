@@ -11,12 +11,14 @@ interface EditorialListViewProps {
   posts?: WpPost[];
   onEditArticle: (post: WpPost) => void;
   onViewLiveArticle: (post: WpPost) => void;
+  onDeleteArticle?: (post: WpPost) => void;
 }
 
 export const EditorialListView: React.FC<EditorialListViewProps> = ({
   posts: externalPosts,
   onEditArticle,
   onViewLiveArticle,
+  onDeleteArticle,
 }) => {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [statusFilter, setStatusFilter] = useState('all');
@@ -205,6 +207,21 @@ export const EditorialListView: React.FC<EditorialListViewProps> = ({
                     <Eye className="w-3.5 h-3.5 text-slate-500" />
                     <span>View</span>
                   </button>
+
+                  {onDeleteArticle && (
+                    <button
+                      onClick={() => {
+                        if (window.confirm("Move \"" + article.title.slice(0, 40) + "...\" to Trash / Recovery?")) {
+                          onDeleteArticle(article.rawPost);
+                        }
+                      }}
+                      className="px-2.5 py-1.5 bg-red-50 hover:bg-red-100 text-editorial-red rounded text-xs font-bold flex items-center gap-1 cursor-pointer"
+                      title="Move to Trash"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Delete</span>
+                    </button>
+                  )}
                 </div>
               </div>
             );
@@ -327,6 +344,19 @@ export const EditorialListView: React.FC<EditorialListViewProps> = ({
                         >
                           <Eye className="w-3.5 h-3.5" />
                         </button>
+                        {onDeleteArticle && (
+                          <button
+                            onClick={() => {
+                              if (window.confirm("Move \"" + article.title.slice(0, 40) + "...\" to Trash / Recovery?")) {
+                                onDeleteArticle(article.rawPost);
+                              }
+                            }}
+                            className="p-1 hover:bg-red-50 rounded text-slate-400 hover:text-editorial-red transition-colors cursor-pointer"
+                            title="Move to Trash"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

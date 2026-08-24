@@ -36,6 +36,7 @@ interface ArticleEditorProps {
   onPublishNow: (postData: Partial<WpPost>) => void;
   onBack?: () => void;
   onOpenRevisions?: () => void;
+  onDeleteArticle?: (post: WpPost) => void;
 }
 
 const CATEGORIES_LIST: { slug: EditorialCategorySlug; label: string; color: string }[] = [
@@ -75,6 +76,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
   onSaveDraft,
   onPublishNow,
   onBack,
+  onDeleteArticle,
 }) => {
   const featuredImageInputRef = useRef<HTMLInputElement>(null);
   const inlineImageInputRef = useRef<HTMLInputElement>(null);
@@ -912,6 +914,20 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                         <span>Modal Preview</span>
                       </button>
                     </div>
+                    {initialPost && onDeleteArticle && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (window.confirm("Are you sure you want to move \"" + title.slice(0, 40) + "...\" to Trash / Recovery?")) {
+                            onDeleteArticle(initialPost);
+                          }
+                        }}
+                        className="w-full py-2 px-3 bg-red-50 hover:bg-red-100 text-editorial-red border border-red-200 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer mt-2"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Move to Trash (कचरे में डालें)</span>
+                      </button>
+                    )}
                   </div>
 
                   <div className="pt-3 border-t border-slate-100 space-y-2.5">

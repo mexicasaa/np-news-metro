@@ -427,29 +427,191 @@ export const saveArticle = async (
   }
 };
 
-export const deleteArticle = async (idOrSlug: string): Promise<{ success: boolean; error?: string }> => {
-  try {
-    await ensureAuthenticatedSession();
-    let query = supabase.from('articles').delete();
+export interface DeletedArticle {
+  id: string;
+  originalArticleId?: string;
+  title: string;
+  slug: string;
+  categorySlug?: string;
+  authorId?: string;
+  authorName?: string;
+  status?: string;
+  featuredImageUrl?: string;
+  articlePayload: any;
+  deletedAt: string;
+  deletedBy?: string;
+}
 
+export const deleteArticleWithRecovery = async (
+  idOrSlug: string
+): Promise<{ success: boolean; recoveredId?: string; error?: string }> => {
+  try {
+    const activeUserId = await ensureAuthenticatedSession();
+
+    // 1. Find existing article first to capture complete snapshot
+    let selectQuery = (supabase.from('articles') as any).select('*');
     if (isValidUUID(idOrSlug)) {
-      query = query.eq('id', idOrSlug);
+      selectQuery = selectQuery.eq('id', idOrSlug);
     } else {
-      query = query.eq('slug', idOrSlug);
+      selectQuery = selectQuery.eq('slug', idOrSlug);
     }
 
-    const { data, error } = await query.select('id');
+    const { data: existingRows, error: findError } = await selectQuery;
+    if (findError) {
+      return { success: false, error: 'Failed to find article: ' + findError.message };
+    }
+
+    const articleToArchive = existingRows && existingRows[0];
+    if (!articleToArchive) {
+      return { success: false, error: 'Article not found in database.' };
+    }
+
+    // 2. Archive to deleted_articles recovery table
+    const archivePayload = {
+      original_article_id: articleToArchive.id,
+      title: articleToArchive.title,
+      slug: articleToArchive.slug,
+      category_slug: articleToArchive.category_slug || null,
+      author_id: articleToArchive.author_id || null,
+      author_name: articleToArchive.author_name || null,
+      status: articleToArchive.status || 'published',
+      featured_image_url: articleToArchive.featured_image_url || null,
+      article_payload: articleToArchive,
+      deleted_at: new Date().toISOString(),
+      deleted_by: isValidUUID(activeUserId || '') ? activeUserId : null,
+    };
+
+    const { data: archiveRes, error: archiveError } = await ((supabase as any)
+      .from('deleted_articles') as any)
+      .insert(archivePayload)
+      .select('id')
+      .single();
+
+    if (archiveError) {
+      console.warn('Warning: Archive insertion returned error:', archiveError.message);
+    }
+
+    // 3. Delete from active articles table
+    let deleteQuery = (supabase.from('articles') as any).delete();
+    if (isValidUUID(idOrSlug)) {
+      deleteQuery = deleteQuery.eq('id', idOrSlug);
+    } else {
+      deleteQuery = deleteQuery.eq('slug', idOrSlug);
+    }
+
+    const { error: deleteError } = await deleteQuery;
+    if (deleteError) {
+      return { success: false, error: 'Failed to remove article from live table: ' + deleteError.message };
+    }
+
+    return { 
+      success: true, 
+      recoveredId: archiveRes?.id || articleToArchive.id 
+    };
+  } catch (err: any) {
+    console.error('Error in deleteArticleWithRecovery:', err);
+    return { success: false, error: err?.message || 'Failed to delete article.' };
+  }
+};
+
+export const getDeletedArticles = async (): Promise<DeletedArticle[]> => {
+  try {
+    await ensureAuthenticatedSession();
+    const { data, error } = await ((supabase as any)
+      .from('deleted_articles') as any)
+      .select('*')
+      .order('deleted_at', { ascending: false });
+
+    if (error || !data) {
+      console.error('Error fetching deleted articles:', error);
+      return [];
+    }
+
+    return data.map((row: any) => ({
+      id: row.id,
+      originalArticleId: row.original_article_id,
+      title: row.title,
+      slug: row.slug,
+      categorySlug: row.category_slug,
+      authorId: row.author_id,
+      authorName: row.author_name,
+      status: row.status,
+      featuredImageUrl: row.featured_image_url,
+      articlePayload: row.article_payload,
+      deletedAt: row.deleted_at,
+      deletedBy: row.deleted_by,
+    }));
+  } catch (err) {
+    console.error('Unexpected error in getDeletedArticles:', err);
+    return [];
+  }
+};
+
+export const restoreDeletedArticle = async (
+  recoveryId: string
+): Promise<{ success: boolean; post?: WpPost; error?: string }> => {
+  try {
+    await ensureAuthenticatedSession();
+
+    // 1. Fetch from deleted_articles
+    const { data: recoveryRow, error: fetchErr } = await ((supabase as any)
+      .from('deleted_articles') as any)
+      .select('*')
+      .eq('id', recoveryId)
+      .single();
+
+    if (fetchErr || !recoveryRow) {
+      return { success: false, error: 'Deleted article recovery record not found.' };
+    }
+
+    const rawPayload = recoveryRow.article_payload;
+    const restorePayload = {
+      ...rawPayload,
+      id: rawPayload.id || recoveryRow.original_article_id || undefined,
+      status: rawPayload.status || 'draft',
+      updated_at: new Date().toISOString(),
+    };
+
+    // 2. Upsert back into articles
+    const { data: restoredArticle, error: insertErr } = await (supabase
+      .from('articles') as any)
+      .upsert(restorePayload)
+      .select('*')
+      .single();
+
+    if (insertErr || !restoredArticle) {
+      return { success: false, error: 'Failed to restore article: ' + (insertErr?.message || 'Database insert error') };
+    }
+
+    // 3. Remove from deleted_articles
+    await ((supabase as any).from('deleted_articles') as any).delete().eq('id', recoveryId);
+
+    const post = mapDbToWpPost(restoredArticle);
+    return { success: true, post };
+  } catch (err: any) {
+    console.error('Error restoring article:', err);
+    return { success: false, error: err?.message || 'Restore failed.' };
+  }
+};
+
+export const permanentDeleteArticle = async (
+  recoveryId: string
+): Promise<{ success: boolean; error?: string }> => {
+  try {
+    await ensureAuthenticatedSession();
+    const { error } = await ((supabase as any)
+      .from('deleted_articles') as any)
+      .delete()
+      .eq('id', recoveryId);
 
     if (error) {
       return { success: false, error: error.message };
     }
-
-    if (!data || data.length === 0) {
-      return { success: false, error: 'Article delete failed: Record not found or permission denied.' };
-    }
-
     return { success: true };
   } catch (err: any) {
-    return { success: false, error: err?.message || 'Delete operation failed.' };
+    return { success: false, error: err?.message || 'Permanent deletion failed.' };
   }
 };
+
+// Backward compatibility alias
+export const deleteArticle = deleteArticleWithRecovery;
