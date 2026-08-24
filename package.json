@@ -6,8 +6,6 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "build:theme": "tailwindcss -i ./src/index.css -o ./wordpress-theme/np-news-metro/assets/css/theme.css --minify",
-    "build:zip": "npm run build:theme && node scripts/build-theme-zip.js",
     "preview": "vite preview"
   },
   "dependencies": {
