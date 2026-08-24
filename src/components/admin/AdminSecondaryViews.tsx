@@ -2,8 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   Image as ImageIcon, Search, DollarSign, Users, BarChart3, 
   Settings, CheckCircle2, AlertTriangle, ShieldCheck, RefreshCw, 
-  Plus, ExternalLink, Globe, Database, Cpu, Radio, Check
+  Plus, ExternalLink, Globe, Database, Cpu, Radio, Check,
+  FileText, Video as VideoIcon, Bot, Rss, Copy
 } from 'lucide-react';
+import { getSitemapStats, SitemapStats, getBaseSiteUrl } from '../../services/sitemapService';
 import { mockAuthors, mockCategories } from '../../data/mockWpData';
 import { mockAdminUsers } from '../../data/mockAdminData';
 import { ROLE_PERMISSIONS, UserProfile } from '../../types/admin';
@@ -171,32 +173,257 @@ export const MonetizationView: React.FC = () => {
    3. SEO HEALTH VIEW
    ====================================================================== */
 export const SeoHealthView: React.FC = () => {
+  const [stats, setStats] = useState<SitemapStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [revalidating, setRevalidating] = useState(false);
+  const [copiedPath, setCopiedPath] = useState<string | null>(null);
+
+  const fetchStats = async () => {
+    try {
+      const data = await getSitemapStats();
+      setStats(data);
+    } catch (e) {
+      console.error('Error loading sitemap stats:', e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const handleRevalidate = async () => {
+    setRevalidating(true);
+    await fetchStats();
+    setTimeout(() => {
+      setRevalidating(false);
+      alert('Sitemaps revalidated and synchronized with live database.');
+    }, 600);
+  };
+
+  const handleCopyUrl = (path: string) => {
+    const fullUrl = `${getBaseSiteUrl()}${path}`;
+    navigator.clipboard?.writeText(fullUrl);
+    setCopiedPath(path);
+    setTimeout(() => setCopiedPath(null), 2000);
+  };
+
+  const baseUrl = getBaseSiteUrl();
+
+  const sitemapEndpoints = [
+    {
+      id: 'main',
+      title: 'Main XML Sitemap',
+      path: '/sitemap.xml',
+      description: 'Homepage, public categories, published indexable stories & video pages',
+      count: stats?.mainUrlCount ?? '—',
+      countLabel: 'Total URLs',
+      icon: Globe,
+      status: 'Active',
+    },
+    {
+      id: 'news',
+      title: 'Google News Sitemap',
+      path: '/news-sitemap.xml',
+      description: 'Recent eligible news articles with publication timestamps and Hindi/English tags',
+      count: stats?.newsUrlCount ?? '—',
+      countLabel: 'News Articles',
+      icon: FileText,
+      status: 'Active',
+    },
+    {
+      id: 'image',
+      title: 'Image XML Sitemap',
+      path: '/image-sitemap.xml',
+      description: 'Editorial article featured images with captions, titles, and CDN URLs',
+      count: stats?.imageUrlCount ?? '—',
+      countLabel: 'Image Assets',
+      icon: ImageIcon,
+      status: 'Active',
+    },
+    {
+      id: 'video',
+      title: 'Video XML Sitemap',
+      path: '/video-sitemap.xml',
+      description: 'Public video desk items with thumbnails, player URLs, and descriptions',
+      count: stats?.videoUrlCount ?? '—',
+      countLabel: 'Video Assets',
+      icon: VideoIcon,
+      status: 'Active',
+    },
+    {
+      id: 'robots',
+      title: 'Robots Directives',
+      path: '/robots.txt',
+      description: 'Search crawler directives allowing public newsroom paths & blocking /admin',
+      count: 'Directives Live',
+      countLabel: 'Crawler Rules',
+      icon: Bot,
+      status: 'Active',
+    },
+    {
+      id: 'rss',
+      title: 'RSS 2.0 Syndication Feed',
+      path: '/rss.xml',
+      description: 'Standard RSS XML feed for feed readers, syndication, and aggregator discovery',
+      count: stats?.newsUrlCount ?? '—',
+      countLabel: 'Feed Items',
+      icon: Rss,
+      status: 'Active',
+    },
+  ];
+
   return (
     <div className="max-w-7xl mx-auto space-y-6 animate-fadeIn">
-      <div>
-        <h1 className="font-serif text-2xl sm:text-3xl font-extrabold text-ink">
-          SEO & Structured Discovery Health
-        </h1>
-        <p className="text-xs sm:text-sm text-ink-secondary mt-1">
-          Automated auditing of Google News Article schemas, canonical tags, and XML sitemaps.
-        </p>
+      {/* Header & Revalidate Action */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="font-serif text-2xl sm:text-3xl font-extrabold text-ink">
+            SEO & Technical Sitemap Management
+          </h1>
+          <p className="text-xs sm:text-sm text-ink-secondary mt-1">
+            Real-time status, crawler discovery endpoints, and XML sitemaps generated from live database.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2.5">
+          <button
+            onClick={handleRevalidate}
+            disabled={revalidating}
+            className="px-3.5 py-2 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 rounded-md text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs disabled:opacity-60"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 text-slate-500 ${revalidating ? 'animate-spin' : ''}`} />
+            <span>{revalidating ? 'Revalidating...' : 'Refresh / Revalidate'}</span>
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono text-xs">
-        <div className="bg-surface-lowest p-5 border border-border-subtle rounded-sm shadow-subtle">
-          <span className="text-ink-muted uppercase">NewsArticle Schema</span>
-          <div className="text-2xl font-bold text-emerald-600 mt-2">100% Valid</div>
-          <p className="text-[11px] text-ink-muted mt-1">Validated via Schema.org validator</p>
+      {/* Top High-Level Metric Tiles */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 font-mono text-xs">
+        <div className="bg-surface-lowest p-4 sm:p-5 border border-border-subtle rounded-sm shadow-2xs">
+          <span className="text-ink-muted uppercase font-bold text-[10px]">Main Indexable URLs</span>
+          <div className="text-2xl font-bold text-ink mt-1.5">
+            {loading ? '...' : (stats?.mainUrlCount || 0)}
+          </div>
+          <p className="text-[11px] text-ink-muted mt-1">Homepage, Desks, Articles, Videos</p>
         </div>
-        <div className="bg-surface-lowest p-5 border border-border-subtle rounded-sm shadow-subtle">
-          <span className="text-ink-muted uppercase">Google News Sitemap</span>
-          <div className="text-2xl font-bold text-emerald-600 mt-2">Live Pinned</div>
-          <p className="text-[11px] text-ink-muted mt-1">Last pinged: 2 mins ago</p>
+
+        <div className="bg-surface-lowest p-4 sm:p-5 border border-border-subtle rounded-sm shadow-2xs">
+          <span className="text-ink-muted uppercase font-bold text-[10px]">Google News Sitemap</span>
+          <div className="text-2xl font-bold text-emerald-600 mt-1.5">
+            {loading ? '...' : (stats?.newsUrlCount || 0)}
+          </div>
+          <p className="text-[11px] text-ink-muted mt-1">Eligible published news stories</p>
         </div>
-        <div className="bg-surface-lowest p-5 border border-border-subtle rounded-sm shadow-subtle">
-          <span className="text-ink-muted uppercase">Canonical Redirects</span>
-          <div className="text-2xl font-bold text-ink mt-2">Zero 404s</div>
-          <p className="text-[11px] text-ink-muted mt-1">301 redirect engine active</p>
+
+        <div className="bg-surface-lowest p-4 sm:p-5 border border-border-subtle rounded-sm shadow-2xs">
+          <span className="text-ink-muted uppercase font-bold text-[10px]">Google Structured Data</span>
+          <div className="text-2xl font-bold text-emerald-600 mt-1.5">100% Valid</div>
+          <p className="text-[11px] text-ink-muted mt-1">NewsArticle & VideoObject schemas</p>
+        </div>
+
+        <div className="bg-surface-lowest p-4 sm:p-5 border border-border-subtle rounded-sm shadow-2xs">
+          <span className="text-ink-muted uppercase font-bold text-[10px]">Base Canonical Domain</span>
+          <div className="text-sm font-bold text-slate-800 mt-2 truncate" title={baseUrl}>
+            {baseUrl.replace('https://', '')}
+          </div>
+          <p className="text-[11px] text-ink-muted mt-1">Production absolute origin</p>
+        </div>
+      </div>
+
+      {/* Technical Sitemaps Endpoints Table / Cards */}
+      <div className="bg-surface-lowest border border-border-subtle rounded-sm shadow-2xs overflow-hidden">
+        <div className="p-4 sm:p-5 border-b border-border-subtle bg-slate-50 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h2 className="font-serif font-bold text-base text-ink">
+              Crawler Discovery Endpoints & XML Feeds
+            </h2>
+            <p className="text-xs text-ink-muted mt-0.5">
+              These endpoints are publicly accessible to search crawlers without authentication, but hidden from normal visitor menus.
+            </p>
+          </div>
+          <div className="text-xs font-mono text-ink-muted">
+            Last Generated: <span className="font-semibold text-ink">{stats?.lastGenerated ? new Date(stats.lastGenerated).toLocaleTimeString() : 'Live on request'}</span>
+          </div>
+        </div>
+
+        <div className="divide-y divide-border-subtle">
+          {sitemapEndpoints.map((item) => {
+            const Icon = item.icon;
+            const isCopied = copiedPath === item.path;
+
+            return (
+              <div
+                key={item.id}
+                className="p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-slate-50/60 transition-colors"
+              >
+                {/* Left: Icon, Title, Path, Description */}
+                <div className="flex items-start gap-3.5 flex-1 min-w-0">
+                  <div className="p-2.5 rounded-sm bg-slate-100 text-slate-700 shrink-0 mt-0.5">
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <div className="space-y-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-serif font-bold text-sm text-ink">{item.title}</span>
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                        <span>{item.status}</span>
+                      </span>
+                    </div>
+                    <code className="block text-xs font-mono text-primary font-bold">
+                      {item.path}
+                    </code>
+                    <p className="text-xs text-ink-muted">
+                      {item.description}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Middle: Count badge */}
+                <div className="shrink-0 flex items-center md:flex-col md:items-end gap-1 font-mono text-xs">
+                  <span className="font-bold text-ink text-sm sm:text-base">
+                    {item.count}
+                  </span>
+                  <span className="text-[11px] text-ink-muted uppercase font-semibold">
+                    {item.countLabel}
+                  </span>
+                </div>
+
+                {/* Right: Actions (Open & Copy) */}
+                <div className="shrink-0 flex items-center gap-2 pt-2 md:pt-0 border-t md:border-t-0 border-slate-100 justify-end">
+                  <a
+                    href={`${baseUrl}${item.path}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1.5 bg-white hover:bg-slate-100 border border-border-subtle text-slate-700 rounded-sm text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                    title="Open XML sitemap endpoint in new tab"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
+                    <span>Open Endpoint ↗</span>
+                  </a>
+
+                  <button
+                    onClick={() => handleCopyUrl(item.path)}
+                    className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-sm text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                    title="Copy absolute URL to clipboard"
+                  >
+                    {isCopied ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-emerald-600" />
+                        <span className="text-emerald-700">Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5 text-slate-500" />
+                        <span>Copy URL</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

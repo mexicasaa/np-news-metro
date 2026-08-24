@@ -2,27 +2,219 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
   <url>
-    <loc>https://npnewsmetro.in/politics/nayab-saini-attacks-bhagwant-mann</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>en</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-24T09:00:00Z</news:publication_date>
-      <news:title>Haryana CM Nayab Saini Attacks Bhagwant Mann: "No Ground Work in Punjab, Only Ads on TV"</news:title>
-      <news:keywords>National News, Policy, Governance, Politics</news:keywords>
-    </news:news>
-  </url>
-  <url>
     <loc>https://npnewsmetro.in/technology/india-strategic-ai-infrastructure-corridor</loc>
     <news:news>
       <news:publication>
         <news:name>NP News Metro</news:name>
-        <news:language>en</news:language>
+        <news:language>hi</news:language>
       </news:publication>
-      <news:publication_date>2026-08-24T06:00:00Z</news:publication_date>
-      <news:title>India Announces Strategic AI Infrastructure Corridor With $12B Clean Energy Backing</news:title>
-      <news:keywords>Technology, Artificial Intelligence, Energy, Infrastructure</news:keywords>
+      <news:publication_date>2026-08-24T06:00:44.556Z</news:publication_date>
+      <news:title>India Announces Strategic AI Infrastructure Corridor With \$12B Clean Energy Backing</news:title>
+      <news:keywords>Technology &amp; AI, Infrastructure</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://npnewsmetro.in/politics/nayab-saini-ka-bhagwant-mann-par-hamla-sirf-chutkule-sunakar-time-pass</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-22T16:00:00.000Z</news:publication_date>
+      <news:title>Haryana CM Nayab Saini Attacks Bhagwant Mann: &quot;Punjab CM is Just Killing Time by Cracking Jokes&quot;</news:title>
+      <news:keywords>नायब सिंह सैनी, भगवंत मान, पंजाब राजनीति, तीज महोत्सव पटियाला, घनौर</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://npnewsmetro.in/india/iskcon-noida-me-bhavya-janmashtami-mahotsav-5-lakh-shradhalu</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-22T15:30:00.000Z</news:publication_date>
+      <news:title>Grand Sri Krishna Janmashtami Mahotsav at ISKCON Noida: Over 5 Lakh Devotees Expected</news:title>
+      <news:keywords>इस्कॉन नोएडा, श्रीकृष्ण जन्माष्टमी, शोभायात्रा, झूलन यात्रा, बलराम पूर्णिमा</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://npnewsmetro.in/economy/ganne-ke-ras-ki-ek-boond-me-uljha-desh-ka-bhavishya</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-22T02:30:00.000Z</news:publication_date>
+      <news:title>Tangled in a Single Drop of Sugarcane Juice: The Future of the Nation</news:title>
+      <news:keywords>गन्ना किसान, एथेनॉल, ऊर्जा नीति, चीनी उद्योग, डॉ. दीपक गोस्वामी</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://npnewsmetro.in/business/upi-cross-border-remittances-monthly-record-transactions</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-19T10:30:00.000Z</news:publication_date>
+      <news:title>Digital Payments Ecosystem Logs Record 16.5 Billion Monthly UPI Transactions as Cross-Border Remittances Expand</news:title>
+      <news:keywords>UPI, Fintech, Banking, Digital Payments, RBI</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://npnewsmetro.in/politics/parliament-clears-digital-public-infrastructure-bill-monsoon-session</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-19T09:00:00.000Z</news:publication_date>
+      <news:title>Parliament Clears Landmark Digital Public Infrastructure &amp; Data Protection Amendment Bill in Monsoon Session</news:title>
+      <news:keywords>Parliament, Monsoon Session, Data Protection, Digital India, Legislation</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://npnewsmetro.in/business/sensex-nifty-all-time-high-fii-inflows-corporate-earnings</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-19T06:00:00.000Z</news:publication_date>
+      <news:title>Sensex Scales Historic 85,000 Mark on Strong Foreign Institutional Inflows and Robust Q1 Corporate Earnings</news:title>
+      <news:keywords>Sensex, Nifty, Stock Markets, Mutual Funds, BSE</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://npnewsmetro.in/politics/election-commission-announces-assembly-poll-dates-schedule</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-19T04:30:00.000Z</news:publication_date>
+      <news:title>Election Commission Announces Schedule for Five Key State Assembly Polls; Voting Across Three Phases Starting November 12</news:title>
+      <news:keywords>Election Commission, State Polls, Assembly Elections, Breaking News, Democracy</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://npnewsmetro.in/world/indo-pacific-trade-corridor-tokyo-summit-critical-minerals</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-19T02:45:00.000Z</news:publication_date>
+      <news:title>Indo-Pacific Trade Corridor Summit Concludes in Tokyo with Trilateral Critical Minerals Pact</news:title>
+      <news:keywords>Geopolitics, Indo-Pacific, Tokyo Summit, Critical Minerals, Diplomacy</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://npnewsmetro.in/india/cabinet-approves-infrastructure-corridor-western-ports</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-19T02:00:00.000Z</news:publication_date>
+      <news:title>Union Cabinet Approves ₹1.2 Lakh Crore Infrastructure Corridor Linking Major Western Ports to Industrial Nodes</news:title>
+      <news:keywords>Infrastructure, Logistics, Cabinet Decision, Economy, Railways</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://npnewsmetro.in/economy/retail-inflation-moderates-july-cpi-food-supply-rbi</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-19T00:45:00.000Z</news:publication_date>
+      <news:title>Retail Inflation Moderates to 3.8% in July as Food Supply Chains Stabilize; RBI Stance Unchanged</news:title>
+      <news:keywords>Inflation, CPI, RBI, Monetary Policy, Economy</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://npnewsmetro.in/sports/india-england-lords-test-match-pace-bowling-series-win</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-18T18:15:00.000Z</news:publication_date>
+      <news:title>Indian Cricket Team Clinches Historic Test Series Victory at Lord’s with Fierce Day 5 Pace Bowling Masterclass</news:title>
+      <news:keywords>Cricket, Test Match, Lords, Team India, BCCI</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://npnewsmetro.in/world/global-maritime-trade-alliance-red-sea-security-protocol</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-18T16:45:00.000Z</news:publication_date>
+      <news:title>Global Maritime Trade Alliance Finalizes New Red Sea Security Escort Protocol Ahead of UN Assembly</news:title>
+      <news:keywords>Global Trade, Maritime Security, United Nations, Red Sea, Geopolitics</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://npnewsmetro.in/technology/national-cyber-coordination-centre-ai-defense-grid</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-18T13:15:00.000Z</news:publication_date>
+      <news:title>National Cyber Coordination Centre Deploys AI Defense Shield Across Critical Energy &amp; Railway Grids</news:title>
+      <news:keywords>Cybersecurity, AI, National Security, Energy Grid, Tech Policy</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://npnewsmetro.in/opinion/rethinking-urban-density-india-megacities-polycentric-transit</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-18T12:30:00.000Z</news:publication_date>
+      <news:title>Rethinking Urban Density: Why India’s Megacities Need Polycentric Transit, Not Just Taller Towers</news:title>
+      <news:keywords>Urban Planning, Sustainability, Climate, Architecture, Opinion</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://npnewsmetro.in/technology/india-first-commercial-semiconductor-fab-dholera-gujarat</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-18T08:50:00.000Z</news:publication_date>
+      <news:title>India’s First Commercial 28nm Fabrication Facility Begins Tool Installation at Dholera Special Investment Region</news:title>
+      <news:keywords>Semiconductors, Dholera, Make In India, Deep Tech, Hardware</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://npnewsmetro.in/entertainment/71st-national-film-awards-regional-cinema-triumph-winners</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-17T11:00:00.000Z</news:publication_date>
+      <news:title>71st National Film Awards: Regional Cinema Triumphs with Groundbreaking Narrative Storytelling and Audiovisual Craft</news:title>
+      <news:keywords>National Film Awards, Cinema, Malayalam Cinema, Culture, Film Heritage</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://npnewsmetro.in/lifestyle/restoring-western-ghats-sacred-groves-community-forestry</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-17T05:30:00.000Z</news:publication_date>
+      <news:title>Restoring the Western Ghats: How Community-Led Sacred Grove Forestry is Reviving Ancient Water Tables</news:title>
+      <news:keywords>Western Ghats, Environment, Forestry, Ecology, Karnataka</news:keywords>
     </news:news>
   </url>
 </urlset>

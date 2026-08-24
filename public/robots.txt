@@ -1,13 +1,17 @@
-# Robots.txt - NP News Metro Search Engine Directives
+# Robots.txt - NP News Metro Search Engine Crawler Directives
 User-agent: *
 Allow: /
 Disallow: /admin/
-Disallow: /wp-admin/
-Disallow: /api/private/
+Disallow: /admin
+Disallow: /api/
+Disallow: /login
+Disallow: /auth/
 
+# Googlebot News Directives
 User-agent: Googlebot-News
 Allow: /
 
+# XML Sitemaps
 Sitemap: https://npnewsmetro.in/sitemap.xml
 Sitemap: https://npnewsmetro.in/news-sitemap.xml
 Sitemap: https://npnewsmetro.in/image-sitemap.xml

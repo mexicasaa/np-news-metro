@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+  <url>
+    <loc>https://npnewsmetro.in/videos/inside-indias-semiconductor-revolution</loc>
+    <video:video>
+      <video:thumbnail_loc>https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&amp;fit=crop&amp;q=80&amp;w=600</video:thumbnail_loc>
+      <video:title>Inside India&apos;s Semiconductor Revolution: Ground Report from Dholera Fab</video:title>
+      <video:description>Special investigative dispatch from the Dholera Special Investment Region examining mega-fab construction timelines and cleanroom standards.</video:description>
+      <video:player_loc>https://www.youtube.com/watch?v=dQw4w9WgXcQ</video:player_loc>
+      <video:publication_date>2026-08-23T11:00:44.556Z</video:publication_date>
+      <video:family_friendly>yes</video:family_friendly>
+    </video:video>
+  </url>
+</urlset>

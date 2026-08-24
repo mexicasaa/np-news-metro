@@ -176,10 +176,6 @@ export const SiteFooter: React.FC<SiteFooterProps> = ({
               <Rss className="w-3 h-3 text-amber-500" />
               <span>{isHindi ? 'आरएसएस फ़ीड' : 'RSS Feeds'}</span>
             </button>
-            <span>•</span>
-            <button onClick={() => onNavigateStatic('sitemap')} className="hover:text-white transition-colors">
-              {isHindi ? 'समाचार साइटमैप' : 'News Sitemap'}
-            </button>
           </div>
         </div>
 
