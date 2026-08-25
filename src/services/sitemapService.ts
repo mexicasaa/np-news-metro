@@ -321,7 +321,7 @@ export const generateRssXml = (
  * 6. Robots.txt (/robots.txt)
  */
 
-export const generateAdsTxt = (publisherId: string = 'pub-0000000000000000'): string => {
+export const generateAdsTxt = (publisherId: string = 'pub-6758961188222479'): string => {
   return `# ads.txt - NP News Metro Authorized Digital Sellers
 google.com, ${publisherId}, DIRECT, f08c47fec0942fa0
 `;

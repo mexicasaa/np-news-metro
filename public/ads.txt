@@ -1,2 +1,2 @@
 # ads.txt - NP News Metro Authorized Digital Sellers
-google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0
+google.com, pub-6758961188222479, DIRECT, f08c47fec0942fa0
