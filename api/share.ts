@@ -25,6 +25,18 @@ function escapeHtml(str: string): string {
     .replace(/'/g, '&#039;');
 }
 
+function sendResponse(res: any, statusCode: number, contentType: string, body: string) {
+  res.statusCode = statusCode;
+  if (typeof res.setHeader === 'function') {
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Cache-Control', 'public, max-age=3600, stale-while-revalidate=600');
+  }
+  if (typeof res.status === 'function' && typeof res.send === 'function') {
+    return res.status(statusCode).send(body);
+  }
+  return res.end(body);
+}
+
 const FALLBACK_SLUGS: Record<string, { title: string; dek: string; category: string; image: string }> = {
   'nayab-saini-patiala-teej': {
     title: 'Haryana CM Nayab Saini Celebrates Teej in Patiala: "Punjab & Haryana Share Timeless Ties of Love and Brotherhood"',
@@ -153,11 +165,8 @@ export default async function handler(req: any, res: any) {
 </body>
 </html>`;
 
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=600');
-    return res.status(200).send(html);
+    return sendResponse(res, 200, 'text/html; charset=utf-8', html);
   } catch (err: any) {
-    res.setHeader('Content-Type', 'text/plain');
-    return res.status(500).send('Error: ' + err?.message);
+    return sendResponse(res, 500, 'text/plain; charset=utf-8', 'Error: ' + err?.message);
   }
 }

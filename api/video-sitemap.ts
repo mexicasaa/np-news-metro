@@ -8,12 +8,24 @@ const SITE_URL = 'https://npnewsmetro.com';
 
 function escapeXml(str: string): string {
   if (!str) return '';
-  return str
+  return String(str)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&apos;');
+}
+
+function sendResponse(res: any, statusCode: number, contentType: string, body: string) {
+  res.statusCode = statusCode;
+  if (typeof res.setHeader === 'function') {
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Cache-Control', 'public, max-age=3600, stale-while-revalidate=600');
+  }
+  if (typeof res.status === 'function' && typeof res.send === 'function') {
+    return res.status(statusCode).send(body);
+  }
+  return res.end(body);
 }
 
 export default async function handler(req: any, res: any) {
@@ -42,11 +54,8 @@ export default async function handler(req: any, res: any) {
 ${itemsXml}
 </urlset>`;
 
-    res.setHeader('Content-Type', 'application/xml; charset=utf-8');
-    res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=600');
-    return res.status(200).send(xml);
+    return sendResponse(res, 200, 'application/xml; charset=utf-8', xml);
   } catch (err: any) {
-    res.setHeader('Content-Type', 'text/plain');
-    return res.status(500).send('Error generating video sitemap: ' + err?.message);
+    return sendResponse(res, 500, 'text/plain; charset=utf-8', 'Error generating video sitemap: ' + err?.message);
   }
 }

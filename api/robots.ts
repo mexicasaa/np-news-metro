@@ -1,4 +1,16 @@
-﻿export default function handler(req: any, res: any) {
+﻿function sendResponse(res: any, statusCode: number, contentType: string, body: string) {
+  res.statusCode = statusCode;
+  if (typeof res.setHeader === 'function') {
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Cache-Control', 'public, max-age=86400, stale-while-revalidate=3600');
+  }
+  if (typeof res.status === 'function' && typeof res.send === 'function') {
+    return res.status(statusCode).send(body);
+  }
+  return res.end(body);
+}
+
+export default function handler(req: any, res: any) {
   const robots = `User-agent: *
 Allow: /
 
@@ -13,7 +25,5 @@ Sitemap: https://npnewsmetro.com/image-sitemap.xml
 Sitemap: https://npnewsmetro.com/video-sitemap.xml
 Sitemap: https://npnewsmetro.com/rss.xml
 `;
-  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-  res.setHeader('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=3600');
-  return res.status(200).send(robots);
+  return sendResponse(res, 200, 'text/plain; charset=utf-8', robots);
 }
