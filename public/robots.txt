@@ -16,3 +16,4 @@ Sitemap: https://npnewsmetro.com/sitemap.xml
 Sitemap: https://npnewsmetro.com/news-sitemap.xml
 Sitemap: https://npnewsmetro.com/image-sitemap.xml
 Sitemap: https://npnewsmetro.com/video-sitemap.xml
+Sitemap: https://npnewsmetro.com/rss.xml
