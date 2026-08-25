@@ -123,6 +123,20 @@ export const generateSitemapXml = (
     }
   }
 
+  // 2.5 Institutional & Policy Pages
+  const staticPages = ['about', 'contact', 'privacy', 'disclaimer', 'terms', 'ethics', 'editorial-team', 'corrections', 'advertise'];
+  for (const page of staticPages) {
+    const pageUrl = `${baseUrl}/${page}`;
+    if (!seenUrls.has(pageUrl)) {
+      seenUrls.add(pageUrl);
+      xml += `  <url>\n`;
+      xml += `    <loc>${pageUrl}</loc>\n`;
+      xml += `    <changefreq>monthly</changefreq>\n`;
+      xml += `    <priority>0.6</priority>\n`;
+      xml += `  </url>\n`;
+    }
+  }
+
   // 3. Published Articles (De-duplicated & validated)
   for (const article of indexableArticles) {
     const articleUrl = `${baseUrl}/${escapeXml(article.category)}/${escapeXml(article.slug)}`;

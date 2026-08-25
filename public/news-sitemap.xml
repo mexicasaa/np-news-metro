@@ -2,6 +2,17 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
   <url>
+    <loc>https://www.npnewsmetro.com/india/84-varsheeya-haarta-pheliyara-mareeja-kaa-binaa-opana-haarta-sarj</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-25T17:38:00.207Z</news:publication_date>
+      <news:title>84 वर्षीय हार्ट फेलियर मरीज का बिना ओपन-हार्ट सर्जरी सफल इलाज</news:title>
+    </news:news>
+  </url>
+  <url>
     <loc>https://www.npnewsmetro.com/india/sportsa-ritela-para-naee-pustaka-kaa-lokaarpana-bhaarata-ke-khela</loc>
     <news:news>
       <news:publication>

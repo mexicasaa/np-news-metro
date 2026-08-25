@@ -2,6 +2,14 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
+    <loc>https://www.npnewsmetro.com/india/84-varsheeya-haarta-pheliyara-mareeja-kaa-binaa-opana-haarta-sarj</loc>
+    <image:image>
+      <image:loc>https://jkzrjqclgqpfjdqxsnut.supabase.co/storage/v1/object/public/article-images/articles/general/1005510607-mt8xul2w.jpg</image:loc>
+      <image:caption>84 वर्षीय हार्ट फेलियर मरीज का बिना ओपन-हार्ट सर्जरी सफल इलाज</image:caption>
+      <image:title>84 वर्षीय हार्ट फेलियर मरीज का बिना ओपन-हार्ट सर्जरी सफल इलाज</image:title>
+    </image:image>
+  </url>
+  <url>
     <loc>https://www.npnewsmetro.com/india/sportsa-ritela-para-naee-pustaka-kaa-lokaarpana-bhaarata-ke-khela</loc>
     <image:image>
       <image:loc>https://jkzrjqclgqpfjdqxsnut.supabase.co/storage/v1/object/public/article-images/articles/general/1005512111-mt8xedlh.jpg</image:loc>

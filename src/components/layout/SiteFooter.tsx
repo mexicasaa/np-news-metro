@@ -203,7 +203,10 @@ export const SiteFooter: React.FC<SiteFooterProps> = ({
           </div>
 
           <div className="flex flex-wrap gap-x-4 gap-y-1 text-slate-400">
+            <button onClick={() => onNavigateStatic('about')} className="hover:text-white underline">{isHindi ? 'हमारे बारे में' : 'About Us'}</button>
+            <button onClick={() => onNavigateStatic('contact')} className="hover:text-white underline">{isHindi ? 'संपर्क करें' : 'Contact Us'}</button>
             <button onClick={() => onNavigateStatic('privacy')} className="hover:text-white underline">{t.privacyPolicy}</button>
+            <button onClick={() => onNavigateStatic('disclaimer')} className="hover:text-white underline">{isHindi ? 'अस्वीकरण (Disclaimer)' : 'Disclaimer'}</button>
             <button onClick={() => onNavigateStatic('terms')} className="hover:text-white underline">{t.termsOfService}</button>
             <button onClick={() => onNavigateStatic('cookie-policy')} className="hover:text-white underline">{isHindi ? 'कुकी सेटिंग्स' : 'Cookie Settings'}</button>
             <button onClick={() => onNavigateStatic('ethics')} className="hover:text-white underline">{t.editorialPolicy}</button>

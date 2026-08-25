@@ -283,6 +283,16 @@ export function buildMainSitemapXml(articles, videos = FALLBACK_VIDEOS) {
 `;
   }
 
+  const staticPages = ['about', 'contact', 'privacy', 'disclaimer', 'terms', 'ethics', 'editorial-team', 'corrections', 'advertise'];
+  for (const page of staticPages) {
+    xml += `  <url>
+    <loc>${BASE_URL}/${page}</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+`;
+  }
+
   const seen = new Set();
   for (const article of articles) {
     const loc = `${BASE_URL}/${article.category}/${article.slug}`;

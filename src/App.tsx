@@ -206,15 +206,46 @@ const parseUrlRoute = (currentPosts: WpPost[], currentVideos: WpVideo[], isIniti
     };
   }
 
-  // 5. Static Pages
-  const staticPages: StaticPageType[] = ['about', 'privacy', 'terms', 'cookie-policy', 'ethics', 'editorial-team', 'corrections', 'advertise', 'contact', 'sitemap'];
-  if (staticPages.includes(cleanPath as StaticPageType)) {
+  // 5. Static Pages & Aliases
+  const staticPageAliases: Record<string, StaticPageType> = {
+    'about': 'about',
+    'about-us': 'about',
+    'contact': 'contact',
+    'contact-us': 'contact',
+    'privacy': 'privacy',
+    'privacy-policy': 'privacy',
+    'privacy_policy': 'privacy',
+    'disclaimer': 'disclaimer',
+    'editorial-disclaimer': 'disclaimer',
+    'terms': 'terms',
+    'terms-and-conditions': 'terms',
+    'terms-conditions': 'terms',
+    'terms-of-service': 'terms',
+    'terms_and_conditions': 'terms',
+    'cookie-policy': 'cookie-policy',
+    'cookies': 'cookie-policy',
+    'ethics': 'ethics',
+    'editorial-policy': 'ethics',
+    'code-of-ethics': 'ethics',
+    'editorial-team': 'editorial-team',
+    'team': 'editorial-team',
+    'masthead': 'editorial-team',
+    'corrections': 'corrections',
+    'grievance': 'corrections',
+    'advertise': 'advertise',
+    'advertise-with-us': 'advertise',
+    'advertising': 'advertise',
+    'sitemap': 'sitemap',
+    'directory': 'sitemap',
+  };
+
+  if (staticPageAliases[cleanPath]) {
     return {
       viewMode: 'public',
       template: 'static',
       category: 'india',
       authorId: 'author-1',
-      staticPage: cleanPath as StaticPageType,
+      staticPage: staticPageAliases[cleanPath],
       searchQuery: '',
       isAdminLoginModalOpen: false,
     };
@@ -1721,6 +1752,7 @@ function AppContent() {
                   initialPage={staticPage}
                   onNavigateHome={handleNavigateHome}
                   onSelectAuthor={handleSelectAuthor}
+                  onNavigateCategory={handleSelectCategory}
                 />
               )}
 
