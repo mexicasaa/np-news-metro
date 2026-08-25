@@ -2,6 +2,7 @@ import React from 'react';
 import { ShieldCheck, ArrowRight, Twitter, Linkedin, Mail } from 'lucide-react';
 import { WpAuthor } from '../../types/wordpress';
 import { useLanguage } from '../../context/LanguageContext';
+import { getAuthorAvatarUrl, handleAvatarError } from '../../utils/imageFallback';
 
 interface AuthorCardProps {
   author: WpAuthor;
@@ -17,9 +18,10 @@ export const AuthorCard: React.FC<AuthorCardProps> = ({
   return (
     <div className="bg-surface-lowest border border-border-subtle p-5 rounded-sm shadow-subtle flex flex-col sm:flex-row gap-4 items-start">
       <img
-        src={author.avatar}
+        src={getAuthorAvatarUrl(author.avatar)}
         alt={author.name}
         className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-border-subtle flex-shrink-0"
+        onError={handleAvatarError}
       />
 
       <div className="flex-1 min-w-0">

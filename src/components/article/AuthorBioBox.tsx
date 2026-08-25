@@ -2,6 +2,7 @@ import React from 'react';
 import { ShieldCheck, ArrowRight, Mail, Twitter, Linkedin } from 'lucide-react';
 import { WpAuthor } from '../../types/wordpress';
 import { useLanguage } from '../../context/LanguageContext';
+import { getAuthorAvatarUrl, handleAvatarError } from '../../utils/imageFallback';
 
 interface AuthorBioBoxProps {
   author: WpAuthor;
@@ -17,9 +18,10 @@ export const AuthorBioBox: React.FC<AuthorBioBoxProps> = ({
   return (
     <div className="my-10 p-6 bg-surface-lowest border border-border-subtle rounded-sm shadow-subtle flex flex-col sm:flex-row gap-5 items-start">
       <img
-        src={author.avatar}
+        src={getAuthorAvatarUrl(author.avatar)}
         alt={author.name}
         className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-border-subtle flex-shrink-0"
+        onError={handleAvatarError}
       />
 
       <div className="flex-1 min-w-0">

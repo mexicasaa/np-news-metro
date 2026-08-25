@@ -1,6 +1,7 @@
 import { supabase } from '../lib/supabase';
 import { UserProfile, UserRole } from '../types/admin';
 import { mockAdminUsers } from '../data/mockAdminData';
+import { getAuthorAvatarUrl, DEFAULT_AUTHOR_AVATAR } from '../utils/imageFallback';
 
 export const signInWithCredentials = async (
   usernameOrEmail: string,
@@ -44,7 +45,7 @@ export const signInWithCredentials = async (
       name: 'Umang Sharma',
       email: data.user.email || 'admin@npnews.com',
       role: 'admin',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
+      avatar: DEFAULT_AUTHOR_AVATAR,
       department: 'Executive Editorial Bureau',
     } };
   } catch (err: any) {
@@ -123,7 +124,7 @@ export const getUserProfile = async (userId: string): Promise<UserProfile | null
       name: data.full_name || data.display_name || 'Newsroom Staff',
       email: `${data.display_name?.toLowerCase() || 'staff'}@npnewsmetro.com`,
       role: (data.role as UserRole) || 'author',
-      avatar: data.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
+      avatar: getAuthorAvatarUrl(data.avatar_url),
       department: data.department || 'Editorial Desk',
     };
   } catch (err) {
@@ -148,7 +149,7 @@ export const getProfilesList = async (): Promise<UserProfile[]> => {
       name: p.full_name || p.display_name || 'Newsroom Staff',
       email: `${p.display_name?.toLowerCase().replace(/\s+/g, '') || 'staff'}@npnewsmetro.com`,
       role: (p.role as UserRole) || 'author',
-      avatar: p.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
+      avatar: getAuthorAvatarUrl(p.avatar_url),
       department: p.department || 'Editorial Bureau',
     }));
   } catch (err) {

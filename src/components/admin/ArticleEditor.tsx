@@ -14,6 +14,7 @@ import { compressImageFile, compressAvatarFile } from '../../utils/imageCompress
 import { uploadArticleImage } from '../../services/mediaService';
 import { generateUniqueSlug } from '../../services/articleService';
 import { slugifyText } from '../../utils/slugify';
+import { getAuthorAvatarUrl, DEFAULT_AUTHOR_AVATAR, handleAvatarError } from '../../utils/imageFallback';
 
 export interface EditorBlock {
   id: string;
@@ -63,11 +64,12 @@ const ARTICLE_TYPES = [
 ];
 
 const AUTHORS_LIST = [
-  { id: 'author-1', name: 'Siddharth Varma', role: 'Senior National Affairs Editor', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400' },
-  { id: 'author-2', name: 'Ananya Deshmukh', role: 'Chief Economics Correspondent', avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=400' },
-  { id: 'author-3', name: 'Rohan Sen', role: 'Technology & Geopolitics Lead', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400' },
-  { id: 'author-4', name: 'Prof. K. R. Nambiar', role: 'Contributing Columnist & Scholar', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=400' },
-  { id: 'author-desk', name: 'NP News Metro Desk', role: 'Editorial Staff Dispatch', avatar: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&q=80&w=400' },
+  { id: 'author-1', name: 'नीरज पाण्डेय', role: 'वरिष्ठ संवाददाता', avatar: '/uploads/neeraj-pandey.jpg' },
+  { id: 'author-2', name: 'डॉ. दीपक गोस्वामी', role: 'मानवीय व्यवहार वैज्ञानिक व लेखक', avatar: '/uploads/dr-deepak-goswami.jpg' },
+  { id: 'author-3', name: 'Siddharth Varma', role: 'Senior National Affairs Editor', avatar: DEFAULT_AUTHOR_AVATAR },
+  { id: 'author-4', name: 'Ananya Deshmukh', role: 'Chief Economics Correspondent', avatar: DEFAULT_AUTHOR_AVATAR },
+  { id: 'author-5', name: 'Rohan Sen', role: 'Technology & Geopolitics Lead', avatar: DEFAULT_AUTHOR_AVATAR },
+  { id: 'author-desk', name: 'NP News Metro Desk', role: 'Editorial Staff Dispatch', avatar: DEFAULT_AUTHOR_AVATAR },
 ];
 
 export const ArticleEditor: React.FC<ArticleEditorProps> = ({
@@ -416,7 +418,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
         role: authorType === 'external' && customAuthorRole.trim() 
           ? customAuthorRole.trim() 
           : (customAuthorRole.trim() && customAuthorRole !== 'Guest Contributor' ? customAuthorRole.trim() : selectedAuthor.role),
-        avatar: customAuthorAvatar || selectedAuthor.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
+        avatar: getAuthorAvatarUrl(customAuthorAvatar || selectedAuthor.avatar),
         bio: (selectedAuthor as any)?.bio || '',
         isGuest: authorType === 'external',
       },
@@ -1183,9 +1185,10 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                             title="Click to upload author photo"
                           >
                             <img
-                              src={customAuthorAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400'}
+                              src={getAuthorAvatarUrl(customAuthorAvatar || (selectedAuthor as any)?.avatar)}
                               alt="Author Avatar"
                               className="w-full h-full object-cover"
+                              onError={handleAvatarError}
                             />
                             <div className="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover/avatar:opacity-100 transition-opacity text-[10px] font-bold">
                               <Camera className="w-3.5 h-3.5" />

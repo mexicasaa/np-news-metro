@@ -12,6 +12,7 @@ import { RankingItem } from '../components/cards/RankingItem';
 import { AdSlot } from '../components/commercial/AdSlot';
 import { Breadcrumbs } from '../components/layout/Breadcrumbs';
 import { useLanguage } from '../context/LanguageContext';
+import { getAuthorAvatarUrl } from '../utils/imageFallback';
 
 interface BreakingArticleTemplateProps {
   post: WpPost;
@@ -34,7 +35,7 @@ export const BreakingArticleTemplate: React.FC<BreakingArticleTemplateProps> = (
     id: 'guest',
     name: post.customAuthor.name,
     role: post.customAuthor.role || 'Guest Contributor',
-    avatar: post.customAuthor.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
+    avatar: getAuthorAvatarUrl(post.customAuthor.avatar),
     bio: '',
     twitter: '',
     email: '',
@@ -42,7 +43,20 @@ export const BreakingArticleTemplate: React.FC<BreakingArticleTemplateProps> = (
     social: {},
     verified: false,
     slug: 'guest'
-  } : mockAuthors[post.authorId];
+  } : (post.authorId && mockAuthors[post.authorId] ? {
+    ...mockAuthors[post.authorId],
+    avatar: getAuthorAvatarUrl(mockAuthors[post.authorId].avatar),
+  } : {
+    id: 'staff-author',
+    name: isHindi ? 'एनपी न्यूज़ मेट्रो ब्यूरो' : 'NP News Metro Bureau',
+    slug: 'author',
+    role: isHindi ? 'संपादकीय डेस्क' : 'Editorial Desk',
+    avatar: getAuthorAvatarUrl(null),
+    bio: 'NP News Metro Bureau reporting team.',
+    verified: true,
+    beats: ['National News'],
+    social: {}
+  });
   const relatedBreaking = mockPosts.filter((p) => p.id !== post.id && p.isBreaking);
   const trendingRanking = [...mockPosts].sort((a, b) => b.viewsCount - a.viewsCount).slice(0, 5);
 

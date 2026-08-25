@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { WpPost } from '../../types/wordpress';
 import { mockAuthors, getLocalizedPost } from '../../data/mockWpData';
-import { handleImageError } from '../../utils/imageFallback';
+import { handleImageError, getAuthorAvatarUrl, handleAvatarError } from '../../utils/imageFallback';
 import { useLanguage } from '../../context/LanguageContext';
 import { ShareModal } from '../article/ShareModal';
 import { getCanonicalArticleUrl } from '../../utils/shareUtils';
@@ -50,11 +50,24 @@ export const HeroStory: React.FC<HeroStoryProps> = ({
     id: 'custom-author',
     name: rawStory.customAuthor.name,
     role: rawStory.customAuthor.role || 'Guest Contributor',
-    avatar: rawStory.customAuthor.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
+    avatar: getAuthorAvatarUrl(rawStory.customAuthor.avatar),
     bio: '',
     twitter: '',
     email: ''
-  } : mockAuthors[currentStory.authorId] || mockAuthors['author-1'];
+  } : (currentStory.authorId && mockAuthors[currentStory.authorId] ? {
+    ...mockAuthors[currentStory.authorId],
+    avatar: getAuthorAvatarUrl(mockAuthors[currentStory.authorId].avatar),
+  } : {
+    id: 'staff-author',
+    name: isHindi ? 'एनपी न्यूज़ मेट्रो ब्यूरो' : 'NP News Metro Bureau',
+    slug: 'author',
+    role: isHindi ? 'संपादकीय डेस्क' : 'Editorial Desk',
+    avatar: getAuthorAvatarUrl(null),
+    bio: 'NP News Metro Bureau reporting team.',
+    verified: true,
+    beats: ['National News'],
+    social: {}
+  });
 
   // Auto-slide carousel when not hovered
   useEffect(() => {
@@ -308,6 +321,7 @@ export const HeroStory: React.FC<HeroStoryProps> = ({
                 src={author.avatar}
                 alt={author.name}
                 className="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover border-2 border-border-subtle group-hover/author:border-secondary-gold transition-colors"
+                onError={handleAvatarError}
               />
               <div>
                 <p className="font-bold text-ink group-hover/author:underline leading-tight text-xs sm:text-sm">

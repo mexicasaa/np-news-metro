@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Clock, ArrowRight, Share2 } from 'lucide-react';
 import { WpPost } from '../../types/wordpress';
 import { mockAuthors, getLocalizedPost } from '../../data/mockWpData';
-import { handleImageError } from '../../utils/imageFallback';
+import { handleImageError, getAuthorAvatarUrl } from '../../utils/imageFallback';
 import { useLanguage } from '../../context/LanguageContext';
 import { ShareModal } from '../article/ShareModal';
 import { getCanonicalArticleUrl } from '../../utils/shareUtils';
@@ -24,8 +24,11 @@ export const HorizontalStoryCard: React.FC<HorizontalStoryCardProps> = ({
   const author = post.customAuthor?.name ? {
     name: post.customAuthor.name,
     role: post.customAuthor.role || 'Guest Contributor',
-    avatar: post.customAuthor.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400'
-  } : mockAuthors[post.authorId];
+    avatar: getAuthorAvatarUrl(post.customAuthor.avatar)
+  } : (post.authorId && mockAuthors[post.authorId] ? {
+    ...mockAuthors[post.authorId],
+    avatar: getAuthorAvatarUrl(mockAuthors[post.authorId].avatar)
+  } : null);
 
   return (
     <article 

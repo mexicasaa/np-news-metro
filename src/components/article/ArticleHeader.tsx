@@ -3,6 +3,7 @@ import { Clock, Calendar, ShieldCheck, Share2, Bookmark, Printer, MessageSquare,
 import { WpPost } from '../../types/wordpress';
 import { mockAuthors, getLocalizedPost } from '../../data/mockWpData';
 import { useLanguage } from '../../context/LanguageContext';
+import { getAuthorAvatarUrl, handleAvatarError } from '../../utils/imageFallback';
 
 interface ArticleHeaderProps {
   post: WpPost;
@@ -24,12 +25,25 @@ export const ArticleHeader: React.FC<ArticleHeaderProps> = ({
     name: post.customAuthor.name,
     slug: 'author',
     role: post.customAuthor.role || (isHindi ? 'विशेष संवाददाता एवं पत्रकार' : 'Staff Journalist & Reporter'),
-    avatar: post.customAuthor.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
+    avatar: getAuthorAvatarUrl(post.customAuthor.avatar),
     bio: post.customAuthor.bio || `${post.customAuthor.name} serves as ${post.customAuthor.role || 'Staff Journalist'} at NP News Metro.`,
     verified: true,
     beats: ['National News', 'Editorial Reporting'],
     social: {}
-  } : mockAuthors[post.authorId];
+  } : (post.authorId && mockAuthors[post.authorId] ? {
+    ...mockAuthors[post.authorId],
+    avatar: getAuthorAvatarUrl(mockAuthors[post.authorId].avatar),
+  } : {
+    id: 'staff-author',
+    name: isHindi ? 'एनपी न्यूज़ मेट्रो ब्यूरो' : 'NP News Metro Bureau',
+    slug: 'author',
+    role: isHindi ? 'संपादकीय डेस्क' : 'Editorial Desk',
+    avatar: getAuthorAvatarUrl(null),
+    bio: 'NP News Metro Bureau reporting team.',
+    verified: true,
+    beats: ['National News'],
+    social: {}
+  });
 
   const formatDateTime = (dateStr: string) => {
     try {
@@ -107,6 +121,7 @@ export const ArticleHeader: React.FC<ArticleHeaderProps> = ({
               src={author.avatar}
               alt={author.name}
               className="w-11 h-11 rounded-full object-cover border border-border-subtle cursor-pointer"
+              onError={handleAvatarError}
               onClick={() => onSelectAuthor?.(author.id)}
             />
             <div>

@@ -7,6 +7,7 @@ import { RankingItem } from '../components/cards/RankingItem';
 import { AdSlot } from '../components/commercial/AdSlot';
 import { Breadcrumbs } from '../components/layout/Breadcrumbs';
 import { useLanguage } from '../context/LanguageContext';
+import { getAuthorAvatarUrl, handleAvatarError } from '../utils/imageFallback';
 
 interface AuthorProfileTemplateProps {
   authorId?: string;
@@ -45,9 +46,10 @@ export const AuthorProfileTemplate: React.FC<AuthorProfileTemplateProps> = ({
         <section aria-label="Journalist Biography" className="bg-surface-lowest border border-border-subtle p-6 sm:p-8 rounded-sm shadow-subtle mb-10">
           <div className="flex flex-col sm:flex-row gap-6 items-start">
             <img
-              src={author.avatar}
+              src={getAuthorAvatarUrl(author.avatar)}
               alt={author.name}
               className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-surface-container flex-shrink-0"
+              onError={handleAvatarError}
             />
 
             <div className="flex-1 min-w-0">

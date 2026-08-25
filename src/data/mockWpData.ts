@@ -6,7 +6,7 @@ export const mockAuthors: Record<string, WpAuthor> = {
     name: 'Siddharth Varma',
     slug: 'siddharth-varma',
     role: 'Senior National Affairs Editor',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
+    avatar: '/np-author-default.png',
     bio: 'Siddharth Varma has covered Indian politics, parliamentary policy, and national security for over 18 years. Formerly with The Indian Express and Frontline.',
     verified: true,
     beats: ['National Politics', 'Parliament', 'Constitutional Law'],

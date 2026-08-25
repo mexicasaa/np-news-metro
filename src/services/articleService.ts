@@ -4,6 +4,7 @@ import { EditorialStatus } from '../types/admin';
 import { mockPosts as defaultMockPosts } from '../data/mockWpData';
 import { ensureAuthenticatedSession } from './authService';
 import { slugifyText } from '../utils/slugify';
+import { getAuthorAvatarUrl, DEFAULT_AUTHOR_AVATAR } from '../utils/imageFallback';
 
 // Category mapping helper
 const CATEGORY_SLUG_TO_ID: Record<string, string> = {
@@ -72,7 +73,7 @@ export const mapDbToWpPost = (row: any, joinedTags?: string[]): WpPost => {
   // Construct author object with reporter name and organizational position
   const authorName = row.custom_author?.name || row.author_name || (row.profiles?.full_name) || 'NP News Metro Bureau';
   const authorRole = row.custom_author?.role || row.author_role || (row.profiles?.position || row.profiles?.designation || row.profiles?.role) || 'Staff Reporter';
-  const authorAvatar = row.custom_author?.avatar || row.author_avatar || row.profiles?.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400';
+  const authorAvatar = getAuthorAvatarUrl(row.custom_author?.avatar || row.author_avatar || row.profiles?.avatar_url);
   const authorBio = row.custom_author?.bio || row.author_bio || row.profiles?.bio || undefined;
 
   const authorObj = {
@@ -279,7 +280,7 @@ export const saveArticle = async (
     // Determine author information (writer name and position in organization)
     const authorName = postData.customAuthor?.name || 'Umang Sharma';
     const authorRole = postData.customAuthor?.role || 'Editor-in-Chief';
-    const authorAvatar = postData.customAuthor?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400';
+    const authorAvatar = getAuthorAvatarUrl(postData.customAuthor?.avatar);
     const authorBio = postData.customAuthor?.bio || null;
 
     const customAuthorPayload = {

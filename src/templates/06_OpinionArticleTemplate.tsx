@@ -10,6 +10,7 @@ import { RankingItem } from '../components/cards/RankingItem';
 import { AdSlot } from '../components/commercial/AdSlot';
 import { Breadcrumbs } from '../components/layout/Breadcrumbs';
 import { useLanguage } from '../context/LanguageContext';
+import { getAuthorAvatarUrl } from '../utils/imageFallback';
 
 interface OpinionArticleTemplateProps {
   post: WpPost;
@@ -32,7 +33,7 @@ export const OpinionArticleTemplate: React.FC<OpinionArticleTemplateProps> = ({
     id: 'guest',
     name: post.customAuthor.name,
     role: post.customAuthor.role || 'Columnist & Contributor',
-    avatar: post.customAuthor.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
+    avatar: getAuthorAvatarUrl(post.customAuthor.avatar),
     bio: `${post.customAuthor.name} writes opinions and analytical columns for NP News Metro.`,
     twitter: '',
     email: '',
@@ -40,7 +41,23 @@ export const OpinionArticleTemplate: React.FC<OpinionArticleTemplateProps> = ({
     social: {},
     verified: false,
     slug: 'guest'
-  } : mockAuthors[post.authorId] || mockAuthors['author-4'];
+  } : (post.authorId && mockAuthors[post.authorId] ? {
+    ...mockAuthors[post.authorId],
+    avatar: getAuthorAvatarUrl(mockAuthors[post.authorId].avatar),
+  } : (mockAuthors['author-4'] ? {
+    ...mockAuthors['author-4'],
+    avatar: getAuthorAvatarUrl(mockAuthors['author-4'].avatar),
+  } : {
+    id: 'staff-author',
+    name: isHindi ? 'संपादकीय विचार मंच' : 'NP Editorial Board',
+    slug: 'author',
+    role: isHindi ? 'संपादकीय लेखक' : 'Opinion Columnist',
+    avatar: getAuthorAvatarUrl(null),
+    bio: 'NP News Metro Opinion Desk.',
+    verified: true,
+    beats: ['Opinion & Analysis'],
+    social: {}
+  }));
   const otherOpinions = mockPosts.filter((p) => p.id !== post.id && (p.isOpinion || p.category === 'opinion'));
   const trendingRanking = [...mockPosts].sort((a, b) => b.viewsCount - a.viewsCount).slice(0, 5);
 

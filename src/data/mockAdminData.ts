@@ -13,7 +13,7 @@ export const mockAdminUsers: UserProfile[] = [
     name: 'Siddharth Varma',
     email: 'siddharth.admin@npnewsmetro.com',
     role: 'admin',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
+    avatar: '/np-author-default.png',
     department: 'Executive Editorial',
   },
   {
