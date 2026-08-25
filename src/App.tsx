@@ -17,9 +17,10 @@ import { AdminLoginModal } from './components/admin/AdminLoginModal';
 import { WpPost, WpVideo, WpGallery } from './types/wordpress';
 import { mockPosts as initialMockPosts, mockVideos, mockGalleries } from './data/mockWpData';
 import { getStoredPosts, savePublishedPost } from './utils/newsStorage';
-import { getPublishedArticles, saveArticle, deleteArticle, getDeletedArticles, restoreDeletedArticle, permanentDeleteArticle, DeletedArticle } from './services/articleService';
+import { getPublishedArticles, getArticleBySlug, saveArticle, deleteArticle, getDeletedArticles, restoreDeletedArticle, permanentDeleteArticle, DeletedArticle } from './services/articleService';
 import { getCurrentUserProfile, ensureAuthenticatedSession, signOut as authSignOut } from './services/authService';
 import { getVideos } from './services/taxonomyService';
+import { getVideoBySlug, getPublishedVideos } from './services/videoService';
 import { supabase } from './lib/supabase';
 import { LanguageProvider } from './context/LanguageContext';
 
@@ -38,6 +39,7 @@ import { AuthorProfileTemplate } from './templates/11_AuthorProfileTemplate';
 import { TrendingTemplate } from './templates/12_TrendingTemplate';
 import { StaticInfoTemplate, StaticPageType } from './templates/13_StaticInfoTemplate';
 import { NotFoundTemplate } from './templates/14_NotFoundTemplate';
+import { ArticleLoadingTemplate } from './templates/15_ArticleLoadingTemplate';
 
 // P0 Admin & Daily Publishing Center Suite
 import { AdminLayout, AdminSection } from './components/admin/AdminLayout';
@@ -60,7 +62,6 @@ import {
   generateVideoStructuredData, 
   generateWebsiteStructuredData 
 } from './services/seoService';
-import { getPublishedVideos } from './services/videoService';
 import { 
   UserRole, UserProfile, PublishingOperation, ReadinessCheckResult, 
   DuplicateMatch, ArticleRevision 
@@ -79,7 +80,7 @@ interface ParsedRoute {
   isAdminLoginModalOpen: boolean;
 }
 
-const parseUrlRoute = (currentPosts: WpPost[], currentVideos: WpVideo[]): ParsedRoute => {
+const parseUrlRoute = (currentPosts: WpPost[], currentVideos: WpVideo[], isInitialLoad: boolean = false): ParsedRoute => {
   if (typeof window === 'undefined') {
     return {
       viewMode: 'public',
@@ -222,12 +223,34 @@ const parseUrlRoute = (currentPosts: WpPost[], currentVideos: WpVideo[]): Parsed
   // 6. Video Detail (/videos/:slug)
   if (cleanPath.startsWith('videos/')) {
     const vSlug = cleanPath.replace(/^videos\//, '');
-    const foundVideo = currentVideos.find(v => v.slug?.toLowerCase() === vSlug.toLowerCase());
+    const foundVideo = currentVideos.find(v => v.slug?.toLowerCase() === vSlug.toLowerCase() || v.id === vSlug);
+    if (foundVideo) {
+      return {
+        viewMode: 'public',
+        template: 'video-detail',
+        category: 'videos',
+        video: foundVideo,
+        authorId: 'author-1',
+        staticPage: 'about',
+        searchQuery: '',
+        isAdminLoginModalOpen: false,
+      };
+    }
+    if (isInitialLoad) {
+      return {
+        viewMode: 'public',
+        template: 'video-loading',
+        category: 'videos',
+        authorId: 'author-1',
+        staticPage: 'about',
+        searchQuery: '',
+        isAdminLoginModalOpen: false,
+      };
+    }
     return {
       viewMode: 'public',
-      template: foundVideo ? 'video-detail' : 'not-found',
+      template: 'not-found',
       category: 'videos',
-      video: foundVideo,
       authorId: 'author-1',
       staticPage: 'about',
       searchQuery: '',
@@ -288,9 +311,22 @@ const parseUrlRoute = (currentPosts: WpPost[], currentVideos: WpVideo[]): Parsed
     return {
       viewMode: 'public',
       template: tpl,
-      category: foundPost.category || 'india',
+      category: foundPost.category || (segments.length > 1 ? segments[0] : 'india'),
       post: foundPost,
       authorId: foundPost.authorId || 'author-1',
+      staticPage: 'about',
+      searchQuery: '',
+      isAdminLoginModalOpen: false,
+    };
+  }
+
+  if (isInitialLoad) {
+    const inferredCat = segments.length > 1 ? segments[0] : 'india';
+    return {
+      viewMode: 'public',
+      template: 'article-loading',
+      category: inferredCat,
+      authorId: 'author-1',
       staticPage: 'about',
       searchQuery: '',
       isAdminLoginModalOpen: false,
@@ -323,8 +359,8 @@ function AppContent() {
   const [videos, setVideos] = useState<WpVideo[]>(mockVideos);
   const [isYouTubeModalOpen, setIsYouTubeModalOpen] = useState(false);
 
-  // Compute Initial Route from URL
-  const initialRoute = React.useMemo(() => parseUrlRoute(posts, videos), []);
+  // Compute Initial Route from URL (with isInitialLoad = true to show instant skeleton rather than 404)
+  const initialRoute = React.useMemo(() => parseUrlRoute(posts, videos, true), []);
 
   // Global View Mode: 'public' reader or 'admin' dashboard
   const [viewMode, setViewMode] = useState<'public' | 'admin'>(initialRoute.viewMode);
@@ -336,6 +372,52 @@ function AppContent() {
   const [selectedAuthorId, setSelectedAuthorId] = useState<string>(initialRoute.authorId);
   const [staticPage, setStaticPage] = useState<StaticPageType>(initialRoute.staticPage);
   const [searchQuery, setSearchQuery] = useState<string>(initialRoute.searchQuery || 'Infrastructure Corridor');
+
+  // Immediate targeted fetching for single article / video if directly loaded via shared permalink
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const cleanPath = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
+    if (!cleanPath || cleanPath === 'admin' || cleanPath.startsWith('admin/')) return;
+
+    if (cleanPath.startsWith('videos/')) {
+      const vSlug = cleanPath.replace(/^videos\//, '');
+      getVideoBySlug(vSlug).then((directVideo) => {
+        if (directVideo) {
+          setSelectedVideo(directVideo);
+          setCurrentTemplate('video-detail');
+          setVideos((prev) => {
+            if (prev.some((v) => v.id === directVideo.id || v.slug === directVideo.slug)) return prev;
+            return [directVideo, ...prev];
+          });
+        }
+      }).catch(() => {});
+      return;
+    }
+
+    const segments = cleanPath.split('/');
+    const candidateSlug = segments[segments.length - 1];
+    const knownDeskSlugs = ['latest', 'trending', 'photos', 'gallery', 'search', 'india', 'politics', 'business', 'economy', 'technology', 'world', 'sports', 'entertainment', 'lifestyle', 'opinion'];
+    const staticPages = ['about', 'privacy', 'terms', 'cookie-policy', 'ethics', 'editorial-team', 'corrections', 'advertise', 'contact', 'sitemap'];
+    
+    if (knownDeskSlugs.includes(cleanPath) || staticPages.includes(cleanPath) || cleanPath.startsWith('category/') || cleanPath.startsWith('author/')) {
+      return;
+    }
+
+    if (candidateSlug) {
+      getArticleBySlug(candidateSlug).then((directPost) => {
+        if (directPost) {
+          setSelectedPost(directPost);
+          const tpl = directPost.isBreaking ? 'article-breaking' : (directPost.isOpinion ? 'article-opinion' : 'article-standard');
+          setCurrentTemplate(tpl);
+          if (directPost.category) setSelectedCategory(directPost.category);
+          setPosts((prev) => {
+            if (prev.some((p) => p.id === directPost.id || p.slug === directPost.slug)) return prev;
+            return [directPost, ...prev];
+          });
+        }
+      }).catch(() => {});
+    }
+  }, []);
 
   // Admin Authentication & Security
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(() => {
@@ -1081,6 +1163,17 @@ function AppContent() {
       };
     }
 
+    if (currentTemplate === 'article-loading' || currentTemplate === 'video-loading') {
+      return {
+        metadata: {
+          title: 'Loading News Report',
+          description: 'Fast, verified, and in-depth national news coverage from NP News Metro.',
+          ogType: 'article' as const,
+        },
+        structuredData: undefined,
+      };
+    }
+
     if (currentTemplate === 'article-standard' || currentTemplate === 'article-breaking' || currentTemplate === 'article-opinion') {
       return {
         metadata: {
@@ -1631,6 +1724,14 @@ function AppContent() {
                 />
               )}
 
+              {(currentTemplate === 'article-loading' || currentTemplate === 'video-loading') && (
+                <ArticleLoadingTemplate
+                  categorySlug={selectedCategory}
+                  onNavigateHome={handleNavigateHome}
+                  onSelectCategory={handleSelectCategory}
+                />
+              )}
+
               {currentTemplate === 'not-found' && (
                 <NotFoundTemplate
                   onNavigateHome={handleNavigateHome}
@@ -1720,7 +1821,7 @@ function AppContent() {
           onViewLiveStory={(id) => {
             setPublishOrchestratorOpen(false);
             const freshPosts = getStoredPosts();
-            const found = freshPosts.find(p => p.id === id) || posts.find(p => p.id === id) || freshPosts[0];
+            const found = freshPosts.find((p: WpPost) => p.id === id) || posts.find((p: WpPost) => p.id === id) || freshPosts[0];
             handleSelectPost(found);
           }}
           onViewHomepage={() => {

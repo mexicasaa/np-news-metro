@@ -1,4 +1,4 @@
-﻿import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://jkzrjqclgqpfjdqxsnut.supabase.co';
 const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprenJqcWNsZ3FwZmpkcXhzbnV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NjU0ODksImV4cCI6MjEwMzE0MTQ4OX0.tDPKLptID2tvWKAKstPVr73I7p_cFt3PPGX9AXL4l28';
@@ -84,48 +84,85 @@ export default async function handler(req, res) {
       }
     }
 
-    let article = null;
+    let mediaItem = null;
 
-    if (cleanSlug) {
+    // Check Video desk first if category is videos
+    if (cleanCategory === 'videos' && cleanSlug) {
+      try {
+        const { data: vData } = await supabase
+          .from('videos')
+          .select('title, description, thumbnail_url, youtube_url, published_at, slug')
+          .eq('slug', cleanSlug)
+          .maybeSingle();
+
+        if (vData) {
+          mediaItem = {
+            title: vData.title,
+            dek: vData.description || vData.title,
+            category: 'videos',
+            image: vData.thumbnail_url || `${SITE_ORIGIN}/uploads/dr-deepak-goswami.jpg`,
+            slug: vData.slug || cleanSlug,
+            type: 'video.other',
+          };
+        }
+      } catch (e) {}
+    }
+
+    // Check Articles
+    if (!mediaItem && cleanSlug) {
       try {
         const { data } = await supabase
           .from('articles')
-          .select('title, seo_title, excerpt, meta_description, category_id, featured_image_url, published_at, slug')
+          .select(`
+            title, 
+            seo_title, 
+            excerpt, 
+            meta_description, 
+            category_id, 
+            featured_image_url, 
+            published_at, 
+            slug,
+            categories (slug)
+          `)
           .eq('slug', cleanSlug)
           .maybeSingle();
 
         if (data) {
-          article = {
+          const resolvedCat = (data.categories && data.categories.slug) ? data.categories.slug : cleanCategory;
+          mediaItem = {
             title: data.seo_title || data.title,
             dek: data.meta_description || data.excerpt || data.title,
-            category: cleanCategory,
+            category: resolvedCat || 'india',
             image: data.featured_image_url,
             slug: data.slug || cleanSlug,
             publishedAt: data.published_at,
+            type: 'article',
           };
         }
-      } catch {
-        // Fallback
-      }
+      } catch (e) {}
 
-      if (!article && FALLBACK_SLUGS[cleanSlug]) {
+      if (!mediaItem && FALLBACK_SLUGS[cleanSlug]) {
         const f = FALLBACK_SLUGS[cleanSlug];
-        article = {
+        mediaItem = {
           title: f.title,
           dek: f.dek,
           category: f.category,
           image: f.image,
           slug: cleanSlug,
+          type: 'article',
         };
       }
     }
 
-    const title = article ? article.title : 'NP NEWS METRO — Real News. Real Impact.';
-    const description = article ? article.dek : 'Independent, credible digital journalism for modern India.';
-    const image = article ? getAbsoluteUrl(article.image) : `${SITE_ORIGIN}/uploads/dr-deepak-goswami.jpg`;
-    const category = article ? article.category : cleanCategory;
-    const slug = article ? article.slug : cleanSlug;
-    const canonicalUrl = slug ? `${SITE_ORIGIN}/${category}/${slug}` : SITE_ORIGIN;
+    const title = mediaItem ? mediaItem.title : 'NP NEWS METRO — Real News. Real Impact.';
+    const description = mediaItem ? mediaItem.dek : 'Independent, credible digital journalism for modern India.';
+    const image = mediaItem ? getAbsoluteUrl(mediaItem.image) : `${SITE_ORIGIN}/uploads/dr-deepak-goswami.jpg`;
+    const category = mediaItem ? mediaItem.category : cleanCategory;
+    const slug = mediaItem ? mediaItem.slug : cleanSlug;
+    const isVideo = category === 'videos';
+    const canonicalUrl = slug 
+      ? (isVideo ? `${SITE_ORIGIN}/videos/${slug}` : `${SITE_ORIGIN}/${category}/${slug}`)
+      : SITE_ORIGIN;
 
     const html = `<!DOCTYPE html>
 <html lang="hi">
@@ -137,7 +174,7 @@ export default async function handler(req, res) {
   <link rel="canonical" href="${canonicalUrl}" />
 
   <meta property="og:site_name" content="NP News Metro" />
-  <meta property="og:type" content="article" />
+  <meta property="og:type" content="${mediaItem?.type || 'article'}" />
   <meta property="og:title" content="${escapeHtml(title)}" />
   <meta property="og:description" content="${escapeHtml(description)}" />
   <meta property="og:url" content="${canonicalUrl}" />
@@ -156,11 +193,11 @@ export default async function handler(req, res) {
 
   <meta http-equiv="refresh" content="0;url=${canonicalUrl}" />
 </head>
-<body>
-  <h1>${escapeHtml(title)}</h1>
-  <p>${escapeHtml(description)}</p>
-  <img src="${image}" alt="${escapeHtml(title)}" />
-  <p><a href="${canonicalUrl}">Click here to read the full story on NP News Metro...</a></p>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 20px; text-align: center; color: #1e293b;">
+  <h1 style="font-size: 20px; margin-bottom: 12px;">${escapeHtml(title)}</h1>
+  <p style="color: #64748b; font-size: 14px; margin-bottom: 20px;">${escapeHtml(description)}</p>
+  <img src="${image}" alt="${escapeHtml(title)}" style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 20px;" />
+  <p><a href="${canonicalUrl}" style="display: inline-block; padding: 10px 20px; background-color: #990000; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 14px;">Open Full Story on NP News Metro</a></p>
   <script>window.location.replace('${canonicalUrl}');</script>
 </body>
 </html>`;
