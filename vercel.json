@@ -8,29 +8,7 @@
       "destination": "/api/$1"
     },
     {
-      "source": "/videos/:slug",
-      "has": [
-        {
-          "type": "header",
-          "key": "user-agent",
-          "value": ".*(facebookexternalhit|WhatsApp|Twitterbot|TelegramBot|LinkedInBot|Discordbot|Slackbot|Applebot).*"
-        }
-      ],
-      "destination": "/api/share?category=videos&slug=:slug"
-    },
-    {
-      "source": "/:category/:slug",
-      "has": [
-        {
-          "type": "header",
-          "key": "user-agent",
-          "value": ".*(facebookexternalhit|WhatsApp|Twitterbot|TelegramBot|LinkedInBot|Discordbot|Slackbot|Applebot).*"
-        }
-      ],
-      "destination": "/api/share?category=:category&slug=:slug"
-    },
-    {
-      "source": "/(.*)",
+      "source": "/((?!api/|assets/|uploads/|.*\\..*).*)",
       "destination": "/index.html"
     }
   ],
@@ -80,6 +58,15 @@
         {
           "key": "Cache-Control",
           "value": "public, max-age=86400, stale-while-revalidate=3600"
+        }
+      ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
         }
       ]
     }
