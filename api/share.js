@@ -7,7 +7,7 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 const SITE_ORIGIN = 'https://npnewsmetro.com';
 const DEFAULT_OG_IMAGE = 'https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&q=80&w=1200';
 
-function getAbsoluteUrl(img?: string): string {
+function getAbsoluteUrl(img) {
   if (!img || typeof img !== 'string' || !img.trim()) return DEFAULT_OG_IMAGE;
   const trimmed = img.trim();
   if (/^https?:\/\//i.test(trimmed)) return trimmed;
@@ -15,7 +15,7 @@ function getAbsoluteUrl(img?: string): string {
   return `${SITE_ORIGIN}${cleanPath}`;
 }
 
-function escapeHtml(str: string): string {
+function escapeHtml(str) {
   if (!str) return '';
   return String(str)
     .replace(/&/g, '&amp;')
@@ -25,7 +25,7 @@ function escapeHtml(str: string): string {
     .replace(/'/g, '&#039;');
 }
 
-function sendResponse(res: any, statusCode: number, contentType: string, body: string) {
+function sendResponse(res, statusCode, contentType, body) {
   res.statusCode = statusCode;
   if (typeof res.setHeader === 'function') {
     res.setHeader('Content-Type', contentType);
@@ -37,7 +37,7 @@ function sendResponse(res: any, statusCode: number, contentType: string, body: s
   return res.end(body);
 }
 
-const FALLBACK_SLUGS: Record<string, { title: string; dek: string; category: string; image: string }> = {
+const FALLBACK_SLUGS = {
   'nayab-saini-patiala-teej': {
     title: 'Haryana CM Nayab Saini Celebrates Teej in Patiala: "Punjab & Haryana Share Timeless Ties of Love and Brotherhood"',
     dek: 'Chief Minister Nayab Saini highlights enduring cultural brotherhood between Punjab and Haryana at Teej celebration in Patiala.',
@@ -64,7 +64,7 @@ const FALLBACK_SLUGS: Record<string, { title: string; dek: string; category: str
   }
 };
 
-export default async function handler(req: any, res: any) {
+export default async function handler(req, res) {
   try {
     const url = new URL(req.url || '/', SITE_ORIGIN);
     const slugParam = req.query?.slug || url.searchParams.get('slug') || '';
@@ -84,7 +84,7 @@ export default async function handler(req: any, res: any) {
       }
     }
 
-    let article: any = null;
+    let article = null;
 
     if (cleanSlug) {
       try {
@@ -166,7 +166,7 @@ export default async function handler(req: any, res: any) {
 </html>`;
 
     return sendResponse(res, 200, 'text/html; charset=utf-8', html);
-  } catch (err: any) {
+  } catch (err) {
     return sendResponse(res, 500, 'text/plain; charset=utf-8', 'Error: ' + err?.message);
   }
 }

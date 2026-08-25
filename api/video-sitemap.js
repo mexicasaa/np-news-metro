@@ -6,7 +6,7 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const SITE_URL = 'https://npnewsmetro.com';
 
-function escapeXml(str: string): string {
+function escapeXml(str) {
   if (!str) return '';
   return String(str)
     .replace(/&/g, '&amp;')
@@ -16,11 +16,11 @@ function escapeXml(str: string): string {
     .replace(/'/g, '&apos;');
 }
 
-function sendResponse(res: any, statusCode: number, contentType: string, body: string) {
+function sendResponse(res, statusCode, contentType, body) {
   res.statusCode = statusCode;
   if (typeof res.setHeader === 'function') {
     res.setHeader('Content-Type', contentType);
-    res.setHeader('Cache-Control', 'public, max-age=900, stale-while-revalidate=300');
+    res.setHeader('Cache-Control', 'public, max-age=3600, stale-while-revalidate=600');
   }
   if (typeof res.status === 'function' && typeof res.send === 'function') {
     return res.status(statusCode).send(body);
@@ -28,37 +28,34 @@ function sendResponse(res: any, statusCode: number, contentType: string, body: s
   return res.end(body);
 }
 
-export default async function handler(req: any, res: any) {
+export default async function handler(req, res) {
   try {
-    const twoDaysAgo = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
-
     const { data } = await supabase
-      .from('articles')
-      .select('title, slug, category_id, published_at')
-      .eq('status', 'published')
-      .gte('published_at', twoDaysAgo)
+      .from('videos')
+      .select('*')
+      .eq('is_published', true)
       .order('published_at', { ascending: false });
 
-    const articlesXml = (data || []).map((post: any) => `  <url>
-    <loc>${SITE_URL}/${post.category_id || 'india'}/${post.slug}</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>${new Date(post.published_at || Date.now()).toISOString()}</news:publication_date>
-      <news:title>${escapeXml(post.title)}</news:title>
-    </news:news>
+    const itemsXml = (data || []).map((video) => `  <url>
+    <loc>${SITE_URL}/videos/${video.slug}</loc>
+    <video:video>
+      <video:thumbnail_loc>${escapeXml(video.thumbnail_url || `${SITE_URL}/uploads/dr-deepak-goswami.jpg`)}</video:thumbnail_loc>
+      <video:title>${escapeXml(video.title)}</video:title>
+      <video:description>${escapeXml(video.description || video.title)}</video:description>
+      <video:player_loc>${escapeXml(video.video_url || '')}</video:player_loc>
+      <video:publication_date>${new Date(video.published_at || Date.now()).toISOString()}</video:publication_date>
+      <video:family_friendly>yes</video:family_friendly>
+    </video:video>
   </url>`).join('\n');
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
-${articlesXml}
+        xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+${itemsXml}
 </urlset>`;
 
     return sendResponse(res, 200, 'application/xml; charset=utf-8', xml);
-  } catch (err: any) {
-    return sendResponse(res, 500, 'text/plain; charset=utf-8', 'Error generating news sitemap: ' + err?.message);
+  } catch (err) {
+    return sendResponse(res, 500, 'text/plain; charset=utf-8', 'Error generating video sitemap: ' + err?.message);
   }
 }

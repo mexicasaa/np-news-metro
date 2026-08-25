@@ -6,17 +6,7 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const SITE_URL = 'https://npnewsmetro.com';
 
-function escapeXml(str: string): string {
-  if (!str) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
-}
-
-function sendResponse(res: any, statusCode: number, contentType: string, body: string) {
+function sendResponse(res, statusCode, contentType, body) {
   res.statusCode = statusCode;
   if (typeof res.setHeader === 'function') {
     res.setHeader('Content-Type', contentType);
@@ -28,37 +18,52 @@ function sendResponse(res: any, statusCode: number, contentType: string, body: s
   return res.end(body);
 }
 
-export default async function handler(req: any, res: any) {
+export default async function handler(req, res) {
   try {
     const { data } = await supabase
       .from('articles')
-      .select('title, slug, category_id, featured_image_url')
+      .select('slug, category_id, updated_at, published_at')
       .eq('status', 'published')
-      .not('featured_image_url', 'is', null)
       .order('published_at', { ascending: false });
 
-    const itemsXml = (data || []).map((post: any) => {
-      const imgUrl = post.featured_image_url?.startsWith('http')
-        ? post.featured_image_url
-        : `${SITE_URL}${post.featured_image_url?.startsWith('/') ? '' : '/'}${post.featured_image_url || 'uploads/dr-deepak-goswami.jpg'}`;
+    const staticPages = [
+      '',
+      '/latest',
+      '/videos',
+      '/photos',
+      '/trending',
+      '/category/india',
+      '/category/politics',
+      '/category/business',
+      '/category/technology',
+      '/category/world',
+      '/category/sports',
+      '/category/entertainment',
+      '/category/lifestyle',
+      '/category/opinion',
+    ];
 
-      return `  <url>
+    const staticXml = staticPages.map(page => `  <url>
+    <loc>${SITE_URL}${page}</loc>
+    <changefreq>hourly</changefreq>
+    <priority>${page === '' ? '1.0' : '0.8'}</priority>
+  </url>`).join('\n');
+
+    const articlesXml = (data || []).map((post) => `  <url>
     <loc>${SITE_URL}/${post.category_id || 'india'}/${post.slug}</loc>
-    <image:image>
-      <image:loc>${escapeXml(imgUrl)}</image:loc>
-      <image:title>${escapeXml(post.title)}</image:title>
-    </image:image>
-  </url>`;
-    }).join('\n');
+    <lastmod>${new Date(post.updated_at || post.published_at || Date.now()).toISOString().split('T')[0]}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>`).join('\n');
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-${itemsXml}
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${staticXml}
+${articlesXml}
 </urlset>`;
 
     return sendResponse(res, 200, 'application/xml; charset=utf-8', xml);
-  } catch (err: any) {
-    return sendResponse(res, 500, 'text/plain; charset=utf-8', 'Error generating image sitemap: ' + err?.message);
+  } catch (err) {
+    return sendResponse(res, 500, 'text/plain; charset=utf-8', 'Error generating sitemap: ' + err?.message);
   }
 }

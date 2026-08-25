@@ -6,7 +6,7 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const SITE_URL = 'https://npnewsmetro.com';
 
-function escapeXml(str: string): string {
+function escapeXml(str) {
   if (!str) return '';
   return String(str)
     .replace(/&/g, '&amp;')
@@ -16,7 +16,7 @@ function escapeXml(str: string): string {
     .replace(/'/g, '&apos;');
 }
 
-function sendResponse(res: any, statusCode: number, contentType: string, body: string) {
+function sendResponse(res, statusCode, contentType, body) {
   res.statusCode = statusCode;
   if (typeof res.setHeader === 'function') {
     res.setHeader('Content-Type', contentType);
@@ -28,7 +28,7 @@ function sendResponse(res: any, statusCode: number, contentType: string, body: s
   return res.end(body);
 }
 
-export default async function handler(req: any, res: any) {
+export default async function handler(req, res) {
   try {
     const { data } = await supabase
       .from('articles')
@@ -37,7 +37,7 @@ export default async function handler(req: any, res: any) {
       .order('published_at', { ascending: false })
       .limit(50);
 
-    const itemsXml = (data || []).map((post: any) => {
+    const itemsXml = (data || []).map((post) => {
       const url = `${SITE_URL}/${post.category_id || 'india'}/${post.slug}`;
       const pubDate = post.published_at ? new Date(post.published_at).toUTCString() : new Date().toUTCString();
       const image = post.featured_image_url || `${SITE_URL}/uploads/dr-deepak-goswami.jpg`;
@@ -65,7 +65,7 @@ ${itemsXml}
 </rss>`;
 
     return sendResponse(res, 200, 'application/rss+xml; charset=utf-8', xml);
-  } catch (err: any) {
+  } catch (err) {
     return sendResponse(res, 500, 'text/plain; charset=utf-8', 'Error generating RSS feed: ' + err?.message);
   }
 }

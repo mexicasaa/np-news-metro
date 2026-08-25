@@ -6,7 +6,7 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const SITE_URL = 'https://npnewsmetro.com';
 
-function escapeXml(str: string): string {
+function escapeXml(str) {
   if (!str) return '';
   return String(str)
     .replace(/&/g, '&amp;')
@@ -16,7 +16,7 @@ function escapeXml(str: string): string {
     .replace(/'/g, '&apos;');
 }
 
-function sendResponse(res: any, statusCode: number, contentType: string, body: string) {
+function sendResponse(res, statusCode, contentType, body) {
   res.statusCode = statusCode;
   if (typeof res.setHeader === 'function') {
     res.setHeader('Content-Type', contentType);
@@ -28,34 +28,37 @@ function sendResponse(res: any, statusCode: number, contentType: string, body: s
   return res.end(body);
 }
 
-export default async function handler(req: any, res: any) {
+export default async function handler(req, res) {
   try {
     const { data } = await supabase
-      .from('videos')
-      .select('*')
-      .eq('is_published', true)
+      .from('articles')
+      .select('title, slug, category_id, featured_image_url')
+      .eq('status', 'published')
+      .not('featured_image_url', 'is', null)
       .order('published_at', { ascending: false });
 
-    const itemsXml = (data || []).map((video: any) => `  <url>
-    <loc>${SITE_URL}/videos/${video.slug}</loc>
-    <video:video>
-      <video:thumbnail_loc>${escapeXml(video.thumbnail_url || `${SITE_URL}/uploads/dr-deepak-goswami.jpg`)}</video:thumbnail_loc>
-      <video:title>${escapeXml(video.title)}</video:title>
-      <video:description>${escapeXml(video.description || video.title)}</video:description>
-      <video:player_loc>${escapeXml(video.video_url || '')}</video:player_loc>
-      <video:publication_date>${new Date(video.published_at || Date.now()).toISOString()}</video:publication_date>
-      <video:family_friendly>yes</video:family_friendly>
-    </video:video>
-  </url>`).join('\n');
+    const itemsXml = (data || []).map((post) => {
+      const imgUrl = post.featured_image_url?.startsWith('http')
+        ? post.featured_image_url
+        : `${SITE_URL}${post.featured_image_url?.startsWith('/') ? '' : '/'}${post.featured_image_url || 'uploads/dr-deepak-goswami.jpg'}`;
+
+      return `  <url>
+    <loc>${SITE_URL}/${post.category_id || 'india'}/${post.slug}</loc>
+    <image:image>
+      <image:loc>${escapeXml(imgUrl)}</image:loc>
+      <image:title>${escapeXml(post.title)}</image:title>
+    </image:image>
+  </url>`;
+    }).join('\n');
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 ${itemsXml}
 </urlset>`;
 
     return sendResponse(res, 200, 'application/xml; charset=utf-8', xml);
-  } catch (err: any) {
-    return sendResponse(res, 500, 'text/plain; charset=utf-8', 'Error generating video sitemap: ' + err?.message);
+  } catch (err) {
+    return sendResponse(res, 500, 'text/plain; charset=utf-8', 'Error generating image sitemap: ' + err?.message);
   }
 }

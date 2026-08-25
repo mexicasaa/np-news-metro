@@ -1,4 +1,4 @@
-﻿function sendResponse(res: any, statusCode: number, contentType: string, body: string) {
+﻿function sendResponse(res, statusCode, contentType, body) {
   res.statusCode = statusCode;
   if (typeof res.setHeader === 'function') {
     res.setHeader('Content-Type', contentType);
@@ -10,7 +10,7 @@
   return res.end(body);
 }
 
-export default function handler(req: any, res: any) {
+export default function handler(req, res) {
   const robots = `User-agent: *
 Allow: /
 
