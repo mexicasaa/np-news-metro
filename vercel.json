@@ -4,30 +4,32 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
+      "source": "/api/sitemap",
+      "destination": "/sitemap.xml"
     },
     {
-      "source": "/:category(india|politics|business|technology|world|sports|entertainment|lifestyle|opinion|culture|photos)/:slug",
-      "has": [
-        {
-          "type": "header",
-          "key": "user-agent",
-          "value": "(?i).*(facebookexternalhit|WhatsApp|Twitterbot|TelegramBot|LinkedInBot|Discordbot|Slackbot|Applebot).*"
-        }
-      ],
-      "destination": "/api/share?category=:category&slug=:slug"
+      "source": "/api/rss",
+      "destination": "/rss.xml"
     },
     {
-      "source": "/videos/:slug",
-      "has": [
-        {
-          "type": "header",
-          "key": "user-agent",
-          "value": "(?i).*(facebookexternalhit|WhatsApp|Twitterbot|TelegramBot|LinkedInBot|Discordbot|Slackbot|Applebot).*"
-        }
-      ],
-      "destination": "/api/share?category=videos&slug=:slug"
+      "source": "/api/news-sitemap",
+      "destination": "/news-sitemap.xml"
+    },
+    {
+      "source": "/api/image-sitemap",
+      "destination": "/image-sitemap.xml"
+    },
+    {
+      "source": "/api/video-sitemap",
+      "destination": "/video-sitemap.xml"
+    },
+    {
+      "source": "/api/robots",
+      "destination": "/robots.txt"
+    },
+    {
+      "source": "/api/share",
+      "destination": "/api/share.js"
     },
     {
       "source": "/((?!api/|assets/|uploads/|.*\\..*).*)",
