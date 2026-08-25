@@ -2,6 +2,28 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
   <url>
+    <loc>https://www.npnewsmetro.com/india/sportsa-ritela-para-naee-pustaka-kaa-lokaarpana-bhaarata-ke-khela</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-25T17:16:22.477Z</news:publication_date>
+      <news:title>स्पोर्ट्स रिटेल पर नई पुस्तक का लोकार्पण, भारत के खेल बाजार की संभावनाओं पर बढ़ी चर्चा</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/india/bhaarata-100-nae-jahaajon-se-ghataaegaa-videshee-shipinga-para-ni</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-25T17:07:21.753Z</news:publication_date>
+      <news:title>भारत 100 नए जहाजों से घटाएगा विदेशी शिपिंग पर निर्भरता, हर साल बचेंगे 75 अरब डॉलर</news:title>
+    </news:news>
+  </url>
+  <url>
     <loc>https://www.npnewsmetro.com/india/nishaanebaajee-men-bhaaooraava-devarasa-vidyaa-mandira-kee-betiyo</loc>
     <news:news>
       <news:publication>
