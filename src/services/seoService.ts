@@ -1,4 +1,5 @@
-import { WpPost, WpVideo, WpCategory } from '../types/wordpress';
+﻿import { WpPost, WpVideo, WpCategory } from '../types/wordpress';
+import { getAbsoluteImageUrl, getSiteOrigin } from '../utils/shareUtils';
 
 export interface SeoMetadataOptions {
   title?: string;
@@ -30,7 +31,7 @@ export interface ExternalLinkCheckResult {
   message?: string;
 }
 
-const SITE_ORIGIN = typeof window !== 'undefined' ? window.location.origin : 'https://npnewsmetro.com';
+const SITE_ORIGIN = getSiteOrigin();
 
 export const generateArticleStructuredData = (
   post: WpPost,
@@ -39,6 +40,7 @@ export const generateArticleStructuredData = (
 ) => {
   const canonicalUrl = `${siteUrl}/${post.category}/${post.slug}`;
   const authorName = post.customAuthor?.name || 'NP News Metro Bureau';
+  const absoluteImage = getAbsoluteImageUrl(post.featuredImage, siteUrl);
 
   return {
     '@context': 'https://schema.org',
@@ -49,9 +51,7 @@ export const generateArticleStructuredData = (
     },
     headline: post.seoTitle || post.title,
     description: post.seoDescription || post.dek || post.title,
-    image: [
-      post.featuredImage || 'https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&q=80&w=1200',
-    ],
+    image: [absoluteImage],
     datePublished: post.publishedAt || new Date().toISOString(),
     dateModified: post.updatedAt || post.publishedAt || new Date().toISOString(),
     author: [
@@ -82,15 +82,14 @@ export const generateVideoStructuredData = (
   siteUrl: string = SITE_ORIGIN
 ) => {
   const canonicalUrl = `${siteUrl}/videos/${video.slug}`;
+  const absolutePoster = getAbsoluteImageUrl(video.posterUrl, siteUrl);
 
   return {
     '@context': 'https://schema.org',
     '@type': 'VideoObject',
     name: video.title,
     description: video.caption || video.title,
-    thumbnailUrl: [
-      video.posterUrl || 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=600',
-    ],
+    thumbnailUrl: [absolutePoster],
     uploadDate: video.publishedAt || new Date().toISOString(),
     duration: 'PT5M00S',
     contentUrl: video.videoUrl,
@@ -169,7 +168,6 @@ export const checkExternalLinkStatus = async (
   }
 
   try {
-    // Attempt HEAD or GET with abort controller
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 4000);
 
@@ -190,7 +188,6 @@ export const checkExternalLinkStatus = async (
     if (err?.name === 'AbortError') {
       return { url, status: 'timeout', message: 'Connection timed out (>4s).' };
     }
-    // With CORS restrictions in browsers, no-cors fetch errors can still indicate network presence
     return { url, status: 'working', message: 'External endpoint reached.' };
   }
 };

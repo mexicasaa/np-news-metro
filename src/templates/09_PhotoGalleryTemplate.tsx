@@ -3,6 +3,7 @@ import { Camera, Eye, Share2, Flame, ArrowRight, User } from 'lucide-react';
 import { WpGallery, WpPost } from '../types/wordpress';
 import { mockGalleries, mockPosts, mockAuthors } from '../data/mockWpData';
 import { GalleryViewer } from '../components/media/GalleryViewer';
+import { ArticleShareBar } from '../components/article/ArticleShareBar';
 import { MediumStoryCard } from '../components/cards/MediumStoryCard';
 import { RankingItem } from '../components/cards/RankingItem';
 import { AdSlot } from '../components/commercial/AdSlot';
@@ -80,6 +81,15 @@ export const PhotoGalleryTemplate: React.FC<PhotoGalleryTemplateProps> = ({
 
             {/* Interactive Gallery Viewer */}
             <GalleryViewer gallery={gallery} />
+
+            {/* Social Share Bar with Gallery Cover Image */}
+            <ArticleShareBar
+              title={galleryTitle}
+              url={typeof window !== 'undefined' ? `${window.location.origin}/photos/${gallery.slug}` : `https://npnewsmetro.com/photos/${gallery.slug}`}
+              featuredImage={gallery.featuredImage || gallery.items[0]?.url}
+              summary={galleryDesc}
+              category="photos"
+            />
 
             {/* Photo Essay Context / Story */}
             <div className="my-8 p-6 bg-surface-lowest border border-border-subtle rounded-sm shadow-subtle text-sm text-ink-secondary leading-relaxed space-y-4">

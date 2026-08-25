@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
+ï»¿import React, { useEffect } from 'react';
 import { SeoMetadataOptions } from '../../services/seoService';
 import { trackPageView } from '../../services/analyticsService';
+import { getAbsoluteImageUrl, getSiteOrigin } from '../../utils/shareUtils';
 
 interface SeoHeadProps {
   metadata?: SeoMetadataOptions;
@@ -11,11 +12,11 @@ export const SeoHead: React.FC<SeoHeadProps> = ({ metadata, structuredData }) =>
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const baseTitle = 'NP News Metro • India’s Premier Newsroom';
+    const baseTitle = "NP News Metro â€” India's Premier Newsroom";
     const finalTitle = metadata?.title ? `${metadata.title} | NP News Metro` : baseTitle;
     const finalDesc = metadata?.description || 'Fast, verified, and in-depth national news coverage, policy analysis, investigative journalism, and live market updates.';
     const finalUrl = metadata?.canonicalUrl || window.location.href;
-    const finalImage = metadata?.ogImage || 'https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&q=80&w=1200';
+    const finalImage = getAbsoluteImageUrl(metadata?.ogImage);
     const robotsContent = metadata?.noIndex ? 'noindex, nofollow' : 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1';
 
     // 1. Document Title
@@ -37,19 +38,43 @@ export const SeoHead: React.FC<SeoHeadProps> = ({ metadata, structuredData }) =>
     setMetaTag('meta[name="robots"]', 'name', 'robots', robotsContent);
     setMetaTag('meta[name="googlebot-news"]', 'name', 'googlebot-news', 'index, follow');
 
-    // 3. Open Graph
+    // 3. Open Graph (Facebook, WhatsApp, LinkedIn, iMessage, etc.)
     setMetaTag('meta[property="og:title"]', 'property', 'og:title', finalTitle);
     setMetaTag('meta[property="og:description"]', 'property', 'og:description', finalDesc);
     setMetaTag('meta[property="og:url"]', 'property', 'og:url', finalUrl);
     setMetaTag('meta[property="og:image"]', 'property', 'og:image', finalImage);
+    setMetaTag('meta[property="og:image:secure_url"]', 'property', 'og:image:secure_url', finalImage);
+    setMetaTag('meta[property="og:image:width"]', 'property', 'og:image:width', '1200');
+    setMetaTag('meta[property="og:image:height"]', 'property', 'og:image:height', '630');
+    setMetaTag('meta[property="og:image:alt"]', 'property', 'og:image:alt', metadata?.title || 'NP News Metro');
+    setMetaTag('meta[property="og:image:type"]', 'property', 'og:image:type', 'image/jpeg');
     setMetaTag('meta[property="og:type"]', 'property', 'og:type', metadata?.ogType || 'website');
     setMetaTag('meta[property="og:site_name"]', 'property', 'og:site_name', 'NP News Metro');
 
+    // Article Specific OG tags
+    if (metadata?.ogType === 'article') {
+      if (metadata.publishedTime) {
+        setMetaTag('meta[property="article:published_time"]', 'property', 'article:published_time', metadata.publishedTime);
+      }
+      if (metadata.modifiedTime) {
+        setMetaTag('meta[property="article:modified_time"]', 'property', 'article:modified_time', metadata.modifiedTime);
+      }
+      if (metadata.authorName) {
+        setMetaTag('meta[property="article:author"]', 'property', 'article:author', metadata.authorName);
+      }
+      if (metadata.section) {
+        setMetaTag('meta[property="article:section"]', 'property', 'article:section', metadata.section);
+      }
+    }
+
     // 4. Twitter / X Cards
     setMetaTag('meta[name="twitter:card"]', 'name', 'twitter:card', 'summary_large_image');
+    setMetaTag('meta[name="twitter:site"]', 'name', 'twitter:site', '@NPNewsMetro');
+    setMetaTag('meta[name="twitter:creator"]', 'name', 'twitter:creator', '@NPNewsMetro');
     setMetaTag('meta[name="twitter:title"]', 'name', 'twitter:title', finalTitle);
     setMetaTag('meta[name="twitter:description"]', 'name', 'twitter:description', finalDesc);
     setMetaTag('meta[name="twitter:image"]', 'name', 'twitter:image', finalImage);
+    setMetaTag('meta[name="twitter:image:src"]', 'name', 'twitter:image:src', finalImage);
 
     // 5. Canonical Link
     let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;

@@ -3,6 +3,7 @@ import { Play, Eye, Clock, User, ShieldCheck, Flame, Share2, FileText, ArrowRigh
 import { WpVideo, WpPost } from '../types/wordpress';
 import { mockVideos, mockPosts, mockAuthors, getLocalizedVideo } from '../data/mockWpData';
 import { VideoPlayer } from '../components/media/VideoPlayer';
+import { ArticleShareBar } from '../components/article/ArticleShareBar';
 import { VideoCard } from '../components/cards/VideoCard';
 import { MediumStoryCard } from '../components/cards/MediumStoryCard';
 import { RankingItem } from '../components/cards/RankingItem';
@@ -84,6 +85,15 @@ export const VideoDetailTemplate: React.FC<VideoDetailTemplateProps> = ({
 
             {/* Main Responsive Video Player */}
             <VideoPlayer video={video} />
+
+            {/* Social Share Bar with Video Thumbnail */}
+            <ArticleShareBar
+              title={localized.title}
+              url={typeof window !== 'undefined' ? `${window.location.origin}/videos/${video.slug}` : `https://npnewsmetro.com/videos/${video.slug}`}
+              featuredImage={video.posterUrl}
+              summary={localized.caption}
+              category={video.category || 'videos'}
+            />
 
             {/* Description & Overview */}
             <div className="my-8 p-5 bg-surface-lowest border border-border-subtle rounded-sm shadow-subtle">

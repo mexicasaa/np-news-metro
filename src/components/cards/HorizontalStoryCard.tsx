@@ -1,9 +1,11 @@
-import React from 'react';
-import { Clock, ArrowRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { Clock, ArrowRight, Share2 } from 'lucide-react';
 import { WpPost } from '../../types/wordpress';
 import { mockAuthors, getLocalizedPost } from '../../data/mockWpData';
 import { handleImageError } from '../../utils/imageFallback';
 import { useLanguage } from '../../context/LanguageContext';
+import { ShareModal } from '../article/ShareModal';
+import { getCanonicalArticleUrl } from '../../utils/shareUtils';
 
 interface HorizontalStoryCardProps {
   post: WpPost;
@@ -17,6 +19,7 @@ export const HorizontalStoryCard: React.FC<HorizontalStoryCardProps> = ({
   onSelectCategory,
 }) => {
   const { language, t, isHindi } = useLanguage();
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const localized = getLocalizedPost(post, language);
   const author = post.customAuthor?.name ? {
     name: post.customAuthor.name,
@@ -77,17 +80,41 @@ export const HorizontalStoryCard: React.FC<HorizontalStoryCardProps> = ({
           </p>
         </div>
 
-        {/* Footer: Author & Read link */}
+        {/* Footer: Author, Share & Read link */}
         <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100 mt-auto">
           <span className="font-medium text-slate-700">
             {author ? `${isHindi ? 'लेखक: ' : 'By '}${author.name}` : t.npNewsDesk}
           </span>
-          <span className="text-[11px] font-semibold text-primary group-hover:text-editorial-red flex items-center gap-1 transition-colors">
-            <span>{t.readStory}</span>
-            <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
-          </span>
+          <div className="flex items-center gap-2.5">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsShareModalOpen(true);
+              }}
+              className="p-1 rounded text-slate-400 hover:text-primary hover:bg-slate-100 transition-colors"
+              title={isHindi ? 'फोटो सहित शेयर करें' : 'Share story with photo'}
+              aria-label="Share story"
+            >
+              <Share2 className="w-3.5 h-3.5" />
+            </button>
+            <span className="text-[11px] font-semibold text-primary group-hover:text-editorial-red flex items-center gap-1 transition-colors">
+              <span>{t.readStory}</span>
+              <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+            </span>
+          </div>
         </div>
       </div>
+
+      {/* Share Modal with Featured Image Preview */}
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        title={localized.title}
+        url={getCanonicalArticleUrl(post.category, post.slug)}
+        imageUrl={localized.featuredImage}
+        summary={localized.dek}
+        category={post.category}
+      />
     </article>
   );
 };

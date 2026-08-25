@@ -113,8 +113,15 @@ export const BreakingArticleTemplate: React.FC<BreakingArticleTemplateProps> = (
               </div>
             </header>
 
-            {/* Social Share Bar */}
-            <ArticleShareBar title={localized.title} />
+            {/* Social Share Bar with Featured Image */}
+            <ArticleShareBar
+              post={post}
+              title={localized.title}
+              featuredImage={localized.featuredImage}
+              summary={localized.dek}
+              category={post.category}
+              commentCount={post.commentCount}
+            />
 
             {/* Hero Image */}
             <figure className="my-6">

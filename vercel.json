@@ -1,4 +1,4 @@
-{
+﻿{
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
@@ -6,6 +6,28 @@
     {
       "source": "/api/(.*)",
       "destination": "/api/$1"
+    },
+    {
+      "source": "/videos/:slug",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(facebookexternalhit|WhatsApp|Twitterbot|TelegramBot|LinkedInBot|Discordbot|Slackbot|Applebot).*"
+        }
+      ],
+      "destination": "/api/share?category=videos&slug=:slug"
+    },
+    {
+      "source": "/:category/:slug",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(facebookexternalhit|WhatsApp|Twitterbot|TelegramBot|LinkedInBot|Discordbot|Slackbot|Applebot).*"
+        }
+      ],
+      "destination": "/api/share?category=:category&slug=:slug"
     },
     {
       "source": "/(.*)",

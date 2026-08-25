@@ -1,9 +1,11 @@
-import React from 'react';
-import { Clock, ArrowRight } from 'lucide-react';
+﻿import React, { useState } from 'react';
+import { Clock, ArrowRight, Share2 } from 'lucide-react';
 import { WpPost } from '../../types/wordpress';
 import { mockAuthors, getLocalizedPost } from '../../data/mockWpData';
 import { handleImageError } from '../../utils/imageFallback';
 import { useLanguage } from '../../context/LanguageContext';
+import { ShareModal } from '../article/ShareModal';
+import { getCanonicalArticleUrl } from '../../utils/shareUtils';
 
 interface LargeStoryCardProps {
   post: WpPost;
@@ -17,6 +19,7 @@ export const LargeStoryCard: React.FC<LargeStoryCardProps> = ({
   onSelectCategory,
 }) => {
   const { language, t, isHindi } = useLanguage();
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const localized = getLocalizedPost(post, language);
   const author = post.customAuthor?.name ? {
     id: 'guest',
@@ -82,7 +85,7 @@ export const LargeStoryCard: React.FC<LargeStoryCardProps> = ({
         </div>
       </div>
 
-      {/* Card Footer: Author Byline & Arrow */}
+      {/* Card Footer: Author Byline, Share & Arrow */}
       <div className="px-4 sm:px-5 pb-4 pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 mt-auto">
         <div className="flex items-center gap-2">
           {author?.avatar ? (
@@ -99,11 +102,35 @@ export const LargeStoryCard: React.FC<LargeStoryCardProps> = ({
           <span className="font-medium text-slate-700">{author ? author.name : t.npNewsDesk}</span>
         </div>
 
-        <span className="text-[11px] font-semibold text-primary group-hover:text-editorial-red flex items-center gap-1 transition-colors">
-          <span>{t.readStory}</span>
-          <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
-        </span>
+        <div className="flex items-center gap-2.5">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsShareModalOpen(true);
+            }}
+            className="p-1 rounded text-slate-400 hover:text-primary hover:bg-slate-100 transition-colors"
+            title={isHindi ? 'फोटो सहित शेयर करें' : 'Share story with photo'}
+            aria-label="Share story"
+          >
+            <Share2 className="w-3.5 h-3.5" />
+          </button>
+          <span className="text-[11px] font-semibold text-primary group-hover:text-editorial-red flex items-center gap-1 transition-colors">
+            <span>{t.readStory}</span>
+            <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+          </span>
+        </div>
       </div>
+
+      {/* Share Modal with Featured Image Preview */}
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        title={localized.title}
+        url={getCanonicalArticleUrl(post.category, post.slug)}
+        imageUrl={localized.featuredImage}
+        summary={localized.dek}
+        category={post.category}
+      />
     </article>
   );
 };

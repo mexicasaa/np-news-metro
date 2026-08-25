@@ -74,9 +74,13 @@ export const StandardArticleTemplate: React.FC<StandardArticleTemplateProps> = (
               onOpenComments={() => setCommentsOpen(!commentsOpen)}
             />
 
-            {/* Social Share Bar */}
+            {/* Social Share Bar with Featured Image */}
             <ArticleShareBar
+              post={post}
               title={localized.title}
+              featuredImage={localized.featuredImage}
+              summary={localized.dek}
+              category={post.category}
               commentCount={post.commentCount}
               onOpenComments={() => setCommentsOpen(!commentsOpen)}
             />

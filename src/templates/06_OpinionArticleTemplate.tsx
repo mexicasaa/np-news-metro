@@ -95,7 +95,14 @@ export const OpinionArticleTemplate: React.FC<OpinionArticleTemplateProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start max-w-site mx-auto">
           {/* Main Article Body */}
           <article className="lg:col-span-8 max-w-reading">
-            <ArticleShareBar title={localized.title} />
+            <ArticleShareBar
+              post={post}
+              title={localized.title}
+              featuredImage={localized.featuredImage}
+              summary={localized.dek}
+              category={post.category}
+              commentCount={post.commentCount}
+            />
 
             {/* Optional Lead Visual */}
             {localized.featuredImage && (

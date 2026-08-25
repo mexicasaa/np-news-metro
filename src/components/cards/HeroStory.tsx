@@ -8,6 +8,8 @@ import { WpPost } from '../../types/wordpress';
 import { mockAuthors, getLocalizedPost } from '../../data/mockWpData';
 import { handleImageError } from '../../utils/imageFallback';
 import { useLanguage } from '../../context/LanguageContext';
+import { ShareModal } from '../article/ShareModal';
+import { getCanonicalArticleUrl } from '../../utils/shareUtils';
 
 interface HeroStoryProps {
   post: WpPost;
@@ -33,6 +35,7 @@ export const HeroStory: React.FC<HeroStoryProps> = ({
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   // Keep activeSlideIndex within bounds
   useEffect(() => {
@@ -74,9 +77,7 @@ export const HeroStory: React.FC<HeroStoryProps> = ({
 
   const handleShare = (e: React.MouseEvent) => {
     e.stopPropagation();
-    navigator.clipboard?.writeText(window.location.href);
-    setIsCopied(true);
-    setTimeout(() => setIsCopied(false), 2000);
+    setIsShareModalOpen(true);
   };
 
   const handleBookmark = (e: React.MouseEvent) => {
@@ -342,6 +343,17 @@ export const HeroStory: React.FC<HeroStoryProps> = ({
         </div>
 
       </div>
+
+      {/* Share Modal with Featured Image Preview */}
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        title={currentStory.title}
+        url={getCanonicalArticleUrl(rawStory.category, rawStory.slug)}
+        imageUrl={currentStory.featuredImage}
+        summary={currentStory.dek}
+        category={rawStory.category}
+      />
     </article>
   );
 };
