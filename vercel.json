@@ -2,6 +2,38 @@
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "redirects": [
+    {
+      "source": "/api/robots",
+      "destination": "/robots.txt",
+      "permanent": true
+    },
+    {
+      "source": "/api/sitemap",
+      "destination": "/sitemap.xml",
+      "permanent": true
+    },
+    {
+      "source": "/api/rss",
+      "destination": "/rss.xml",
+      "permanent": true
+    },
+    {
+      "source": "/api/news-sitemap",
+      "destination": "/news-sitemap.xml",
+      "permanent": true
+    },
+    {
+      "source": "/api/image-sitemap",
+      "destination": "/image-sitemap.xml",
+      "permanent": true
+    },
+    {
+      "source": "/api/video-sitemap",
+      "destination": "/video-sitemap.xml",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/((?!assets/|uploads/|.*\\..*).*)",
