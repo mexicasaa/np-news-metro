@@ -4,35 +4,7 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
-      "source": "/api/sitemap",
-      "destination": "/sitemap.xml"
-    },
-    {
-      "source": "/api/rss",
-      "destination": "/rss.xml"
-    },
-    {
-      "source": "/api/news-sitemap",
-      "destination": "/news-sitemap.xml"
-    },
-    {
-      "source": "/api/image-sitemap",
-      "destination": "/image-sitemap.xml"
-    },
-    {
-      "source": "/api/video-sitemap",
-      "destination": "/video-sitemap.xml"
-    },
-    {
-      "source": "/api/robots",
-      "destination": "/robots.txt"
-    },
-    {
-      "source": "/api/share",
-      "destination": "/api/share.js"
-    },
-    {
-      "source": "/((?!api/|assets/|uploads/|.*\\..*).*)",
+      "source": "/((?!assets/|uploads/|.*\\..*).*)",
       "destination": "/index.html"
     }
   ],
