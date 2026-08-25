@@ -2,170 +2,206 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
   <channel>
     <title>NP News Metro</title>
-    <link>https://npnewsmetro.com</link>
+    <link>https://www.npnewsmetro.com</link>
     <description>National News, Policy, Governance &amp; Investigative Journalism</description>
-    <language>en-IN</language>
-    <lastBuildDate>Mon, 24 Aug 2026 14:54:55 GMT</lastBuildDate>
-    <atom:link href="https://npnewsmetro.com/rss.xml" rel="self" type="application/rss+xml" />
+    <language>hi-IN</language>
+    <lastBuildDate>Tue, 25 Aug 2026 15:26:43 GMT</lastBuildDate>
+    <atom:link href="https://www.npnewsmetro.com/rss.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>India Announces Strategic AI Infrastructure Corridor With $12B Clean Energy Backing</title>
-      <link>https://npnewsmetro.com/technology/india-strategic-ai-infrastructure-corridor</link>
-      <guid isPermaLink="true">https://npnewsmetro.com/technology/india-strategic-ai-infrastructure-corridor</guid>
+      <title>निशानेबाजी में भाऊराव देवरस विद्या मंदिर की बेटियों का शानदार प्रदर्शन, राष्ट्रीय चैंपियनशिप में बनाएंगी जगह</title>
+      <link>https://www.npnewsmetro.com/india/nishaanebaajee-men-bhaaooraava-devarasa-vidyaa-mandira-kee-betiyo</link>
+      <guid isPermaLink="true">https://www.npnewsmetro.com/india/nishaanebaajee-men-bhaaooraava-devarasa-vidyaa-mandira-kee-betiyo</guid>
+      <pubDate>Tue, 25 Aug 2026 05:35:46 GMT</pubDate>
+      <description>निशानेबाजी में भाऊराव देवरस विद्या मंदिर की बेटियों का शानदार प्रदर्शन, राष्ट्रीय चैंपियनशिप में बनाएंगी जगह</description>
+      <dc:creator>NP News Metro Desk</dc:creator>
+      <category>INDIA</category>
+    </item>
+    <item>
+      <title>जमीनी स्तर पर बैडमिंटन के विकास में सनराइज़ शटलर्स ने रचा नया कीर्तिमान</title>
+      <link>https://www.npnewsmetro.com/sports/sunrise-shuttlers-badminton-record-noida</link>
+      <guid isPermaLink="true">https://www.npnewsmetro.com/sports/sunrise-shuttlers-badminton-record-noida</guid>
+      <pubDate>Mon, 24 Aug 2026 17:26:14 GMT</pubDate>
+      <description>जमीनी स्तर पर बैडमिंटन के विकास में सनराइज़ शटलर्स ने रचा नया कीर्तिमान</description>
+      <dc:creator>NP News Metro Desk</dc:creator>
+      <category>SPORTS</category>
+    </item>
+    <item>
+      <title>रक्षाबंधन पर द बॉडी शॉप का खास तोहफा, लॉन्च किए वेलवेट फिग-पिस्ता और अजवा डेट-हनी कलेक्शन</title>
+      <link>https://www.npnewsmetro.com/business/auto-draft</link>
+      <guid isPermaLink="true">https://www.npnewsmetro.com/business/auto-draft</guid>
+      <pubDate>Mon, 24 Aug 2026 17:23:47 GMT</pubDate>
+      <description>रक्षाबंधन पर द बॉडी शॉप का खास तोहफा, लॉन्च किए वेलवेट फिग-पिस्ता और अजवा डेट-हनी कलेक्शन</description>
+      <dc:creator>NP News Metro Desk</dc:creator>
+      <category>BUSINESS</category>
+    </item>
+    <item>
+      <title>सावन के अंतिम सोमवार पर झण्डेवाला देवी मंदिर में गूंजा हर-हर महादेव, श्रद्धालुओं ने किया जलाभिषेक</title>
+      <link>https://www.npnewsmetro.com/india/sawan-somwar-jhandewala-devi-mandir-rudrabhishek</link>
+      <guid isPermaLink="true">https://www.npnewsmetro.com/india/sawan-somwar-jhandewala-devi-mandir-rudrabhishek</guid>
+      <pubDate>Mon, 24 Aug 2026 17:02:36 GMT</pubDate>
+      <description>सावन के अंतिम सोमवार पर झण्डेवाला देवी मंदिर में गूंजा हर-हर महादेव, श्रद्धालुओं ने किया जलाभिषेक</description>
+      <dc:creator>NP News Metro Desk</dc:creator>
+      <category>INDIA</category>
+    </item>
+    <item>
+      <title>India Announces Strategic AI Infrastructure Corridor With \$12B Clean Energy Backing</title>
+      <link>https://www.npnewsmetro.com/technology/india-strategic-ai-infrastructure-corridor</link>
+      <guid isPermaLink="true">https://www.npnewsmetro.com/technology/india-strategic-ai-infrastructure-corridor</guid>
       <pubDate>Mon, 24 Aug 2026 06:00:44 GMT</pubDate>
-      <description>Ministry of Electronics and Information Technology reveals high-compute GPU clusters powered by 100% dedicated solar and hydro microgrids.</description>
-      <dc:creator>NP News Metro Bureau</dc:creator>
+      <description>High-density server architecture in the new hyperscale corridor.</description>
+      <dc:creator>NP News Metro Desk</dc:creator>
       <category>TECHNOLOGY</category>
     </item>
     <item>
       <title>Haryana CM Nayab Saini Attacks Bhagwant Mann: &quot;Punjab CM is Just Killing Time by Cracking Jokes&quot;</title>
-      <link>https://npnewsmetro.com/politics/nayab-saini-ka-bhagwant-mann-par-hamla-sirf-chutkule-sunakar-time-pass</link>
-      <guid isPermaLink="true">https://npnewsmetro.com/politics/nayab-saini-ka-bhagwant-mann-par-hamla-sirf-chutkule-sunakar-time-pass</guid>
+      <link>https://www.npnewsmetro.com/politics/nayab-saini-ka-bhagwant-mann-par-hamla-sirf-chutkule-sunakar-time-pass</link>
+      <guid isPermaLink="true">https://www.npnewsmetro.com/politics/nayab-saini-ka-bhagwant-mann-par-hamla-sirf-chutkule-sunakar-time-pass</guid>
       <pubDate>Sat, 22 Aug 2026 16:00:00 GMT</pubDate>
-      <description>Addressing the Teej festival in Ghanaur (Patiala), Haryana Chief Minister Nayab Singh Saini questioned the AAP government over unfulfilled promises to women and youth, pledging Haryana-style welfare schemes and 100% MSP purchase in Punjab.</description>
-      <dc:creator>नीरज पाण्डेय</dc:creator>
+      <description>Haryana CM Nayab Saini at Teej celebration.</description>
+      <dc:creator>NP News Metro Desk</dc:creator>
       <category>POLITICS</category>
     </item>
     <item>
       <title>Grand Sri Krishna Janmashtami Mahotsav at ISKCON Noida: Over 5 Lakh Devotees Expected</title>
-      <link>https://npnewsmetro.com/india/iskcon-noida-me-bhavya-janmashtami-mahotsav-5-lakh-shradhalu</link>
-      <guid isPermaLink="true">https://npnewsmetro.com/india/iskcon-noida-me-bhavya-janmashtami-mahotsav-5-lakh-shradhalu</guid>
+      <link>https://www.npnewsmetro.com/india/iskcon-noida-me-bhavya-janmashtami-mahotsav-5-lakh-shradhalu</link>
+      <guid isPermaLink="true">https://www.npnewsmetro.com/india/iskcon-noida-me-bhavya-janmashtami-mahotsav-5-lakh-shradhalu</guid>
       <pubDate>Sat, 22 Aug 2026 15:30:00 GMT</pubDate>
-      <description>A 17-day grand devotional celebration featuring Shobha Yatra, Jhulan Yatra, Balaram Purnima, Sri Krishna Janmashtami with 251+ bhog offerings, Srila Prabhupada Vyasa-Puja, and Radhashtami across Noida and NCR.</description>
-      <dc:creator>नीरज पाण्डेय</dc:creator>
+      <description>ISKCON Noida Janmashtami preparations.</description>
+      <dc:creator>NP News Metro Desk</dc:creator>
       <category>INDIA</category>
     </item>
     <item>
       <title>Tangled in a Single Drop of Sugarcane Juice: The Future of the Nation</title>
-      <link>https://npnewsmetro.com/economy/ganne-ke-ras-ki-ek-boond-me-uljha-desh-ka-bhavishya</link>
-      <guid isPermaLink="true">https://npnewsmetro.com/economy/ganne-ke-ras-ki-ek-boond-me-uljha-desh-ka-bhavishya</guid>
+      <link>https://www.npnewsmetro.com/economy/ganne-ke-ras-ki-ek-boond-me-uljha-desh-ka-bhavishya</link>
+      <guid isPermaLink="true">https://www.npnewsmetro.com/economy/ganne-ke-ras-ki-ek-boond-me-uljha-desh-ka-bhavishya</guid>
       <pubDate>Sat, 22 Aug 2026 02:30:00 GMT</pubDate>
-      <description>From the cane field to the cup of tea, and from village pathways to national energy policy—a single drop of sugarcane juice is writing a defining chapter in India’s future, balancing food security and biofuel transition.</description>
-      <dc:creator>डॉ. दीपक गोस्वामी</dc:creator>
+      <description>Sugarcane to ethanol transformation.</description>
+      <dc:creator>NP News Metro Desk</dc:creator>
       <category>ECONOMY</category>
     </item>
     <item>
       <title>Union Cabinet Approves ₹1.2 Lakh Crore Infrastructure Corridor Linking Major Western Ports to Industrial Nodes</title>
-      <link>https://npnewsmetro.com/india/cabinet-approves-infrastructure-corridor-western-ports</link>
-      <guid isPermaLink="true">https://npnewsmetro.com/india/cabinet-approves-infrastructure-corridor-western-ports</guid>
+      <link>https://www.npnewsmetro.com/india/cabinet-approves-infrastructure-corridor-western-ports</link>
+      <guid isPermaLink="true">https://www.npnewsmetro.com/india/cabinet-approves-infrastructure-corridor-western-ports</guid>
       <pubDate>Wed, 19 Aug 2026 02:00:00 GMT</pubDate>
-      <description>The mega multi-modal logistics project aims to slash freight transit durations by 40% across five states, featuring high-speed freight links and green manufacturing zones.</description>
+      <description>Freight lines and automated terminal logistics under construction at JNPT.</description>
       <dc:creator>NP News Metro Desk</dc:creator>
       <category>INDIA</category>
     </item>
     <item>
       <title>Election Commission Announces Schedule for Five Key State Assembly Polls; Voting Across Three Phases Starting November 12</title>
-      <link>https://npnewsmetro.com/politics/election-commission-announces-assembly-poll-dates-schedule</link>
-      <guid isPermaLink="true">https://npnewsmetro.com/politics/election-commission-announces-assembly-poll-dates-schedule</guid>
+      <link>https://www.npnewsmetro.com/politics/election-commission-announces-assembly-poll-dates-schedule</link>
+      <guid isPermaLink="true">https://www.npnewsmetro.com/politics/election-commission-announces-assembly-poll-dates-schedule</guid>
       <pubDate>Wed, 19 Aug 2026 04:30:00 GMT</pubDate>
-      <description>Chief Election Commissioner declares immediate enforcement of the Model Code of Conduct, introducing 100% webcasting at sensitive polling stations and biometric voter verification trials.</description>
+      <description>Chief Election Commissioner addressing press conference.</description>
       <dc:creator>NP News Metro Desk</dc:creator>
       <category>POLITICS</category>
     </item>
     <item>
       <title>Rethinking Urban Density: Why India’s Megacities Need Polycentric Transit, Not Just Taller Towers</title>
-      <link>https://npnewsmetro.com/opinion/rethinking-urban-density-india-megacities-polycentric-transit</link>
-      <guid isPermaLink="true">https://npnewsmetro.com/opinion/rethinking-urban-density-india-megacities-polycentric-transit</guid>
+      <link>https://www.npnewsmetro.com/opinion/rethinking-urban-density-india-megacities-polycentric-transit</link>
+      <guid isPermaLink="true">https://www.npnewsmetro.com/opinion/rethinking-urban-density-india-megacities-polycentric-transit</guid>
       <pubDate>Tue, 18 Aug 2026 12:30:00 GMT</pubDate>
-      <description>Unchecked vertical expansion without distributed public transport networks risks turning Mumbai and Bengaluru into climate-vulnerable heat traps.</description>
+      <description>High-rise residential and commercial density along transit spine.</description>
       <dc:creator>NP News Metro Desk</dc:creator>
       <category>OPINION</category>
     </item>
     <item>
       <title>Retail Inflation Moderates to 3.8% in July as Food Supply Chains Stabilize; RBI Stance Unchanged</title>
-      <link>https://npnewsmetro.com/economy/retail-inflation-moderates-july-cpi-food-supply-rbi</link>
-      <guid isPermaLink="true">https://npnewsmetro.com/economy/retail-inflation-moderates-july-cpi-food-supply-rbi</guid>
+      <link>https://www.npnewsmetro.com/economy/retail-inflation-moderates-july-cpi-food-supply-rbi</link>
+      <guid isPermaLink="true">https://www.npnewsmetro.com/economy/retail-inflation-moderates-july-cpi-food-supply-rbi</guid>
       <pubDate>Wed, 19 Aug 2026 00:45:00 GMT</pubDate>
-      <description>Core inflation held steady at 3.1%, giving the Monetary Policy Committee breathing room ahead of the festive quarter.</description>
+      <description>Vegetable wholesale markets in Navi Mumbai.</description>
       <dc:creator>NP News Metro Desk</dc:creator>
       <category>ECONOMY</category>
     </item>
     <item>
       <title>India’s First Commercial 28nm Fabrication Facility Begins Tool Installation at Dholera Special Investment Region</title>
-      <link>https://npnewsmetro.com/technology/india-first-commercial-semiconductor-fab-dholera-gujarat</link>
-      <guid isPermaLink="true">https://npnewsmetro.com/technology/india-first-commercial-semiconductor-fab-dholera-gujarat</guid>
+      <link>https://www.npnewsmetro.com/technology/india-first-commercial-semiconductor-fab-dholera-gujarat</link>
+      <guid isPermaLink="true">https://www.npnewsmetro.com/technology/india-first-commercial-semiconductor-fab-dholera-gujarat</guid>
       <pubDate>Tue, 18 Aug 2026 08:50:00 GMT</pubDate>
-      <description>Joint venture project with Taiwanese and domestic engineering giants aims to roll out automotive and power management microchips by Q3 2027.</description>
+      <description>High-precision cleanroom fabrication machinery.</description>
       <dc:creator>NP News Metro Desk</dc:creator>
       <category>TECHNOLOGY</category>
     </item>
     <item>
       <title>Sensex Scales Historic 85,000 Mark on Strong Foreign Institutional Inflows and Robust Q1 Corporate Earnings</title>
-      <link>https://npnewsmetro.com/business/sensex-nifty-all-time-high-fii-inflows-corporate-earnings</link>
-      <guid isPermaLink="true">https://npnewsmetro.com/business/sensex-nifty-all-time-high-fii-inflows-corporate-earnings</guid>
+      <link>https://www.npnewsmetro.com/business/sensex-nifty-all-time-high-fii-inflows-corporate-earnings</link>
+      <guid isPermaLink="true">https://www.npnewsmetro.com/business/sensex-nifty-all-time-high-fii-inflows-corporate-earnings</guid>
       <pubDate>Wed, 19 Aug 2026 06:00:00 GMT</pubDate>
-      <description>Banking, capital goods, and auto indices spearheaded the rally as domestic retail SIP participation crossed ₹24,000 crore per month.</description>
+      <description>Traders monitoring real-time stock ticker indices at BSE.</description>
       <dc:creator>NP News Metro Desk</dc:creator>
       <category>BUSINESS</category>
     </item>
     <item>
       <title>Global Maritime Trade Alliance Finalizes New Red Sea Security Escort Protocol Ahead of UN Assembly</title>
-      <link>https://npnewsmetro.com/world/global-maritime-trade-alliance-red-sea-security-protocol</link>
-      <guid isPermaLink="true">https://npnewsmetro.com/world/global-maritime-trade-alliance-red-sea-security-protocol</guid>
+      <link>https://www.npnewsmetro.com/world/global-maritime-trade-alliance-red-sea-security-protocol</link>
+      <guid isPermaLink="true">https://www.npnewsmetro.com/world/global-maritime-trade-alliance-red-sea-security-protocol</guid>
       <pubDate>Tue, 18 Aug 2026 16:45:00 GMT</pubDate>
-      <description>Twenty-four maritime nations agree on synchronized naval patrols and automated commercial vessel tracking to safeguard vital energy and container channels.</description>
+      <description>International naval frigates coordinating maritime corridor protection.</description>
       <dc:creator>NP News Metro Desk</dc:creator>
       <category>WORLD</category>
     </item>
     <item>
       <title>Indian Cricket Team Clinches Historic Test Series Victory at Lord’s with Fierce Day 5 Pace Bowling Masterclass</title>
-      <link>https://npnewsmetro.com/sports/india-england-lords-test-match-pace-bowling-series-win</link>
-      <guid isPermaLink="true">https://npnewsmetro.com/sports/india-england-lords-test-match-pace-bowling-series-win</guid>
+      <link>https://www.npnewsmetro.com/sports/india-england-lords-test-match-pace-bowling-series-win</link>
+      <guid isPermaLink="true">https://www.npnewsmetro.com/sports/india-england-lords-test-match-pace-bowling-series-win</guid>
       <pubDate>Tue, 18 Aug 2026 18:15:00 GMT</pubDate>
-      <description>Jasprit Bumrah and Mohammed Siraj claim 8 wickets in the post-lunch session to seal a famous 154-run triumph in London.</description>
+      <description>The Indian cricket team celebrating victory at Lord’s balcony.</description>
       <dc:creator>NP News Metro Desk</dc:creator>
       <category>SPORTS</category>
     </item>
     <item>
       <title>Restoring the Western Ghats: How Community-Led Sacred Grove Forestry is Reviving Ancient Water Tables</title>
-      <link>https://npnewsmetro.com/lifestyle/restoring-western-ghats-sacred-groves-community-forestry</link>
-      <guid isPermaLink="true">https://npnewsmetro.com/lifestyle/restoring-western-ghats-sacred-groves-community-forestry</guid>
+      <link>https://www.npnewsmetro.com/lifestyle/restoring-western-ghats-sacred-groves-community-forestry</link>
+      <guid isPermaLink="true">https://www.npnewsmetro.com/lifestyle/restoring-western-ghats-sacred-groves-community-forestry</guid>
       <pubDate>Mon, 17 Aug 2026 05:30:00 GMT</pubDate>
-      <description>Grassroots conservation initiatives in Karnataka and Kerala demonstrate how indigenous botanical knowledge protects endemic species from extreme climate shifts.</description>
+      <description>Lush evergreen canopy inside sacred grove reserves.</description>
       <dc:creator>NP News Metro Desk</dc:creator>
       <category>LIFESTYLE</category>
     </item>
     <item>
       <title>71st National Film Awards: Regional Cinema Triumphs with Groundbreaking Narrative Storytelling and Audiovisual Craft</title>
-      <link>https://npnewsmetro.com/entertainment/71st-national-film-awards-regional-cinema-triumph-winners</link>
-      <guid isPermaLink="true">https://npnewsmetro.com/entertainment/71st-national-film-awards-regional-cinema-triumph-winners</guid>
+      <link>https://www.npnewsmetro.com/entertainment/71st-national-film-awards-regional-cinema-triumph-winners</link>
+      <guid isPermaLink="true">https://www.npnewsmetro.com/entertainment/71st-national-film-awards-regional-cinema-triumph-winners</guid>
       <pubDate>Mon, 17 Aug 2026 11:00:00 GMT</pubDate>
-      <description>Malayalam, Tamil, and Bengali films swept the top technical and writing honours, marking a watershed moment for authentic regional realism in Indian cinema.</description>
+      <description>Dignitaries and award-winning filmmakers gather at Vigyan Bhawan.</description>
       <dc:creator>NP News Metro Desk</dc:creator>
       <category>ENTERTAINMENT</category>
     </item>
     <item>
       <title>Parliament Clears Landmark Digital Public Infrastructure &amp; Data Protection Amendment Bill in Monsoon Session</title>
-      <link>https://npnewsmetro.com/politics/parliament-clears-digital-public-infrastructure-bill-monsoon-session</link>
-      <guid isPermaLink="true">https://npnewsmetro.com/politics/parliament-clears-digital-public-infrastructure-bill-monsoon-session</guid>
+      <link>https://www.npnewsmetro.com/politics/parliament-clears-digital-public-infrastructure-bill-monsoon-session</link>
+      <guid isPermaLink="true">https://www.npnewsmetro.com/politics/parliament-clears-digital-public-infrastructure-bill-monsoon-session</guid>
       <pubDate>Wed, 19 Aug 2026 09:00:00 GMT</pubDate>
-      <description>The legislation establishes statutory oversight for national citizen data repositories, institutionalizing strict penalties for unauthorized telemetry profiling.</description>
+      <description>The Parliament House illuminated during monsoon session.</description>
       <dc:creator>NP News Metro Desk</dc:creator>
       <category>POLITICS</category>
     </item>
     <item>
       <title>Digital Payments Ecosystem Logs Record 16.5 Billion Monthly UPI Transactions as Cross-Border Remittances Expand</title>
-      <link>https://npnewsmetro.com/business/upi-cross-border-remittances-monthly-record-transactions</link>
-      <guid isPermaLink="true">https://npnewsmetro.com/business/upi-cross-border-remittances-monthly-record-transactions</guid>
+      <link>https://www.npnewsmetro.com/business/upi-cross-border-remittances-monthly-record-transactions</link>
+      <guid isPermaLink="true">https://www.npnewsmetro.com/business/upi-cross-border-remittances-monthly-record-transactions</guid>
       <pubDate>Wed, 19 Aug 2026 10:30:00 GMT</pubDate>
-      <description>Instant QR settlements between Indian merchant rails and Southeast Asian trade hubs surge 34% quarter-on-quarter.</description>
+      <description>Digital point-of-sale terminals and merchant QR code network.</description>
       <dc:creator>NP News Metro Desk</dc:creator>
       <category>BUSINESS</category>
     </item>
     <item>
       <title>National Cyber Coordination Centre Deploys AI Defense Shield Across Critical Energy &amp; Railway Grids</title>
-      <link>https://npnewsmetro.com/technology/national-cyber-coordination-centre-ai-defense-grid</link>
-      <guid isPermaLink="true">https://npnewsmetro.com/technology/national-cyber-coordination-centre-ai-defense-grid</guid>
+      <link>https://www.npnewsmetro.com/technology/national-cyber-coordination-centre-ai-defense-grid</link>
+      <guid isPermaLink="true">https://www.npnewsmetro.com/technology/national-cyber-coordination-centre-ai-defense-grid</guid>
       <pubDate>Tue, 18 Aug 2026 13:15:00 GMT</pubDate>
-      <description>Autonomous heuristic detection systems thwart over 450,000 coordinated intrusion attempts against power transmission nodes.</description>
+      <description>Operations center monitoring high-security telemetry feeds.</description>
       <dc:creator>NP News Metro Desk</dc:creator>
       <category>TECHNOLOGY</category>
     </item>
     <item>
       <title>Indo-Pacific Trade Corridor Summit Concludes in Tokyo with Trilateral Critical Minerals Pact</title>
-      <link>https://npnewsmetro.com/world/indo-pacific-trade-corridor-tokyo-summit-critical-minerals</link>
-      <guid isPermaLink="true">https://npnewsmetro.com/world/indo-pacific-trade-corridor-tokyo-summit-critical-minerals</guid>
+      <link>https://www.npnewsmetro.com/world/indo-pacific-trade-corridor-tokyo-summit-critical-minerals</link>
+      <guid isPermaLink="true">https://www.npnewsmetro.com/world/indo-pacific-trade-corridor-tokyo-summit-critical-minerals</guid>
       <pubDate>Wed, 19 Aug 2026 02:45:00 GMT</pubDate>
-      <description>India, Japan, and Australia commit $6.4 billion toward lithium, rare earth processing, and resilient silicon supply chains.</description>
+      <description>Delegates and trade ministers signing clean energy mineral alliance.</description>
       <dc:creator>NP News Metro Desk</dc:creator>
       <category>WORLD</category>
     </item>

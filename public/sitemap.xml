@@ -1,182 +1,205 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://npnewsmetro.com/</loc>
-    <lastmod>2026-08-24</lastmod>
+    <loc>https://www.npnewsmetro.com/</loc>
+    <lastmod>2026-08-25</lastmod>
     <changefreq>always</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://npnewsmetro.com/category/india</loc>
+    <loc>https://www.npnewsmetro.com/category/india</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://npnewsmetro.com/category/politics</loc>
+    <loc>https://www.npnewsmetro.com/category/politics</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://npnewsmetro.com/category/business</loc>
+    <loc>https://www.npnewsmetro.com/category/business</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://npnewsmetro.com/category/technology</loc>
+    <loc>https://www.npnewsmetro.com/category/technology</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://npnewsmetro.com/category/world</loc>
+    <loc>https://www.npnewsmetro.com/category/world</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://npnewsmetro.com/category/sports</loc>
+    <loc>https://www.npnewsmetro.com/category/sports</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://npnewsmetro.com/category/entertainment</loc>
+    <loc>https://www.npnewsmetro.com/category/entertainment</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://npnewsmetro.com/category/lifestyle</loc>
+    <loc>https://www.npnewsmetro.com/category/lifestyle</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://npnewsmetro.com/category/opinion</loc>
+    <loc>https://www.npnewsmetro.com/category/opinion</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://npnewsmetro.com/category/videos</loc>
+    <loc>https://www.npnewsmetro.com/category/videos</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://npnewsmetro.com/category/photos</loc>
+    <loc>https://www.npnewsmetro.com/category/photos</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://npnewsmetro.com/category/latest</loc>
+    <loc>https://www.npnewsmetro.com/category/latest</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://npnewsmetro.com/technology/india-strategic-ai-infrastructure-corridor</loc>
+    <loc>https://www.npnewsmetro.com/india/nishaanebaajee-men-bhaaooraava-devarasa-vidyaa-mandira-kee-betiyo</loc>
+    <lastmod>2026-08-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/sports/sunrise-shuttlers-badminton-record-noida</loc>
     <lastmod>2026-08-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://npnewsmetro.com/politics/nayab-saini-ka-bhagwant-mann-par-hamla-sirf-chutkule-sunakar-time-pass</loc>
+    <loc>https://www.npnewsmetro.com/business/auto-draft</loc>
+    <lastmod>2026-08-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/india/sawan-somwar-jhandewala-devi-mandir-rudrabhishek</loc>
+    <lastmod>2026-08-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/technology/india-strategic-ai-infrastructure-corridor</loc>
+    <lastmod>2026-08-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/politics/nayab-saini-ka-bhagwant-mann-par-hamla-sirf-chutkule-sunakar-time-pass</loc>
     <lastmod>2026-08-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://npnewsmetro.com/india/iskcon-noida-me-bhavya-janmashtami-mahotsav-5-lakh-shradhalu</loc>
+    <loc>https://www.npnewsmetro.com/india/iskcon-noida-me-bhavya-janmashtami-mahotsav-5-lakh-shradhalu</loc>
     <lastmod>2026-08-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://npnewsmetro.com/economy/ganne-ke-ras-ki-ek-boond-me-uljha-desh-ka-bhavishya</loc>
+    <loc>https://www.npnewsmetro.com/economy/ganne-ke-ras-ki-ek-boond-me-uljha-desh-ka-bhavishya</loc>
     <lastmod>2026-08-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://npnewsmetro.com/india/cabinet-approves-infrastructure-corridor-western-ports</loc>
+    <loc>https://www.npnewsmetro.com/india/cabinet-approves-infrastructure-corridor-western-ports</loc>
     <lastmod>2026-08-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://npnewsmetro.com/politics/election-commission-announces-assembly-poll-dates-schedule</loc>
+    <loc>https://www.npnewsmetro.com/politics/election-commission-announces-assembly-poll-dates-schedule</loc>
     <lastmod>2026-08-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://npnewsmetro.com/opinion/rethinking-urban-density-india-megacities-polycentric-transit</loc>
+    <loc>https://www.npnewsmetro.com/opinion/rethinking-urban-density-india-megacities-polycentric-transit</loc>
     <lastmod>2026-08-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://npnewsmetro.com/economy/retail-inflation-moderates-july-cpi-food-supply-rbi</loc>
+    <loc>https://www.npnewsmetro.com/economy/retail-inflation-moderates-july-cpi-food-supply-rbi</loc>
     <lastmod>2026-08-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://npnewsmetro.com/technology/india-first-commercial-semiconductor-fab-dholera-gujarat</loc>
+    <loc>https://www.npnewsmetro.com/technology/india-first-commercial-semiconductor-fab-dholera-gujarat</loc>
     <lastmod>2026-08-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://npnewsmetro.com/business/sensex-nifty-all-time-high-fii-inflows-corporate-earnings</loc>
+    <loc>https://www.npnewsmetro.com/business/sensex-nifty-all-time-high-fii-inflows-corporate-earnings</loc>
     <lastmod>2026-08-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://npnewsmetro.com/world/global-maritime-trade-alliance-red-sea-security-protocol</loc>
+    <loc>https://www.npnewsmetro.com/world/global-maritime-trade-alliance-red-sea-security-protocol</loc>
     <lastmod>2026-08-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://npnewsmetro.com/sports/india-england-lords-test-match-pace-bowling-series-win</loc>
+    <loc>https://www.npnewsmetro.com/sports/india-england-lords-test-match-pace-bowling-series-win</loc>
     <lastmod>2026-08-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://npnewsmetro.com/lifestyle/restoring-western-ghats-sacred-groves-community-forestry</loc>
+    <loc>https://www.npnewsmetro.com/lifestyle/restoring-western-ghats-sacred-groves-community-forestry</loc>
     <lastmod>2026-08-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://npnewsmetro.com/entertainment/71st-national-film-awards-regional-cinema-triumph-winners</loc>
+    <loc>https://www.npnewsmetro.com/entertainment/71st-national-film-awards-regional-cinema-triumph-winners</loc>
     <lastmod>2026-08-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://npnewsmetro.com/politics/parliament-clears-digital-public-infrastructure-bill-monsoon-session</loc>
+    <loc>https://www.npnewsmetro.com/politics/parliament-clears-digital-public-infrastructure-bill-monsoon-session</loc>
     <lastmod>2026-08-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://npnewsmetro.com/business/upi-cross-border-remittances-monthly-record-transactions</loc>
+    <loc>https://www.npnewsmetro.com/business/upi-cross-border-remittances-monthly-record-transactions</loc>
     <lastmod>2026-08-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://npnewsmetro.com/technology/national-cyber-coordination-centre-ai-defense-grid</loc>
+    <loc>https://www.npnewsmetro.com/technology/national-cyber-coordination-centre-ai-defense-grid</loc>
     <lastmod>2026-08-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://npnewsmetro.com/world/indo-pacific-trade-corridor-tokyo-summit-critical-minerals</loc>
+    <loc>https://www.npnewsmetro.com/world/indo-pacific-trade-corridor-tokyo-summit-critical-minerals</loc>
     <lastmod>2026-08-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://npnewsmetro.com/videos/inside-indias-semiconductor-revolution</loc>
+    <loc>https://www.npnewsmetro.com/videos/inside-indias-semiconductor-revolution</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>

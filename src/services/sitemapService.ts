@@ -18,7 +18,7 @@ export const getBaseSiteUrl = (): string => {
   } catch (e) {
     // Ignore
   }
-  return 'https://npnewsmetro.com';
+  return 'https://www.npnewsmetro.com';
 };
 
 const escapeXml = (unsafe: string): string => {
@@ -63,6 +63,22 @@ export const filterIndexableArticles = (articles: WpPost[]): WpPost[] => {
 
     return true;
   });
+};
+
+/**
+ * 0. Master Sitemap Index (/sitemap_index.xml)
+ */
+export const generateSitemapIndexXml = (): string => {
+  const baseUrl = getBaseSiteUrl();
+  const today = new Date().toISOString().slice(0, 10);
+  let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+  xml += `<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+  xml += `  <sitemap>\n    <loc>${baseUrl}/sitemap.xml</loc>\n    <lastmod>${today}</lastmod>\n  </sitemap>\n`;
+  xml += `  <sitemap>\n    <loc>${baseUrl}/news-sitemap.xml</loc>\n    <lastmod>${today}</lastmod>\n  </sitemap>\n`;
+  xml += `  <sitemap>\n    <loc>${baseUrl}/image-sitemap.xml</loc>\n    <lastmod>${today}</lastmod>\n  </sitemap>\n`;
+  xml += `  <sitemap>\n    <loc>${baseUrl}/video-sitemap.xml</loc>\n    <lastmod>${today}</lastmod>\n  </sitemap>\n`;
+  xml += `</sitemapindex>`;
+  return xml;
 };
 
 /**
@@ -327,10 +343,12 @@ User-agent: Googlebot-News
 Allow: /
 
 # XML Sitemaps
+Sitemap: ${baseUrl}/sitemap_index.xml
 Sitemap: ${baseUrl}/sitemap.xml
 Sitemap: ${baseUrl}/news-sitemap.xml
 Sitemap: ${baseUrl}/image-sitemap.xml
 Sitemap: ${baseUrl}/video-sitemap.xml
+Sitemap: ${baseUrl}/rss.xml
 `;
 };
 

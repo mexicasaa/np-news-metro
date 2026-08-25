@@ -4,37 +4,110 @@
   "outputDirectory": "dist",
   "redirects": [
     {
-      "source": "/api/robots",
-      "destination": "/robots.txt",
-      "permanent": true
-    },
-    {
-      "source": "/api/sitemap",
+      "source": "/sitemap",
       "destination": "/sitemap.xml",
       "permanent": true
     },
     {
-      "source": "/api/rss",
-      "destination": "/rss.xml",
+      "source": "/sitemaps",
+      "destination": "/sitemap_index.xml",
       "permanent": true
     },
     {
-      "source": "/api/news-sitemap",
+      "source": "/sitemaps.xml",
+      "destination": "/sitemap_index.xml",
+      "permanent": true
+    },
+    {
+      "source": "/sitemap_index",
+      "destination": "/sitemap_index.xml",
+      "permanent": true
+    },
+    {
+      "source": "/sitemap-index",
+      "destination": "/sitemap_index.xml",
+      "permanent": true
+    },
+    {
+      "source": "/sitemap-index.xml",
+      "destination": "/sitemap_index.xml",
+      "permanent": true
+    },
+    {
+      "source": "/news-sitemap",
       "destination": "/news-sitemap.xml",
       "permanent": true
     },
     {
-      "source": "/api/image-sitemap",
+      "source": "/news_sitemap.xml",
+      "destination": "/news-sitemap.xml",
+      "permanent": true
+    },
+    {
+      "source": "/image-sitemap",
       "destination": "/image-sitemap.xml",
       "permanent": true
     },
     {
-      "source": "/api/video-sitemap",
+      "source": "/image_sitemap.xml",
+      "destination": "/image-sitemap.xml",
+      "permanent": true
+    },
+    {
+      "source": "/video-sitemap",
       "destination": "/video-sitemap.xml",
+      "permanent": true
+    },
+    {
+      "source": "/video_sitemap.xml",
+      "destination": "/video-sitemap.xml",
+      "permanent": true
+    },
+    {
+      "source": "/rss",
+      "destination": "/rss.xml",
+      "permanent": true
+    },
+    {
+      "source": "/feed",
+      "destination": "/rss.xml",
+      "permanent": true
+    },
+    {
+      "source": "/feed.xml",
+      "destination": "/rss.xml",
       "permanent": true
     }
   ],
   "rewrites": [
+    {
+      "source": "/sitemap_index.xml",
+      "destination": "/api/sitemap_index"
+    },
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/sitemap"
+    },
+    {
+      "source": "/news-sitemap.xml",
+      "destination": "/api/news-sitemap"
+    },
+    {
+      "source": "/image-sitemap.xml",
+      "destination": "/api/image-sitemap"
+    },
+    {
+      "source": "/video-sitemap.xml",
+      "destination": "/api/video-sitemap"
+    },
+    {
+      "source": "/rss.xml",
+      "destination": "/api/rss"
+    },
+    {
+      "source": "/robots.txt",
+      "destination": "/api/robots"
+    },
     {
       "source": "/videos/:slug",
       "has": [

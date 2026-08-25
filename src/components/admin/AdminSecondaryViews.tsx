@@ -213,6 +213,16 @@ export const SeoHealthView: React.FC = () => {
 
   const sitemapEndpoints = [
     {
+      id: 'index',
+      title: 'Master Sitemap Index',
+      path: '/sitemap_index.xml',
+      description: 'Master index referencing all sub-sitemaps (Main, News, Images, Videos)',
+      count: '4 Sitemaps',
+      countLabel: 'Sub-Sitemaps',
+      icon: Globe,
+      status: 'Active',
+    },
+    {
       id: 'main',
       title: 'Main XML Sitemap',
       path: '/sitemap.xml',
