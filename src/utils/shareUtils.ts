@@ -58,14 +58,27 @@ export const getAbsoluteImageUrl = (imageUrl?: string, customOrigin?: string): s
 export const getCanonicalArticleUrl = (
   category?: string,
   slug?: string,
-  customOrigin?: string
+  customOrigin?: string,
+  updatedAt?: string | null
 ): string => {
   const origin = (customOrigin || getSiteOrigin()).replace(/\/+$/, '');
+  let url = '';
   if (!slug) {
-    return typeof window !== 'undefined' ? window.location.href : origin;
+    url = typeof window !== 'undefined' ? window.location.href.split('?')[0] : origin;
+  } else {
+    const cleanCategory = (category || 'india').toLowerCase().trim();
+    url = `${origin}/${cleanCategory}/${slug}`;
   }
-  const cleanCategory = (category || 'india').toLowerCase().trim();
-  return `${origin}/${cleanCategory}/${slug}`;
+  
+  // Append cache busting parameter based on the last update time
+  // This completely solves WhatsApp/Facebook caching issues when featured images are updated multiple times
+  if (updatedAt) {
+    const timestamp = new Date(updatedAt).getTime();
+    if (!isNaN(timestamp)) {
+      url = `${url}?v=${timestamp}`;
+    }
+  }
+  return url;
 };
 
 /**

@@ -49,7 +49,7 @@ export const ArticleShareBar: React.FC<ArticleShareBarProps> = ({
 
   const title = customTitle || post?.title || 'NP News Metro';
   const category = customCategory || post?.category || 'india';
-  const url = customUrl || (post?.slug ? getCanonicalArticleUrl(category, post.slug) : (typeof window !== 'undefined' ? window.location.href : 'https://www.npnewsmetro.com'));
+  const url = customUrl || (post?.slug ? getCanonicalArticleUrl(category, post.slug, undefined, post.updatedAt) : (typeof window !== 'undefined' ? window.location.href : 'https://www.npnewsmetro.com'));
   const featuredImage = customImage || post?.featuredImage;
   const summary = customSummary || post?.dek || post?.seoDescription || '';
   const commentCount = customCommentCount ?? post?.commentCount ?? 0;
