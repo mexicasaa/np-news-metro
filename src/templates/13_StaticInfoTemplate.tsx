@@ -123,16 +123,19 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
     const totalVisible = [showExecutive, showNeelima, showArya, showAgarwal, showNeeraj, showChetan, showBhawana, showPurnima, showTripathi, showLaxmi].filter(Boolean).length;
 
     return (
-      <article className="w-full bg-[#fdfdfb] text-slate-900 font-sans antialiased animate-fadeIn px-4 py-8 sm:px-6 lg:px-8 border border-slate-200/80 rounded-none">
+      <article className="w-full bg-[#FAF9F6] text-[#1A1A1A] font-sans antialiased animate-fadeIn px-4 py-10 sm:px-8 lg:px-12 border border-slate-200/80 rounded-none shadow-[0_4px_30px_rgba(0,0,0,0.015)]">
         
-        {/* Masthead Section */}
-        <header className="border-b border-slate-300 pb-8 mb-10">
+        {/* Creative Top Masthead Header (Double border print style) */}
+        <header className="border-b-4 border-double border-slate-800 pb-8 mb-12">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div className="space-y-3">
-              <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-red-800">
-                NP News Metro
-              </span>
-              <h1 className="font-serif text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-950">
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 bg-red-800 rotate-45" />
+                <span className="text-[10px] font-sans font-extrabold uppercase tracking-widest text-red-850">
+                  National News Masthead
+                </span>
+              </div>
+              <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-955">
                 Editorial Board & Leadership
               </h1>
               <p className="font-serif italic text-slate-700 text-base sm:text-lg max-w-3xl leading-relaxed">
@@ -141,40 +144,37 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
             </div>
             
             <div className="flex flex-col gap-2 items-start md:items-end flex-shrink-0">
-              <span className="text-[11px] font-mono text-slate-500 bg-slate-100/80 border border-slate-200 px-3 py-1 font-semibold uppercase tracking-wider rounded-none">
+              <span className="text-[10px] font-mono text-slate-650 bg-white border border-slate-250 px-3.5 py-1.5 font-bold uppercase tracking-wider shadow-2xs">
                 RNI: DEL HIN/2010/31544
               </span>
             </div>
           </div>
           
-          {/* Trust Strip */}
-          <div className="border-t border-slate-200 mt-8 pt-4 pb-1">
-            <div className="flex flex-wrap items-center justify-between gap-y-3 gap-x-6 text-[11px] font-sans font-bold uppercase tracking-wider text-slate-500">
-              <div className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-red-800" />
+          {/* Trust Strip - Creative Layout */}
+          <div className="border-t border-slate-250 mt-8 pt-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-[11px] font-sans font-bold uppercase tracking-wider text-slate-650">
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 rounded-full border border-red-800/30 flex items-center justify-center text-red-800 flex-shrink-0 font-sans">✓</div>
                 <span>Verified Newsroom Staff</span>
               </div>
-              <span className="hidden sm:inline text-slate-300">|</span>
-              <div className="flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-red-800" />
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 rounded-full border border-red-800/30 flex items-center justify-center text-red-800 flex-shrink-0 font-sans">🛡</div>
                 <span>Press Council Code</span>
               </div>
-              <span className="hidden sm:inline text-slate-300">|</span>
-              <div className="flex items-center gap-1.5">
-                <Award className="w-3.5 h-3.5 text-red-800" />
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 rounded-full border border-red-800/30 flex items-center justify-center text-red-800 flex-shrink-0 font-sans">🔍</div>
                 <span>Fact-Check Verification</span>
               </div>
-              <span className="hidden sm:inline text-slate-300">|</span>
-              <div className="flex items-center gap-1.5">
-                <Scale className="w-3.5 h-3.5 text-red-800" />
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 rounded-full border border-red-800/30 flex items-center justify-center text-red-800 flex-shrink-0 font-sans">⚖</div>
                 <span>Editorial Autonomy</span>
               </div>
             </div>
           </div>
         </header>
 
-        {/* Filter Console */}
-        <div className="border-b border-slate-200 pb-5 mb-10 flex flex-col md:flex-row items-center justify-between gap-4">
+        {/* Floating Filter Console Bar */}
+        <div className="border-b border-slate-200 pb-5 mb-12 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-1 overflow-x-auto hide-scrollbar w-full md:w-auto pb-1 md:pb-0">
             {[
               { id: 'all', label: isHindi ? 'सभी सदस्य' : 'All Leadership' },
@@ -183,29 +183,33 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
               { id: 'editorial', label: isHindi ? 'संपादकीय नेतृत्व' : 'Editorial Leadership' },
               { id: 'digital', label: isHindi ? 'डिजिटल रणनीति' : 'Digital Media' },
               { id: 'reporting', label: isHindi ? 'रिपोर्टिंग ब्यूरो' : 'Reporting Bureau' },
-            ].map((dept) => (
-              <button
-                key={dept.id}
-                onClick={() => setActiveDept(dept.id)}
-                className={`px-3 py-1.5 text-xs font-semibold whitespace-nowrap tracking-wider transition-colors cursor-pointer border border-transparent rounded-none ${
-                  activeDept === dept.id
-                    ? 'bg-slate-950 text-white font-bold'
-                    : 'bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                {dept.label}
-              </button>
-            ))}
+            ].map((dept) => {
+              const isActive = activeDept === dept.id;
+              return (
+                <button
+                  key={dept.id}
+                  onClick={() => setActiveDept(dept.id)}
+                  className={`px-4 py-2 text-xs font-bold whitespace-nowrap tracking-wider transition-all duration-200 cursor-pointer border-b-2 relative rounded-none ${
+                    isActive
+                      ? 'border-red-800 text-slate-955 font-black'
+                      : 'border-transparent text-slate-500 hover:text-slate-805'
+                  }`}
+                >
+                  {dept.label}
+                  {isActive && <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-red-855 rounded-full mb-[-4px]" />}
+                </button>
+              );
+            })}
           </div>
 
           <div className="relative w-full md:w-72 flex-shrink-0">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={teamSearchQuery}
               onChange={(e) => setTeamSearchQuery(e.target.value)}
               placeholder={isHindi ? 'खोजें...' : 'Search...'}
-              className="w-full pl-9 pr-7 py-1.5 text-xs bg-slate-50 border border-slate-200 text-slate-955 placeholder:text-slate-400 focus:outline-hidden focus:border-slate-400 focus:bg-white transition-colors rounded-none"
+              className="w-full pl-9 pr-7 py-2 text-xs bg-white border border-slate-250 text-slate-955 placeholder:text-slate-400 focus:outline-hidden focus:border-red-800 transition-colors rounded-none shadow-3xs"
             />
             {teamSearchQuery && (
               <button
@@ -220,9 +224,9 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
 
         {/* Empty Search State */}
         {totalVisible === 0 && (
-          <div className="py-12 text-center border border-dashed border-slate-200 rounded-none space-y-2">
-            <Users className="w-8 h-8 text-slate-300 mx-auto" />
-            <p className="text-sm font-bold text-slate-900">
+          <div className="py-12 text-center border border-dashed border-slate-300 bg-white rounded-none space-y-3">
+            <Users className="w-8 h-8 text-slate-350 mx-auto" />
+            <p className="text-sm font-bold text-slate-955">
               {isHindi ? 'कोई सदस्य नहीं मिला' : 'No team members matched your search'}
             </p>
             <p className="text-xs text-slate-500 max-w-sm mx-auto">
@@ -230,64 +234,74 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
             </p>
             <button
               onClick={() => { setActiveDept('all'); setTeamSearchQuery(''); }}
-              className="px-4 py-2 bg-slate-900 text-white text-xs font-bold rounded-none hover:bg-slate-800 transition-colors cursor-pointer"
+              className="px-5 py-2.5 bg-slate-955 text-white text-xs font-bold hover:bg-slate-800 transition-colors cursor-pointer rounded-none"
             >
               {isHindi ? 'फ़िल्टर रीसेट करें' : 'Reset Filters'}
             </button>
           </div>
         )}
 
-        {/* 1. Founder & Executive Leadership */}
+        {/* 1. Founder & Executive Leadership (Umang Pandey) */}
         {showExecutive && (
-          <section className="py-10 border-b border-slate-300">
-            <div className="space-y-1 mb-8">
-              <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-red-800">
-                01 / Executive Masthead
-              </span>
+          <section className="py-12 border-b border-slate-305">
+            <div className="flex items-center gap-2 mb-8">
+              <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-red-800">01</span>
+              <div className="h-[1px] w-8 bg-red-800/40" />
               <h2 className="font-serif text-2xl font-bold tracking-tight text-slate-955">
                 Founder & Executive Leadership
               </h2>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch bg-white border border-slate-200/80 p-6 sm:p-8 relative overflow-hidden shadow-2xs hover:shadow-xs transition-shadow duration-300 rounded-none">
+              {/* Asymmetrical Accent Bar */}
+              <div className="absolute top-0 left-0 w-1.5 h-full bg-red-800" />
+              
               {/* Left Column: Portrait */}
-              <div className="md:col-span-4 lg:col-span-4">
-                <div className="relative group overflow-hidden border border-slate-200">
+              <div className="lg:col-span-5 flex flex-col justify-center">
+                <div className="relative group overflow-hidden border border-slate-200/85 p-1 bg-white">
                   <img
                     src={getAuthorAvatarUrl('/uploads/umang-pandey.jpg')}
                     alt="Umang Pandey"
-                    className="w-full aspect-[4/5] object-cover grayscale contrast-[1.05] brightness-[0.98] group-hover:grayscale-0 transition-all duration-500"
+                    className="w-full aspect-[4/5] object-cover grayscale contrast-[1.05] sepia-[0.1] brightness-[0.98] group-hover:grayscale-0 group-hover:sepia-0 transition-all duration-500"
                     onError={handleAvatarError}
                   />
-                  <div className="absolute inset-0 bg-slate-900/5 mix-blend-multiply" />
                 </div>
               </div>
 
               {/* Right Column: Identity & Bio */}
-              <div className="md:col-span-8 lg:col-span-8 flex flex-col justify-between h-full space-y-6">
+              <div className="lg:col-span-7 flex flex-col justify-between space-y-6">
                 <div className="space-y-4">
-                  <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-slate-200 pb-3">
+                  <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-3 border-b border-slate-205 pb-4">
                     <div>
                       <h3
                         onClick={() => onSelectAuthor('author-umang-pandey')}
-                        className="font-serif text-2xl sm:text-3xl font-bold text-slate-955 hover:text-red-800 cursor-pointer transition-colors"
+                        className="font-serif text-2xl sm:text-3xl font-extrabold text-slate-955 hover:text-red-800 cursor-pointer transition-colors"
                       >
                         {isHindi ? 'उमंग पाण्डेय' : 'Umang Pandey'}
                       </h3>
-                      <span className="text-xs font-sans font-bold uppercase tracking-wider text-red-800 block mt-1">
+                      <span className="text-xs font-sans font-bold uppercase tracking-wider text-red-850 block mt-1">
                         Founder & Chief Technology Officer (CTO) • NP News Metro
                       </span>
                     </div>
                     
-                    <div className="flex items-center gap-1.5 text-xs text-slate-500">
-                      <Mail className="w-3.5 h-3.5" />
+                    <div className="flex items-center gap-1.5 text-xs text-slate-500 font-mono">
+                      <Mail className="w-3.5 h-3.5 text-red-800" />
                       <a
                         href="mailto:umang.pandey@npnewsmetro.com"
-                        className="font-mono hover:text-red-800 transition-colors"
+                        className="hover:text-red-855 hover:underline transition-colors"
                       >
                         umang.pandey@npnewsmetro.com
                       </a>
                     </div>
+                  </div>
+
+                  {/* Quote block layout with elegant styling */}
+                  <div className="relative p-5 bg-[#FAF9F6] border-l-4 border-slate-800 italic font-serif text-slate-700 text-xs sm:text-sm leading-relaxed before:content-['“'] before:text-slate-200/60 before:text-7xl before:absolute before:-top-4 before:-left-2 overflow-hidden">
+                    <span className="relative z-15">
+                      {isHindi 
+                        ? 'हमारा लक्ष्य केवल समाचार देना नहीं, बल्कि उन्नत प्रौद्योगिकी, निष्पक्षता और संवैधानिक मूल्यों के साथ डिजिटल पत्रकारिता में एक नया मानक स्थापित करना है।'
+                        : 'Our mission is to architect next-generation digital news infrastructure, pairing fearless factual journalism with cutting-edge technology and constitutional integrity.'}
+                    </span>
                   </div>
 
                   <p className="font-serif text-slate-800 text-sm sm:text-base leading-relaxed">
@@ -299,20 +313,17 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
 
                 <div className="space-y-4 pt-4 border-t border-slate-200">
                   {/* Focus Areas Metadata */}
-                  <div className="flex flex-wrap gap-x-4 gap-y-2 text-[11px] font-sans font-bold text-slate-500 uppercase tracking-wider">
-                    <span>Institutional Leadership</span>
-                    <span className="text-slate-300">/</span>
-                    <span>Chief Technology Officer (CTO)</span>
-                    <span className="text-slate-300">/</span>
-                    <span>AI & Digital Systems</span>
-                    <span className="text-slate-300">/</span>
-                    <span>Media Strategy</span>
+                  <div className="flex flex-wrap gap-x-2 gap-y-1.5 text-[10px] font-sans font-bold text-slate-500 uppercase tracking-wider">
+                    <span className="bg-slate-100 border border-slate-200 px-2.5 py-0.5">Institutional Leadership</span>
+                    <span className="bg-slate-100 border border-slate-200 px-2.5 py-0.5">Chief Technology Officer (CTO)</span>
+                    <span className="bg-slate-100 border border-slate-200 px-2.5 py-0.5">AI & Digital Systems</span>
+                    <span className="bg-slate-100 border border-slate-200 px-2.5 py-0.5">Media Strategy</span>
                   </div>
 
                   <div className="flex items-center gap-4 pt-2">
                     <button
                       onClick={() => onSelectAuthor('author-umang-pandey')}
-                      className="text-red-800 hover:text-red-900 text-xs font-bold uppercase tracking-wider transition-colors inline-flex items-center gap-1.5 hover:underline cursor-pointer"
+                      className="text-red-855 hover:text-red-900 text-xs font-bold uppercase tracking-wider transition-colors inline-flex items-center gap-1.5 hover:underline cursor-pointer"
                     >
                       <span>View Profile & Articles</span>
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -336,26 +347,26 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
 
         {/* 2. Mentorship & Advisory Board */}
         {showAdvisorySection && (
-          <section className="py-10 border-b border-slate-300">
-            <div className="space-y-1 mb-8">
-              <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-red-800">
-                02 / Advisory Council
-              </span>
+          <section className="py-12 border-b border-slate-300">
+            <div className="flex items-center gap-2 mb-8">
+              <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-red-800">02</span>
+              <div className="h-[1px] w-8 bg-red-800/40" />
               <h2 className="font-serif text-2xl font-bold tracking-tight text-slate-955">
                 Mentorship & Advisory Board
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {/* Dr. Neelima Pandey */}
               {showNeelima && (
-                <article className="space-y-4 flex flex-col justify-between h-full">
+                <article className="bg-white border border-slate-200/80 p-5 shadow-2xs hover:shadow-xs transition-all duration-300 flex flex-col justify-between h-full relative group rounded-none">
+                  <div className="absolute top-0 left-0 w-full h-1 bg-slate-200 group-hover:bg-red-800 transition-colors" />
                   <div className="space-y-4">
-                    <div className="relative overflow-hidden border border-slate-200">
+                    <div className="relative overflow-hidden border border-slate-200 p-0.5 bg-white">
                       <img
                         src={getAuthorAvatarUrl('/uploads/dr-neelima-pandey.jpg')}
                         alt="Dr. Neelima Pandey"
-                        className="w-full aspect-[4/5] object-cover grayscale contrast-[1.05] hover:grayscale-0 transition-all duration-300"
+                        className="w-full aspect-[4/5] object-cover grayscale contrast-[1.05] sepia-[0.1] hover:grayscale-0 hover:sepia-0 transition-all duration-500"
                         onError={handleAvatarError}
                       />
                     </div>
@@ -366,7 +377,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                       >
                         {isHindi ? 'डॉ. नीलिमा पाण्डेय' : 'Dr. Neelima Pandey'}
                       </h3>
-                      <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-red-800 block">
+                      <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-red-805 block">
                         Chief Mentor & Advisor
                       </span>
                       <p className="text-[11px] text-slate-500 font-sans">
@@ -380,20 +391,17 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                     </p>
                   </div>
 
-                  <div className="space-y-3.5 pt-4 border-t border-slate-200 mt-auto">
-                    <div className="flex flex-wrap gap-x-2 gap-y-1 text-[10px] font-sans font-bold text-slate-500 uppercase tracking-wider">
-                      <span>Literature & Culture</span>
-                      <span className="text-slate-300">/</span>
-                      <span>Education & Ethics</span>
-                      <span className="text-slate-300">/</span>
-                      <span>Social Consciousness</span>
-                      <span className="text-slate-300">/</span>
-                      <span>Cultural Discourse</span>
+                  <div className="space-y-3.5 pt-4 border-t border-slate-200 mt-6">
+                    <div className="flex flex-wrap gap-x-2 gap-y-1.5 text-[9px] font-sans font-bold text-slate-500 uppercase tracking-wider">
+                      <span className="border border-slate-200 px-1.5 py-0.5 bg-slate-50">Literature & Culture</span>
+                      <span className="border border-slate-200 px-1.5 py-0.5 bg-slate-50">Education & Ethics</span>
+                      <span className="border border-slate-200 px-1.5 py-0.5 bg-slate-50">Social Consciousness</span>
+                      <span className="border border-slate-200 px-1.5 py-0.5 bg-slate-50">Cultural Discourse</span>
                     </div>
                     <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100">
                       <button
                         onClick={() => handleCopy('dr.neelima.pandey@npnewsmetro.com')}
-                        className="text-slate-500 hover:text-slate-900 font-semibold cursor-pointer"
+                        className="text-slate-500 hover:text-slate-905 font-bold cursor-pointer hover:underline"
                       >
                         {copiedEmail === 'dr.neelima.pandey@npnewsmetro.com' ? (
                           <span className="text-emerald-700 font-bold">{isHindi ? 'कॉपी हुआ' : 'Copied'}</span>
@@ -403,7 +411,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                       </button>
                       <button
                         onClick={() => onSelectAuthor('author-dr-neelima-pandey')}
-                        className="text-red-800 hover:text-red-905 font-bold uppercase tracking-wider inline-flex items-center gap-1 hover:underline cursor-pointer"
+                        className="text-red-800 hover:text-red-900 font-bold uppercase tracking-wider inline-flex items-center gap-1 hover:underline cursor-pointer"
                       >
                         <span>Profile & Articles</span>
                         <ArrowRight className="w-3 h-3" />
@@ -415,13 +423,14 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
 
               {/* Diwan Chand Arya */}
               {showArya && (
-                <article className="space-y-4 flex flex-col justify-between h-full">
+                <article className="bg-white border border-slate-200/80 p-5 shadow-2xs hover:shadow-xs transition-all duration-300 flex flex-col justify-between h-full relative group rounded-none">
+                  <div className="absolute top-0 left-0 w-full h-1 bg-slate-200 group-hover:bg-red-800 transition-colors" />
                   <div className="space-y-4">
-                    <div className="relative overflow-hidden border border-slate-200">
+                    <div className="relative overflow-hidden border border-slate-200 p-0.5 bg-white">
                       <img
                         src={getAuthorAvatarUrl('/np-author-default.png')}
                         alt="Diwan Chand Arya (D. C. Arya)"
-                        className="w-full aspect-[4/5] object-cover grayscale contrast-[1.05] hover:grayscale-0 transition-all duration-300"
+                        className="w-full aspect-[4/5] object-cover grayscale contrast-[1.05] sepia-[0.1] hover:grayscale-0 hover:sepia-0 transition-all duration-500"
                         onError={handleAvatarError}
                       />
                     </div>
@@ -432,7 +441,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                       >
                         {isHindi ? 'दीवान चंद आर्य (डी. सी. आर्य)' : 'Diwan Chand Arya (D. C. Arya)'}
                       </h3>
-                      <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-red-800 block">
+                      <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-red-805 block">
                         Advisory Board Member
                       </span>
                       <p className="text-[11px] text-slate-500 font-sans">
@@ -446,18 +455,16 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                     </p>
                   </div>
 
-                  <div className="space-y-3.5 pt-4 border-t border-slate-200 mt-auto">
-                    <div className="flex flex-wrap gap-x-2 gap-y-1 text-[10px] font-sans font-bold text-slate-500 uppercase tracking-wider">
-                      <span>Governance & Policy</span>
-                      <span className="text-slate-300">/</span>
-                      <span>Public Affairs</span>
-                      <span className="text-slate-300">/</span>
-                      <span>Institutional Strategy</span>
+                  <div className="space-y-3.5 pt-4 border-t border-slate-200 mt-6">
+                    <div className="flex flex-wrap gap-x-2 gap-y-1.5 text-[9px] font-sans font-bold text-slate-500 uppercase tracking-wider">
+                      <span className="border border-slate-200 px-1.5 py-0.5 bg-slate-50">Governance & Policy</span>
+                      <span className="border border-slate-200 px-1.5 py-0.5 bg-slate-50">Public Affairs</span>
+                      <span className="border border-slate-200 px-1.5 py-0.5 bg-slate-50">Institutional Strategy</span>
                     </div>
                     <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100">
                       <button
                         onClick={() => handleCopy('dc.arya@npnewsmetro.com')}
-                        className="text-slate-500 hover:text-slate-900 font-semibold cursor-pointer"
+                        className="text-slate-500 hover:text-slate-905 font-bold cursor-pointer hover:underline"
                       >
                         {copiedEmail === 'dc.arya@npnewsmetro.com' ? (
                           <span className="text-emerald-700 font-bold">{isHindi ? 'कॉपी हुआ' : 'Copied'}</span>
@@ -479,13 +486,14 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
 
               {/* Raj Kumar Agarwal */}
               {showAgarwal && (
-                <article className="space-y-4 flex flex-col justify-between h-full">
+                <article className="bg-white border border-slate-200/80 p-5 shadow-2xs hover:shadow-xs transition-all duration-300 flex flex-col justify-between h-full relative group rounded-none">
+                  <div className="absolute top-0 left-0 w-full h-1 bg-slate-200 group-hover:bg-red-800 transition-colors" />
                   <div className="space-y-4">
-                    <div className="relative overflow-hidden border border-slate-200">
+                    <div className="relative overflow-hidden border border-slate-200 p-0.5 bg-white">
                       <img
                         src={getAuthorAvatarUrl('/np-author-default.png')}
                         alt="Raj Kumar Agarwal"
-                        className="w-full aspect-[4/5] object-cover grayscale contrast-[1.05] hover:grayscale-0 transition-all duration-300"
+                        className="w-full aspect-[4/5] object-cover grayscale contrast-[1.05] sepia-[0.1] hover:grayscale-0 hover:sepia-0 transition-all duration-500"
                         onError={handleAvatarError}
                       />
                     </div>
@@ -496,7 +504,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                       >
                         {isHindi ? 'राज कुमार अग्रवाल' : 'Raj Kumar Agarwal'}
                       </h3>
-                      <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-red-800 block">
+                      <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-red-805 block">
                         Advisory Board Member
                       </span>
                       <p className="text-[11px] text-slate-500 font-sans">
@@ -510,18 +518,16 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                     </p>
                   </div>
 
-                  <div className="space-y-3.5 pt-4 border-t border-slate-200 mt-auto">
-                    <div className="flex flex-wrap gap-x-2 gap-y-1 text-[10px] font-sans font-bold text-slate-500 uppercase tracking-wider">
-                      <span>Economic Policy</span>
-                      <span className="text-slate-300">/</span>
-                      <span>Enterprise Affairs</span>
-                      <span className="text-slate-300">/</span>
-                      <span>Ethical Standards</span>
+                  <div className="space-y-3.5 pt-4 border-t border-slate-200 mt-6">
+                    <div className="flex flex-wrap gap-x-2 gap-y-1.5 text-[9px] font-sans font-bold text-slate-500 uppercase tracking-wider">
+                      <span className="border border-slate-200 px-1.5 py-0.5 bg-slate-50">Economic Policy</span>
+                      <span className="border border-slate-200 px-1.5 py-0.5 bg-slate-50">Enterprise Affairs</span>
+                      <span className="border border-slate-200 px-1.5 py-0.5 bg-slate-50">Ethical Standards</span>
                     </div>
                     <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100">
                       <button
                         onClick={() => handleCopy('rk.agarwal@npnewsmetro.com')}
-                        className="text-slate-500 hover:text-slate-900 font-semibold cursor-pointer"
+                        className="text-slate-500 hover:text-slate-905 font-bold cursor-pointer hover:underline"
                       >
                         {copiedEmail === 'rk.agarwal@npnewsmetro.com' ? (
                           <span className="text-emerald-700 font-bold">{isHindi ? 'कॉपी हुआ' : 'Copied'}</span>
@@ -544,27 +550,26 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
           </section>
         )}
 
-        {/* 3. Editorial Leadership (Editors-in-Chief) */}
+        {/* 3. Editorial Leadership (Editors-in-Chief - Alternating portrait grid) */}
         {showEditorialSection && (
-          <section className="py-10 border-b border-slate-300">
-            <div className="space-y-1 mb-8">
-              <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-red-800">
-                03 / Newsroom Authority
-              </span>
+          <section className="py-12 border-b border-slate-300">
+            <div className="flex items-center gap-2 mb-8">
+              <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-red-800">03</span>
+              <div className="h-[1px] w-8 bg-red-800/40" />
               <h2 className="font-serif text-2xl font-bold tracking-tight text-slate-955">
                 Editorial Leadership
               </h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-              {/* Neeraj Kumar Pandey */}
+              {/* Neeraj Kumar Pandey - Left Portrait */}
               {showNeeraj && (
-                <article className="grid grid-cols-1 sm:grid-cols-12 gap-6 items-start">
-                  <div className="sm:col-span-5 relative overflow-hidden border border-slate-200">
+                <article className="grid grid-cols-1 sm:grid-cols-12 gap-6 items-stretch bg-white border border-slate-200/80 p-5 shadow-2xs hover:shadow-xs transition-all duration-300 rounded-none">
+                  <div className="sm:col-span-5 relative overflow-hidden border border-slate-200 p-0.5 bg-white flex flex-col justify-center">
                     <img
                       src={getAuthorAvatarUrl('/uploads/neeraj-pandey.jpg')}
                       alt="Neeraj Kumar Pandey"
-                      className="w-full aspect-[4/5] object-cover grayscale contrast-[1.05] hover:grayscale-0 transition-all duration-300"
+                      className="w-full aspect-[4/5] object-cover grayscale contrast-[1.05] sepia-[0.1] hover:grayscale-0 hover:sepia-0 transition-all duration-500"
                       onError={handleAvatarError}
                     />
                   </div>
@@ -578,7 +583,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                         >
                           {isHindi ? 'नीरज कुमार पाण्डेय' : 'Neeraj Kumar Pandey'}
                         </h3>
-                        <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-red-800 block mt-0.5">
+                        <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-red-805 block mt-0.5">
                           Editor-in-Chief
                         </span>
                         <p className="text-[11px] text-slate-500 font-mono mt-0.5">
@@ -593,17 +598,15 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                     </div>
 
                     <div className="space-y-3 pt-3 border-t border-slate-200 mt-4">
-                      <div className="flex flex-wrap gap-x-2 gap-y-1 text-[10px] font-sans font-bold text-slate-500 uppercase tracking-wider">
-                        <span>National Politics</span>
-                        <span className="text-slate-300">/</span>
-                        <span>Investigations</span>
-                        <span className="text-slate-300">/</span>
-                        <span>NCR & Regional</span>
+                      <div className="flex flex-wrap gap-x-2 gap-y-1.5 text-[9px] font-sans font-bold text-slate-500 uppercase tracking-wider">
+                        <span className="border border-slate-205 px-1.5 py-0.5 bg-slate-50">National Politics</span>
+                        <span className="border border-slate-205 px-1.5 py-0.5 bg-slate-50">Investigations</span>
+                        <span className="border border-slate-205 px-1.5 py-0.5 bg-slate-50">NCR & Regional</span>
                       </div>
-                      <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100">
+                      <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-100">
                         <button
                           onClick={() => handleCopy('neeraj.pandey@npnewsmetro.com')}
-                          className="text-slate-500 hover:text-slate-900 font-semibold cursor-pointer"
+                          className="text-slate-500 hover:text-slate-905 font-bold cursor-pointer hover:underline"
                         >
                           {copiedEmail === 'neeraj.pandey@npnewsmetro.com' ? (
                             <span className="text-emerald-700 font-bold">{isHindi ? 'कॉपी हुआ' : 'Copied'}</span>
@@ -613,10 +616,10 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                         </button>
                         <button
                           onClick={() => onSelectAuthor('author-neeraj-pandey')}
-                          className="text-red-800 hover:text-red-905 font-bold uppercase tracking-wider inline-flex items-center gap-1 hover:underline cursor-pointer"
+                          className="text-red-800 hover:text-red-900 font-bold uppercase tracking-wider inline-flex items-center gap-1 hover:underline cursor-pointer"
                         >
                           <span>View Articles</span>
-                          <ArrowRight className="w-3 h-3" />
+                          <ArrowRight className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </div>
@@ -624,19 +627,10 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                 </article>
               )}
 
-              {/* Chetan Sharma */}
+              {/* Chetan Sharma - Right Portrait (Asymmetric Layout Flip for creative rhythm) */}
               {showChetan && (
-                <article className="grid grid-cols-1 sm:grid-cols-12 gap-6 items-start">
-                  <div className="sm:col-span-5 relative overflow-hidden border border-slate-200">
-                    <img
-                      src={getAuthorAvatarUrl('/uploads/chetan-sharma.jpg')}
-                      alt="Chetan Sharma"
-                      className="w-full aspect-[4/5] object-cover grayscale contrast-[1.05] hover:grayscale-0 transition-all duration-300"
-                      onError={handleAvatarError}
-                    />
-                  </div>
-                  
-                  <div className="sm:col-span-7 flex flex-col justify-between h-full min-h-[220px]">
+                <article className="grid grid-cols-1 sm:grid-cols-12 gap-6 items-stretch bg-white border border-slate-200/80 p-5 shadow-2xs hover:shadow-xs transition-all duration-300 rounded-none">
+                  <div className="sm:col-span-7 flex flex-col justify-between h-full min-h-[220px] order-2 sm:order-1">
                     <div className="space-y-3">
                       <div>
                         <h3
@@ -645,7 +639,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                         >
                           {isHindi ? 'चेतन शर्मा' : 'Chetan Sharma'}
                         </h3>
-                        <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-red-800 block mt-0.5">
+                        <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-red-805 block mt-0.5">
                           Editor-in-Chief
                         </span>
                         <p className="text-[11px] text-slate-500 font-mono mt-0.5">
@@ -660,17 +654,15 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                     </div>
 
                     <div className="space-y-3 pt-3 border-t border-slate-200 mt-4">
-                      <div className="flex flex-wrap gap-x-2 gap-y-1 text-[10px] font-sans font-bold text-slate-500 uppercase tracking-wider">
-                        <span>Editorial Policy</span>
-                        <span className="text-slate-300">/</span>
-                        <span>Governance</span>
-                        <span className="text-slate-300">/</span>
-                        <span>Special Investigations</span>
+                      <div className="flex flex-wrap gap-x-2 gap-y-1.5 text-[9px] font-sans font-bold text-slate-500 uppercase tracking-wider">
+                        <span className="border border-slate-205 px-1.5 py-0.5 bg-slate-50">Editorial Policy</span>
+                        <span className="border border-slate-205 px-1.5 py-0.5 bg-slate-50">Governance</span>
+                        <span className="border border-slate-205 px-1.5 py-0.5 bg-slate-50">Special Investigations</span>
                       </div>
-                      <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100">
+                      <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-100">
                         <button
                           onClick={() => handleCopy('chetan.sharma@npnewsmetro.com')}
-                          className="text-slate-500 hover:text-slate-900 font-semibold cursor-pointer"
+                          className="text-slate-500 hover:text-slate-905 font-bold cursor-pointer hover:underline"
                         >
                           {copiedEmail === 'chetan.sharma@npnewsmetro.com' ? (
                             <span className="text-emerald-700 font-bold">{isHindi ? 'कॉपी हुआ' : 'Copied'}</span>
@@ -680,13 +672,22 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                         </button>
                         <button
                           onClick={() => onSelectAuthor('author-chetan-sharma')}
-                          className="text-red-800 hover:text-red-905 font-bold uppercase tracking-wider inline-flex items-center gap-1 hover:underline cursor-pointer"
+                          className="text-red-800 hover:text-red-900 font-bold uppercase tracking-wider inline-flex items-center gap-1 hover:underline cursor-pointer"
                         >
                           <span>View Articles</span>
-                          <ArrowRight className="w-3 h-3" />
+                          <ArrowRight className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </div>
+                  </div>
+
+                  <div className="sm:col-span-5 relative overflow-hidden border border-slate-200 p-0.5 bg-white flex flex-col justify-center order-1 sm:order-2">
+                    <img
+                      src={getAuthorAvatarUrl('/uploads/chetan-sharma.jpg')}
+                      alt="Chetan Sharma"
+                      className="w-full aspect-[4/5] object-cover grayscale contrast-[1.05] sepia-[0.1] hover:grayscale-0 hover:sepia-0 transition-all duration-500"
+                      onError={handleAvatarError}
+                    />
                   </div>
                 </article>
               )}
@@ -696,23 +697,23 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
 
         {/* 4. Digital Media & Audience Strategy */}
         {showBhawana && (
-          <section className="py-10 border-b border-slate-300">
-            <div className="space-y-1 mb-8">
-              <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-red-800">
-                04 / Platform & Distribution
-              </span>
+          <section className="py-12 border-b border-slate-300">
+            <div className="flex items-center gap-2 mb-8">
+              <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-red-800">04</span>
+              <div className="h-[1px] w-8 bg-red-800/40" />
               <h2 className="font-serif text-2xl font-bold tracking-tight text-slate-955">
                 Digital Media & Audience Strategy
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center bg-white border border-slate-200/80 p-5 shadow-2xs hover:shadow-xs transition-shadow duration-300 relative rounded-none">
+              <div className="absolute top-0 left-0 w-full h-1 bg-red-800" />
               <div className="md:col-span-3 lg:col-span-2">
-                <div className="relative overflow-hidden border border-slate-200">
+                <div className="relative overflow-hidden border border-slate-205 p-0.5 bg-white">
                   <img
                     src={getAuthorAvatarUrl('/np-author-default.png')}
                     alt="Bhawana Pandey"
-                    className="w-full aspect-[4/5] object-cover grayscale contrast-[1.05] hover:grayscale-0 transition-all duration-300"
+                    className="w-full aspect-[4/5] object-cover grayscale contrast-[1.05] sepia-[0.1] hover:grayscale-0 hover:sepia-0 transition-all duration-300"
                     onError={handleAvatarError}
                   />
                 </div>
@@ -720,7 +721,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
               
               <div className="md:col-span-9 lg:col-span-10 flex flex-col justify-between h-full space-y-4">
                 <div className="space-y-2">
-                  <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-slate-200 pb-2">
+                  <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-3 border-b border-slate-200 pb-3">
                     <div>
                       <h3
                         onClick={() => onSelectAuthor('author-bhawana-pandey')}
@@ -728,13 +729,13 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                       >
                         {isHindi ? 'भावना पाण्डेय' : 'Bhawana Pandey'}
                       </h3>
-                      <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-red-800 block mt-0.5">
+                      <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-red-805 block mt-0.5">
                         Social Media Manager
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5 text-xs text-slate-500 font-mono">
-                      <Mail className="w-3.5 h-3.5" />
-                      <a href="mailto:bhawana.pandey@npnewsmetro.com" className="hover:text-red-800">bhawana.pandey@npnewsmetro.com</a>
+                      <Mail className="w-3.5 h-3.5 text-red-855" />
+                      <a href="mailto:bhawana.pandey@npnewsmetro.com" className="hover:text-red-855 hover:underline">bhawana.pandey@npnewsmetro.com</a>
                     </div>
                   </div>
                   <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-serif">
@@ -744,18 +745,16 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                   </p>
                 </div>
 
-                <div className="flex flex-wrap gap-x-2 gap-y-1 text-[10px] font-sans font-bold text-slate-500 uppercase tracking-wider pt-2 border-t border-slate-100">
-                  <span>Social Media Strategy</span>
-                  <span className="text-slate-300">/</span>
-                  <span>Audience Growth</span>
-                  <span className="text-slate-300">/</span>
-                  <span>Digital Distribution</span>
+                <div className="flex flex-wrap gap-x-2 gap-y-1.5 text-[9px] font-sans font-bold text-slate-500 uppercase tracking-wider pt-2 border-t border-slate-100">
+                  <span className="border border-slate-205 px-1.5 py-0.5 bg-slate-50">Social Media Strategy</span>
+                  <span className="border border-slate-205 px-1.5 py-0.5 bg-slate-50">Audience Growth</span>
+                  <span className="border border-slate-205 px-1.5 py-0.5 bg-slate-50">Digital Distribution</span>
                 </div>
                 
                 <div className="flex items-center gap-4 text-xs pt-2">
                   <button
                     onClick={() => handleCopy('bhawana.pandey@npnewsmetro.com')}
-                    className="text-slate-500 hover:text-slate-905 font-semibold cursor-pointer"
+                    className="text-slate-500 hover:text-slate-905 font-bold cursor-pointer hover:underline"
                   >
                     {copiedEmail === 'bhawana.pandey@npnewsmetro.com' ? (
                       <span className="text-emerald-700 font-bold">{isHindi ? 'कॉपी हुआ' : 'Copied'}</span>
@@ -765,7 +764,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                   </button>
                   <button
                     onClick={() => onSelectAuthor('author-bhawana-pandey')}
-                    className="text-red-800 hover:text-red-905 font-bold uppercase tracking-wider inline-flex items-center gap-1 hover:underline cursor-pointer"
+                    className="text-red-800 hover:text-red-900 font-bold uppercase tracking-wider inline-flex items-center gap-1 hover:underline cursor-pointer"
                   >
                     <span>View Articles</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -777,15 +776,18 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
         )}
 
         {/* Restrained Editorial Trust Statement */}
-        <section className="py-8 my-8 border-y border-slate-300 bg-slate-50/50 px-6">
+        <section className="py-8 my-10 border-y-4 border-double border-slate-350 bg-white px-6 shadow-3xs relative overflow-hidden rounded-none">
+          <div className="absolute top-0 right-0 w-16 h-16 bg-red-800/2 rotate-45 translate-x-8 -translate-y-8" />
           <div className="max-w-4xl mx-auto text-center space-y-4">
-            <h3 className="font-serif italic text-base sm:text-lg text-slate-950 font-bold">
+            <h3 className="font-serif italic text-base sm:text-lg text-slate-955 font-bold flex items-center justify-center gap-2">
+              <span className="w-1 h-1 bg-red-850 rounded-full" />
               Our Institutional Principles
+              <span className="w-1 h-1 bg-red-850 rounded-full" />
             </h3>
             <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-serif">
               NP News Metro operates under strict principles of journalistic integrity, independent of commercial, corporate, or political influence. We commit to factual accuracy, multi-source verification, editorial autonomy, and strict compliance with the Press Council of India standards.
             </p>
-            <div className="flex justify-center items-center gap-2 pt-2 text-[10px] font-sans font-bold uppercase tracking-wider text-slate-500">
+            <div className="flex justify-center items-center gap-3 pt-2 text-[10px] font-sans font-bold uppercase tracking-wider text-slate-500">
               <span>Independence</span>
               <span className="text-slate-300">•</span>
               <span>Verification</span>
@@ -797,26 +799,27 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
 
         {/* 5. Newsroom & Field Reporting Bureau */}
         {showReportingSection && (
-          <section className="py-10">
-            <div className="space-y-1 mb-8">
-              <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-red-800">
-                05 / Field Bureau
-              </span>
+          <section className="py-12">
+            <div className="flex items-center gap-2 mb-8">
+              <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-red-800">05</span>
+              <div className="h-[1px] w-8 bg-red-800/40" />
               <h2 className="font-serif text-2xl font-bold tracking-tight text-slate-955">
                 Newsroom & Field Reporting Bureau
               </h2>
             </div>
 
             <div className="space-y-10">
-              {/* Row 1: Large Asymmetrical Row for Purnima Mishra */}
+              
+              {/* Row 1: Asymmetrical Spotlight Banner for Purnima Mishra (Senior Reporter) */}
               {showPurnima && (
-                <article className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start border-b border-slate-200 pb-8">
+                <article className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start border-b border-slate-200 pb-8 bg-white border border-slate-200/80 p-5 shadow-2xs hover:shadow-xs transition-shadow duration-300 relative rounded-none">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-slate-400" />
                   <div className="md:col-span-3">
-                    <div className="relative overflow-hidden border border-slate-200">
+                    <div className="relative overflow-hidden border border-slate-200 p-0.5 bg-white">
                       <img
                         src={getAuthorAvatarUrl('/np-author-default.png')}
                         alt="Purnima Mishra"
-                        className="w-full aspect-[4/5] object-cover grayscale contrast-[1.05] hover:grayscale-0 transition-all duration-300"
+                        className="w-full aspect-[4/5] object-cover grayscale contrast-[1.05] sepia-[0.1] hover:grayscale-0 hover:sepia-0 transition-all duration-300"
                         onError={handleAvatarError}
                       />
                     </div>
@@ -824,21 +827,21 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                   
                   <div className="md:col-span-9 flex flex-col justify-between h-full min-h-[180px]">
                     <div className="space-y-3">
-                      <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-slate-200 pb-2">
+                      <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-3 border-b border-slate-200 pb-3">
                         <div>
                           <h3
                             onClick={() => onSelectAuthor('author-purnima-mishra')}
-                            className="font-serif text-xl font-bold text-slate-955 hover:text-red-800 cursor-pointer transition-colors"
+                            className="font-serif text-xl font-bold text-slate-955 hover:text-red-805 cursor-pointer transition-colors"
                           >
                             {isHindi ? 'पूर्णिमा मिश्रा' : 'Purnima Mishra'}
                           </h3>
-                          <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-red-800 block mt-0.5">
+                          <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-red-805 block mt-0.5">
                             Senior Reporter
                           </span>
                         </div>
                         <div className="flex items-center gap-1.5 text-xs text-slate-500 font-mono">
-                          <Mail className="w-3.5 h-3.5" />
-                          <a href="mailto:purnima.mishra@npnewsmetro.com" className="hover:text-red-800">purnima.mishra@npnewsmetro.com</a>
+                          <Mail className="w-3.5 h-3.5 text-red-855" />
+                          <a href="mailto:purnima.mishra@npnewsmetro.com" className="hover:text-red-855 hover:underline">purnima.mishra@npnewsmetro.com</a>
                         </div>
                       </div>
                       
@@ -850,18 +853,16 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                     </div>
 
                     <div className="space-y-3 pt-3 border-t border-slate-100 mt-4">
-                      <div className="flex flex-wrap gap-x-2 gap-y-1 text-[10px] font-sans font-bold text-slate-500 uppercase tracking-wider">
-                        <span>Public Policy</span>
-                        <span className="text-slate-300">/</span>
-                        <span>Social Affairs</span>
-                        <span className="text-slate-300">/</span>
-                        <span>Ground Reporting</span>
+                      <div className="flex flex-wrap gap-x-2 gap-y-1.5 text-[9px] font-sans font-bold text-slate-500 uppercase tracking-wider">
+                        <span className="border border-slate-205 px-1.5 py-0.5 bg-slate-50">Public Policy</span>
+                        <span className="border border-slate-205 px-1.5 py-0.5 bg-slate-50">Social Affairs</span>
+                        <span className="border border-slate-205 px-1.5 py-0.5 bg-slate-50">Ground Reporting</span>
                       </div>
                       
-                      <div className="flex items-center justify-between text-xs pt-1">
+                      <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-100">
                         <button
                           onClick={() => handleCopy('purnima.mishra@npnewsmetro.com')}
-                          className="text-slate-500 hover:text-slate-900 font-semibold cursor-pointer"
+                          className="text-slate-500 hover:text-slate-905 font-bold cursor-pointer hover:underline"
                         >
                           {copiedEmail === 'purnima.mishra@npnewsmetro.com' ? (
                             <span className="text-emerald-700 font-bold">{isHindi ? 'कॉपी हुआ' : 'Copied'}</span>
@@ -871,7 +872,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                         </button>
                         <button
                           onClick={() => onSelectAuthor('author-purnima-mishra')}
-                          className="text-red-800 hover:text-red-905 font-bold uppercase tracking-wider inline-flex items-center gap-1 hover:underline cursor-pointer"
+                          className="text-red-800 hover:text-red-900 font-bold uppercase tracking-wider inline-flex items-center gap-1.5 hover:underline cursor-pointer"
                         >
                           <span>Articles</span>
                           <ArrowRight className="w-3.5 h-3.5" />
@@ -886,12 +887,13 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* CL Tripathi */}
                 {showTripathi && (
-                  <article className="flex flex-col sm:flex-row gap-5 items-start border-b border-slate-200 pb-6 md:border-b-0 md:pb-0">
-                    <div className="w-24 sm:w-28 relative overflow-hidden border border-slate-200 flex-shrink-0">
+                  <article className="flex flex-col sm:flex-row gap-5 items-stretch bg-white border border-slate-200/80 p-5 shadow-2xs hover:shadow-xs transition-shadow duration-300 relative rounded-none">
+                    <div className="absolute top-0 left-0 w-1 h-full bg-slate-400" />
+                    <div className="w-24 sm:w-28 relative overflow-hidden border border-slate-205 p-0.5 bg-white flex-shrink-0">
                       <img
                         src={getAuthorAvatarUrl('/np-author-default.png')}
                         alt="CL Tripathi"
-                        className="w-full aspect-[4/5] object-cover grayscale contrast-[1.05] hover:grayscale-0 transition-all duration-300"
+                        className="w-full aspect-[4/5] object-cover grayscale contrast-[1.05] sepia-[0.1] hover:grayscale-0 hover:sepia-0 transition-all duration-300"
                         onError={handleAvatarError}
                       />
                     </div>
@@ -901,11 +903,11 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                         <div>
                           <h3
                             onClick={() => onSelectAuthor('author-cl-tripathi')}
-                            className="font-serif text-base sm:text-lg font-bold text-slate-955 hover:text-red-800 cursor-pointer transition-colors"
+                            className="font-serif text-base sm:text-lg font-bold text-slate-955 hover:text-red-850 cursor-pointer transition-colors"
                           >
                             {isHindi ? 'सी. एल. त्रिपाठी' : 'CL Tripathi'}
                           </h3>
-                          <span className="text-[9px] font-sans font-bold uppercase tracking-wider text-red-800 block mt-0.5">
+                          <span className="text-[9px] font-sans font-bold uppercase tracking-wider text-red-805 block mt-0.5">
                             Senior Reporter
                           </span>
                         </div>
@@ -925,7 +927,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                         <div className="flex items-center justify-between text-xs pt-1">
                           <button
                             onClick={() => handleCopy('cl.tripathi@npnewsmetro.com')}
-                            className="text-slate-500 hover:text-slate-900 font-semibold cursor-pointer"
+                            className="text-slate-500 hover:text-slate-905 font-bold cursor-pointer hover:underline"
                           >
                             {copiedEmail === 'cl.tripathi@npnewsmetro.com' ? (
                               <span className="text-emerald-700 font-bold">{isHindi ? 'कॉपी हुआ' : 'Copied'}</span>
@@ -935,7 +937,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                           </button>
                           <button
                             onClick={() => onSelectAuthor('author-cl-tripathi')}
-                            className="text-red-800 hover:text-red-905 font-bold uppercase tracking-wider inline-flex items-center gap-1 hover:underline cursor-pointer"
+                            className="text-red-855 hover:text-red-900 font-bold uppercase tracking-wider inline-flex items-center gap-1 hover:underline cursor-pointer"
                           >
                             <span>Articles</span>
                             <ArrowRight className="w-3.5 h-3.5" />
@@ -948,12 +950,13 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
 
                 {/* Laxmi Kant Mishra */}
                 {showLaxmi && (
-                  <article className="flex flex-col sm:flex-row gap-5 items-start">
-                    <div className="w-24 sm:w-28 relative overflow-hidden border border-slate-200 flex-shrink-0">
+                  <article className="flex flex-col sm:flex-row gap-5 items-stretch bg-white border border-slate-200/80 p-5 shadow-2xs hover:shadow-xs transition-shadow duration-300 relative rounded-none">
+                    <div className="absolute top-0 left-0 w-1 h-full bg-slate-400" />
+                    <div className="w-24 sm:w-28 relative overflow-hidden border border-slate-205 p-0.5 bg-white flex-shrink-0">
                       <img
                         src={getAuthorAvatarUrl('/uploads/laxmi-kant-mishra.jpg')}
                         alt="Laxmi Kant Mishra"
-                        className="w-full aspect-[4/5] object-cover grayscale contrast-[1.05] hover:grayscale-0 transition-all duration-300"
+                        className="w-full aspect-[4/5] object-cover grayscale contrast-[1.05] sepia-[0.1] hover:grayscale-0 hover:sepia-0 transition-all duration-300"
                         onError={handleAvatarError}
                       />
                     </div>
@@ -963,11 +966,11 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                         <div>
                           <h3
                             onClick={() => onSelectAuthor('author-laxmi-kant-mishra')}
-                            className="font-serif text-base sm:text-lg font-bold text-slate-955 hover:text-red-800 cursor-pointer transition-colors"
+                            className="font-serif text-base sm:text-lg font-bold text-slate-955 hover:text-red-855 cursor-pointer transition-colors"
                           >
                             {isHindi ? 'लक्ष्मी कांत मिश्रा' : 'Laxmi Kant Mishra'}
                           </h3>
-                          <span className="text-[9px] font-sans font-bold uppercase tracking-wider text-red-800 block mt-0.5">
+                          <span className="text-[9px] font-sans font-bold uppercase tracking-wider text-red-805 block mt-0.5">
                             Reporter
                           </span>
                         </div>
@@ -987,7 +990,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                         <div className="flex items-center justify-between text-xs pt-1">
                           <button
                             onClick={() => handleCopy('laxmikant.mishra@npnewsmetro.com')}
-                            className="text-slate-500 hover:text-slate-900 font-semibold cursor-pointer"
+                            className="text-slate-500 hover:text-slate-905 font-bold cursor-pointer hover:underline"
                           >
                             {copiedEmail === 'laxmikant.mishra@npnewsmetro.com' ? (
                               <span className="text-emerald-700 font-bold">{isHindi ? 'कॉपी हुआ' : 'Copied'}</span>
@@ -997,7 +1000,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                           </button>
                           <button
                             onClick={() => onSelectAuthor('author-laxmi-kant-mishra')}
-                            className="text-red-800 hover:text-red-905 font-bold uppercase tracking-wider inline-flex items-center gap-1 hover:underline cursor-pointer"
+                            className="text-red-855 hover:text-red-900 font-bold uppercase tracking-wider inline-flex items-center gap-1 hover:underline cursor-pointer"
                           >
                             <span>Articles</span>
                             <ArrowRight className="w-3.5 h-3.5" />
@@ -1015,7 +1018,9 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
 
       </article>
     );
-  };const activeItemLabel = menuItems.find((m) => m.id === currentPage)?.label || (isHindi ? 'परिचय' : 'About');
+  };
+
+  const activeItemLabel = menuItems.find((m) => m.id === currentPage)?.label || (isHindi ? 'परिचय' : 'About');
 
   return (
     <div className="bg-canvas min-h-screen">
