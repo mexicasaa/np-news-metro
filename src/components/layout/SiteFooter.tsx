@@ -140,7 +140,7 @@ export const SiteFooter: React.FC<SiteFooterProps> = ({
               {isHindi ? 'मानक एवं नीतियां' : 'Standards & Policies'}
             </h5>
             <ul className="space-y-1.5 text-slate-300">
-              <li><a href="/editorial-team" onClick={(e) => { e.preventDefault(); onNavigateStatic('editorial-team'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'संपादकीय मंडल' : 'Editorial Board'}</a></li>
+              <li><a href="/editorial-team" onClick={(e) => { e.preventDefault(); onNavigateStatic('editorial-team'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'संपादकीय बोर्ड एवं नेतृत्व' : 'Editorial Board & Leadership'}</a></li>
               <li><a href="/ethics" onClick={(e) => { e.preventDefault(); onNavigateStatic('ethics'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'संपादकीय नीति' : 'Editorial Policy'}</a></li>
               <li><a href="/corrections" onClick={(e) => { e.preventDefault(); onNavigateStatic('corrections'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'संशोधन एवं निवारण' : 'Corrections & Redressal'}</a></li>
               <li><a href="/advertise" onClick={(e) => { e.preventDefault(); onNavigateStatic('advertise'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'विज्ञापन दें' : 'Advertise with Us'}</a></li>
@@ -198,7 +198,9 @@ export const SiteFooter: React.FC<SiteFooterProps> = ({
           <div>
             <p>{t.footerCopyright} {t.allRightsReserved}</p>
             <p className="text-[10px] text-slate-400 mt-0.5">
-              Registration No. DL/NP-NEWS/2026/8941 • Registered Office: Connaught Place, New Delhi 110001
+              {isHindi 
+                ? 'आरएनआई पंजी. सं.: DEL HIN/2010/31544 (मेट्रोमैट दिल्ली) • पंजीकृत कार्यालय: कनाट प्लेस, नई दिल्ली 110001'
+                : 'RNI Reg. No.: DEL HIN/2010/31544 (by Metromat Delhi) • Registered Office: Connaught Place, New Delhi 110001'}
             </p>
           </div>
 

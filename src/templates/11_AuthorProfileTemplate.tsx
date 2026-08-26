@@ -26,6 +26,9 @@ export const AuthorProfileTemplate: React.FC<AuthorProfileTemplateProps> = ({
   const { t, isHindi } = useLanguage();
 
   const author = mockAuthors[authorId] || mockAuthors['author-1'];
+  const displayName = isHindi && author.nameHi ? author.nameHi : author.name;
+  const displayRole = isHindi && author.roleHi ? author.roleHi : author.role;
+  const displayBio = isHindi && author.bioHi ? author.bioHi : author.bio;
   const authorPosts = mockPosts.filter((p) => p.authorId === author.id);
   const displayPosts = authorPosts.length > 0 ? authorPosts : mockPosts.slice(0, 3);
   const popularPosts = [...displayPosts].sort((a, b) => b.viewsCount - a.viewsCount);
@@ -37,7 +40,7 @@ export const AuthorProfileTemplate: React.FC<AuthorProfileTemplateProps> = ({
         items={[
           { label: 'Home', onClick: onNavigateHome },
           { label: isHindi ? 'पत्रकार एवं स्तंभकार' : 'Journalists & Columnists', onClick: () => onNavigateHome() },
-          { label: author.name, isActive: true },
+          { label: displayName, isActive: true },
         ]}
       />
 
@@ -47,7 +50,7 @@ export const AuthorProfileTemplate: React.FC<AuthorProfileTemplateProps> = ({
           <div className="flex flex-col sm:flex-row gap-6 items-start">
             <img
               src={getAuthorAvatarUrl(author.avatar)}
-              alt={author.name}
+              alt={displayName}
               className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-surface-container flex-shrink-0"
               onError={handleAvatarError}
             />
@@ -55,7 +58,7 @@ export const AuthorProfileTemplate: React.FC<AuthorProfileTemplateProps> = ({
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2.5 mb-1.5 flex-wrap">
                 <h1 className="font-serif text-2xl sm:text-3xl font-bold text-ink">
-                  {author.name}
+                  {displayName}
                 </h1>
                 {author.verified && (
                   <span className="flex items-center gap-1 text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-sm">
@@ -66,11 +69,11 @@ export const AuthorProfileTemplate: React.FC<AuthorProfileTemplateProps> = ({
               </div>
 
               <p className="text-xs sm:text-sm font-semibold text-secondary mb-3">
-                {author.role} • NP News Metro
+                {displayRole} • NP News Metro
               </p>
 
               <p className="text-xs sm:text-sm text-ink-secondary leading-relaxed mb-4 max-w-2xl">
-                {author.bio}
+                {displayBio}
               </p>
 
               {/* Beats & Editorial Contact Links */}

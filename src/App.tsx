@@ -1312,7 +1312,7 @@ function AppContent() {
         'terms': 'Terms and Conditions',
         'disclaimer': 'Editorial Disclaimer',
         'ethics': 'Code of Ethics & Editorial Guidelines',
-        'editorial-team': 'Editorial Team & Masthead',
+        'editorial-team': 'Editorial Board & Leadership — NP News Metro',
         'corrections': 'Corrections & Grievance Redressal Policy',
         'advertise': 'Advertise With Us',
         'cookie-policy': 'Cookie Policy',

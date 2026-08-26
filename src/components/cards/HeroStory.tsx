@@ -79,26 +79,31 @@ export const HeroStory: React.FC<HeroStoryProps> = ({
   }, [storyList.length, isHovered]);
 
   const handlePrevSlide = (e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
     setActiveSlideIndex((prev) => (prev - 1 + storyList.length) % storyList.length);
   };
 
   const handleNextSlide = (e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
     setActiveSlideIndex((prev) => (prev + 1) % storyList.length);
   };
 
   const handleShare = (e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
     setIsShareModalOpen(true);
   };
 
   const handleBookmark = (e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
     setIsBookmarked(!isBookmarked);
   };
 
   const handleToggleListen = (e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
     setIsListening(!isListening);
   };
@@ -113,7 +118,7 @@ export const HeroStory: React.FC<HeroStoryProps> = ({
       {/* 1. TOP: BIG CINEMATIC SLIDER MEDIA STAGE                */}
       {/* ======================================================== */}
       <div className="relative w-full aspect-[16/10] sm:aspect-[16/9] md:aspect-[16/9] lg:aspect-[16/9] bg-slate-950 overflow-hidden select-none">
-        {/* High-Res Image Slider Mode */}
+        {/* High-Res Image Slider Mode - Image Link */}
         <a 
           href={`/${rawStory.category || 'india'}/${rawStory.slug}`}
           className="relative w-full h-full cursor-pointer block"
@@ -121,6 +126,7 @@ export const HeroStory: React.FC<HeroStoryProps> = ({
             e.preventDefault();
             onSelect(currentStory);
           }}
+          title={currentStory.title}
         >
           {/* Background Image with subtle zoom on hover */}
           <img
@@ -135,95 +141,101 @@ export const HeroStory: React.FC<HeroStoryProps> = ({
           {/* Gradient Scrim Overlays for Depth & Readability */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-black/30 pointer-events-none" />
           <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-transparent pointer-events-none" />
-
-          {/* Top Overlay Badges */}
-          <div className="absolute top-3 sm:top-4 left-3 sm:left-4 right-3 sm:right-4 flex items-center justify-between pointer-events-none z-20">
-            {/* Lead / Breaking Badge */}
-            <div className="flex items-center gap-2">
-              <span className="bg-editorial-red text-white px-2.5 sm:px-3 py-1 rounded-sm text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider shadow-lg flex items-center gap-1.5 backdrop-blur-xs">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-80"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
-                </span>
-                <span>{currentStory.isBreaking ? 'Breaking News' : 'Lead Story'}</span>
-              </span>
-
-              <span className="hidden sm:inline-flex items-center gap-1 bg-black/60 backdrop-blur-md text-white border border-white/20 px-2.5 py-1 rounded-sm text-[10px] font-bold uppercase tracking-wider">
-                <Flame className="w-3 h-3 text-amber-400" />
-                <span>Exclusive Report</span>
-              </span>
-            </div>
-
-            {/* Category Pill Tag */}
-            <div className="pointer-events-auto">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onSelectCategory?.(currentStory.category);
-                }}
-                className="bg-white/90 hover:bg-white text-primary font-extrabold uppercase text-[10px] sm:text-[11px] px-2.5 sm:px-3 py-1 rounded-sm shadow-md transition-all hover:scale-105 border border-white/40 cursor-pointer"
-              >
-                {currentStory.category}
-              </button>
-            </div>
-          </div>
-
-          {/* Bottom Floating Bar: Slide Indicators & Caption */}
-          <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 flex items-end justify-between gap-3 pointer-events-none z-20">
-            {/* Photo Caption & Credit */}
-            <div className="hidden sm:block max-w-md bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-sm border border-white/15 text-white text-[11px]">
-              <p className="truncate italic">{currentStory.imageCaption}</p>
-              <p className="font-semibold text-slate-300 text-[10px]">{currentStory.imageCredit}</p>
-            </div>
-
-            {/* Slider Dots / Tabs (when multiple stories exist) */}
-            {storyList.length > 1 && (
-              <div className="pointer-events-auto flex items-center gap-1.5 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20 shadow-lg ml-auto">
-                <span className="text-[10px] text-white/90 font-mono font-bold mr-1">
-                  {activeSlideIndex + 1}/{storyList.length}
-                </span>
-                {storyList.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setActiveSlideIndex(idx);
-                    }}
-                    className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
-                      activeSlideIndex === idx
-                        ? 'w-6 bg-secondary-gold shadow-sm'
-                        : 'w-2 bg-white/50 hover:bg-white'
-                    }`}
-                    title={`Go to slide ${idx + 1}`}
-                    aria-label={`Go to slide ${idx + 1}`}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Previous & Next Slider Arrow Buttons */}
-          {storyList.length > 1 && (
-            <>
-              <button
-                onClick={handlePrevSlide}
-                className="pointer-events-auto absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 z-30 p-2 sm:p-2.5 rounded-full bg-black/50 hover:bg-black/80 text-white backdrop-blur-md border border-white/20 shadow-xl opacity-80 sm:opacity-0 group-hover:opacity-100 transition-all hover:scale-110 cursor-pointer"
-                title="Previous Lead Story"
-                aria-label="Previous Lead Story"
-              >
-                <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
-              </button>
-              <button
-                onClick={handleNextSlide}
-                className="pointer-events-auto absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 z-30 p-2 sm:p-2.5 rounded-full bg-black/50 hover:bg-black/80 text-white backdrop-blur-md border border-white/20 shadow-xl opacity-80 sm:opacity-0 group-hover:opacity-100 transition-all hover:scale-110 cursor-pointer"
-                title="Next Lead Story"
-                aria-label="Next Lead Story"
-              >
-                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
-              </button>
-            </>
-          )}
         </a>
+
+        {/* Top Overlay Badges */}
+        <div className="absolute top-3 sm:top-4 left-3 sm:left-4 right-3 sm:right-4 flex items-center justify-between pointer-events-none z-20">
+          {/* Lead / Breaking Badge */}
+          <div className="flex items-center gap-2">
+            <span className="bg-editorial-red text-white px-2.5 sm:px-3 py-1 rounded-sm text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider shadow-lg flex items-center gap-1.5 backdrop-blur-xs">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-80"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+              </span>
+              <span>{currentStory.isBreaking ? 'Breaking News' : 'Lead Story'}</span>
+            </span>
+
+            <span className="hidden sm:inline-flex items-center gap-1 bg-black/60 backdrop-blur-md text-white border border-white/20 px-2.5 py-1 rounded-sm text-[10px] font-bold uppercase tracking-wider">
+              <Flame className="w-3 h-3 text-amber-400" />
+              <span>Exclusive Report</span>
+            </span>
+          </div>
+
+          {/* Category Pill Tag */}
+          <div className="pointer-events-auto">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onSelectCategory?.(currentStory.category);
+              }}
+              className="bg-white/90 hover:bg-white text-primary font-extrabold uppercase text-[10px] sm:text-[11px] px-2.5 sm:px-3 py-1 rounded-sm shadow-md transition-all hover:scale-105 border border-white/40 cursor-pointer"
+            >
+              {currentStory.category}
+            </button>
+          </div>
+        </div>
+
+        {/* Bottom Floating Bar: Slide Indicators & Caption */}
+        <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 flex items-end justify-between gap-3 pointer-events-none z-20">
+          {/* Photo Caption & Credit */}
+          <div className="hidden sm:block max-w-md bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-sm border border-white/15 text-white text-[11px]">
+            <p className="truncate italic">{currentStory.imageCaption}</p>
+            <p className="font-semibold text-slate-300 text-[10px]">{currentStory.imageCredit}</p>
+          </div>
+
+          {/* Slider Dots / Tabs (when multiple stories exist) */}
+          {storyList.length > 1 && (
+            <div className="pointer-events-auto flex items-center gap-1.5 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20 shadow-lg ml-auto">
+              <span className="text-[10px] text-white/90 font-mono font-bold mr-1">
+                {activeSlideIndex + 1}/{storyList.length}
+              </span>
+              {storyList.map((_, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setActiveSlideIndex(idx);
+                  }}
+                  className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                    activeSlideIndex === idx
+                      ? 'w-6 bg-secondary-gold shadow-sm'
+                      : 'w-2 bg-white/50 hover:bg-white'
+                  }`}
+                  title={`Go to slide ${idx + 1}`}
+                  aria-label={`Go to slide ${idx + 1}`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Previous & Next Slider Arrow Buttons */}
+        {storyList.length > 1 && (
+          <>
+            <button
+              type="button"
+              onClick={handlePrevSlide}
+              className="pointer-events-auto absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 z-30 p-2 sm:p-2.5 rounded-full bg-black/50 hover:bg-black/80 text-white backdrop-blur-md border border-white/20 shadow-xl opacity-80 sm:opacity-0 group-hover:opacity-100 transition-all hover:scale-110 cursor-pointer"
+              title="Previous Lead Story"
+              aria-label="Previous Lead Story"
+            >
+              <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+            </button>
+            <button
+              type="button"
+              onClick={handleNextSlide}
+              className="pointer-events-auto absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 z-30 p-2 sm:p-2.5 rounded-full bg-black/50 hover:bg-black/80 text-white backdrop-blur-md border border-white/20 shadow-xl opacity-80 sm:opacity-0 group-hover:opacity-100 transition-all hover:scale-110 cursor-pointer"
+              title="Next Lead Story"
+              aria-label="Next Lead Story"
+            >
+              <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
+            </button>
+          </>
+        )}
       </div>
 
       {/* ======================================================== */}
@@ -307,7 +319,7 @@ export const HeroStory: React.FC<HeroStoryProps> = ({
               href={`/${rawStory.category || 'india'}/${rawStory.slug}`}
               onClick={(e) => {
                 e.preventDefault();
-                onSelect(rawStory);
+                onSelect(currentStory);
               }}
               className="hover:text-editorial-red transition-colors text-inherit no-underline"
             >
@@ -363,7 +375,7 @@ export const HeroStory: React.FC<HeroStoryProps> = ({
             href={`/${rawStory.category || 'india'}/${rawStory.slug}`}
             onClick={(e) => {
               e.preventDefault();
-              onSelect(rawStory);
+              onSelect(currentStory);
             }}
             className="bg-primary hover:bg-primary-dark text-white font-bold px-4 sm:px-5 py-2 sm:py-2.5 rounded-sm flex items-center gap-2 text-xs sm:text-sm shadow-xs hover:shadow-md transition-all group/btn ml-auto cursor-pointer no-underline"
           >

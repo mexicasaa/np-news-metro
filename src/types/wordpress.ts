@@ -16,10 +16,13 @@ export type EditorialCategorySlug =
 export interface WpAuthor {
   id: string;
   name: string;
+  nameHi?: string;
   slug: string;
   role: string;
+  roleHi?: string;
   avatar: string;
   bio: string;
+  bioHi?: string;
   verified: boolean;
   beats: string[];
   social: {
