@@ -940,7 +940,109 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                   </div>
                 </div>
 
-                {/* 2. EDITORIAL LEADERSHIP / EDITORS-IN-CHIEF */}
+                {/* 2. CHIEF MENTOR & ADVISOR */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 pb-1 border-b border-border-subtle">
+                    <Sparkles className="w-4 h-4 text-secondary-gold" />
+                    <h2 className="font-serif text-sm font-bold uppercase tracking-wider text-ink">
+                      {isHindi ? 'मुख्य मार्गदर्शक मंडल (Chief Mentor & Advisor)' : 'Mentorship & Advisory Board (Chief Mentor & Advisor)'}
+                    </h2>
+                  </div>
+
+                  <div className="bg-gradient-to-br from-white via-surface-lowest to-surface-container/30 border-2 border-secondary-gold/30 hover:border-secondary-gold/60 transition-colors p-6 rounded-sm shadow-subtle relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none" />
+                    
+                    <div className="flex flex-col sm:flex-row gap-5 items-start relative z-10">
+                      <div className="relative flex-shrink-0 mx-auto sm:mx-0">
+                        <img
+                          src={getAuthorAvatarUrl('/uploads/dr-neelima-pandey.jpg')}
+                          alt="Dr. Neelima Pandey"
+                          className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-white shadow-md ring-2 ring-secondary-gold/50"
+                          onError={handleAvatarError}
+                        />
+                        <span className="absolute bottom-0 right-0 bg-amber-600 text-white p-1 rounded-full border-2 border-white shadow-xs" title="Verified Chief Mentor & Advisor">
+                          <ShieldCheck className="w-3.5 h-3.5" />
+                        </span>
+                      </div>
+
+                      <div className="flex-1 min-w-0 text-center sm:text-left">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-1.5">
+                          <div>
+                            <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
+                              <h3 
+                                onClick={() => onSelectAuthor('author-dr-neelima-pandey')}
+                                className="font-serif text-2xl font-bold text-ink hover:text-primary cursor-pointer transition-colors"
+                              >
+                                {isHindi ? 'डॉ. नीलिमा पाण्डेय' : 'Dr. Neelima Pandey'}
+                              </h3>
+                              <span className="bg-amber-50 text-amber-900 border border-amber-200 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                                <Award className="w-3 h-3 text-secondary-gold" />
+                                {isHindi ? 'मार्गदर्शक' : 'Chief Mentor & Advisor'}
+                              </span>
+                            </div>
+                            <p className="text-xs font-semibold text-secondary-gold mt-1 font-sans">
+                              {isHindi 
+                                ? 'शिक्षिका, साहित्यकार एवं कवयित्री • NP News Metro' 
+                                : 'Educator, Literary Scholar & Poet • NP News Metro'}
+                            </p>
+                          </div>
+
+                          <div className="flex items-center justify-center sm:justify-end gap-1.5">
+                            <button
+                              onClick={() => handleCopy('dr.neelima.pandey@npnewsmetro.com')}
+                              className="px-2.5 py-1 bg-white hover:bg-surface-container border border-border-subtle text-ink-secondary text-xs rounded flex items-center gap-1.5 transition-colors cursor-pointer"
+                              title="Copy email"
+                            >
+                              {copiedEmail === 'dr.neelima.pandey@npnewsmetro.com' ? (
+                                <>
+                                  <Check className="w-3.5 h-3.5 text-emerald-600" />
+                                  <span className="text-emerald-700 font-semibold">{isHindi ? 'कॉपी किया गया' : 'Copied!'}</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Mail className="w-3.5 h-3.5 text-primary" />
+                                  <span className="font-mono text-[11px]">dr.neelima.pandey@npnewsmetro.com</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
+                        </div>
+
+                        <p className="text-xs sm:text-sm text-ink-secondary leading-relaxed mb-4">
+                          {isHindi
+                            ? 'एनपी न्यूज़ मेट्रो की मुख्य मार्गदर्शक, प्रतिष्ठित शिक्षिका, प्रख्यात साहित्यकार एवं कवयित्री। शिक्षा, सामाजिक मूल्य, साहित्यिक विमर्श और सांस्कृतिक चेतना के संवर्धन में मार्गदर्शक भूमिका।'
+                            : 'Chief Mentor and Advisory Patron at NP News Metro; distinguished educator, accomplished litterateur, and celebrated poet guiding our ethical, educational, and cultural vision.'}
+                        </p>
+
+                        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-border-subtle text-xs">
+                          <div className="flex flex-wrap gap-1.5 items-center">
+                            <span className="text-[10px] uppercase font-bold text-ink-muted tracking-wider">
+                              {isHindi ? 'कार्यक्षेत्र:' : 'Focus Areas:'}
+                            </span>
+                            {(isHindi 
+                              ? ['साहित्य एवं संस्कृति', 'शिक्षा एवं दर्शन', 'सामाजिक चेतना', 'सांस्कृतिक विमर्श']
+                              : ['Literature & Culture', 'Education & Ethics', 'Social Consciousness', 'Cultural Discourse']
+                            ).map((b, i) => (
+                              <span key={i} className="bg-primary/5 text-primary font-medium text-[11px] px-2 py-0.5 rounded border border-primary/10">
+                                {b}
+                              </span>
+                            ))}
+                          </div>
+
+                          <button
+                            onClick={() => onSelectAuthor('author-dr-neelima-pandey')}
+                            className="text-primary hover:text-primary-container font-semibold text-xs flex items-center gap-1 group cursor-pointer"
+                          >
+                            <span>{isHindi ? 'प्रोफ़ाइल एवं लेख देखें' : 'View Profile & Articles'}</span>
+                            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. EDITORIAL LEADERSHIP / EDITORS-IN-CHIEF */}
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 pb-1 border-b border-border-subtle">
                     <Feather className="w-4 h-4 text-editorial-red" />
@@ -1114,7 +1216,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                   </div>
                 </div>
 
-                {/* 3. DIGITAL MEDIA & AUDIENCE STRATEGY */}
+                {/* 4. DIGITAL MEDIA & AUDIENCE STRATEGY */}
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 pb-1 border-b border-border-subtle">
                     <Globe className="w-4 h-4 text-secondary" />
@@ -1202,7 +1304,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                   </div>
                 </div>
 
-                {/* 4. NEWSROOM & FIELD REPORTING BUREAU */}
+                {/* 5. NEWSROOM & FIELD REPORTING BUREAU */}
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 pb-1 border-b border-border-subtle">
                     <Newspaper className="w-4 h-4 text-editorial-red" />

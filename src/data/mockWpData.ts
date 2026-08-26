@@ -17,6 +17,22 @@ export const mockAuthors: Record<string, WpAuthor> = {
       email: 'umang.pandey@npnewsmetro.com',
     },
   },
+  'author-dr-neelima-pandey': {
+    id: 'author-dr-neelima-pandey',
+    name: 'Dr. Neelima Pandey',
+    nameHi: 'डॉ. नीलिमा पाण्डेय',
+    slug: 'dr-neelima-pandey',
+    role: 'Chief Mentor & Advisor (Educator, Literary Scholar & Poet)',
+    roleHi: 'मार्गदर्शक (शिक्षिका, साहित्यकार एवं कवयित्री)',
+    avatar: '/uploads/dr-neelima-pandey.jpg',
+    bio: 'Chief Mentor and Advisory Patron at NP News Metro; distinguished educator, accomplished litterateur, and celebrated poet guiding our ethical, educational, and cultural vision.',
+    bioHi: 'एनपी न्यूज़ मेट्रो की मुख्य मार्गदर्शक, प्रतिष्ठित शिक्षिका, प्रख्यात साहित्यकार एवं कवयित्री। शिक्षा, सामाजिक मूल्य, साहित्यिक विमर्श और सांस्कृतिक चेतना के संवर्धन में मार्गदर्शक भूमिका।',
+    verified: true,
+    beats: ['Literature & Culture', 'Education & Ethics', 'Social Consciousness', 'Cultural Discourse'],
+    social: {
+      email: 'dr.neelima.pandey@npnewsmetro.com',
+    },
+  },
   'author-neeraj-pandey': {
     id: 'author-neeraj-pandey',
     name: 'Neeraj Kumar Pandey',
