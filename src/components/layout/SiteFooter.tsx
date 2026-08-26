@@ -80,10 +80,10 @@ export const SiteFooter: React.FC<SiteFooterProps> = ({
               {isHindi ? 'राष्ट्रीय एवं प्रशासन' : 'National & Governance'}
             </h5>
             <ul className="space-y-1.5 text-slate-300">
-              <li><button onClick={() => onNavigateCategory('india')} className="hover:text-secondary-gold transition-colors">{isHindi ? 'राष्ट्रीय समाचार' : 'National News'}</button></li>
-              <li><button onClick={() => onNavigateCategory('politics')} className="hover:text-secondary-gold transition-colors">{isHindi ? 'संसद एवं चुनाव' : 'Parliament & Elections'}</button></li>
-              <li><button onClick={() => onNavigateCategory('india')} className="hover:text-secondary-gold transition-colors">{isHindi ? 'सुप्रीम कोर्ट एवं कानून' : 'Supreme Court & Law'}</button></li>
-              <li><button onClick={() => onNavigateCategory('india')} className="hover:text-secondary-gold transition-colors">{isHindi ? 'राज्य एवं क्षेत्र' : 'States & Territories'}</button></li>
+              <li><a href="/category/india" onClick={(e) => { e.preventDefault(); onNavigateCategory('india'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'राष्ट्रीय समाचार' : 'National News'}</a></li>
+              <li><a href="/category/politics" onClick={(e) => { e.preventDefault(); onNavigateCategory('politics'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'संसद एवं चुनाव' : 'Parliament & Elections'}</a></li>
+              <li><a href="/category/india" onClick={(e) => { e.preventDefault(); onNavigateCategory('india'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'सुप्रीम कोर्ट एवं कानून' : 'Supreme Court & Law'}</a></li>
+              <li><a href="/category/india" onClick={(e) => { e.preventDefault(); onNavigateCategory('india'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'राज्य एवं क्षेत्र' : 'States & Territories'}</a></li>
             </ul>
           </div>
 
@@ -92,10 +92,10 @@ export const SiteFooter: React.FC<SiteFooterProps> = ({
               {isHindi ? 'व्यापार एवं अर्थव्यवस्था' : 'Business & Economy'}
             </h5>
             <ul className="space-y-1.5 text-slate-300">
-              <li><button onClick={() => onNavigateCategory('business')} className="hover:text-secondary-gold transition-colors">{isHindi ? 'शेयर बाजार एवं सेंसेक्स' : 'Markets & Sensex'}</button></li>
-              <li><button onClick={() => onNavigateCategory('economy')} className="hover:text-secondary-gold transition-colors">{isHindi ? 'अर्थव्यवस्था एवं जीडीपी' : 'Macroeconomy & GDP'}</button></li>
-              <li><button onClick={() => onNavigateCategory('business')} className="hover:text-secondary-gold transition-colors">{isHindi ? 'स्टार्टअप्स एवं यूनिकॉर्न्स' : 'Startups & Tech Unicorns'}</button></li>
-              <li><button onClick={() => onNavigateCategory('economy')} className="hover:text-secondary-gold transition-colors">{isHindi ? 'आरबीआई एवं मौद्रिक नीति' : 'RBI & Monetary Policy'}</button></li>
+              <li><a href="/category/business" onClick={(e) => { e.preventDefault(); onNavigateCategory('business'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'शेयर बाजार एवं सेंसेक्स' : 'Markets & Sensex'}</a></li>
+              <li><a href="/category/economy" onClick={(e) => { e.preventDefault(); onNavigateCategory('economy'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'अर्थव्यवस्था एवं जीडीपी' : 'Macroeconomy & GDP'}</a></li>
+              <li><a href="/category/business" onClick={(e) => { e.preventDefault(); onNavigateCategory('business'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'स्टार्टअप्स एवं यूनिकॉर्न्स' : 'Startups & Tech Unicorns'}</a></li>
+              <li><a href="/category/economy" onClick={(e) => { e.preventDefault(); onNavigateCategory('economy'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'आरबीआई एवं मौद्रिक नीति' : 'RBI & Monetary Policy'}</a></li>
             </ul>
           </div>
 
@@ -104,10 +104,10 @@ export const SiteFooter: React.FC<SiteFooterProps> = ({
               {isHindi ? 'तकनीक एवं वैश्विक' : 'Tech & Global'}
             </h5>
             <ul className="space-y-1.5 text-slate-300">
-              <li><button onClick={() => onNavigateCategory('technology')} className="hover:text-secondary-gold transition-colors">{isHindi ? 'एआई एवं डीप टेक' : 'AI & Deep Tech'}</button></li>
-              <li><button onClick={() => onNavigateCategory('technology')} className="hover:text-secondary-gold transition-colors">{isHindi ? 'सेमीकंडक्टर मिशन' : 'Semiconductor Mission'}</button></li>
-              <li><button onClick={() => onNavigateCategory('world')} className="hover:text-secondary-gold transition-colors">{isHindi ? 'वैश्विक मामले एवं G20' : 'World Affairs & G20'}</button></li>
-              <li><button onClick={() => onNavigateCategory('world')} className="hover:text-secondary-gold transition-colors">{isHindi ? 'कूटनीति एवं व्यापार' : 'Diplomacy & Trade'}</button></li>
+              <li><a href="/category/technology" onClick={(e) => { e.preventDefault(); onNavigateCategory('technology'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'एआई एवं डीप टेक' : 'AI & Deep Tech'}</a></li>
+              <li><a href="/category/technology" onClick={(e) => { e.preventDefault(); onNavigateCategory('technology'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'सेमीकंडक्टर मिशन' : 'Semiconductor Mission'}</a></li>
+              <li><a href="/category/world" onClick={(e) => { e.preventDefault(); onNavigateCategory('world'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'वैश्विक मामले एवं G20' : 'World Affairs & G20'}</a></li>
+              <li><a href="/category/world" onClick={(e) => { e.preventDefault(); onNavigateCategory('world'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'कूटनीति एवं व्यापार' : 'Diplomacy & Trade'}</a></li>
             </ul>
           </div>
 
@@ -116,10 +116,10 @@ export const SiteFooter: React.FC<SiteFooterProps> = ({
               {isHindi ? 'संस्कृति एवं खेल' : 'Culture & Sports'}
             </h5>
             <ul className="space-y-1.5 text-slate-300">
-              <li><button onClick={() => onNavigateCategory('sports')} className="hover:text-secondary-gold transition-colors">{isHindi ? 'क्रिकेट एवं टेस्ट सीरीज' : 'Cricket & Test Series'}</button></li>
-              <li><button onClick={() => onNavigateCategory('sports')} className="hover:text-secondary-gold transition-colors">{isHindi ? 'ओलंपिक एवं एथलेटिक्स' : 'Olympics & Athletics'}</button></li>
-              <li><button onClick={() => onNavigateCategory('entertainment')} className="hover:text-secondary-gold transition-colors">{isHindi ? 'सिनेमा एवं राष्ट्रीय पुरस्कार' : 'Cinema & National Awards'}</button></li>
-              <li><button onClick={() => onNavigateCategory('lifestyle')} className="hover:text-secondary-gold transition-colors">{isHindi ? 'विरासत एवं पर्यावरण' : 'Heritage & Environment'}</button></li>
+              <li><a href="/category/sports" onClick={(e) => { e.preventDefault(); onNavigateCategory('sports'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'क्रिकेट एवं टेस्ट सीरीज' : 'Cricket & Test Series'}</a></li>
+              <li><a href="/category/sports" onClick={(e) => { e.preventDefault(); onNavigateCategory('sports'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'ओलंपिक एवं एथलेटिक्स' : 'Olympics & Athletics'}</a></li>
+              <li><a href="/category/entertainment" onClick={(e) => { e.preventDefault(); onNavigateCategory('entertainment'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'सिनेमा एवं राष्ट्रीय पुरस्कार' : 'Cinema & National Awards'}</a></li>
+              <li><a href="/category/lifestyle" onClick={(e) => { e.preventDefault(); onNavigateCategory('lifestyle'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'विरासत एवं पर्यावरण' : 'Heritage & Environment'}</a></li>
             </ul>
           </div>
 
@@ -128,10 +128,10 @@ export const SiteFooter: React.FC<SiteFooterProps> = ({
               {isHindi ? 'विचार एवं विश्लेषण' : 'Opinion & Analysis'}
             </h5>
             <ul className="space-y-1.5 text-slate-300">
-              <li><button onClick={() => onNavigateCategory('opinion')} className="hover:text-secondary-gold transition-colors">{isHindi ? 'दैनिक संपादकीय' : 'The Daily Editorial'}</button></li>
-              <li><button onClick={() => onNavigateCategory('opinion')} className="hover:text-secondary-gold transition-colors">{isHindi ? 'स्तंभकार एवं निबंध' : 'Columnists & Essays'}</button></li>
-              <li><button onClick={() => onNavigateCategory('opinion')} className="hover:text-secondary-gold transition-colors">{isHindi ? 'नीतिगत शोधपत्र' : 'Policy Papers'}</button></li>
-              <li><button onClick={() => onNavigateCategory('opinion')} className="hover:text-secondary-gold transition-colors">{isHindi ? 'संपादक को पत्र' : 'Letters to Editor'}</button></li>
+              <li><a href="/category/opinion" onClick={(e) => { e.preventDefault(); onNavigateCategory('opinion'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'दैनिक संपादकीय' : 'The Daily Editorial'}</a></li>
+              <li><a href="/category/opinion" onClick={(e) => { e.preventDefault(); onNavigateCategory('opinion'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'स्तंभकार एवं निबंध' : 'Columnists & Essays'}</a></li>
+              <li><a href="/category/opinion" onClick={(e) => { e.preventDefault(); onNavigateCategory('opinion'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'नीतिगत शोधपत्र' : 'Policy Papers'}</a></li>
+              <li><a href="/category/opinion" onClick={(e) => { e.preventDefault(); onNavigateCategory('opinion'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'संपादक को पत्र' : 'Letters to Editor'}</a></li>
             </ul>
           </div>
 
@@ -140,12 +140,12 @@ export const SiteFooter: React.FC<SiteFooterProps> = ({
               {isHindi ? 'मानक एवं नीतियां' : 'Standards & Policies'}
             </h5>
             <ul className="space-y-1.5 text-slate-300">
-              <li><button onClick={() => onNavigateStatic('editorial-team')} className="hover:text-secondary-gold transition-colors">{isHindi ? 'संपादकीय मंडल' : 'Editorial Board'}</button></li>
-              <li><button onClick={() => onNavigateStatic('ethics')} className="hover:text-secondary-gold transition-colors">{isHindi ? 'संपादकीय नीति' : 'Editorial Policy'}</button></li>
-              <li><button onClick={() => onNavigateStatic('corrections')} className="hover:text-secondary-gold transition-colors">{isHindi ? 'संशोधन एवं निवारण' : 'Corrections & Redressal'}</button></li>
-              <li><button onClick={() => onNavigateStatic('advertise')} className="hover:text-secondary-gold transition-colors">{isHindi ? 'विज्ञापन दें' : 'Advertise with Us'}</button></li>
-              <li><button onClick={() => onNavigateStatic('contact')} className="hover:text-secondary-gold transition-colors">{isHindi ? 'न्यूज़रूम से संपर्क करें' : 'Contact Newsroom'}</button></li>
-              <li><button onClick={() => onNavigateStatic('sitemap')} className="hover:text-secondary-gold transition-colors">{isHindi ? 'साइटमैप (Sitemap)' : 'Sitemap'}</button></li>
+              <li><a href="/editorial-team" onClick={(e) => { e.preventDefault(); onNavigateStatic('editorial-team'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'संपादकीय मंडल' : 'Editorial Board'}</a></li>
+              <li><a href="/ethics" onClick={(e) => { e.preventDefault(); onNavigateStatic('ethics'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'संपादकीय नीति' : 'Editorial Policy'}</a></li>
+              <li><a href="/corrections" onClick={(e) => { e.preventDefault(); onNavigateStatic('corrections'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'संशोधन एवं निवारण' : 'Corrections & Redressal'}</a></li>
+              <li><a href="/advertise" onClick={(e) => { e.preventDefault(); onNavigateStatic('advertise'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'विज्ञापन दें' : 'Advertise with Us'}</a></li>
+              <li><a href="/contact" onClick={(e) => { e.preventDefault(); onNavigateStatic('contact'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'न्यूज़रूम से संपर्क करें' : 'Contact Newsroom'}</a></li>
+              <li><a href="/sitemap" onClick={(e) => { e.preventDefault(); onNavigateStatic('sitemap'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'साइटमैप (Sitemap)' : 'Sitemap'}</a></li>
             </ul>
           </div>
         </div>
@@ -173,10 +173,10 @@ export const SiteFooter: React.FC<SiteFooterProps> = ({
           </div>
 
           <div className="flex items-center gap-3 flex-wrap">
-            <button onClick={() => onNavigateStatic('sitemap')} className="flex items-center gap-1 hover:text-white transition-colors font-bold text-slate-200 cursor-pointer">
+            <a href="/sitemap" onClick={(e) => { e.preventDefault(); onNavigateStatic('sitemap'); }} className="flex items-center gap-1 hover:text-white transition-colors font-bold text-slate-200 cursor-pointer">
               <Globe className="w-3.5 h-3.5 text-secondary-gold" />
               <span>{isHindi ? 'साइटमैप (Sitemap)' : 'Sitemap Directory'}</span>
-            </button>
+            </a>
             <span>•</span>
             <a href="/sitemap.xml" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors" title="Main XML Sitemap for Search Engines">
               {isHindi ? 'एक्सएमएल साइटमैप' : 'XML Sitemap'}
@@ -203,15 +203,15 @@ export const SiteFooter: React.FC<SiteFooterProps> = ({
           </div>
 
           <div className="flex flex-wrap gap-x-4 gap-y-1 text-slate-400">
-            <button onClick={() => onNavigateStatic('about')} className="hover:text-white underline">{isHindi ? 'हमारे बारे में' : 'About Us'}</button>
-            <button onClick={() => onNavigateStatic('contact')} className="hover:text-white underline">{isHindi ? 'संपर्क करें' : 'Contact Us'}</button>
-            <button onClick={() => onNavigateStatic('privacy')} className="hover:text-white underline">{t.privacyPolicy}</button>
-            <button onClick={() => onNavigateStatic('disclaimer')} className="hover:text-white underline">{isHindi ? 'अस्वीकरण (Disclaimer)' : 'Disclaimer'}</button>
-            <button onClick={() => onNavigateStatic('terms')} className="hover:text-white underline">{t.termsOfService}</button>
-            <button onClick={() => onNavigateStatic('cookie-policy')} className="hover:text-white underline">{isHindi ? 'कुकी सेटिंग्स' : 'Cookie Settings'}</button>
-            <button onClick={() => onNavigateStatic('ethics')} className="hover:text-white underline">{t.editorialPolicy}</button>
-            <button onClick={() => onNavigateStatic('corrections')} className="hover:text-white underline">{isHindi ? 'शिकायत निवारण' : 'Grievance Officer'}</button>
-            <button onClick={() => onNavigateStatic('sitemap')} className="hover:text-white underline">{isHindi ? 'साइटमैप' : 'Sitemap'}</button>
+            <a href="/about" onClick={(e) => { e.preventDefault(); onNavigateStatic('about'); }} className="hover:text-white underline">{isHindi ? 'हमारे बारे में' : 'About Us'}</a>
+            <a href="/contact" onClick={(e) => { e.preventDefault(); onNavigateStatic('contact'); }} className="hover:text-white underline">{isHindi ? 'संपर्क करें' : 'Contact Us'}</a>
+            <a href="/privacy" onClick={(e) => { e.preventDefault(); onNavigateStatic('privacy'); }} className="hover:text-white underline">{t.privacyPolicy}</a>
+            <a href="/disclaimer" onClick={(e) => { e.preventDefault(); onNavigateStatic('disclaimer'); }} className="hover:text-white underline">{isHindi ? 'अस्वीकरण (Disclaimer)' : 'Disclaimer'}</a>
+            <a href="/terms" onClick={(e) => { e.preventDefault(); onNavigateStatic('terms'); }} className="hover:text-white underline">{t.termsOfService}</a>
+            <a href="/cookie-policy" onClick={(e) => { e.preventDefault(); onNavigateStatic('cookie-policy'); }} className="hover:text-white underline">{isHindi ? 'कुकी सेटिंग्स' : 'Cookie Settings'}</a>
+            <a href="/ethics" onClick={(e) => { e.preventDefault(); onNavigateStatic('ethics'); }} className="hover:text-white underline">{t.editorialPolicy}</a>
+            <a href="/corrections" onClick={(e) => { e.preventDefault(); onNavigateStatic('corrections'); }} className="hover:text-white underline">{isHindi ? 'शिकायत निवारण' : 'Grievance Officer'}</a>
+            <a href="/sitemap" onClick={(e) => { e.preventDefault(); onNavigateStatic('sitemap'); }} className="hover:text-white underline">{isHindi ? 'साइटमैप' : 'Sitemap'}</a>
           </div>
         </div>
       </div>

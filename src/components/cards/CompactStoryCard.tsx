@@ -25,7 +25,14 @@ export const CompactStoryCard: React.FC<CompactStoryCardProps> = ({
       className="group p-2.5 sm:p-3 hover:bg-surface-container/60 rounded-md cursor-pointer transition-all duration-200 flex items-start gap-3.5"
     >
       {showThumbnail && (
-        <div className="relative w-20 h-20 sm:w-24 sm:h-20 flex-shrink-0 overflow-hidden rounded-md bg-surface-container border border-border-subtle shadow-2xs">
+        <a
+          href={`/${post.category || 'india'}/${post.slug}`}
+          onClick={(e) => {
+            e.preventDefault();
+            onSelect(post);
+          }}
+          className="relative w-20 h-20 sm:w-24 sm:h-20 flex-shrink-0 overflow-hidden rounded-md bg-surface-container border border-border-subtle shadow-2xs block"
+        >
           <img
             src={localized.featuredImage}
             alt={localized.imageAlt || localized.title}
@@ -38,7 +45,7 @@ export const CompactStoryCard: React.FC<CompactStoryCardProps> = ({
               {t.live}
             </span>
           )}
-        </div>
+        </a>
       )}
 
       <div className="flex-1 min-w-0">
@@ -52,7 +59,16 @@ export const CompactStoryCard: React.FC<CompactStoryCardProps> = ({
         </div>
         
         <h5 className="font-serif text-xs sm:text-[13px] md:text-sm font-bold text-ink leading-snug group-hover:text-editorial-red transition-colors line-clamp-2">
-          {localized.title}
+          <a
+            href={`/${post.category || 'india'}/${post.slug}`}
+            onClick={(e) => {
+              e.preventDefault();
+              onSelect(post);
+            }}
+            className="text-inherit hover:text-editorial-red no-underline block"
+          >
+            {localized.title}
+          </a>
         </h5>
       </div>
     </article>

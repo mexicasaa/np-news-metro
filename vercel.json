@@ -109,12 +109,23 @@
       "destination": "/api/robots"
     },
     {
+      "source": "/category/:category",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(googlebot|bingbot|yandex|duckduckbot|baiduspider|facebookexternalhit|WhatsApp|Twitterbot|TelegramBot|LinkedInBot|Discordbot|Slackbot|Applebot|Google-InspectionTool|Storebot-Google|Mediapartners-Google|Feedfetcher-Google).*"
+        }
+      ],
+      "destination": "/api/share?category=:category"
+    },
+    {
       "source": "/videos/:slug",
       "has": [
         {
           "type": "header",
           "key": "user-agent",
-          "value": ".*(facebookexternalhit|WhatsApp|Twitterbot|TelegramBot|LinkedInBot|Discordbot|Slackbot|Applebot).*"
+          "value": ".*(googlebot|bingbot|yandex|duckduckbot|baiduspider|facebookexternalhit|WhatsApp|Twitterbot|TelegramBot|LinkedInBot|Discordbot|Slackbot|Applebot|Google-InspectionTool|Storebot-Google|Mediapartners-Google|Feedfetcher-Google).*"
         }
       ],
       "destination": "/api/share?category=videos&slug=:slug"
@@ -125,7 +136,7 @@
         {
           "type": "header",
           "key": "user-agent",
-          "value": ".*(facebookexternalhit|WhatsApp|Twitterbot|TelegramBot|LinkedInBot|Discordbot|Slackbot|Applebot).*"
+          "value": ".*(googlebot|bingbot|yandex|duckduckbot|baiduspider|facebookexternalhit|WhatsApp|Twitterbot|TelegramBot|LinkedInBot|Discordbot|Slackbot|Applebot|Google-InspectionTool|Storebot-Google|Mediapartners-Google|Feedfetcher-Google).*"
         }
       ],
       "destination": "/api/share?category=:category&slug=:slug"

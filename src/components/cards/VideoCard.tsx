@@ -25,7 +25,14 @@ export const VideoCard: React.FC<VideoCardProps> = ({
     >
       <div>
         {/* Video Thumbnail with Centered Play Button & Badges */}
-        <div className="relative aspect-[16/9] w-full overflow-hidden bg-black rounded-sm mb-3">
+        <a
+          href={`/videos/${video.slug}`}
+          onClick={(e) => {
+            e.preventDefault();
+            onSelect(video);
+          }}
+          className="relative aspect-[16/9] w-full overflow-hidden bg-black rounded-sm mb-3 block"
+        >
           <img
             src={localized.posterUrl}
             alt={localized.title}
@@ -50,11 +57,20 @@ export const VideoCard: React.FC<VideoCardProps> = ({
           <span className="absolute top-2 left-2 bg-slate-950/80 backdrop-blur-md text-slate-200 border border-slate-700 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider rounded-xs">
             {localized.category}
           </span>
-        </div>
+        </a>
 
         {/* Video Title */}
         <h3 className="font-serif font-bold text-white text-sm sm:text-[15px] leading-snug group-hover:text-amber-400 transition-colors line-clamp-2 mb-1.5">
-          {localized.title}
+          <a
+            href={`/videos/${video.slug}`}
+            onClick={(e) => {
+              e.preventDefault();
+              onSelect(video);
+            }}
+            className="text-inherit hover:text-amber-400 no-underline block"
+          >
+            {localized.title}
+          </a>
         </h3>
 
         {/* Video Caption / Dek */}

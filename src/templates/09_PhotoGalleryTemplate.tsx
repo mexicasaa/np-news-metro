@@ -85,7 +85,7 @@ export const PhotoGalleryTemplate: React.FC<PhotoGalleryTemplateProps> = ({
             {/* Social Share Bar with Gallery Cover Image */}
             <ArticleShareBar
               title={galleryTitle}
-              url={typeof window !== 'undefined' ? `${window.location.origin}/photos/${gallery.slug}` : `https://npnewsmetro.com/photos/${gallery.slug}`}
+              url={typeof window !== 'undefined' ? `${window.location.origin}/photos/${gallery.slug}` : `https://www.npnewsmetro.com/photos/${gallery.slug}`}
               featuredImage={gallery.featuredImage || gallery.items[0]?.url}
               summary={galleryDesc}
               category="photos"

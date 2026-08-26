@@ -177,7 +177,7 @@ export const mockFailedOperations: PublishingOperation[] = [
       '[16:45:19] Website published successfully on core WordPress. Downstream social task queued for retry.',
     ],
     verificationReport: {
-      url: 'https://npnewsmetro.com/business/global-supply-chain-disruptions-auto',
+      url: 'https://www.npnewsmetro.com/business/global-supply-chain-disruptions-auto',
       httpStatus: 200,
       headlineMatch: true,
       heroImageLoaded: true,

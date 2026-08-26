@@ -25,9 +25,13 @@ export const MediumStoryCard: React.FC<MediumStoryCardProps> = ({
     <article className="group bg-surface-lowest border border-border-subtle p-3.5 rounded-sm hover:border-border-strong transition-all flex flex-col justify-between h-full shadow-subtle">
       <div>
         {showImage && (
-          <div
-            className="relative aspect-[16/10] w-full overflow-hidden bg-surface-container mb-2.5 cursor-pointer"
-            onClick={() => onSelect(post)}
+          <a
+            href={`/${post.category || 'india'}/${post.slug}`}
+            className="relative aspect-[16/10] w-full overflow-hidden bg-surface-container mb-2.5 cursor-pointer block"
+            onClick={(e) => {
+              e.preventDefault();
+              onSelect(post);
+            }}
           >
             <img
               src={localized.featuredImage}
@@ -36,7 +40,7 @@ export const MediumStoryCard: React.FC<MediumStoryCardProps> = ({
               className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
               loading="lazy"
             />
-          </div>
+          </a>
         )}
 
         <div className="flex items-center gap-1.5 mb-1 text-[11px]">
@@ -52,11 +56,17 @@ export const MediumStoryCard: React.FC<MediumStoryCardProps> = ({
           </span>
         </div>
 
-        <h4
-          onClick={() => onSelect(post)}
-          className="font-serif text-base font-bold text-ink leading-snug cursor-pointer group-hover:text-primary transition-colors line-clamp-3 mb-1.5"
-        >
-          {localized.title}
+        <h4 className="font-serif text-base font-bold text-ink leading-snug group-hover:text-primary transition-colors line-clamp-3 mb-1.5">
+          <a
+            href={`/${post.category || 'india'}/${post.slug}`}
+            onClick={(e) => {
+              e.preventDefault();
+              onSelect(post);
+            }}
+            className="text-inherit hover:text-primary no-underline block"
+          >
+            {localized.title}
+          </a>
         </h4>
       </div>
 

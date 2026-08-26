@@ -1,10 +1,10 @@
-﻿/**
+/**
  * Share Utilities for NP News Metro
  * Handles absolute image resolution, social sharing link generation,
  * and Web Share API Level 2 (with image file attachments).
  */
 
-export const DEFAULT_SITE_ORIGIN = 'https://npnewsmetro.com';
+export const DEFAULT_SITE_ORIGIN = 'https://www.npnewsmetro.com';
 export const DEFAULT_OG_IMAGE = 'https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&q=80&w=1200';
 
 /**

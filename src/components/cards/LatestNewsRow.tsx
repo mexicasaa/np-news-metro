@@ -50,7 +50,16 @@ export const LatestNewsRow: React.FC<LatestNewsRowProps> = ({
 
         {/* Headline */}
         <h4 className="font-serif text-sm sm:text-base font-bold text-ink leading-snug group-hover:text-editorial-red transition-colors line-clamp-2 mb-1">
-          {localized.title}
+          <a
+            href={`/${post.category || 'india'}/${post.slug}`}
+            onClick={(e) => {
+              e.preventDefault();
+              onSelect(post);
+            }}
+            className="text-inherit hover:text-editorial-red no-underline block"
+          >
+            {localized.title}
+          </a>
         </h4>
 
         {/* Snippet Dek */}
@@ -61,7 +70,14 @@ export const LatestNewsRow: React.FC<LatestNewsRowProps> = ({
 
       {/* Thumbnail with clean aspect ratio */}
       {showThumbnail && (
-        <div className="relative w-20 h-16 sm:w-24 sm:h-20 flex-shrink-0 rounded-md overflow-hidden bg-surface-container border border-border-subtle shadow-2xs ml-1">
+        <a
+          href={`/${post.category || 'india'}/${post.slug}`}
+          onClick={(e) => {
+            e.preventDefault();
+            onSelect(post);
+          }}
+          className="relative w-20 h-16 sm:w-24 sm:h-20 flex-shrink-0 rounded-md overflow-hidden bg-surface-container border border-border-subtle shadow-2xs ml-1 block"
+        >
           <img
             src={localized.featuredImage}
             alt={localized.imageAlt || localized.title}
@@ -69,7 +85,7 @@ export const LatestNewsRow: React.FC<LatestNewsRowProps> = ({
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             loading="lazy"
           />
-        </div>
+        </a>
       )}
     </article>
   );

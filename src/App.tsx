@@ -918,7 +918,7 @@ function AppContent() {
       {
         category: 'required',
         title: 'Slug & URL Format Safe',
-        description: `https://npnewsmetro.com/${postData.category}/${postData.slug || 'story'}`,
+        description: `https://www.npnewsmetro.com/${postData.category}/${postData.slug || 'story'}`,
         passed: !!postData.slug,
         code: 'REQ_SLUG',
       },
@@ -1098,7 +1098,7 @@ function AppContent() {
         completedAt: new Date().toLocaleTimeString() + ' IST',
         steps: prev.steps.map(s => ({ ...s, status: 'success' as const, durationMs: Math.floor(40 + Math.random() * 80) })),
         verificationReport: {
-          url: `https://npnewsmetro.com/${savedDbPost.category}/${savedDbPost.slug}`,
+          url: `https://www.npnewsmetro.com/${savedDbPost.category}/${savedDbPost.slug}`,
           httpStatus: 200,
           headlineMatch: true,
           heroImageLoaded: true,
@@ -1194,6 +1194,30 @@ function AppContent() {
       };
     }
 
+    if (currentTemplate === 'not-found') {
+      return {
+        metadata: {
+          title: 'Page Not Found | 404',
+          description: 'The requested news report or page does not exist on NP News Metro.',
+          noIndex: true,
+          noFollow: true,
+        },
+        structuredData: undefined,
+      };
+    }
+
+    if (currentTemplate === 'search') {
+      return {
+        metadata: {
+          title: searchQuery ? `Search: ${searchQuery}` : 'Search News & Archive',
+          description: 'Search breaking news, investigative reporting, and multimedia archives across NP News Metro.',
+          canonicalUrl: 'https://www.npnewsmetro.com/search',
+          noIndex: true,
+        },
+        structuredData: undefined,
+      };
+    }
+
     if (currentTemplate === 'article-loading' || currentTemplate === 'video-loading') {
       return {
         metadata: {
@@ -1210,7 +1234,7 @@ function AppContent() {
         metadata: {
           title: selectedPost.seoTitle || selectedPost.title,
           description: selectedPost.seoDescription || selectedPost.dek || selectedPost.title,
-          canonicalUrl: `https://npnewsmetro.com/${selectedPost.category}/${selectedPost.slug}`,
+          canonicalUrl: `https://www.npnewsmetro.com/${selectedPost.category}/${selectedPost.slug}`,
           ogType: 'article' as const,
           ogImage: selectedPost.featuredImage,
           publishedTime: selectedPost.publishedAt,
@@ -1218,7 +1242,7 @@ function AppContent() {
           authorName: selectedPost.customAuthor?.name || 'NP News Metro Bureau',
           section: selectedPost.category,
         },
-        structuredData: generateArticleStructuredData(selectedPost),
+        structuredData: generateArticleStructuredData(selectedPost, 'NP News Metro', 'https://www.npnewsmetro.com'),
       };
     }
 
@@ -1227,12 +1251,12 @@ function AppContent() {
         metadata: {
           title: selectedVideo.title,
           description: selectedVideo.caption || selectedVideo.title,
-          canonicalUrl: `https://npnewsmetro.com/videos/${selectedVideo.slug}`,
+          canonicalUrl: `https://www.npnewsmetro.com/videos/${selectedVideo.slug}`,
           ogType: 'video.other' as const,
           ogImage: selectedVideo.posterUrl,
           publishedTime: selectedVideo.publishedAt,
         },
-        structuredData: generateVideoStructuredData(selectedVideo),
+        structuredData: generateVideoStructuredData(selectedVideo, 'NP News Metro', 'https://www.npnewsmetro.com'),
       };
     }
 
@@ -1241,9 +1265,65 @@ function AppContent() {
         metadata: {
           title: 'Video Hub & Investigative Documentaries',
           description: 'Watch deep dive documentary broadcasts, ground reports, policy explainers, and leadership interviews.',
-          canonicalUrl: 'https://npnewsmetro.com/videos',
+          canonicalUrl: 'https://www.npnewsmetro.com/videos',
         },
-        structuredData: generateWebsiteStructuredData(),
+        structuredData: generateWebsiteStructuredData('NP News Metro', 'https://www.npnewsmetro.com'),
+      };
+    }
+
+    if (currentTemplate === 'latest') {
+      return {
+        metadata: {
+          title: 'Latest News & Breaking Headlines',
+          description: 'Real-time updates, breaking stories, and chronological dispatches from NP News Metro correspondents.',
+          canonicalUrl: 'https://www.npnewsmetro.com/latest',
+        },
+        structuredData: generateWebsiteStructuredData('NP News Metro', 'https://www.npnewsmetro.com'),
+      };
+    }
+
+    if (currentTemplate === 'trending') {
+      return {
+        metadata: {
+          title: 'Trending Stories & Viral Coverage',
+          description: 'Explore the most read, highly debated, and trending stories across India and the globe.',
+          canonicalUrl: 'https://www.npnewsmetro.com/trending',
+        },
+        structuredData: generateWebsiteStructuredData('NP News Metro', 'https://www.npnewsmetro.com'),
+      };
+    }
+
+    if (currentTemplate === 'gallery') {
+      return {
+        metadata: {
+          title: 'Photo Galleries & Visual Reports',
+          description: 'High-resolution photo essays and ground dispatches covering culture, politics, national events, and daily life.',
+          canonicalUrl: 'https://www.npnewsmetro.com/photos',
+        },
+        structuredData: generateWebsiteStructuredData('NP News Metro', 'https://www.npnewsmetro.com'),
+      };
+    }
+
+    if (currentTemplate === 'static') {
+      const pageTitles: Record<string, string> = {
+        'about': 'About Us — Editorial Mission & Standards',
+        'contact': 'Contact NP News Metro — Editorial Desk & Bureau Contacts',
+        'privacy': 'Privacy Policy',
+        'terms': 'Terms and Conditions',
+        'disclaimer': 'Editorial Disclaimer',
+        'ethics': 'Code of Ethics & Editorial Guidelines',
+        'editorial-team': 'Editorial Team & Masthead',
+        'corrections': 'Corrections & Grievance Redressal Policy',
+        'advertise': 'Advertise With Us',
+        'cookie-policy': 'Cookie Policy',
+      };
+      return {
+        metadata: {
+          title: pageTitles[staticPage] || `${staticPage.replace(/-/g, ' ').toUpperCase()}`,
+          description: 'Official institutional and editorial information from NP News Metro.',
+          canonicalUrl: `https://www.npnewsmetro.com/${staticPage}`,
+        },
+        structuredData: generateWebsiteStructuredData('NP News Metro', 'https://www.npnewsmetro.com'),
       };
     }
 
@@ -1252,21 +1332,21 @@ function AppContent() {
         metadata: {
           title: `${selectedCategory.toUpperCase()} News & Latest Analysis`,
           description: `Latest breaking headlines, reports, and exclusive analysis in ${selectedCategory}.`,
-          canonicalUrl: `https://npnewsmetro.com/category/${selectedCategory}`,
+          canonicalUrl: `https://www.npnewsmetro.com/category/${selectedCategory}`,
         },
-        structuredData: generateWebsiteStructuredData(),
+        structuredData: generateWebsiteStructuredData('NP News Metro', 'https://www.npnewsmetro.com'),
       };
     }
 
     // Default: Homepage
     return {
       metadata: {
-        title: 'NP News Metro — Latest Breaking News, India, Politics & Business',
+        title: 'NP NEWS METRO — Real News. Real Impact. | Indian Digital Newspaper',
         description: 'Fast, verified, and in-depth national news coverage, policy analysis, investigative journalism, and live market updates.',
-        canonicalUrl: 'https://npnewsmetro.com/',
+        canonicalUrl: 'https://www.npnewsmetro.com/',
         ogType: 'website' as const,
       },
-      structuredData: generateWebsiteStructuredData(),
+      structuredData: generateWebsiteStructuredData('NP News Metro', 'https://www.npnewsmetro.com'),
     };
   };
 

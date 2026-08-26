@@ -19,14 +19,20 @@
     <title>NP NEWS METRO — Real News. Real Impact. | Indian Digital Newspaper</title>
     <meta name="description" content="NP News Metro delivers real news, hard-hitting investigative journalism, politics, economy, technology, sports, and culture from across India and the world." />
     
+    <!-- Canonical & Crawlability Directives -->
+    <link rel="canonical" href="https://www.npnewsmetro.com/" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="googlebot-news" content="index, follow" />
+    
     <!-- OpenGraph & Social Previews with Featured Image -->
     <meta property="og:site_name" content="NP News Metro" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="NP NEWS METRO — Real News. Real Impact." />
     <meta property="og:description" content="Independent, credible digital journalism for modern India." />
-    <meta property="og:url" content="https://npnewsmetro.com" />
-    <meta property="og:image" content="https://npnewsmetro.com/uploads/dr-deepak-goswami.jpg" />
-    <meta property="og:image:secure_url" content="https://npnewsmetro.com/uploads/dr-deepak-goswami.jpg" />
+    <meta property="og:url" content="https://www.npnewsmetro.com/" />
+    <meta property="og:image" content="https://www.npnewsmetro.com/uploads/dr-deepak-goswami.jpg" />
+    <meta property="og:image:secure_url" content="https://www.npnewsmetro.com/uploads/dr-deepak-goswami.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:type" content="image/jpeg" />
@@ -38,8 +44,46 @@
     <meta name="twitter:creator" content="@NPNewsMetro" />
     <meta name="twitter:title" content="NP NEWS METRO — Real News. Real Impact." />
     <meta name="twitter:description" content="Independent, credible digital journalism for modern India." />
-    <meta name="twitter:image" content="https://npnewsmetro.com/uploads/dr-deepak-goswami.jpg" />
+    <meta name="twitter:image" content="https://www.npnewsmetro.com/uploads/dr-deepak-goswami.jpg" />
     
+    <!-- Schema.org Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "NewsMediaOrganization",
+          "@id": "https://www.npnewsmetro.com/#organization",
+          "name": "NP News Metro",
+          "url": "https://www.npnewsmetro.com/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://www.npnewsmetro.com/logo.png",
+            "width": 600,
+            "height": 120
+          },
+          "sameAs": [
+            "https://twitter.com/NPNewsMetro"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://www.npnewsmetro.com/#website",
+          "url": "https://www.npnewsmetro.com/",
+          "name": "NP News Metro",
+          "publisher": {
+            "@id": "https://www.npnewsmetro.com/#organization"
+          },
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://www.npnewsmetro.com/search?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        }
+      ]
+    }
+    </script>
+
     <!-- Google Fonts: Playfair Display + Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

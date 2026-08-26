@@ -1,8 +1,5 @@
 const testUrls = [
-  'http://npnewsmetro.com/sitemap.xml',
-  'https://npnewsmetro.com/sitemap.xml',
   'https://www.npnewsmetro.com/sitemap.xml',
-  'http://npnewsmetro.com/sitemap_index.xml',
   'https://www.npnewsmetro.com/sitemap_index.xml',
   'http://npnewsmetro.com/news-sitemap.xml',
   'https://www.npnewsmetro.com/news-sitemap.xml',

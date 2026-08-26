@@ -1,4 +1,4 @@
-﻿import { WpPost, WpVideo, WpCategory } from '../types/wordpress';
+import { WpPost, WpVideo, WpCategory } from '../types/wordpress';
 import { getAbsoluteImageUrl, getSiteOrigin } from '../utils/shareUtils';
 
 export interface SeoMetadataOptions {
@@ -67,7 +67,7 @@ export const generateArticleStructuredData = (
       url: siteUrl,
       logo: {
         '@type': 'ImageObject',
-        url: `${siteUrl}/assets/logo.png`,
+        url: `${siteUrl}/logo.png`,
       },
     },
     articleSection: post.category?.toUpperCase() || 'NATIONAL',

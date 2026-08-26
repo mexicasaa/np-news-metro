@@ -2,6 +2,94 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
   <url>
+    <loc>https://www.npnewsmetro.com/politics/chhaha-maheene-men-eka-laakha-yuvaaon-ko-sarakaaree-naukaree-deng</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-26T07:03:11.699Z</news:publication_date>
+      <news:title>छह महीने में एक लाख युवाओं को सरकारी नौकरी देंगे: सीएम योगी</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/india/khare-the-sikke-jo-khote-nikala-gae</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-26T07:01:40.969Z</news:publication_date>
+      <news:title>खरे थे सिक्के जो खोटे निकल गए...</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/india/pavitra-chhadee-yaatraa-men-shaamila-honge-dhaamee-santon-ne-diya</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-26T02:48:21.283Z</news:publication_date>
+      <news:title>पवित्र छड़ी यात्रा में शामिल होंगे धामी, संतों ने दिया न्योता</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/india/cheenee-kee-jamaakhoree-para-dee-ema-kee-sakhtee-4000-kuntala-se</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-26T02:40:51.763Z</news:publication_date>
+      <news:title>चीनी की जमाखोरी पर डी एम की सख्ती, 4000 कुंतल से ज्यादा स्टॉक पर कार्रवाई</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/india/aaee-phona-badaa-yaa-jeevana-badaa</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-25T19:05:51.928Z</news:publication_date>
+      <news:title>आई फोन बड़ा या जीवन बड़ा?</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/india/kanpanee-se-363-tee-sharta-choree-do-surakshaa-gaarda-sameta-teen</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-25T18:25:45.815Z</news:publication_date>
+      <news:title>कंपनी से 363 टी-शर्ट चोरी, दो सुरक्षा गार्ड समेत तीन गिरफ्तार</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/india/466-puraane-vaatara-varksa-honge-aaraseesee-aadhaarita-shuddha-pe</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-25T17:58:32.037Z</news:publication_date>
+      <news:title>466 पुराने वाटर वर्क्स होंगे आरसीसी आधारित, शुद्ध पेयजल पर सरकार का जोर</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/politics/320-taalaabon-kaa-jalda-hogaa-saundaryeekarana-naayaba-sainaee</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-25T17:53:10.933Z</news:publication_date>
+      <news:title>320 तालाबों का जल्द होगा सौंदर्यीकरण: नायब सैनी</news:title>
+    </news:news>
+  </url>
+  <url>
     <loc>https://www.npnewsmetro.com/india/84-varsheeya-haarta-pheliyara-mareeja-kaa-binaa-opana-haarta-sarj</loc>
     <news:news>
       <news:publication>
@@ -54,17 +142,6 @@
       </news:publication>
       <news:publication_date>2026-08-24T17:26:14.631Z</news:publication_date>
       <news:title>जमीनी स्तर पर बैडमिंटन के विकास में सनराइज़ शटलर्स ने रचा नया कीर्तिमान</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/business/auto-draft</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-24T17:23:47.149Z</news:publication_date>
-      <news:title>रक्षाबंधन पर द बॉडी शॉप का खास तोहफा, लॉन्च किए वेलवेट फिग-पिस्ता और अजवा डेट-हनी कलेक्शन</news:title>
     </news:news>
   </url>
   <url>

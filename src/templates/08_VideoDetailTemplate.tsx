@@ -89,7 +89,7 @@ export const VideoDetailTemplate: React.FC<VideoDetailTemplateProps> = ({
             {/* Social Share Bar with Video Thumbnail */}
             <ArticleShareBar
               title={localized.title}
-              url={typeof window !== 'undefined' ? `${window.location.origin}/videos/${video.slug}` : `https://npnewsmetro.com/videos/${video.slug}`}
+              url={typeof window !== 'undefined' ? `${window.location.origin}/videos/${video.slug}` : `https://www.npnewsmetro.com/videos/${video.slug}`}
               featuredImage={video.posterUrl}
               summary={localized.caption}
               category={video.category || 'videos'}

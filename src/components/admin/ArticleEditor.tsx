@@ -636,7 +636,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                 {title && (
                   <div className="pt-2 flex items-center gap-2 text-xs text-slate-500 font-mono bg-slate-50 p-2.5 rounded-lg border border-slate-100">
                     <Globe className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                    <span className="text-slate-400 truncate">https://npnewsmetro.com/{category}/</span>
+                    <span className="text-slate-400 truncate">https://www.npnewsmetro.com/{category}/</span>
                     <span className="font-bold text-blue-700 bg-blue-100/70 px-1.5 py-0.5 rounded shrink-0">{slug}</span>
                   </div>
                 )}
@@ -806,7 +806,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                       Google Search Live Preview
                     </span>
                     <div className="text-xs text-emerald-800 font-sans truncate">
-                      https://npnewsmetro.com/{category}/{slug || 'story-url'}
+                      https://www.npnewsmetro.com/{category}/{slug || 'story-url'}
                     </div>
                     <div className="text-lg font-medium text-blue-700 hover:underline cursor-pointer font-sans leading-snug">
                       {seoTitle || title || 'Story Title — NP News Metro'}

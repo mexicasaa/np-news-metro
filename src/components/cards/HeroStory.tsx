@@ -114,9 +114,13 @@ export const HeroStory: React.FC<HeroStoryProps> = ({
       {/* ======================================================== */}
       <div className="relative w-full aspect-[16/10] sm:aspect-[16/9] md:aspect-[16/9] lg:aspect-[16/9] bg-slate-950 overflow-hidden select-none">
         {/* High-Res Image Slider Mode */}
-        <div 
-          className="relative w-full h-full cursor-pointer"
-          onClick={() => onSelect(currentStory)}
+        <a 
+          href={`/${rawStory.category || 'india'}/${rawStory.slug}`}
+          className="relative w-full h-full cursor-pointer block"
+          onClick={(e) => {
+            e.preventDefault();
+            onSelect(currentStory);
+          }}
         >
           {/* Background Image with subtle zoom on hover */}
           <img
@@ -219,7 +223,7 @@ export const HeroStory: React.FC<HeroStoryProps> = ({
               </button>
             </>
           )}
-        </div>
+        </a>
       </div>
 
       {/* ======================================================== */}
@@ -297,10 +301,18 @@ export const HeroStory: React.FC<HeroStoryProps> = ({
         {/* Grand Headline */}
         <div>
           <h1
-            onClick={() => onSelect(rawStory)}
-            className={`font-serif text-2xl sm:text-3xl lg:text-[34px] xl:text-[36px] font-extrabold text-ink cursor-pointer hover:text-editorial-red transition-colors tracking-tight mb-3 ${isHindi ? 'leading-[1.4]' : 'leading-[1.2]'}`}
+            className={`font-serif text-2xl sm:text-3xl lg:text-[34px] xl:text-[36px] font-extrabold text-ink tracking-tight mb-3 ${isHindi ? 'leading-[1.4]' : 'leading-[1.2]'}`}
           >
-            {currentStory.title}
+            <a
+              href={`/${rawStory.category || 'india'}/${rawStory.slug}`}
+              onClick={(e) => {
+                e.preventDefault();
+                onSelect(rawStory);
+              }}
+              className="hover:text-editorial-red transition-colors text-inherit no-underline"
+            >
+              {currentStory.title}
+            </a>
           </h1>
 
           {/* Dek / Executive Summary */}
@@ -347,13 +359,17 @@ export const HeroStory: React.FC<HeroStoryProps> = ({
           </div>
 
           {/* Full Story CTA Button */}
-          <button
-            onClick={() => onSelect(rawStory)}
-            className="bg-primary hover:bg-primary-dark text-white font-bold px-4 sm:px-5 py-2 sm:py-2.5 rounded-sm flex items-center gap-2 text-xs sm:text-sm shadow-xs hover:shadow-md transition-all group/btn ml-auto cursor-pointer"
+          <a
+            href={`/${rawStory.category || 'india'}/${rawStory.slug}`}
+            onClick={(e) => {
+              e.preventDefault();
+              onSelect(rawStory);
+            }}
+            className="bg-primary hover:bg-primary-dark text-white font-bold px-4 sm:px-5 py-2 sm:py-2.5 rounded-sm flex items-center gap-2 text-xs sm:text-sm shadow-xs hover:shadow-md transition-all group/btn ml-auto cursor-pointer no-underline"
           >
             <span>{isHindi ? 'पूरी ख़बर पढ़ें' : 'Read Complete Story'}</span>
             <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-          </button>
+          </a>
         </div>
 
       </div>

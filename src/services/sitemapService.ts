@@ -56,8 +56,8 @@ export const filterIndexableArticles = (articles: WpPost[]): WpPost[] => {
       return false;
     }
 
-    // 4. Must have slug and category
-    if (!a.slug || !a.category) {
+    // 4. Must have valid non-draft slug and category
+    if (!a.slug || !a.category || a.slug === 'auto-draft' || a.slug.startsWith('auto-draft') || a.slug === 'draft') {
       return false;
     }
 
@@ -272,7 +272,7 @@ export const generateVideoSitemapXml = (videos: WpVideo[]): string => {
         xml += `  <url>\n`;
         xml += `    <loc>${videoUrl}</loc>\n`;
         xml += `    <video:video>\n`;
-        xml += `      <video:thumbnail_loc>${escapeXml(video.posterUrl || 'https://npnewsmetro.com/logo.png')}</video:thumbnail_loc>\n`;
+        xml += `      <video:thumbnail_loc>${escapeXml(video.posterUrl || 'https://www.npnewsmetro.com/logo.png')}</video:thumbnail_loc>\n`;
         xml += `      <video:title>${escapeXml(video.title)}</video:title>\n`;
         xml += `      <video:description>${escapeXml(video.caption || video.title)}</video:description>\n`;
         xml += `      <video:player_loc>${escapeXml(video.videoUrl)}</video:player_loc>\n`;

@@ -36,7 +36,14 @@ export const HorizontalStoryCard: React.FC<HorizontalStoryCardProps> = ({
       className="group bg-surface-lowest border border-border-subtle hover:border-slate-300 rounded-md p-3.5 sm:p-4 transition-all duration-300 shadow-xs hover:shadow-md cursor-pointer flex flex-col sm:flex-row items-start gap-4"
     >
       {/* Left Image */}
-      <div className="relative w-full sm:w-44 md:w-48 aspect-[16/10] sm:aspect-[4/3] overflow-hidden bg-slate-950 rounded-sm flex-shrink-0">
+      <a
+        href={`/${post.category || 'india'}/${post.slug}`}
+        onClick={(e) => {
+          e.preventDefault();
+          onSelect(post);
+        }}
+        className="relative w-full sm:w-44 md:w-48 aspect-[16/10] sm:aspect-[4/3] overflow-hidden bg-slate-950 rounded-sm flex-shrink-0 block"
+      >
         <img
           src={localized.featuredImage}
           alt={localized.imageAlt || localized.title}
@@ -49,7 +56,7 @@ export const HorizontalStoryCard: React.FC<HorizontalStoryCardProps> = ({
             {t.breaking}
           </span>
         )}
-      </div>
+      </a>
 
       {/* Right Content */}
       <div className="flex-1 min-w-0 flex flex-col justify-between h-full">
@@ -74,7 +81,16 @@ export const HorizontalStoryCard: React.FC<HorizontalStoryCardProps> = ({
 
           {/* Title */}
           <h3 className="font-serif text-base sm:text-lg font-bold text-slate-900 leading-snug group-hover:text-editorial-red transition-colors line-clamp-2 mb-1.5">
-            {localized.title}
+            <a
+              href={`/${post.category || 'india'}/${post.slug}`}
+              onClick={(e) => {
+                e.preventDefault();
+                onSelect(post);
+              }}
+              className="text-inherit hover:text-editorial-red no-underline block"
+            >
+              {localized.title}
+            </a>
           </h3>
 
           {/* Dek */}
@@ -100,10 +116,17 @@ export const HorizontalStoryCard: React.FC<HorizontalStoryCardProps> = ({
             >
               <Share2 className="w-3.5 h-3.5" />
             </button>
-            <span className="text-[11px] font-semibold text-primary group-hover:text-editorial-red flex items-center gap-1 transition-colors">
+            <a
+              href={`/${post.category || 'india'}/${post.slug}`}
+              onClick={(e) => {
+                e.preventDefault();
+                onSelect(post);
+              }}
+              className="text-[11px] font-semibold text-primary group-hover:text-editorial-red flex items-center gap-1 transition-colors no-underline cursor-pointer"
+            >
               <span>{t.readStory}</span>
               <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
-            </span>
+            </a>
           </div>
         </div>
       </div>

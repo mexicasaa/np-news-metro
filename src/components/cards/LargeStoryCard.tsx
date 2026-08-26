@@ -78,7 +78,16 @@ export const LargeStoryCard: React.FC<LargeStoryCardProps> = ({
 
           {/* Headline */}
           <h3 className="font-serif text-lg sm:text-[19px] font-bold text-slate-900 leading-snug group-hover:text-editorial-red transition-colors line-clamp-2 mb-2">
-            {localized.title}
+            <a
+              href={`/${post.category || 'india'}/${post.slug}`}
+              onClick={(e) => {
+                e.preventDefault();
+                onSelect(post);
+              }}
+              className="text-inherit hover:text-editorial-red no-underline block"
+            >
+              {localized.title}
+            </a>
           </h3>
 
           {/* Dek Excerpt */}
@@ -117,10 +126,17 @@ export const LargeStoryCard: React.FC<LargeStoryCardProps> = ({
           >
             <Share2 className="w-3.5 h-3.5" />
           </button>
-          <span className="text-[11px] font-semibold text-primary group-hover:text-editorial-red flex items-center gap-1 transition-colors">
+          <a
+            href={`/${post.category || 'india'}/${post.slug}`}
+            onClick={(e) => {
+              e.preventDefault();
+              onSelect(post);
+            }}
+            className="text-[11px] font-semibold text-primary group-hover:text-editorial-red flex items-center gap-1 transition-colors no-underline cursor-pointer"
+          >
             <span>{t.readStory}</span>
             <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
-          </span>
+          </a>
         </div>
       </div>
 

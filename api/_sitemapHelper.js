@@ -17,8 +17,8 @@ export const escapeXml = (unsafe) => {
 };
 
 export const DEFAULT_CATEGORIES = [
-  'india', 'politics', 'business', 'technology', 'world',
-  'sports', 'entertainment', 'lifestyle', 'opinion', 'videos', 'photos', 'latest'
+  'india', 'politics', 'business', 'economy', 'technology', 'world',
+  'sports', 'entertainment', 'lifestyle', 'opinion'
 ];
 
 export const FALLBACK_ARTICLES = [
@@ -214,22 +214,24 @@ export async function fetchLiveArticles() {
       return FALLBACK_ARTICLES;
     }
 
-    const liveArticles = data.map(item => {
-      const tagsList = Array.isArray(item.article_tags)
-        ? item.article_tags.map(at => at.tags?.name).filter(Boolean)
-        : ['News', 'National'];
+    const liveArticles = data
+      .filter(item => item.slug && item.slug !== 'auto-draft' && !item.slug.startsWith('auto-draft') && item.slug !== 'draft')
+      .map(item => {
+        const tagsList = Array.isArray(item.article_tags)
+          ? item.article_tags.map(at => at.tags?.name).filter(Boolean)
+          : ['News', 'National'];
 
-      return {
-        slug: item.slug,
-        category: item.categories?.slug || 'india',
-        title: item.title,
-        titleHi: item.title_hi,
-        publishedAt: item.published_at || new Date().toISOString(),
-        featuredImage: item.featured_image_url,
-        caption: item.featured_image_caption || item.title,
-        tags: tagsList
-      };
-    });
+        return {
+          slug: item.slug,
+          category: item.categories?.slug || 'india',
+          title: item.title,
+          titleHi: item.title_hi,
+          publishedAt: item.published_at || new Date().toISOString(),
+          featuredImage: item.featured_image_url,
+          caption: item.featured_image_caption || item.title,
+          tags: tagsList
+        };
+      });
 
     const liveSlugs = new Set(liveArticles.map(a => a.slug));
     return [...liveArticles, ...FALLBACK_ARTICLES.filter(f => !liveSlugs.has(f.slug))];
@@ -273,6 +275,17 @@ export function buildMainSitemapXml(articles, videos = FALLBACK_VIDEOS) {
     <priority>1.0</priority>
   </url>
 `;
+
+  // Hub Pages
+  const hubPages = ['latest', 'trending', 'videos', 'photos'];
+  for (const hub of hubPages) {
+    xml += `  <url>
+    <loc>${BASE_URL}/${hub}</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.85</priority>
+  </url>
+`;
+  }
 
   for (const cat of DEFAULT_CATEGORIES) {
     xml += `  <url>

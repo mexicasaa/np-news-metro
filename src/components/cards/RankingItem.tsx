@@ -41,7 +41,16 @@ export const RankingItem: React.FC<RankingItemProps> = ({
 
         {/* Headline */}
         <h4 className="font-serif text-sm sm:text-[15px] font-bold text-slate-900 leading-snug group-hover:text-editorial-red transition-colors line-clamp-2">
-          {localized.title}
+          <a
+            href={`/${post.category || 'india'}/${post.slug}`}
+            onClick={(e) => {
+              e.preventDefault();
+              onSelect(post);
+            }}
+            className="text-inherit hover:text-editorial-red no-underline block"
+          >
+            {localized.title}
+          </a>
         </h4>
       </div>
     </article>

@@ -119,7 +119,7 @@
           <div class="stats">
             <div>Total Indexed URLs: <span><xsl:value-of select="count(sitemap:urlset/sitemap:url)"/></span></div>
             <div>•</div>
-            <div>Canonical Base: <span>https://npnewsmetro.com</span></div>
+            <div>Canonical Base: <span>https://www.npnewsmetro.com</span></div>
           </div>
           <table>
             <thead>

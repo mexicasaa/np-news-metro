@@ -1,4 +1,4 @@
-﻿import React, { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { SeoMetadataOptions } from '../../services/seoService';
 import { trackPageView } from '../../services/analyticsService';
 import { getAbsoluteImageUrl, getSiteOrigin } from '../../utils/shareUtils';
@@ -12,12 +12,15 @@ export const SeoHead: React.FC<SeoHeadProps> = ({ metadata, structuredData }) =>
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const baseTitle = "NP News Metro — India's Premier Newsroom";
-    const finalTitle = metadata?.title ? `${metadata.title} | NP News Metro` : baseTitle;
+    const baseTitle = 'NP NEWS METRO — Real News. Real Impact. | Indian Digital Newspaper';
+    const finalTitle = metadata?.title 
+      ? (metadata.title.includes('NP News Metro') || metadata.title.includes('NP NEWS METRO') ? metadata.title : `${metadata.title} | NP News Metro`)
+      : baseTitle;
     const finalDesc = metadata?.description || 'Fast, verified, and in-depth national news coverage, policy analysis, investigative journalism, and live market updates.';
-    const finalUrl = metadata?.canonicalUrl || window.location.href;
-    const finalImage = getAbsoluteImageUrl(metadata?.ogImage);
+    const finalUrl = metadata?.canonicalUrl || (typeof window !== 'undefined' ? `${window.location.origin}${window.location.pathname}` : 'https://www.npnewsmetro.com/');
+    const finalImage = getAbsoluteImageUrl(metadata?.ogImage, 'https://www.npnewsmetro.com');
     const robotsContent = metadata?.noIndex ? 'noindex, nofollow' : 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1';
+    const googleNewsContent = metadata?.noIndex ? 'noindex, nofollow' : 'index, follow';
 
     // 1. Document Title
     document.title = finalTitle;
@@ -36,7 +39,8 @@ export const SeoHead: React.FC<SeoHeadProps> = ({ metadata, structuredData }) =>
     // 2. Primary Meta Tags
     setMetaTag('meta[name="description"]', 'name', 'description', finalDesc);
     setMetaTag('meta[name="robots"]', 'name', 'robots', robotsContent);
-    setMetaTag('meta[name="googlebot-news"]', 'name', 'googlebot-news', 'index, follow');
+    setMetaTag('meta[name="googlebot"]', 'name', 'googlebot', robotsContent);
+    setMetaTag('meta[name="googlebot-news"]', 'name', 'googlebot-news', googleNewsContent);
 
     // 3. Open Graph (Facebook, WhatsApp, LinkedIn, iMessage, etc.)
     setMetaTag('meta[property="og:title"]', 'property', 'og:title', finalTitle);

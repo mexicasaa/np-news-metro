@@ -1,6 +1,6 @@
-﻿import assert from 'assert';
+import assert from 'assert';
 
-const DEFAULT_SITE_ORIGIN = 'https://npnewsmetro.com';
+const DEFAULT_SITE_ORIGIN = 'https://www.npnewsmetro.com';
 const DEFAULT_OG_IMAGE = 'https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&q=80&w=1200';
 
 function getAbsoluteImageUrl(imageUrl, customOrigin) {
@@ -55,11 +55,11 @@ console.log('--- Starting Featured Image & Share Verification Tests ---');
 
 // Test 1: Relative image paths
 const rel1 = getAbsoluteImageUrl('/uploads/dr-deepak-goswami.jpg');
-assert.strictEqual(rel1, 'https://npnewsmetro.com/uploads/dr-deepak-goswami.jpg');
+assert.strictEqual(rel1, 'https://www.npnewsmetro.com/uploads/dr-deepak-goswami.jpg');
 console.log('✓ Test 1 Passed: Relative /uploads/ path resolved to absolute URL:', rel1);
 
 const rel2 = getAbsoluteImageUrl('uploads/nayab-saini-patiala-teej.jpg');
-assert.strictEqual(rel2, 'https://npnewsmetro.com/uploads/nayab-saini-patiala-teej.jpg');
+assert.strictEqual(rel2, 'https://www.npnewsmetro.com/uploads/nayab-saini-patiala-teej.jpg');
 console.log('✓ Test 2 Passed: Relative uploads/ path resolved to absolute URL:', rel2);
 
 // Test 2: External full URLs
@@ -75,7 +75,7 @@ console.log('✓ Test 4 Passed: Empty image falls back to default branded OG ima
 
 // Test 4: Canonical article URL generator
 const articleUrl = getCanonicalArticleUrl('politics', 'nayab-saini-patiala-teej');
-assert.strictEqual(articleUrl, 'https://npnewsmetro.com/politics/nayab-saini-patiala-teej');
+assert.strictEqual(articleUrl, 'https://www.npnewsmetro.com/politics/nayab-saini-patiala-teej');
 console.log('✓ Test 5 Passed: Canonical URL correctly generated:', articleUrl);
 
 // Test 5: Social Share link generator
@@ -93,7 +93,7 @@ assert.ok(shareLinks.twitter.includes('twitter.com'));
 assert.ok(shareLinks.facebook.includes('facebook.com'));
 assert.ok(shareLinks.telegram.includes('t.me'));
 assert.ok(shareLinks.linkedin.includes('linkedin.com'));
-assert.strictEqual(shareLinks.absoluteImage, 'https://npnewsmetro.com/uploads/nayab-saini-patiala-teej.jpg');
+assert.strictEqual(shareLinks.absoluteImage, 'https://www.npnewsmetro.com/uploads/nayab-saini-patiala-teej.jpg');
 console.log('✓ Test 6 Passed: Social share links properly formatted and encoded');
 
 console.log('\n========================================');
