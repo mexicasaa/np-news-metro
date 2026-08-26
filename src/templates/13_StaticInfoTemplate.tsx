@@ -394,10 +394,10 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
           </section>
         )}
 
-        {/* 2. Mentorship & Advisory Board (3-Column Modern Grid) */}
+        {/* 2. Mentorship & Advisory Board (3-Column Compact Grid) */}
         {showAdvisorySection && (
-          <section className="mb-24">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
+          <section className="mb-20">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
               <div>
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-950 tracking-tight">
                   {isHindi ? (
@@ -412,120 +412,55 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {/* Dr. Neelima Pandey */}
-              {showNeelima && (
-                <article className="bg-white rounded-3xl p-4 sm:p-5 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group border border-slate-100">
-                  <div>
-                    {/* Portrait with Soft Warm Backdrop & Pill Badge */}
-                    <div className="relative rounded-2xl bg-gradient-to-b from-amber-50/70 to-rose-50/40 p-4 pb-0 flex justify-center overflow-hidden">
-                      <div className="absolute top-3 left-3 z-10 px-3 py-1 bg-white/90 backdrop-blur-md rounded-full text-[11px] font-bold text-slate-800 shadow-2xs border border-white/60">
-                        Chief Mentor & Advisor
-                      </div>
-                      <img
-                        src={getAuthorAvatarUrl('/uploads/dr-neelima-pandey.jpg')}
-                        alt="Dr. Neelima Pandey"
-                        className="w-full aspect-[4/5] object-cover rounded-t-xl group-hover:scale-105 transition-transform duration-500"
-                        onError={handleAvatarError}
-                      />
-                    </div>
-
-                    <div className="p-4 space-y-3">
-                      <div>
-                        <h3
-                          onClick={() => onSelectAuthor('author-dr-neelima-pandey')}
-                          className="font-serif text-xl font-bold text-slate-950 group-hover:text-red-700 cursor-pointer transition-colors"
-                        >
-                          {isHindi ? 'डॉ. नीलिमा पाण्डेय' : 'Dr. Neelima Pandey'}
-                        </h3>
-                        <span className="text-xs font-semibold text-slate-500 block mt-0.5">
-                          Educator, Literary Scholar & Poet
-                        </span>
-                      </div>
-
-                      <p className="text-xs text-slate-600 leading-relaxed line-clamp-3">
-                        {isHindi
-                          ? 'एनपी न्यूज़ मेट्रो की मुख्य मार्गदर्शक, प्रतिष्ठित शिक्षिका, प्रख्यात साहित्यकार एवं कवयित्री। शिक्षा, सामाजिक मूल्य और साहित्यिक चेतना में मार्गदर्शक।'
-                          : 'Chief Mentor at NP News Metro; distinguished educator and celebrated poet guiding our ethical, educational, and cultural vision.'}
-                      </p>
-
-                      <div className="flex flex-wrap gap-1.5 text-[10px] font-semibold text-slate-500 pt-1">
-                        <span className="px-2.5 py-0.5 bg-slate-100 rounded-full">Literature</span>
-                        <span className="px-2.5 py-0.5 bg-slate-100 rounded-full">Ethics</span>
-                        <span className="px-2.5 py-0.5 bg-slate-100 rounded-full">Education</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="p-4 pt-2 border-t border-slate-100 mt-2 flex items-center justify-between text-xs">
-                    <button
-                      onClick={() => handleCopy('dr.neelima.pandey@npnewsmetro.com')}
-                      className="text-slate-500 hover:text-slate-900 font-semibold cursor-pointer"
-                    >
-                      {copiedEmail === 'dr.neelima.pandey@npnewsmetro.com' ? (
-                        <span className="text-emerald-600 font-bold">Copied</span>
-                      ) : (
-                        <span>Copy Email</span>
-                      )}
-                    </button>
-                    <button
-                      onClick={() => onSelectAuthor('author-dr-neelima-pandey')}
-                      className="text-red-700 hover:text-red-800 font-bold inline-flex items-center gap-1 cursor-pointer"
-                    >
-                      <span>Profile & Articles</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </article>
-              )}
-
-              {/* Diwan Chand Arya */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              
+              {/* 1. Diwan Chand Arya (D. C. Arya) */}
               {showArya && (
-                <article className="bg-white rounded-3xl p-4 sm:p-5 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group border border-slate-100">
+                <article className="bg-white rounded-2xl p-3.5 sm:p-4 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between group border border-slate-100/90">
                   <div>
-                    <div className="relative rounded-2xl bg-gradient-to-b from-sky-50/70 to-slate-100/60 p-4 pb-0 flex justify-center overflow-hidden">
-                      <div className="absolute top-3 left-3 z-10 px-3 py-1 bg-white/90 backdrop-blur-md rounded-full text-[11px] font-bold text-slate-800 shadow-2xs border border-white/60">
+                    <div className="relative rounded-xl bg-gradient-to-b from-sky-50/70 to-slate-100/60 p-3 pb-0 flex justify-center overflow-hidden aspect-[4/3] max-h-48">
+                      <div className="absolute top-2.5 left-2.5 z-10 px-2.5 py-0.5 bg-white/90 backdrop-blur-md rounded-full text-[10px] font-bold text-slate-800 shadow-2xs border border-white/60">
                         Advisory Board Member
                       </div>
                       <img
                         src={getAuthorAvatarUrl('/np-author-default.png')}
                         alt="Diwan Chand Arya (D. C. Arya)"
-                        className="w-full aspect-[4/5] object-cover rounded-t-xl group-hover:scale-105 transition-transform duration-500"
+                        className="w-full h-full object-cover object-top rounded-t-lg group-hover:scale-105 transition-transform duration-500"
                         onError={handleAvatarError}
                       />
                     </div>
 
-                    <div className="p-4 space-y-3">
+                    <div className="p-3 space-y-2">
                       <div>
                         <h3
                           onClick={() => onSelectAuthor('author-diwan-chand-arya')}
-                          className="font-serif text-xl font-bold text-slate-955 group-hover:text-red-700 cursor-pointer transition-colors"
+                          className="font-serif text-base sm:text-lg font-bold text-slate-955 group-hover:text-red-700 cursor-pointer transition-colors"
                         >
                           {isHindi ? 'दीवान चंद आर्य (डी. सी. आर्य)' : 'Diwan Chand Arya (D. C. Arya)'}
                         </h3>
-                        <span className="text-xs font-semibold text-slate-500 block mt-0.5">
-                          Advisory Board Member
+                        <span className="text-[11px] font-semibold text-red-700 block mt-0.5">
+                          {isHindi ? 'सलाहकार मंडल सदस्य' : 'Advisory Board Member'}
                         </span>
                       </div>
 
-                      <p className="text-xs text-slate-600 leading-relaxed line-clamp-3">
+                      <p className="text-xs text-slate-600 leading-relaxed line-clamp-2">
                         {isHindi
                           ? 'संस्थागत प्रशासन, सामाजिक सरोकारों और सार्वजनिक शुचिता पर रणनीतिक मार्गदर्शन प्रदान करते हैं।'
-                          : 'Advisory Board Member providing strategic guidance on institutional governance, community affairs, and public integrity.'}
+                          : 'Providing strategic guidance on institutional governance, public policy, community affairs, and integrity.'}
                       </p>
 
-                      <div className="flex flex-wrap gap-1.5 text-[10px] font-semibold text-slate-500 pt-1">
-                        <span className="px-2.5 py-0.5 bg-slate-100 rounded-full">Governance</span>
-                        <span className="px-2.5 py-0.5 bg-slate-100 rounded-full">Public Policy</span>
-                        <span className="px-2.5 py-0.5 bg-slate-100 rounded-full">Strategy</span>
+                      <div className="flex flex-wrap gap-1 text-[9px] font-semibold text-slate-500 pt-0.5">
+                        <span className="px-2 py-0.5 bg-slate-100 rounded-full">Governance</span>
+                        <span className="px-2 py-0.5 bg-slate-100 rounded-full">Public Policy</span>
+                        <span className="px-2 py-0.5 bg-slate-100 rounded-full">Strategy</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="p-4 pt-2 border-t border-slate-100 mt-2 flex items-center justify-between text-xs">
+                  <div className="p-3 pt-2 border-t border-slate-100 mt-1 flex items-center justify-between text-xs">
                     <button
                       onClick={() => handleCopy('dc.arya@npnewsmetro.com')}
-                      className="text-slate-500 hover:text-slate-900 font-semibold cursor-pointer"
+                      className="text-slate-500 hover:text-slate-900 font-semibold cursor-pointer text-[11px]"
                     >
                       {copiedEmail === 'dc.arya@npnewsmetro.com' ? (
                         <span className="text-emerald-600 font-bold">Copied</span>
@@ -535,62 +470,62 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                     </button>
                     <button
                       onClick={() => onSelectAuthor('author-diwan-chand-arya')}
-                      className="text-red-700 hover:text-red-800 font-bold inline-flex items-center gap-1 cursor-pointer"
+                      className="text-red-700 hover:text-red-800 font-bold inline-flex items-center gap-1 cursor-pointer text-[11px]"
                     >
                       <span>Profile & Articles</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
+                      <ArrowRight className="w-3 h-3" />
                     </button>
                   </div>
                 </article>
               )}
 
-              {/* Raj Kumar Agarwal */}
+              {/* 2. Raj Kumar Agarwal */}
               {showAgarwal && (
-                <article className="bg-white rounded-3xl p-4 sm:p-5 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group border border-slate-100">
+                <article className="bg-white rounded-2xl p-3.5 sm:p-4 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between group border border-slate-100/90">
                   <div>
-                    <div className="relative rounded-2xl bg-gradient-to-b from-emerald-50/70 to-teal-50/40 p-4 pb-0 flex justify-center overflow-hidden">
-                      <div className="absolute top-3 left-3 z-10 px-3 py-1 bg-white/90 backdrop-blur-md rounded-full text-[11px] font-bold text-slate-800 shadow-2xs border border-white/60">
+                    <div className="relative rounded-xl bg-gradient-to-b from-emerald-50/70 to-teal-50/40 p-3 pb-0 flex justify-center overflow-hidden aspect-[4/3] max-h-48">
+                      <div className="absolute top-2.5 left-2.5 z-10 px-2.5 py-0.5 bg-white/90 backdrop-blur-md rounded-full text-[10px] font-bold text-slate-800 shadow-2xs border border-white/60">
                         Advisory Board Member
                       </div>
                       <img
                         src={getAuthorAvatarUrl('/np-author-default.png')}
                         alt="Raj Kumar Agarwal"
-                        className="w-full aspect-[4/5] object-cover rounded-t-xl group-hover:scale-105 transition-transform duration-500"
+                        className="w-full h-full object-cover object-top rounded-t-lg group-hover:scale-105 transition-transform duration-500"
                         onError={handleAvatarError}
                       />
                     </div>
 
-                    <div className="p-4 space-y-3">
+                    <div className="p-3 space-y-2">
                       <div>
                         <h3
                           onClick={() => onSelectAuthor('author-raj-kumar-agarwal')}
-                          className="font-serif text-xl font-bold text-slate-955 group-hover:text-red-700 cursor-pointer transition-colors"
+                          className="font-serif text-base sm:text-lg font-bold text-slate-955 group-hover:text-red-700 cursor-pointer transition-colors"
                         >
                           {isHindi ? 'राज कुमार अग्रवाल' : 'Raj Kumar Agarwal'}
                         </h3>
-                        <span className="text-xs font-semibold text-slate-500 block mt-0.5">
-                          Advisory Board Member
+                        <span className="text-[11px] font-semibold text-red-700 block mt-0.5">
+                          {isHindi ? 'सलाहकार मंडल सदस्य' : 'Advisory Board Member'}
                         </span>
                       </div>
 
-                      <p className="text-xs text-slate-600 leading-relaxed line-clamp-3">
+                      <p className="text-xs text-slate-600 leading-relaxed line-clamp-2">
                         {isHindi
                           ? 'आर्थिक नीतियों, उद्यम स्थिरता, मीडिया आचार संहिता और सामाजिक विकास के विशेषज्ञ सलाहकार।'
                           : 'Advising on economic policy, enterprise sustainability, media ethics, and societal development.'}
                       </p>
 
-                      <div className="flex flex-wrap gap-1.5 text-[10px] font-semibold text-slate-500 pt-1">
-                        <span className="px-2.5 py-0.5 bg-slate-100 rounded-full">Economic Policy</span>
-                        <span className="px-2.5 py-0.5 bg-slate-100 rounded-full">Enterprise</span>
-                        <span className="px-2.5 py-0.5 bg-slate-100 rounded-full">Ethics</span>
+                      <div className="flex flex-wrap gap-1 text-[9px] font-semibold text-slate-500 pt-0.5">
+                        <span className="px-2 py-0.5 bg-slate-100 rounded-full">Economic Policy</span>
+                        <span className="px-2 py-0.5 bg-slate-100 rounded-full">Enterprise</span>
+                        <span className="px-2 py-0.5 bg-slate-100 rounded-full">Ethics</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="p-4 pt-2 border-t border-slate-100 mt-2 flex items-center justify-between text-xs">
+                  <div className="p-3 pt-2 border-t border-slate-100 mt-1 flex items-center justify-between text-xs">
                     <button
                       onClick={() => handleCopy('rk.agarwal@npnewsmetro.com')}
-                      className="text-slate-500 hover:text-slate-900 font-semibold cursor-pointer"
+                      className="text-slate-500 hover:text-slate-900 font-semibold cursor-pointer text-[11px]"
                     >
                       {copiedEmail === 'rk.agarwal@npnewsmetro.com' ? (
                         <span className="text-emerald-600 font-bold">Copied</span>
@@ -600,14 +535,81 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                     </button>
                     <button
                       onClick={() => onSelectAuthor('author-raj-kumar-agarwal')}
-                      className="text-red-700 hover:text-red-800 font-bold inline-flex items-center gap-1 cursor-pointer"
+                      className="text-red-700 hover:text-red-800 font-bold inline-flex items-center gap-1 cursor-pointer text-[11px]"
                     >
                       <span>Profile & Articles</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
+                      <ArrowRight className="w-3 h-3" />
                     </button>
                   </div>
                 </article>
               )}
+
+              {/* 3. Dr. Neelima Pandey */}
+              {showNeelima && (
+                <article className="bg-white rounded-2xl p-3.5 sm:p-4 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between group border border-slate-100/90">
+                  <div>
+                    {/* Portrait with Soft Warm Backdrop & Pill Badge */}
+                    <div className="relative rounded-xl bg-gradient-to-b from-amber-50/70 to-rose-50/40 p-3 pb-0 flex justify-center overflow-hidden aspect-[4/3] max-h-48">
+                      <div className="absolute top-2.5 left-2.5 z-10 px-2.5 py-0.5 bg-white/90 backdrop-blur-md rounded-full text-[10px] font-bold text-slate-800 shadow-2xs border border-white/60">
+                        Advisory Board Member
+                      </div>
+                      <img
+                        src={getAuthorAvatarUrl('/uploads/dr-neelima-pandey.jpg')}
+                        alt="Dr. Neelima Pandey"
+                        className="w-full h-full object-cover object-top rounded-t-lg group-hover:scale-105 transition-transform duration-500"
+                        onError={handleAvatarError}
+                      />
+                    </div>
+
+                    <div className="p-3 space-y-2">
+                      <div>
+                        <h3
+                          onClick={() => onSelectAuthor('author-dr-neelima-pandey')}
+                          className="font-serif text-base sm:text-lg font-bold text-slate-950 group-hover:text-red-700 cursor-pointer transition-colors"
+                        >
+                          {isHindi ? 'डॉ. नीलिमा पाण्डेय' : 'Dr. Neelima Pandey'}
+                        </h3>
+                        <span className="text-[11px] font-semibold text-red-700 block mt-0.5">
+                          {isHindi ? 'सलाहकार मंडल सदस्य' : 'Advisory Board Member'}
+                        </span>
+                      </div>
+
+                      <p className="text-xs text-slate-600 leading-relaxed line-clamp-2">
+                        {isHindi
+                          ? 'प्रतिष्ठित शिक्षिका, प्रख्यात साहित्यकार एवं कवयित्री। शिक्षा, सामाजिक मूल्य और साहित्यिक चेतना में मार्गदर्शक भूमिका।'
+                          : 'Distinguished educator, accomplished litterateur, and celebrated poet guiding our ethical, educational, and cultural vision.'}
+                      </p>
+
+                      <div className="flex flex-wrap gap-1 text-[9px] font-semibold text-slate-500 pt-0.5">
+                        <span className="px-2 py-0.5 bg-slate-100 rounded-full">Literature</span>
+                        <span className="px-2 py-0.5 bg-slate-100 rounded-full">Ethics</span>
+                        <span className="px-2 py-0.5 bg-slate-100 rounded-full">Education</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-3 pt-2 border-t border-slate-100 mt-1 flex items-center justify-between text-xs">
+                    <button
+                      onClick={() => handleCopy('dr.neelima.pandey@npnewsmetro.com')}
+                      className="text-slate-500 hover:text-slate-900 font-semibold cursor-pointer text-[11px]"
+                    >
+                      {copiedEmail === 'dr.neelima.pandey@npnewsmetro.com' ? (
+                        <span className="text-emerald-600 font-bold">Copied</span>
+                      ) : (
+                        <span>Copy Email</span>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => onSelectAuthor('author-dr-neelima-pandey')}
+                      className="text-red-700 hover:text-red-800 font-bold inline-flex items-center gap-1 cursor-pointer text-[11px]"
+                    >
+                      <span>Profile & Articles</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </button>
+                  </div>
+                </article>
+              )}
+
             </div>
           </section>
         )}
