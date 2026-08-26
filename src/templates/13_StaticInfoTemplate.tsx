@@ -124,86 +124,185 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
-          {/* Left Navigation Sidebar */}
-          <aside className="hidden lg:block lg:col-span-4 bg-surface-lowest border border-border-subtle p-4 rounded-sm shadow-subtle space-y-1 sticky top-24">
-            <div className="px-3 py-2 border-b border-border-subtle mb-2 flex items-center gap-2.5">
-              <img src="/logo-circle.png" alt="NP News Metro" className="w-7 h-7 rounded-full object-cover border border-border-subtle shadow-2xs flex-shrink-0" />
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-editorial-red block">NP News Metro</span>
-                <h3 className="font-serif text-base font-bold text-ink leading-tight">
-                  {isHindi ? 'संस्थागत डायरेक्टरी' : 'Institutional Directory'}
+          {/* Left Navigation Sidebar - Modern Glassmorphic Directory */}
+          <aside className="hidden lg:block lg:col-span-4 bg-white border border-slate-200/90 p-4 rounded-2xl shadow-[0_4px_24px_-4px_rgba(0,0,0,0.06)] space-y-4 sticky top-24">
+            {/* Brand Header */}
+            <div className="p-3 bg-gradient-to-br from-slate-50 to-amber-50/40 rounded-xl border border-slate-200/70 flex items-center gap-3">
+              <div className="relative flex-shrink-0">
+                <img
+                  src="/logo-circle.png"
+                  alt="NP News Metro"
+                  className="w-10 h-10 rounded-full object-cover ring-2 ring-primary/20 shadow-xs"
+                />
+                <span className="absolute -bottom-0.5 -right-0.5 bg-emerald-500 w-2.5 h-2.5 rounded-full border border-white" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <span className="text-[10px] font-extrabold uppercase tracking-widest text-editorial-red block">NP NEWS METRO</span>
+                <h3 className="font-serif text-sm font-bold text-ink truncate leading-tight">
+                  {isHindi ? 'संस्थागत निर्देशिका' : 'Institutional Directory'}
                 </h3>
               </div>
             </div>
 
-            {menuItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = currentPage === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    setCurrentPage(item.id as StaticPageType);
-                    setFormSubmitted(false);
-                    if (typeof window !== 'undefined') {
-                      window.history.pushState({ view: 'public', static: item.id }, '', `/${item.id}`);
-                    }
-                  }}
-                  className={`w-full text-left px-3 py-2.5 rounded-sm text-xs font-semibold flex items-center gap-2.5 transition-colors cursor-pointer ${
-                    isActive
-                      ? 'bg-primary text-white font-bold shadow-sm'
-                      : 'text-ink hover:bg-surface-container hover:text-primary'
-                  }`}
-                >
-                  {item.id === 'editorial-team' ? (
-                    <img src="/logo-circle.png" alt="NP Logo" className="w-4 h-4 rounded-full object-cover flex-shrink-0" />
-                  ) : (
-                    <Icon className={`w-4 h-4 ${isActive ? 'text-secondary-gold' : 'text-ink-muted'}`} />
-                  )}
-                  <span>{item.label}</span>
-                </button>
-              );
-            })}
+            {/* Categorized Navigation Groups */}
+            <div className="space-y-3.5">
+              {/* Group 1: Editorial & Standards */}
+              <div className="space-y-1">
+                <div className="px-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-ink-muted">
+                  {isHindi ? 'संपादकीय एवं मानक' : 'Editorial & Ethics'}
+                </div>
+                {[
+                  { id: 'editorial-team', label: isHindi ? 'संपादकीय बोर्ड एवं नेतृत्व' : 'Editorial Board & Leadership', icon: Users },
+                  { id: 'about', label: isHindi ? 'एनपी न्यूज़ मेट्रो के बारे में' : 'About NP News Metro', icon: Building },
+                  { id: 'ethics', label: isHindi ? 'आचार संहिता एवं मानक' : 'Code of Ethics & Standards', icon: ShieldCheck },
+                  { id: 'corrections', label: isHindi ? 'सुधार एवं निवारण नीति' : 'Corrections & Grievance', icon: AlertCircle },
+                ].map((item) => {
+                  const Icon = item.icon;
+                  const isActive = currentPage === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => {
+                        setCurrentPage(item.id as StaticPageType);
+                        setFormSubmitted(false);
+                        if (typeof window !== 'undefined') {
+                          window.history.pushState({ view: 'public', static: item.id }, '', `/${item.id}`);
+                        }
+                      }}
+                      className={`w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between transition-all duration-200 cursor-pointer ${
+                        isActive
+                          ? 'bg-[#0B1521] text-white shadow-md font-bold scale-[1.01]'
+                          : 'text-slate-700 hover:bg-slate-100/80 hover:text-primary'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        {item.id === 'editorial-team' ? (
+                          <img src="/logo-circle.png" alt="NP Logo" className="w-4 h-4 rounded-full object-cover flex-shrink-0" />
+                        ) : (
+                          <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-amber-400' : 'text-slate-400'}`} />
+                        )}
+                        <span className="truncate">{item.label}</span>
+                      </div>
+                      {isActive && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0" />}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Group 2: Public Desks & Partnerships */}
+              <div className="space-y-1 pt-1 border-t border-slate-100">
+                <div className="px-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-ink-muted">
+                  {isHindi ? 'न्यूज़रूम व संपर्क' : 'Newsroom & Reach'}
+                </div>
+                {[
+                  { id: 'contact', label: isHindi ? 'न्यूज़रूम संपर्क एवं सुझाव' : 'Contact Us & Tip-Offs', icon: Mail },
+                  { id: 'advertise', label: isHindi ? 'विज्ञापन एवं साझेदारी' : 'Advertise with Us', icon: DollarSign },
+                ].map((item) => {
+                  const Icon = item.icon;
+                  const isActive = currentPage === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => {
+                        setCurrentPage(item.id as StaticPageType);
+                        setFormSubmitted(false);
+                        if (typeof window !== 'undefined') {
+                          window.history.pushState({ view: 'public', static: item.id }, '', `/${item.id}`);
+                        }
+                      }}
+                      className={`w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between transition-all duration-200 cursor-pointer ${
+                        isActive
+                          ? 'bg-[#0B1521] text-white shadow-md font-bold scale-[1.01]'
+                          : 'text-slate-700 hover:bg-slate-100/80 hover:text-primary'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-amber-400' : 'text-slate-400'}`} />
+                        <span className="truncate">{item.label}</span>
+                      </div>
+                      {isActive && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0" />}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Group 3: Policies & Compliance */}
+              <div className="space-y-1 pt-1 border-t border-slate-100">
+                <div className="px-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-ink-muted">
+                  {isHindi ? 'कानूनी एवं नीतियां' : 'Legal & Policies'}
+                </div>
+                {[
+                  { id: 'privacy', label: isHindi ? 'गोपनीयता नीति' : 'Privacy Policy', icon: Lock },
+                  { id: 'disclaimer', label: isHindi ? 'अस्वीकरण (डिस्क्लेमर)' : 'Disclaimer', icon: AlertTriangle },
+                  { id: 'terms', label: isHindi ? 'सेवा की शर्तें एवं नियम' : 'Terms & Conditions', icon: Scale },
+                  { id: 'cookie-policy', label: isHindi ? 'कुकी नीति' : 'Cookie Policy', icon: FileText },
+                  { id: 'sitemap', label: isHindi ? 'साइट डायरेक्टरी' : 'Sitemap Directory', icon: Globe },
+                ].map((item) => {
+                  const Icon = item.icon;
+                  const isActive = currentPage === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => {
+                        setCurrentPage(item.id as StaticPageType);
+                        setFormSubmitted(false);
+                        if (typeof window !== 'undefined') {
+                          window.history.pushState({ view: 'public', static: item.id }, '', `/${item.id}`);
+                        }
+                      }}
+                      className={`w-full text-left px-3 py-2 rounded-xl text-xs font-semibold flex items-center justify-between transition-all duration-200 cursor-pointer ${
+                        isActive
+                          ? 'bg-[#0B1521] text-white shadow-md font-bold scale-[1.01]'
+                          : 'text-slate-700 hover:bg-slate-100/80 hover:text-primary'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <Icon className={`w-3.5 h-3.5 flex-shrink-0 ${isActive ? 'text-amber-400' : 'text-slate-400'}`} />
+                        <span className="truncate">{item.label}</span>
+                      </div>
+                      {isActive && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
 
             {/* Statutory Redressal Quick Callout */}
-            <div className="pt-4 mt-4 border-t border-border-subtle p-3.5 bg-surface-container/60 rounded-sm text-[11px] text-ink-secondary space-y-2">
-              <div className="flex items-center gap-1.5 text-primary font-bold">
-                <ShieldCheck className="w-3.5 h-3.5 text-editorial-red" />
-                <span>{isHindi ? 'कानूनी शिकायत एवं पंजीकरण' : 'Statutory & RNI Credentials'}</span>
-              </div>
-              
-              <div className="bg-white p-2 rounded border border-border-subtle text-[10px] space-y-0.5">
-                <span className="text-ink-muted uppercase font-bold text-[9px] tracking-wider block">
-                  {isHindi ? 'आरएनआई पंजीकरण संख्या:' : 'RNI Registration No:'}
-                </span>
-                <span className="font-mono text-ink font-bold block">
-                  DEL HIN/2010/31544
-                </span>
-                <span className="text-ink-secondary text-[10px] block">
-                  {isHindi ? 'द्वारा: मेट्रोमैट दिल्ली' : 'by Metromat Delhi'}
-                </span>
-              </div>
+            <div className="pt-3 border-t border-slate-200/80">
+              <div className="p-3 bg-gradient-to-br from-amber-50/70 via-slate-50 to-slate-50 border border-amber-200/70 rounded-xl text-xs text-ink-secondary space-y-2">
+                <div className="flex items-center gap-1.5 text-primary font-bold text-[11px]">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>{isHindi ? 'आरएनआई एवं कानूनी साख' : 'Statutory & RNI Credentials'}</span>
+                </div>
+                
+                <div className="bg-white p-2 rounded-lg border border-slate-200/80 text-[10px] space-y-0.5 shadow-2xs">
+                  <span className="text-ink-muted uppercase font-bold text-[9px] tracking-wider block">
+                    {isHindi ? 'आरएनआई पंजीकरण संख्या:' : 'RNI Registration No:'}
+                  </span>
+                  <span className="font-mono text-ink font-bold block">
+                    DEL HIN/2010/31544
+                  </span>
+                  <span className="text-ink-secondary text-[10px] block">
+                    {isHindi ? 'द्वारा: मेट्रोमैट दिल्ली' : 'by Metromat Delhi'}
+                  </span>
+                </div>
 
-              <p className="text-[11px] leading-relaxed">
-                {isHindi 
-                  ? 'डिजिटल मीडिया आचार संहिता नियम 2021 के तहत शिकायत निवारण अधिकारी:' 
-                  : 'Grievance Officer under Information Technology Rules 2021:'}
-              </p>
-              <div className="flex items-center justify-between bg-white p-1.5 rounded border border-border-subtle text-[10px] font-mono text-ink">
-                <span>grievance@npnewsmetro.com</span>
-                <button 
-                  onClick={() => handleCopy('grievance@npnewsmetro.com')}
-                  className="text-ink-muted hover:text-primary transition-colors cursor-pointer"
-                  title="Copy email"
-                >
-                  {copiedEmail === 'grievance@npnewsmetro.com' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
-                </button>
+                <div className="flex items-center justify-between bg-white p-1.5 rounded-lg border border-slate-200/80 text-[10px] font-mono text-ink">
+                  <span className="truncate">grievance@npnewsmetro.com</span>
+                  <button 
+                    onClick={() => handleCopy('grievance@npnewsmetro.com')}
+                    className="text-ink-muted hover:text-primary transition-colors cursor-pointer p-0.5 ml-1 flex-shrink-0"
+                    title="Copy email"
+                  >
+                    {copiedEmail === 'grievance@npnewsmetro.com' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                  </button>
+                </div>
               </div>
             </div>
           </aside>
 
           {/* Right Main Content Panel (8 cols) */}
-          <section className="lg:col-span-8 bg-surface-lowest border border-border-subtle p-6 sm:p-10 rounded-sm shadow-subtle">
+          <section className={`lg:col-span-8 ${currentPage === 'editorial-team' ? 'space-y-8' : 'bg-white border border-slate-200/90 p-6 sm:p-10 rounded-2xl shadow-sm'}`}>
             
             {/* =========================================================================
                 1. ABOUT US
@@ -849,13 +948,13 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
 
               return (
                 <article className="space-y-10">
-                  {/* Hero Stage: Dark Obsidian Gradient with Ambient Lighting & Statutory Credential Badges */}
-                  <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-[#0A1624] via-[#102338] to-[#183450] text-white p-6 sm:p-10 border border-[#203D5B] shadow-2xl">
+                  {/* Hero Stage: Balanced Modern Slate-Navy Masthead Header */}
+                  <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-[#0F1E2E] via-[#162A3E] to-[#1F3952] text-white p-6 sm:p-8 border border-[#224262] shadow-xl">
                     {/* Atmospheric Lighting Highlights */}
-                    <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none -mr-24 -mt-24" />
-                    <div className="absolute bottom-0 left-0 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl pointer-events-none -ml-24 -mb-24" />
+                    <div className="absolute top-0 right-0 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
+                    <div className="absolute bottom-0 left-0 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl pointer-events-none -ml-20 -mb-20" />
 
-                    <div className="relative z-10 space-y-6">
+                    <div className="relative z-10 space-y-5">
                       {/* Top Masthead Ribbon */}
                       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
                         <div className="flex items-center gap-3">
@@ -863,13 +962,13 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                             <img
                               src="/logo-circle.png"
                               alt="NP News Metro Logo"
-                              className="w-11 h-11 sm:w-13 sm:h-13 rounded-full object-cover ring-2 ring-amber-400/70 shadow-lg"
+                              className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover ring-2 ring-amber-400/70 shadow-md"
                             />
-                            <span className="absolute -bottom-0.5 -right-0.5 bg-emerald-500 w-3.5 h-3.5 rounded-full border-2 border-[#0A1624]" title="Verified National Masthead" />
+                            <span className="absolute -bottom-0.5 -right-0.5 bg-emerald-500 w-3 h-3 rounded-full border-2 border-[#0F1E2E]" title="Verified National Masthead" />
                           </div>
                           <div>
-                            <span className="text-[11px] font-bold uppercase tracking-widest text-amber-400 font-sans block">
-                              {isHindi ? 'राष्ट्रीय संस्थागत संपादकीय मंडल' : 'NATIONAL INSTITUTIONAL EDITORIAL MASTHEAD'}
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-amber-400 font-sans block">
+                              {isHindi ? 'राष्ट्रीय संस्थागत संपादकीय मंडल' : 'NATIONAL EDITORIAL MASTHEAD & LEADERSHIP'}
                             </span>
                             <span className="text-xs text-slate-300 font-medium">
                               NP News Metro • Real News. Real Impact.
@@ -881,70 +980,70 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                         <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/15 text-xs shadow-inner">
                           <Building className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
                           <span className="text-slate-300 font-mono text-[11px]">
-                            {isHindi ? 'आरएनआई पंजी.:' : 'RNI Reg.:'}{' '}
+                            {isHindi ? 'आरएनआई:' : 'RNI:'}{' '}
                             <strong className="text-white font-bold">DEL HIN/2010/31544</strong>
                           </span>
                         </div>
                       </div>
 
                       {/* Headline & Mission Statement */}
-                      <div className="space-y-3 max-w-3xl">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/10 border border-amber-400/20 text-amber-300 text-xs font-semibold uppercase tracking-wider">
-                          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                          <span>{isHindi ? 'स्वतंत्र एवं निष्पक्ष पत्रकारिता' : 'Uncompromised & Credible Journalism'}</span>
+                      <div className="space-y-2 max-w-3xl">
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-400/10 border border-amber-400/20 text-amber-300 text-[11px] font-semibold uppercase tracking-wider">
+                          <Sparkles className="w-3 h-3 text-amber-400" />
+                          <span>{isHindi ? 'संपादकीय नेतृत्व एवं मार्गदर्शक मंडल' : 'Newsroom Leadership & Advisory Council'}</span>
                         </div>
 
-                        <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-[1.15]">
+                        <h1 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight leading-snug">
                           {isHindi
-                            ? 'सत्य, निष्पक्षता और संवैधानिक मूल्यों के सजग प्रहरी'
-                            : 'Guiding Fearless Journalism, Ethics & Truth Across India'}
+                            ? 'संपादकीय बोर्ड एवं सर्वोच्च नेतृत्व'
+                            : 'Editorial Board & Leadership'}
                         </h1>
-                        <p className="text-slate-300 text-sm sm:text-base leading-relaxed font-sans">
+                        <p className="text-slate-300 text-xs sm:text-sm leading-relaxed font-sans max-w-2xl">
                           {isHindi
-                            ? 'एनपी न्यूज़ मेट्रो का संपादकीय मंडल किसी भी कॉर्पोरेट या राजनीतिक दबाव से पूर्णतः स्वतंत्र होकर भारत के जनसरोकारों, निष्पक्ष पड़ताल, तथ्य-सत्यापन और उच्च-स्तरीय पत्रकारिता के लिए समर्पित है।'
-                            : 'Our institutional directory of founders, editors-in-chief, advisory mentors, and investigative correspondents shaping high-integrity digital journalism.'}
+                            ? 'स्वतंत्र, निष्पक्ष और प्रमाण-आधारित पत्रकारिता के प्रति समर्पित हमारा संपादकीय, प्रबंधकीय, तकनीकी व मार्गदर्शक नेतृत्व।'
+                            : 'The masthead, editors, advisory mentors, and investigative correspondents upholding fearless reporting, factual accuracy, and constitutional values across India.'}
                         </p>
                       </div>
 
                       {/* 4 Trust Metric Cards */}
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-                        <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-3.5 rounded-xl flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0">
-                            <ShieldCheck className="w-5 h-5" />
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
+                        <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-2.5 sm:p-3 rounded-xl flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0">
+                            <ShieldCheck className="w-4 h-4" />
                           </div>
-                          <div>
-                            <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">{isHindi ? 'मानक' : 'Standards'}</p>
-                            <p className="text-xs font-bold text-white leading-tight">{isHindi ? 'प्रेस परिषद कोड' : 'PCI Ethics Code'}</p>
-                          </div>
-                        </div>
-
-                        <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-3.5 rounded-xl flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center flex-shrink-0">
-                            <Scale className="w-5 h-5" />
-                          </div>
-                          <div>
-                            <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">{isHindi ? 'स्वायत्तता' : 'Autonomy'}</p>
-                            <p className="text-xs font-bold text-white leading-tight">{isHindi ? '100% स्वतंत्र' : '100% Independent'}</p>
+                          <div className="min-w-0">
+                            <p className="text-[9px] text-slate-400 uppercase font-bold tracking-wider">{isHindi ? 'मानक' : 'Standards'}</p>
+                            <p className="text-xs font-bold text-white truncate">{isHindi ? 'प्रेस परिषद कोड' : 'PCI Ethics Code'}</p>
                           </div>
                         </div>
 
-                        <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-3.5 rounded-xl flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center flex-shrink-0">
-                            <CheckCircle2 className="w-5 h-5" />
+                        <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-2.5 sm:p-3 rounded-xl flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center flex-shrink-0">
+                            <Scale className="w-4 h-4" />
                           </div>
-                          <div>
-                            <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">{isHindi ? 'तथ्य-जांच' : 'Fact-Check'}</p>
-                            <p className="text-xs font-bold text-white leading-tight">{isHindi ? 'बहु-स्तरीय पड़ताल' : 'Multi-Tier Sourcing'}</p>
+                          <div className="min-w-0">
+                            <p className="text-[9px] text-slate-400 uppercase font-bold tracking-wider">{isHindi ? 'स्वायत्तता' : 'Autonomy'}</p>
+                            <p className="text-xs font-bold text-white truncate">{isHindi ? '100% स्वतंत्र' : '100% Independent'}</p>
                           </div>
                         </div>
 
-                        <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-3.5 rounded-xl flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center flex-shrink-0">
-                            <Globe className="w-5 h-5" />
+                        <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-2.5 sm:p-3 rounded-xl flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center flex-shrink-0">
+                            <CheckCircle2 className="w-4 h-4" />
                           </div>
-                          <div>
-                            <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">{isHindi ? 'मुख्यालय' : 'Headquarters'}</p>
-                            <p className="text-xs font-bold text-white leading-tight">{isHindi ? 'नई दिल्ली ब्यूरो' : 'New Delhi HQ'}</p>
+                          <div className="min-w-0">
+                            <p className="text-[9px] text-slate-400 uppercase font-bold tracking-wider">{isHindi ? 'तथ्य-जांच' : 'Fact-Check'}</p>
+                            <p className="text-xs font-bold text-white truncate">{isHindi ? 'बहु-स्तरीय पड़ताल' : 'Multi-Tier Sourcing'}</p>
+                          </div>
+                        </div>
+
+                        <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-2.5 sm:p-3 rounded-xl flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center flex-shrink-0">
+                            <Globe className="w-4 h-4" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-[9px] text-slate-400 uppercase font-bold tracking-wider">{isHindi ? 'मुख्यालय' : 'Headquarters'}</p>
+                            <p className="text-xs font-bold text-white truncate">{isHindi ? 'नई दिल्ली ब्यूरो' : 'New Delhi HQ'}</p>
                           </div>
                         </div>
                       </div>
