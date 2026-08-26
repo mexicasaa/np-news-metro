@@ -19,15 +19,19 @@
   body {
     background-color: var(--color-canvas);
     color: var(--color-ink);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    line-height: 1.6;
+    font-family: 'Source Sans 3', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans Devanagari', sans-serif;
+    line-height: 1.65;
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
+  /* Main & Editorial Headlines: Merriweather Bold */
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Playfair Display', Georgia, serif;
+    font-family: 'Merriweather', 'Playfair Display', Georgia, 'Noto Serif Devanagari', serif;
     color: #1A1A1A;
     font-weight: 700;
+    letter-spacing: -0.015em;
   }
 
   /* Custom subtle focus styles for WCAG accessibility */
@@ -58,9 +62,9 @@
   border-right: 1px solid #E5E7EB;
 }
 
-/* Drop cap for editorial articles */
+/* Drop cap for editorial articles: Merriweather */
 .editorial-dropcap:first-letter {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Merriweather', 'Playfair Display', Georgia, serif;
   float: left;
   font-size: 4.25rem;
   line-height: 0.85;
@@ -71,32 +75,39 @@
   font-weight: 700;
 }
 
-/* Gutenberg block styles for single article */
+/* Gutenberg block & Article Reading Typography: Source Sans 3 for body, Merriweather for headings */
+.gutenberg-content {
+  font-family: 'Source Sans 3', 'Noto Sans Devanagari', sans-serif;
+}
+
 .gutenberg-content p {
+  font-family: 'Source Sans 3', 'Noto Sans Devanagari', sans-serif;
   margin-bottom: 1.5rem;
   font-size: 1.125rem;
-  line-height: 1.8;
+  line-height: 1.85;
   color: #2D3748;
 }
 
 .gutenberg-content h2 {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Merriweather', 'Playfair Display', Georgia, 'Noto Serif Devanagari', serif;
   font-size: 1.875rem;
-  line-height: 1.3;
+  line-height: 1.35;
   font-weight: 700;
   margin-top: 2.5rem;
   margin-bottom: 1rem;
   color: #1A1A1A;
+  letter-spacing: -0.015em;
 }
 
 .gutenberg-content h3 {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Merriweather', 'Playfair Display', Georgia, 'Noto Serif Devanagari', serif;
   font-size: 1.4rem;
   line-height: 1.4;
-  font-weight: 600;
+  font-weight: 700;
   margin-top: 2rem;
   margin-bottom: 0.75rem;
   color: #1A1A1A;
+  letter-spacing: -0.01em;
 }
 
 .gutenberg-content ul, .gutenberg-content ol {
@@ -108,9 +119,14 @@
 .gutenberg-content li {
   margin-bottom: 0.5rem;
   line-height: 1.7;
+  font-family: 'Source Sans 3', 'Noto Sans Devanagari', sans-serif;
 }
 
 .gutenberg-content blockquote {
+  font-family: 'Merriweather', Georgia, serif;
+  font-style: italic;
+  font-size: 1.25rem;
+  line-height: 1.6;
   border-left: 3px solid #162839;
   padding-left: 1.25rem;
   margin: 2rem 0;

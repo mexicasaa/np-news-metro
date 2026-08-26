@@ -59,8 +59,14 @@ export default {
         },
       },
       fontFamily: {
-        serif: ['"Playfair Display"', 'Georgia', 'Cambria', 'serif'],
-        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+        serif: ['Merriweather', '"Playfair Display"', 'Georgia', '"Noto Serif Devanagari"', 'serif'],
+        'serif-headline': ['Merriweather', 'Georgia', '"Noto Serif Devanagari"', 'serif'],
+        'serif-editorial': ['"Playfair Display"', 'Georgia', 'serif'],
+        'serif-modern': ['"DM Serif Display"', 'Georgia', 'serif'],
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', '"Noto Sans Devanagari"', 'Roboto', 'sans-serif'],
+        body: ['"Source Sans 3"', 'Inter', '-apple-system', 'BlinkMacSystemFont', '"Noto Sans Devanagari"', 'sans-serif'],
+        condensed: ['"Roboto Condensed"', 'Inter', 'sans-serif'],
+        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
       },
       fontSize: {
         'display-lg': ['60px', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '700' }],

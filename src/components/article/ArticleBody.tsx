@@ -22,7 +22,7 @@ export const ArticleBody: React.FC<ArticleBodyProps> = ({
   const localized = getLocalizedPost(post, language);
 
   return (
-    <div className="gutenberg-content font-sans text-ink leading-relaxed">
+    <div className="gutenberg-content font-body text-ink leading-relaxed">
       {(localized.blocks || post.blocks).map((block, index) => {
         switch (block.type) {
           case 'paragraph': {

@@ -75,7 +75,7 @@ export const BreakingNewsBar: React.FC<BreakingNewsBarProps> = ({
         {/* Left: Breaking News Label Badge */}
         <div className="flex items-center gap-2 flex-shrink-0">
           <div
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded font-bold uppercase tracking-wider text-[10px] sm:text-[11px] ${
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded font-condensed font-bold uppercase tracking-wider text-[10px] sm:text-[11px] ${
               isEmergencyMode
                 ? 'bg-white text-red-700 shadow-xs'
                 : 'bg-editorial-red text-white'
@@ -99,7 +99,7 @@ export const BreakingNewsBar: React.FC<BreakingNewsBarProps> = ({
           {/* Category Tag (Clean & Compact) */}
           {currentPost.category && (
             <span
-              className={`hidden md:inline font-bold uppercase text-[11px] tracking-wider ${
+              className={`hidden md:inline font-condensed font-bold uppercase text-[11px] tracking-wider ${
                 isEmergencyMode ? 'text-red-100' : 'text-editorial-red'
               }`}
             >
