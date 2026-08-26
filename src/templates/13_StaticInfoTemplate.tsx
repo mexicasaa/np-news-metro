@@ -87,7 +87,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
     };
 
     const showExecutive = (activeDept === 'all' || activeDept === 'executive') && 
-      matchesSearch('Umang Pandey', 'उमंग पाण्डेय', 'Founder', 'संस्थापक', 'Chief Technology Officer', 'CTO', 'Technology', 'Platform', 'Architecture');
+      matchesSearch('Umang Pandey', 'उमंग पाण्डेय', 'Founder', 'संस्थापक', 'Chief Technology Officer', 'CTO', 'Technology', 'AI', 'Architecture');
     
     const showNeelima = (activeDept === 'all' || activeDept === 'advisory') && 
       matchesSearch('Dr. Neelima Pandey', 'डॉ. नीलिमा पाण्डेय', 'Chief Mentor', 'मार्गदर्शक', 'Educator', 'Literary', 'Poet', 'कवयित्री', 'साहित्यकार');
@@ -123,116 +123,73 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
     const totalVisible = [showExecutive, showNeelima, showArya, showAgarwal, showNeeraj, showChetan, showBhawana, showPurnima, showTripathi, showLaxmi].filter(Boolean).length;
 
     return (
-      <article className="w-full space-y-12 animate-fadeIn">
-
-        {/* Hero Stage: Minimalist Editorial Header */}
-        <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-8 sm:p-10 lg:p-12 relative overflow-hidden">
-          <div className="space-y-6 relative z-10">
-            {/* Top Masthead Header Ribbon */}
-            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-5">
-              <div className="flex items-center gap-3">
-                <img
-                  src="/logo-circle.png"
-                  alt="NP News Metro Logo"
-                  className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover border border-slate-200"
-                />
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 font-sans block">
-                    {isHindi ? 'राष्ट्रीय संस्थागत संपादकीय मंडल' : 'NATIONAL INSTITUTIONAL EDITORIAL MASTHEAD'}
-                  </span>
-                  <span className="text-xs text-slate-700 font-serif italic">
-                    NP News Metro • Real News. Real Impact.
-                  </span>
-                </div>
-              </div>
-
-              {/* RNI Registration Code */}
-              <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-slate-200 text-xs">
-                <Building className="w-3.5 h-3.5 text-slate-600 flex-shrink-0" />
-                <span className="text-slate-600 font-mono text-[11px]">
-                  {isHindi ? 'पंजीकरण:' : 'Regn:'}{' '}
-                  <strong className="text-slate-900 font-bold">DEL HIN/2010/31544</strong>
-                </span>
-              </div>
-            </div>
-
-            {/* Headline & Mission Statement */}
-            <div className="space-y-2 max-w-3xl">
-              <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
-                {isHindi
-                  ? 'संपादकीय बोर्ड एवं सर्वोच्च नेतृत्व'
-                  : 'Editorial Board & Leadership'}
+      <article className="w-full bg-[#fdfdfb] text-slate-900 font-sans antialiased animate-fadeIn px-4 py-8 sm:px-6 lg:px-8 border border-slate-200/80 rounded-none">
+        
+        {/* Masthead Section */}
+        <header className="border-b border-slate-300 pb-8 mb-10">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="space-y-3">
+              <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-red-800">
+                NP News Metro
+              </span>
+              <h1 className="font-serif text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-950">
+                Editorial Board & Leadership
               </h1>
-              <p className="text-slate-600 text-sm sm:text-base leading-relaxed font-sans max-w-2xl">
-                {isHindi
-                  ? 'स्वतंत्र, निष्पक्ष और प्रमाण-आधारित पत्रकारिता के प्रति समर्पित हमारा संपादकीय, प्रबंधकीय, तकनीकी व मार्गदर्शक नेतृत्व।'
-                  : 'The masthead, editors, advisory mentors, and investigative correspondents upholding fearless reporting, factual accuracy, and constitutional values across India.'}
+              <p className="font-serif italic text-slate-700 text-base sm:text-lg max-w-3xl leading-relaxed">
+                The masthead, editors, and newsroom journalists upholding independent reporting, factual accuracy, and constitutional values.
               </p>
             </div>
-
-            {/* 4 Trust Metric Blocks */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-slate-200/50 text-slate-700 flex items-center justify-center flex-shrink-0">
-                  <ShieldCheck className="w-4 h-4" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[9px] text-slate-400 uppercase font-bold tracking-wider">{isHindi ? 'मानक' : 'Standards'}</p>
-                  <p className="text-xs font-bold text-slate-900 truncate">{isHindi ? 'प्रेस परिषद कोड' : 'PCI Ethics Code'}</p>
-                </div>
+            
+            <div className="flex flex-col gap-2 items-start md:items-end flex-shrink-0">
+              <span className="text-[11px] font-mono text-slate-500 bg-slate-100/80 border border-slate-200 px-3 py-1 font-semibold uppercase tracking-wider rounded-none">
+                RNI: DEL HIN/2010/31544
+              </span>
+            </div>
+          </div>
+          
+          {/* Trust Strip */}
+          <div className="border-t border-slate-200 mt-8 pt-4 pb-1">
+            <div className="flex flex-wrap items-center justify-between gap-y-3 gap-x-6 text-[11px] font-sans font-bold uppercase tracking-wider text-slate-500">
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-red-800" />
+                <span>Verified Newsroom Staff</span>
               </div>
-
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-slate-200/50 text-slate-700 flex items-center justify-center flex-shrink-0">
-                  <Scale className="w-4 h-4" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[9px] text-slate-400 uppercase font-bold tracking-wider">{isHindi ? 'स्वायत्तता' : 'Autonomy'}</p>
-                  <p className="text-xs font-bold text-slate-900 truncate">{isHindi ? '100% स्वतंत्र' : '100% Independent'}</p>
-                </div>
+              <span className="hidden sm:inline text-slate-300">|</span>
+              <div className="flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-red-800" />
+                <span>Press Council Code</span>
               </div>
-
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-slate-200/50 text-slate-700 flex items-center justify-center flex-shrink-0">
-                  <CheckCircle2 className="w-4 h-4" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[9px] text-slate-400 uppercase font-bold tracking-wider">{isHindi ? 'तथ्य-जांच' : 'Fact-Check'}</p>
-                  <p className="text-xs font-bold text-slate-900 truncate">{isHindi ? 'बहु-स्तरीय पड़ताल' : 'Multi-Tier Sourcing'}</p>
-                </div>
+              <span className="hidden sm:inline text-slate-300">|</span>
+              <div className="flex items-center gap-1.5">
+                <Award className="w-3.5 h-3.5 text-red-800" />
+                <span>Fact-Check Verification</span>
               </div>
-
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-slate-200/50 text-slate-700 flex items-center justify-center flex-shrink-0">
-                  <Globe className="w-4 h-4" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[9px] text-slate-400 uppercase font-bold tracking-wider">{isHindi ? 'मुख्यालय' : 'Headquarters'}</p>
-                  <p className="text-xs font-bold text-slate-900 truncate">{isHindi ? 'नई दिल्ली ब्यूरो' : 'New Delhi HQ'}</p>
-                </div>
+              <span className="hidden sm:inline text-slate-300">|</span>
+              <div className="flex items-center gap-1.5">
+                <Scale className="w-3.5 h-3.5 text-red-800" />
+                <span>Editorial Autonomy</span>
               </div>
             </div>
           </div>
-        </div>
+        </header>
 
-        {/* Filter Console: Department Tabs & Instant Search Box */}
-        <div className="border-b border-slate-200 pb-4 flex flex-col md:flex-row items-center justify-between gap-4">
-          {/* Department Filter Tabs */}
+        {/* Filter Console */}
+        <div className="border-b border-slate-200 pb-5 mb-10 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-1 overflow-x-auto hide-scrollbar w-full md:w-auto pb-1 md:pb-0">
             {[
               { id: 'all', label: isHindi ? 'सभी सदस्य' : 'All Leadership' },
               { id: 'executive', label: isHindi ? 'संस्थापक एवं CTO' : 'Founder & CTO' },
               { id: 'advisory', label: isHindi ? 'मार्गदर्शक एवं सलाहकार' : 'Advisory Board' },
-              { id: 'editorial', label: isHindi ? 'प्रधान संपादक' : 'Editors-in-Chief' },
-              { id: 'digital', label: isHindi ? 'सोशल मीडिया' : 'Digital Media' },
+              { id: 'editorial', label: isHindi ? 'संपादकीय नेतृत्व' : 'Editorial Leadership' },
+              { id: 'digital', label: isHindi ? 'डिजिटल रणनीति' : 'Digital Media' },
               { id: 'reporting', label: isHindi ? 'रिपोर्टिंग ब्यूरो' : 'Reporting Bureau' },
             ].map((dept) => (
               <button
                 key={dept.id}
                 onClick={() => setActiveDept(dept.id)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
+                className={`px-3 py-1.5 text-xs font-semibold whitespace-nowrap tracking-wider transition-colors cursor-pointer border border-transparent rounded-none ${
                   activeDept === dept.id
-                    ? 'bg-slate-900 text-white font-bold'
+                    ? 'bg-slate-950 text-white font-bold'
                     : 'bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -241,7 +198,6 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
             ))}
           </div>
 
-          {/* Instant Search Filter */}
           <div className="relative w-full md:w-72 flex-shrink-0">
             <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
@@ -249,7 +205,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
               value={teamSearchQuery}
               onChange={(e) => setTeamSearchQuery(e.target.value)}
               placeholder={isHindi ? 'खोजें...' : 'Search...'}
-              className="w-full pl-9 pr-7 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:border-slate-400 focus:bg-white transition-colors"
+              className="w-full pl-9 pr-7 py-1.5 text-xs bg-slate-50 border border-slate-200 text-slate-955 placeholder:text-slate-400 focus:outline-hidden focus:border-slate-400 focus:bg-white transition-colors rounded-none"
             />
             {teamSearchQuery && (
               <button
@@ -264,7 +220,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
 
         {/* Empty Search State */}
         {totalVisible === 0 && (
-          <div className="py-12 text-center border border-dashed border-slate-200 rounded-xl space-y-2">
+          <div className="py-12 text-center border border-dashed border-slate-200 rounded-none space-y-2">
             <Users className="w-8 h-8 text-slate-300 mx-auto" />
             <p className="text-sm font-bold text-slate-900">
               {isHindi ? 'कोई सदस्य नहीं मिला' : 'No team members matched your search'}
@@ -274,962 +230,792 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
             </p>
             <button
               onClick={() => { setActiveDept('all'); setTeamSearchQuery(''); }}
-              className="px-4 py-2 bg-slate-900 text-white text-xs font-bold rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
+              className="px-4 py-2 bg-slate-900 text-white text-xs font-bold rounded-none hover:bg-slate-800 transition-colors cursor-pointer"
             >
               {isHindi ? 'फ़िल्टर रीसेट करें' : 'Reset Filters'}
             </button>
           </div>
         )}
 
-        {/* =========================================================================
-            1. FOUNDER & CHIEF TECHNOLOGY OFFICER (CTO) SPOTLIGHT
-           ========================================================================= */}
+        {/* 1. Founder & Executive Leadership */}
         {showExecutive && (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
-              <h2 className="font-serif text-sm font-bold uppercase tracking-wider text-slate-900">
-                {isHindi ? 'संस्थापक एवं मुख्य प्रौद्योगिकी नेतृत्व' : 'Founder & Executive Technology Leadership'}
-              </h2>
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                {isHindi ? 'संस्थापक' : 'Founder'}
+          <section className="py-10 border-b border-slate-300">
+            <div className="space-y-1 mb-8">
+              <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-red-800">
+                01 / Executive Masthead
               </span>
+              <h2 className="font-serif text-2xl font-bold tracking-tight text-slate-955">
+                Founder & Executive Leadership
+              </h2>
             </div>
-
-            {/* Executive Card */}
-            <div className="bg-white border border-slate-200 p-6 sm:p-8 rounded-2xl shadow-xs transition-colors hover:border-slate-300">
-              <div className="flex flex-col md:flex-row gap-6 sm:gap-8 items-start">
-                <div className="relative flex-shrink-0 mx-auto md:mx-0">
+            
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-start">
+              {/* Left Column: Portrait */}
+              <div className="md:col-span-4 lg:col-span-4">
+                <div className="relative group overflow-hidden border border-slate-200">
                   <img
                     src={getAuthorAvatarUrl('/uploads/umang-pandey.jpg')}
                     alt="Umang Pandey"
-                    className="w-28 h-28 sm:w-32 sm:h-32 rounded-xl object-cover border border-slate-200"
+                    className="w-full aspect-[4/5] object-cover grayscale contrast-[1.05] brightness-[0.98] group-hover:grayscale-0 transition-all duration-500"
                     onError={handleAvatarError}
                   />
+                  <div className="absolute inset-0 bg-slate-900/5 mix-blend-multiply" />
+                </div>
+              </div>
+
+              {/* Right Column: Identity & Bio */}
+              <div className="md:col-span-8 lg:col-span-8 flex flex-col justify-between h-full space-y-6">
+                <div className="space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-slate-200 pb-3">
+                    <div>
+                      <h3
+                        onClick={() => onSelectAuthor('author-umang-pandey')}
+                        className="font-serif text-2xl sm:text-3xl font-bold text-slate-955 hover:text-red-800 cursor-pointer transition-colors"
+                      >
+                        {isHindi ? 'उमंग पाण्डेय' : 'Umang Pandey'}
+                      </h3>
+                      <span className="text-xs font-sans font-bold uppercase tracking-wider text-red-800 block mt-1">
+                        Founder & Chief Technology Officer (CTO) • NP News Metro
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                      <Mail className="w-3.5 h-3.5" />
+                      <a
+                        href="mailto:umang.pandey@npnewsmetro.com"
+                        className="font-mono hover:text-red-800 transition-colors"
+                      >
+                        umang.pandey@npnewsmetro.com
+                      </a>
+                    </div>
+                  </div>
+
+                  <p className="font-serif text-slate-800 text-sm sm:text-base leading-relaxed">
+                    {isHindi
+                      ? 'एनपी न्यूज़ मेट्रो के संस्थापक एवं मुख्य प्रौद्योगिकी अधिकारी (CTO), जो डिजिटल मीडिया में स्वतंत्र, निर्भीक और प्रमाण-आधारित पत्रकारिता, उच्च-प्रदर्शन डिजिटल पब्लिशिंग अवसंरचना, एआई प्रणालियों तथा तकनीकी नवाचार का नेतृत्व कर रहे हैं।'
+                      : 'Founder & Chief Technology Officer (CTO) of NP News Metro, architecting high-performance digital publishing infrastructure, AI-driven news systems, media innovation, and uncompromised journalistic integrity.'}
+                  </p>
                 </div>
 
-                <div className="flex-1 min-w-0 text-center md:text-left space-y-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div>
-                      <div className="flex items-center justify-center md:justify-start gap-2 flex-wrap">
-                        <h3
-                          onClick={() => onSelectAuthor('author-umang-pandey')}
-                          className="font-serif text-xl sm:text-2xl font-bold text-slate-900 hover:text-primary cursor-pointer transition-colors"
-                        >
-                          {isHindi ? 'उमंग पाण्डेय' : 'Umang Pandey'}
-                        </h3>
-                        <span className="bg-slate-100 text-slate-800 text-[10px] font-bold px-2 py-0.5 rounded border border-slate-200">
-                          {isHindi ? 'संस्थापक' : 'Founder'}
-                        </span>
-                        <span className="bg-amber-50 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-200">
-                          {isHindi ? 'मुख्य प्रौद्योगिकी अधिकारी (CTO)' : 'Chief Technology Officer (CTO)'}
-                        </span>
-                      </div>
-                      <p className="text-xs text-slate-500 mt-1 font-sans">
-                        Founder & Chief Technology Officer (CTO) • NP News Metro
-                      </p>
-                    </div>
-
-                    {/* Email Action */}
-                    <div className="flex items-center justify-center md:justify-end">
-                      <button
-                        onClick={() => handleCopy('umang.pandey@npnewsmetro.com')}
-                        className="px-3 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer"
-                      >
-                        {copiedEmail === 'umang.pandey@npnewsmetro.com' ? (
-                          <>
-                            <Check className="w-3.5 h-3.5 text-emerald-600" />
-                            <span className="text-emerald-700 font-bold">{isHindi ? 'कॉपी हुआ' : 'Copied'}</span>
-                          </>
-                        ) : (
-                          <>
-                            <Mail className="w-3.5 h-3.5 text-slate-500" />
-                            <span className="font-mono text-xs">umang.pandey@npnewsmetro.com</span>
-                          </>
-                        )}
-                      </button>
-                    </div>
+                <div className="space-y-4 pt-4 border-t border-slate-200">
+                  {/* Focus Areas Metadata */}
+                  <div className="flex flex-wrap gap-x-4 gap-y-2 text-[11px] font-sans font-bold text-slate-500 uppercase tracking-wider">
+                    <span>Institutional Leadership</span>
+                    <span className="text-slate-300">/</span>
+                    <span>Chief Technology Officer (CTO)</span>
+                    <span className="text-slate-300">/</span>
+                    <span>AI & Digital Systems</span>
+                    <span className="text-slate-300">/</span>
+                    <span>Media Strategy</span>
                   </div>
 
-                  {/* Clean Manifesto Quote */}
-                  <div className="border-l-2 border-slate-300 pl-4 py-0.5 italic text-slate-600 text-xs sm:text-sm leading-relaxed">
-                    "{isHindi 
-                      ? 'हमारा लक्ष्य केवल समाचार देना नहीं, बल्कि उन्नत प्रौद्योगिकी, निष्पक्षता और संवैधानिक मूल्यों के साथ डिजिटल पत्रकारिता में एक नया मानक स्थापित करना है।'
-                      : 'Our mission is to architect next-generation digital news infrastructure, pairing fearless factual journalism with cutting-edge technology and constitutional integrity.'}"
-                  </div>
-
-                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                    {isHindi
-                      ? 'एनपी न्यूज़ मेट्रो के संस्थापक एवं मुख्य प्रौद्योगिकी अधिकारी (CTO), जो डिजिटल मीडिया में स्वतंत्र, निर्भीक और प्रमाण-आधारित पत्रकारिता, उच्च-प्रदर्शन डिजिटल पब्लिशिंग अवसंरचना, डिजिटल प्रणालियों तथा तकनीकी नवाचार का नेतृत्व कर रहे हैं।'
-                      : 'Founder & Chief Technology Officer (CTO) of NP News Metro, architecting high-performance digital publishing infrastructure, platform engineering, media innovation, and uncompromised journalistic integrity.'}
-                  </p>
-
-                  <div className="flex flex-wrap items-center justify-between gap-4 pt-3.5 border-t border-slate-100 text-xs">
-                    <div className="flex flex-wrap gap-1.5 items-center justify-center md:justify-start">
-                      {(isHindi 
-                        ? ['संस्थागत नेतृत्व', 'मुख्य प्रौद्योगिकी अधिकारी (CTO)', 'सिस्टम एवं डिजिटल आर्किटेक्चर', 'मीडिया रणनीति']
-                        : ['Institutional Leadership', 'Chief Technology Officer (CTO)', 'Platform & Digital Systems', 'Media Strategy']
-                      ).map((b, i) => (
-                        <span key={i} className="bg-slate-50 text-slate-600 text-[11px] px-2 py-0.5 rounded border border-slate-200">
-                          {b}
-                        </span>
-                      ))}
-                    </div>
-
+                  <div className="flex items-center gap-4 pt-2">
                     <button
                       onClick={() => onSelectAuthor('author-umang-pandey')}
-                      className="inline-flex items-center gap-1 px-4 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition-colors cursor-pointer"
+                      className="text-red-800 hover:text-red-900 text-xs font-bold uppercase tracking-wider transition-colors inline-flex items-center gap-1.5 hover:underline cursor-pointer"
                     >
-                      <span>{isHindi ? 'प्रोफ़ाइल एवं लेख' : 'View Profile'}</span>
+                      <span>View Profile & Articles</span>
                       <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => handleCopy('umang.pandey@npnewsmetro.com')}
+                      className="text-slate-500 hover:text-slate-905 text-xs font-bold uppercase tracking-wider transition-colors inline-flex items-center gap-1.5 cursor-pointer"
+                    >
+                      {copiedEmail === 'umang.pandey@npnewsmetro.com' ? (
+                        <span className="text-emerald-700 font-bold">{isHindi ? 'कॉपी हुआ' : 'Email Copied'}</span>
+                      ) : (
+                        <span>Copy Email</span>
+                      )}
                     </button>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          </section>
         )}
 
-        {/* =========================================================================
-            2. MENTORSHIP & ADVISORY BOARD
-           ========================================================================= */}
+        {/* 2. Mentorship & Advisory Board */}
         {showAdvisorySection && (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
-              <h2 className="font-serif text-sm font-bold uppercase tracking-wider text-slate-900">
-                {isHindi ? 'मार्गदर्शक मंडल एवं सलाहकार परिषद' : 'Mentorship & Advisory Board'}
-              </h2>
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                {isHindi ? 'सलाहकार परिषद' : 'Advisory Council'}
+          <section className="py-10 border-b border-slate-300">
+            <div className="space-y-1 mb-8">
+              <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-red-800">
+                02 / Advisory Council
               </span>
+              <h2 className="font-serif text-2xl font-bold tracking-tight text-slate-955">
+                Mentorship & Advisory Board
+              </h2>
             </div>
 
-            {/* Chief Mentor & Advisor: Dr. Neelima Pandey */}
-            {showNeelima && (
-              <div className="bg-white border border-slate-200 p-6 sm:p-8 rounded-2xl shadow-xs transition-colors hover:border-slate-300">
-                <div className="flex flex-col sm:flex-row gap-6 items-start">
-                  <div className="relative flex-shrink-0 mx-auto sm:mx-0">
-                    <img
-                      src={getAuthorAvatarUrl('/uploads/dr-neelima-pandey.jpg')}
-                      alt="Dr. Neelima Pandey"
-                      className="w-28 h-28 sm:w-32 sm:h-32 rounded-xl object-cover border border-slate-200"
-                      onError={handleAvatarError}
-                    />
-                  </div>
-
-                  <div className="flex-1 min-w-0 text-center sm:text-left space-y-3">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                      <div>
-                        <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
-                          <h3
-                            onClick={() => onSelectAuthor('author-dr-neelima-pandey')}
-                            className="font-serif text-xl sm:text-2xl font-bold text-slate-900 hover:text-primary cursor-pointer transition-colors"
-                          >
-                            {isHindi ? 'डॉ. नीलिमा पाण्डेय' : 'Dr. Neelima Pandey'}
-                          </h3>
-                          <span className="bg-slate-100 text-slate-800 text-[10px] font-bold px-2 py-0.5 rounded border border-slate-200">
-                            {isHindi ? 'मुख्य मार्गदर्शक' : 'Chief Mentor & Advisor'}
-                          </span>
-                        </div>
-                        <p className="text-xs text-slate-500 mt-1 font-sans">
-                          {isHindi 
-                            ? 'शिक्षिका, साहित्यकार एवं कवयित्री • NP News Metro' 
-                            : 'Educator, Literary Scholar & Poet • NP News Metro'}
-                        </p>
-                      </div>
-
-                      <button
-                        onClick={() => handleCopy('dr.neelima.pandey@npnewsmetro.com')}
-                        className="px-3 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer self-center sm:self-auto shadow-2xs"
-                      >
-                        {copiedEmail === 'dr.neelima.pandey@npnewsmetro.com' ? (
-                          <>
-                            <Check className="w-3.5 h-3.5 text-emerald-600" />
-                            <span className="text-emerald-700 font-bold">{isHindi ? 'कॉपी हुआ' : 'Copied'}</span>
-                          </>
-                        ) : (
-                          <>
-                            <Mail className="w-3.5 h-3.5 text-slate-500" />
-                            <span className="font-mono text-xs">dr.neelima.pandey@npnewsmetro.com</span>
-                          </>
-                        )}
-                      </button>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+              {/* Dr. Neelima Pandey */}
+              {showNeelima && (
+                <article className="space-y-4 flex flex-col justify-between h-full">
+                  <div className="space-y-4">
+                    <div className="relative overflow-hidden border border-slate-200">
+                      <img
+                        src={getAuthorAvatarUrl('/uploads/dr-neelima-pandey.jpg')}
+                        alt="Dr. Neelima Pandey"
+                        className="w-full aspect-[4/5] object-cover grayscale contrast-[1.05] hover:grayscale-0 transition-all duration-300"
+                        onError={handleAvatarError}
+                      />
                     </div>
-
-                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    <div className="space-y-1.5">
+                      <h3
+                        onClick={() => onSelectAuthor('author-dr-neelima-pandey')}
+                        className="font-serif text-xl font-bold text-slate-955 hover:text-red-800 cursor-pointer transition-colors"
+                      >
+                        {isHindi ? 'डॉ. नीलिमा पाण्डेय' : 'Dr. Neelima Pandey'}
+                      </h3>
+                      <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-red-800 block">
+                        Chief Mentor & Advisor
+                      </span>
+                      <p className="text-[11px] text-slate-500 font-sans">
+                        Educator, Literary Scholar & Poet • NP News Metro
+                      </p>
+                    </div>
+                    <p className="text-xs text-slate-700 leading-relaxed font-serif">
                       {isHindi
                         ? 'एनपी न्यूज़ मेट्रो की मुख्य मार्गदर्शक, प्रतिष्ठित शिक्षिका, प्रख्यात साहित्यकार एवं कवयित्री। शिक्षा, सामाजिक मूल्य, साहित्यिक विमर्श और सांस्कृतिक चेतना के संवर्धन में मार्गदर्शक भूमिका।'
                         : 'Chief Mentor and Advisory Patron at NP News Metro; distinguished educator, accomplished litterateur, and celebrated poet guiding our ethical, educational, and cultural vision.'}
                     </p>
+                  </div>
 
-                    <div className="flex flex-wrap items-center justify-between gap-3 pt-3.5 border-t border-slate-100 text-xs">
-                      <div className="flex flex-wrap gap-1.5 items-center justify-center sm:justify-start">
-                        {(isHindi 
-                          ? ['साहित्य एवं संस्कृति', 'शिक्षा एवं दर्शन', 'सामाजिक चेतना', 'सांस्कृतिक विमर्श']
-                          : ['Literature & Culture', 'Education & Ethics', 'Social Consciousness', 'Cultural Discourse']
-                        ).map((b, i) => (
-                          <span key={i} className="bg-slate-50 text-slate-600 text-[11px] px-2 py-0.5 rounded border border-slate-200">
-                            {b}
-                          </span>
-                        ))}
-                      </div>
-
+                  <div className="space-y-3.5 pt-4 border-t border-slate-200 mt-auto">
+                    <div className="flex flex-wrap gap-x-2 gap-y-1 text-[10px] font-sans font-bold text-slate-500 uppercase tracking-wider">
+                      <span>Literature & Culture</span>
+                      <span className="text-slate-300">/</span>
+                      <span>Education & Ethics</span>
+                      <span className="text-slate-300">/</span>
+                      <span>Social Consciousness</span>
+                      <span className="text-slate-300">/</span>
+                      <span>Cultural Discourse</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100">
+                      <button
+                        onClick={() => handleCopy('dr.neelima.pandey@npnewsmetro.com')}
+                        className="text-slate-500 hover:text-slate-900 font-semibold cursor-pointer"
+                      >
+                        {copiedEmail === 'dr.neelima.pandey@npnewsmetro.com' ? (
+                          <span className="text-emerald-700 font-bold">{isHindi ? 'कॉपी हुआ' : 'Copied'}</span>
+                        ) : (
+                          <span>Copy Email</span>
+                        )}
+                      </button>
                       <button
                         onClick={() => onSelectAuthor('author-dr-neelima-pandey')}
-                        className="text-primary hover:text-primary-container font-bold text-xs flex items-center gap-1 group cursor-pointer"
+                        className="text-red-800 hover:text-red-905 font-bold uppercase tracking-wider inline-flex items-center gap-1 hover:underline cursor-pointer"
                       >
-                        <span>{isHindi ? 'लेख देखें' : 'View Articles'}</span>
-                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                        <span>Profile & Articles</span>
+                        <ArrowRight className="w-3 h-3" />
                       </button>
                     </div>
                   </div>
-                </div>
-              </div>
-            )}
+                </article>
+              )}
 
-            {/* Advisory Board Members Grid (2 Columns) */}
-            {(showArya || showAgarwal) && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-1">
-                {/* Diwan Chand Arya (D. C. Arya) */}
-                {showArya && (
-                  <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-xs hover:border-slate-300 transition-colors flex flex-col justify-between">
-                    <div className="space-y-3.5">
-                      <div className="flex items-start gap-3.5">
-                        <img
-                          src={getAuthorAvatarUrl('/np-author-default.png')}
-                          alt="Diwan Chand Arya (D. C. Arya)"
-                          className="w-14 h-14 rounded-xl object-cover border border-slate-200"
-                          onError={handleAvatarError}
-                        />
-                        <div className="flex-1 min-w-0">
-                          <h3
-                            onClick={() => onSelectAuthor('author-diwan-chand-arya')}
-                            className="font-serif text-lg font-bold text-slate-900 hover:text-primary cursor-pointer transition-colors"
-                          >
-                            {isHindi ? 'दीवान चंद आर्य (डी. सी. आर्य)' : 'Diwan Chand Arya (D. C. Arya)'}
-                          </h3>
-                          <div className="inline-block bg-slate-100 text-slate-800 font-bold text-[9px] uppercase tracking-wider px-2 py-0.5 rounded mt-1 border border-slate-200">
-                            {isHindi ? 'सलाहकार मंडल सदस्य' : 'Advisory Board Member'}
-                          </div>
-                          <p className="text-xs text-slate-500 mt-1 font-mono">
-                            dc.arya@npnewsmetro.com
-                          </p>
-                        </div>
-                      </div>
-
-                      <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                        {isHindi
-                          ? 'एनपी न्यूज़ मेट्रो के सलाहकार मंडल सदस्य, संस्थागत प्रशासन, सामाजिक सरोकारों और सार्वजनिक शुचिता पर रणनीतिक मार्गदर्शन प्रदान करते हैं।'
-                          : 'Advisory Board Member at NP News Metro, providing strategic guidance on institutional governance, community affairs, and public integrity.'}
-                      </p>
-                    </div>
-
-                    <div className="pt-3.5 mt-3.5 border-t border-slate-100 space-y-3">
-                      <div className="flex flex-wrap gap-1">
-                        {(isHindi 
-                          ? ['प्रशासन एवं नीति', 'सामाजिक सरोकार', 'संस्थागत रणनीति']
-                          : ['Governance & Policy', 'Public Affairs', 'Institutional Strategy']
-                        ).map((beat, i) => (
-                          <span key={i} className="bg-slate-50 text-slate-600 px-2.5 py-0.5 rounded text-[11px] font-medium border border-slate-200">
-                            {beat}
-                          </span>
-                        ))}
-                      </div>
-
-                      <div className="flex items-center justify-between text-xs pt-1">
-                        <button
-                          onClick={() => handleCopy('dc.arya@npnewsmetro.com')}
-                          className="text-slate-500 hover:text-primary flex items-center gap-1 text-xs cursor-pointer"
-                        >
-                          {copiedEmail === 'dc.arya@npnewsmetro.com' ? (
-                            <span className="text-emerald-700 font-semibold flex items-center gap-1">
-                              <Check className="w-3 h-3" /> {isHindi ? 'कॉपी हुआ' : 'Copied'}
-                            </span>
-                          ) : (
-                            <>
-                              <Copy className="w-3 h-3" />
-                              <span>{isHindi ? 'ईमेल कॉपी' : 'Copy Email'}</span>
-                            </>
-                          )}
-                        </button>
-
-                        <button
-                          onClick={() => onSelectAuthor('author-diwan-chand-arya')}
-                          className="text-primary hover:text-primary-container font-bold text-xs flex items-center gap-1 group cursor-pointer"
-                        >
-                          <span>{isHindi ? 'प्रोफ़ाइल' : 'View Profile'}</span>
-                          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Raj Kumar Agarwal */}
-                {showAgarwal && (
-                  <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-xs hover:border-slate-300 transition-colors flex flex-col justify-between">
-                    <div className="space-y-3.5">
-                      <div className="flex items-start gap-3.5">
-                        <img
-                          src={getAuthorAvatarUrl('/np-author-default.png')}
-                          alt="Raj Kumar Agarwal"
-                          className="w-14 h-14 rounded-xl object-cover border border-slate-200"
-                          onError={handleAvatarError}
-                        />
-                        <div className="flex-1 min-w-0">
-                          <h3
-                            onClick={() => onSelectAuthor('author-raj-kumar-agarwal')}
-                            className="font-serif text-lg font-bold text-slate-900 hover:text-primary cursor-pointer transition-colors"
-                          >
-                            {isHindi ? 'राज कुमार अग्रवाल' : 'Raj Kumar Agarwal'}
-                          </h3>
-                          <div className="inline-block bg-slate-100 text-slate-800 font-bold text-[9px] uppercase tracking-wider px-2 py-0.5 rounded mt-1 border border-slate-200">
-                            {isHindi ? 'सलाहकार मंडल सदस्य' : 'Advisory Board Member'}
-                          </div>
-                          <p className="text-xs text-slate-500 mt-1 font-mono">
-                            rk.agarwal@npnewsmetro.com
-                          </p>
-                        </div>
-                      </div>
-
-                      <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                        {isHindi
-                          ? 'एनपी न्यूज़ मेट्रो के सलाहकार मंडल सदस्य, आर्थिक नीतियों, उद्यम स्थिरता, मीडिया आचार संहिता और सामाजिक विकास के विशेषज्ञ सलाहकार।'
-                          : 'Advisory Board Member at NP News Metro, advising on economic policy, enterprise sustainability, media ethics, and societal development.'}
-                      </p>
-                    </div>
-
-                    <div className="pt-3.5 mt-3.5 border-t border-slate-100 space-y-3">
-                      <div className="flex flex-wrap gap-1">
-                        {(isHindi 
-                          ? ['आर्थिक नीतियां', 'उद्यम मामले', 'नैतिक मानक']
-                          : ['Economic Policy', 'Enterprise Affairs', 'Ethical Standards']
-                        ).map((beat, i) => (
-                          <span key={i} className="bg-slate-50 text-slate-600 px-2.5 py-0.5 rounded text-[11px] font-medium border border-slate-200">
-                            {beat}
-                          </span>
-                        ))}
-                      </div>
-
-                      <div className="flex items-center justify-between text-xs pt-1">
-                        <button
-                          onClick={() => handleCopy('rk.agarwal@npnewsmetro.com')}
-                          className="text-slate-500 hover:text-primary flex items-center gap-1 text-xs cursor-pointer"
-                        >
-                          {copiedEmail === 'rk.agarwal@npnewsmetro.com' ? (
-                            <span className="text-emerald-700 font-semibold flex items-center gap-1">
-                              <Check className="w-3 h-3" /> {isHindi ? 'कॉपी हुआ' : 'Copied'}
-                            </span>
-                          ) : (
-                            <>
-                              <Copy className="w-3 h-3" />
-                              <span>{isHindi ? 'ईमेल कॉपी' : 'Copy Email'}</span>
-                            </>
-                          )}
-                        </button>
-
-                        <button
-                          onClick={() => onSelectAuthor('author-raj-kumar-agarwal')}
-                          className="text-primary hover:text-primary-container font-bold text-xs flex items-center gap-1 group cursor-pointer"
-                        >
-                          <span>{isHindi ? 'प्रोफ़ाइल' : 'View Profile'}</span>
-                          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* =========================================================================
-            3. EDITORIAL LEADERSHIP / EDITORS-IN-CHIEF
-           ========================================================================= */}
-        {showEditorialSection && (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
-              <h2 className="font-serif text-sm font-bold uppercase tracking-wider text-slate-900">
-                {isHindi ? 'संपादकीय नेतृत्व (प्रधान संपादक मंडल)' : 'Editorial Leadership (Editors-in-Chief)'}
-              </h2>
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                {isHindi ? 'संपादकीय प्रमुख' : 'Editorial Directors'}
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {/* Neeraj Kumar Pandey */}
-              {showNeeraj && (
-                <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-xs hover:border-slate-300 transition-colors flex flex-col justify-between">
-                  <div className="space-y-3.5">
-                    <div className="flex items-start gap-4">
+              {/* Diwan Chand Arya */}
+              {showArya && (
+                <article className="space-y-4 flex flex-col justify-between h-full">
+                  <div className="space-y-4">
+                    <div className="relative overflow-hidden border border-slate-200">
                       <img
-                        src={getAuthorAvatarUrl('/uploads/neeraj-pandey.jpg')}
-                        alt="Neeraj Kumar Pandey"
-                        className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover border border-slate-200 shadow-2xs"
+                        src={getAuthorAvatarUrl('/np-author-default.png')}
+                        alt="Diwan Chand Arya (D. C. Arya)"
+                        className="w-full aspect-[4/5] object-cover grayscale contrast-[1.05] hover:grayscale-0 transition-all duration-300"
                         onError={handleAvatarError}
                       />
-                      <div className="flex-1 min-w-0">
-                        <h3
-                          onClick={() => onSelectAuthor('author-neeraj-pandey')}
-                          className="font-serif text-lg sm:text-xl font-bold text-slate-900 hover:text-primary cursor-pointer transition-colors"
-                        >
-                          {isHindi ? 'नीरज कुमार पाण्डेय' : 'Neeraj Kumar Pandey'}
-                        </h3>
-                        <div className="inline-block bg-slate-900 text-white font-bold text-[9px] uppercase tracking-wider px-2 py-0.5 rounded mt-1">
-                          {isHindi ? 'प्रधान संपादक' : 'Editor-in-Chief'}
-                        </div>
-                        <p className="text-xs text-slate-500 mt-1 font-mono">
-                          neeraj.pandey@npnewsmetro.com
-                        </p>
-                      </div>
                     </div>
-
-                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    <div className="space-y-1.5">
+                      <h3
+                        onClick={() => onSelectAuthor('author-diwan-chand-arya')}
+                        className="font-serif text-xl font-bold text-slate-955 hover:text-red-800 cursor-pointer transition-colors"
+                      >
+                        {isHindi ? 'दीवान चंद आर्य (डी. सी. आर्य)' : 'Diwan Chand Arya (D. C. Arya)'}
+                      </h3>
+                      <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-red-800 block">
+                        Advisory Board Member
+                      </span>
+                      <p className="text-[11px] text-slate-500 font-sans">
+                        dc.arya@npnewsmetro.com
+                      </p>
+                    </div>
+                    <p className="text-xs text-slate-700 leading-relaxed font-serif">
                       {isHindi
-                        ? 'एनपी न्यूज़ मेट्रो के प्रधान संपादक, राष्ट्रीय रिपोर्टिंग, ज़मीनी जांच, संसदीय मामलों और न्यूज़रूम संपादकीय मानकों के प्रमुख।'
-                        : 'Editor-in-Chief at NP News Metro, leading national reporting, field investigations, parliamentary coverage, and newsroom editorial standards.'}
+                        ? 'एनपी न्यूज़ मेट्रो के सलाहकार मंडल सदस्य, संस्थागत प्रशासन, सामाजिक सरोकारों और सार्वजनिक शुचिता पर रणनीतिक मार्गदर्शन प्रदान करते हैं।'
+                        : 'Advisory Board Member at NP News Metro, providing strategic guidance on institutional governance, community affairs, and public integrity.'}
                     </p>
                   </div>
 
-                  <div className="pt-3.5 mt-3.5 border-t border-slate-100 space-y-3">
-                    <div className="flex flex-wrap gap-1">
-                      {(isHindi 
-                        ? ['राष्ट्रीय राजनीति', 'विशेष जांच', 'एनसीआर व प्रादेशिक']
-                        : ['National Politics', 'Investigations', 'NCR & Regional']
-                      ).map((beat, i) => (
-                        <span key={i} className="bg-slate-50 text-slate-600 px-2.5 py-0.5 rounded text-[11px] font-medium border border-slate-200">
-                          {beat}
-                        </span>
-                      ))}
+                  <div className="space-y-3.5 pt-4 border-t border-slate-200 mt-auto">
+                    <div className="flex flex-wrap gap-x-2 gap-y-1 text-[10px] font-sans font-bold text-slate-500 uppercase tracking-wider">
+                      <span>Governance & Policy</span>
+                      <span className="text-slate-300">/</span>
+                      <span>Public Affairs</span>
+                      <span className="text-slate-300">/</span>
+                      <span>Institutional Strategy</span>
                     </div>
-
-                    <div className="flex items-center justify-between text-xs pt-1">
+                    <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100">
                       <button
-                        onClick={() => handleCopy('neeraj.pandey@npnewsmetro.com')}
-                        className="text-slate-500 hover:text-primary flex items-center gap-1 text-xs cursor-pointer"
+                        onClick={() => handleCopy('dc.arya@npnewsmetro.com')}
+                        className="text-slate-500 hover:text-slate-900 font-semibold cursor-pointer"
                       >
-                        {copiedEmail === 'neeraj.pandey@npnewsmetro.com' ? (
-                          <span className="text-emerald-700 font-semibold flex items-center gap-1">
-                            <Check className="w-3 h-3" /> {isHindi ? 'कॉपी हुआ' : 'Copied'}
-                          </span>
+                        {copiedEmail === 'dc.arya@npnewsmetro.com' ? (
+                          <span className="text-emerald-700 font-bold">{isHindi ? 'कॉपी हुआ' : 'Copied'}</span>
                         ) : (
-                          <>
-                            <Copy className="w-3 h-3" />
-                            <span>{isHindi ? 'ईमेल कॉपी' : 'Copy Email'}</span>
-                          </>
+                          <span>Copy Email</span>
                         )}
                       </button>
-
                       <button
-                        onClick={() => onSelectAuthor('author-neeraj-pandey')}
-                        className="text-primary hover:text-primary-container font-bold text-xs flex items-center gap-1 group cursor-pointer"
+                        onClick={() => onSelectAuthor('author-diwan-chand-arya')}
+                        className="text-red-800 hover:text-red-905 font-bold uppercase tracking-wider inline-flex items-center gap-1 hover:underline cursor-pointer"
                       >
-                        <span>{isHindi ? 'लेख देखें' : 'View Articles'}</span>
-                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                        <span>Profile & Articles</span>
+                        <ArrowRight className="w-3 h-3" />
                       </button>
                     </div>
                   </div>
-                </div>
+                </article>
+              )}
+
+              {/* Raj Kumar Agarwal */}
+              {showAgarwal && (
+                <article className="space-y-4 flex flex-col justify-between h-full">
+                  <div className="space-y-4">
+                    <div className="relative overflow-hidden border border-slate-200">
+                      <img
+                        src={getAuthorAvatarUrl('/np-author-default.png')}
+                        alt="Raj Kumar Agarwal"
+                        className="w-full aspect-[4/5] object-cover grayscale contrast-[1.05] hover:grayscale-0 transition-all duration-300"
+                        onError={handleAvatarError}
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <h3
+                        onClick={() => onSelectAuthor('author-raj-kumar-agarwal')}
+                        className="font-serif text-xl font-bold text-slate-955 hover:text-red-800 cursor-pointer transition-colors"
+                      >
+                        {isHindi ? 'राज कुमार अग्रवाल' : 'Raj Kumar Agarwal'}
+                      </h3>
+                      <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-red-800 block">
+                        Advisory Board Member
+                      </span>
+                      <p className="text-[11px] text-slate-500 font-sans">
+                        rk.agarwal@npnewsmetro.com
+                      </p>
+                    </div>
+                    <p className="text-xs text-slate-700 leading-relaxed font-serif">
+                      {isHindi
+                        ? 'एनपी न्यूज़ मेट्रो के सलाहकार मंडल सदस्य, आर्थिक नीतियों, उद्यम स्थिरता, मीडिया आचार संहिता और सामाजिक विकास के विशेषज्ञ सलाहकार।'
+                        : 'Advisory Board Member at NP News Metro, advising on economic policy, enterprise sustainability, media ethics, and societal development.'}
+                    </p>
+                  </div>
+
+                  <div className="space-y-3.5 pt-4 border-t border-slate-200 mt-auto">
+                    <div className="flex flex-wrap gap-x-2 gap-y-1 text-[10px] font-sans font-bold text-slate-500 uppercase tracking-wider">
+                      <span>Economic Policy</span>
+                      <span className="text-slate-300">/</span>
+                      <span>Enterprise Affairs</span>
+                      <span className="text-slate-300">/</span>
+                      <span>Ethical Standards</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100">
+                      <button
+                        onClick={() => handleCopy('rk.agarwal@npnewsmetro.com')}
+                        className="text-slate-500 hover:text-slate-900 font-semibold cursor-pointer"
+                      >
+                        {copiedEmail === 'rk.agarwal@npnewsmetro.com' ? (
+                          <span className="text-emerald-700 font-bold">{isHindi ? 'कॉपी हुआ' : 'Copied'}</span>
+                        ) : (
+                          <span>Copy Email</span>
+                        )}
+                      </button>
+                      <button
+                        onClick={() => onSelectAuthor('author-raj-kumar-agarwal')}
+                        className="text-red-800 hover:text-red-905 font-bold uppercase tracking-wider inline-flex items-center gap-1 hover:underline cursor-pointer"
+                      >
+                        <span>Profile & Articles</span>
+                        <ArrowRight className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* 3. Editorial Leadership (Editors-in-Chief) */}
+        {showEditorialSection && (
+          <section className="py-10 border-b border-slate-300">
+            <div className="space-y-1 mb-8">
+              <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-red-800">
+                03 / Newsroom Authority
+              </span>
+              <h2 className="font-serif text-2xl font-bold tracking-tight text-slate-955">
+                Editorial Leadership
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+              {/* Neeraj Kumar Pandey */}
+              {showNeeraj && (
+                <article className="grid grid-cols-1 sm:grid-cols-12 gap-6 items-start">
+                  <div className="sm:col-span-5 relative overflow-hidden border border-slate-200">
+                    <img
+                      src={getAuthorAvatarUrl('/uploads/neeraj-pandey.jpg')}
+                      alt="Neeraj Kumar Pandey"
+                      className="w-full aspect-[4/5] object-cover grayscale contrast-[1.05] hover:grayscale-0 transition-all duration-300"
+                      onError={handleAvatarError}
+                    />
+                  </div>
+                  
+                  <div className="sm:col-span-7 flex flex-col justify-between h-full min-h-[220px]">
+                    <div className="space-y-3">
+                      <div>
+                        <h3
+                          onClick={() => onSelectAuthor('author-neeraj-pandey')}
+                          className="font-serif text-xl font-bold text-slate-955 hover:text-red-800 cursor-pointer transition-colors"
+                        >
+                          {isHindi ? 'नीरज कुमार पाण्डेय' : 'Neeraj Kumar Pandey'}
+                        </h3>
+                        <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-red-800 block mt-0.5">
+                          Editor-in-Chief
+                        </span>
+                        <p className="text-[11px] text-slate-500 font-mono mt-0.5">
+                          neeraj.pandey@npnewsmetro.com
+                        </p>
+                      </div>
+                      <p className="text-xs text-slate-700 leading-relaxed font-serif">
+                        {isHindi
+                          ? 'एनपी न्यूज़ मेट्रो के प्रधान संपादक, राष्ट्रीय रिपोर्टिंग, ज़मीनी जांच, संसदीय मामलों और न्यूज़रूम संपादकीय मानकों के प्रमुख।'
+                          : 'Editor-in-Chief at NP News Metro, leading national reporting, field investigations, parliamentary coverage, and newsroom editorial standards.'}
+                      </p>
+                    </div>
+
+                    <div className="space-y-3 pt-3 border-t border-slate-200 mt-4">
+                      <div className="flex flex-wrap gap-x-2 gap-y-1 text-[10px] font-sans font-bold text-slate-500 uppercase tracking-wider">
+                        <span>National Politics</span>
+                        <span className="text-slate-300">/</span>
+                        <span>Investigations</span>
+                        <span className="text-slate-300">/</span>
+                        <span>NCR & Regional</span>
+                      </div>
+                      <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100">
+                        <button
+                          onClick={() => handleCopy('neeraj.pandey@npnewsmetro.com')}
+                          className="text-slate-500 hover:text-slate-900 font-semibold cursor-pointer"
+                        >
+                          {copiedEmail === 'neeraj.pandey@npnewsmetro.com' ? (
+                            <span className="text-emerald-700 font-bold">{isHindi ? 'कॉपी हुआ' : 'Copied'}</span>
+                          ) : (
+                            <span>Copy Email</span>
+                          )}
+                        </button>
+                        <button
+                          onClick={() => onSelectAuthor('author-neeraj-pandey')}
+                          className="text-red-800 hover:text-red-905 font-bold uppercase tracking-wider inline-flex items-center gap-1 hover:underline cursor-pointer"
+                        >
+                          <span>View Articles</span>
+                          <ArrowRight className="w-3 h-3" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </article>
               )}
 
               {/* Chetan Sharma */}
               {showChetan && (
-                <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-xs hover:border-slate-300 transition-colors flex flex-col justify-between">
-                  <div className="space-y-3.5">
-                    <div className="flex items-start gap-4">
-                      <img
-                        src={getAuthorAvatarUrl('/uploads/chetan-sharma.jpg')}
-                        alt="Chetan Sharma"
-                        className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover border border-slate-200 shadow-2xs"
-                        onError={handleAvatarError}
-                      />
-                      <div className="flex-1 min-w-0">
+                <article className="grid grid-cols-1 sm:grid-cols-12 gap-6 items-start">
+                  <div className="sm:col-span-5 relative overflow-hidden border border-slate-200">
+                    <img
+                      src={getAuthorAvatarUrl('/uploads/chetan-sharma.jpg')}
+                      alt="Chetan Sharma"
+                      className="w-full aspect-[4/5] object-cover grayscale contrast-[1.05] hover:grayscale-0 transition-all duration-300"
+                      onError={handleAvatarError}
+                    />
+                  </div>
+                  
+                  <div className="sm:col-span-7 flex flex-col justify-between h-full min-h-[220px]">
+                    <div className="space-y-3">
+                      <div>
                         <h3
                           onClick={() => onSelectAuthor('author-chetan-sharma')}
-                          className="font-serif text-lg sm:text-xl font-bold text-slate-900 hover:text-primary cursor-pointer transition-colors"
+                          className="font-serif text-xl font-bold text-slate-955 hover:text-red-800 cursor-pointer transition-colors"
                         >
                           {isHindi ? 'चेतन शर्मा' : 'Chetan Sharma'}
                         </h3>
-                        <div className="inline-block bg-slate-900 text-white font-bold text-[9px] uppercase tracking-wider px-2 py-0.5 rounded mt-1">
-                          {isHindi ? 'प्रधान संपादक' : 'Editor-in-Chief'}
-                        </div>
-                        <p className="text-xs text-slate-500 mt-1 font-mono">
+                        <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-red-800 block mt-0.5">
+                          Editor-in-Chief
+                        </span>
+                        <p className="text-[11px] text-slate-500 font-mono mt-0.5">
                           chetan.sharma@npnewsmetro.com
                         </p>
                       </div>
+                      <p className="text-xs text-slate-700 leading-relaxed font-serif">
+                        {isHindi
+                          ? 'एनपी न्यूज़ मेट्रो के प्रधान संपादक, न्यूज़रूम नीति, रणनीतिक जांच, ब्रेकिंग कवरेज और पत्रकारिता अखंडता के मार्गदर्शक।'
+                          : 'Editor-in-Chief at NP News Metro, directing newsroom policy, strategic investigations, breaking coverage, and editorial integrity.'}
+                      </p>
                     </div>
 
-                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                      {isHindi
-                        ? 'एनपी न्यूज़ मेट्रो के प्रधान संपादक, न्यूज़रूम नीति, रणनीतिक जांच, ब्रेकिंग कवरेज और पत्रकारिता अखंडता के मार्गदर्शक।'
-                        : 'Editor-in-Chief at NP News Metro, directing newsroom policy, strategic investigations, breaking coverage, and editorial integrity.'}
-                    </p>
-                  </div>
-
-                  <div className="pt-3.5 mt-3.5 border-t border-slate-100 space-y-3">
-                    <div className="flex flex-wrap gap-1">
-                      {(isHindi 
-                        ? ['संपादकीय नीति', 'शासन एवं कानून', 'विशेष पड़ताल']
-                        : ['Editorial Policy', 'Governance', 'Special Investigations']
-                      ).map((beat, i) => (
-                        <span key={i} className="bg-slate-50 text-slate-600 px-2.5 py-0.5 rounded text-[11px] font-medium border border-slate-200">
-                          {beat}
-                        </span>
-                      ))}
-                    </div>
-
-                    <div className="flex items-center justify-between text-xs pt-1">
-                      <button
-                        onClick={() => handleCopy('chetan.sharma@npnewsmetro.com')}
-                        className="text-slate-500 hover:text-primary flex items-center gap-1 text-xs cursor-pointer"
-                      >
-                        {copiedEmail === 'chetan.sharma@npnewsmetro.com' ? (
-                          <span className="text-emerald-700 font-semibold flex items-center gap-1">
-                            <Check className="w-3 h-3" /> {isHindi ? 'कॉपी हुआ' : 'Copied'}
-                          </span>
-                        ) : (
-                          <>
-                            <Copy className="w-3 h-3" />
-                            <span>{isHindi ? 'ईमेल कॉपी' : 'Copy Email'}</span>
-                          </>
-                        )}
-                      </button>
-
-                      <button
-                        onClick={() => onSelectAuthor('author-chetan-sharma')}
-                        className="text-primary hover:text-primary-container font-bold text-xs flex items-center gap-1 group cursor-pointer"
-                      >
-                        <span>{isHindi ? 'लेख देखें' : 'View Articles'}</span>
-                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                      </button>
+                    <div className="space-y-3 pt-3 border-t border-slate-200 mt-4">
+                      <div className="flex flex-wrap gap-x-2 gap-y-1 text-[10px] font-sans font-bold text-slate-500 uppercase tracking-wider">
+                        <span>Editorial Policy</span>
+                        <span className="text-slate-300">/</span>
+                        <span>Governance</span>
+                        <span className="text-slate-300">/</span>
+                        <span>Special Investigations</span>
+                      </div>
+                      <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100">
+                        <button
+                          onClick={() => handleCopy('chetan.sharma@npnewsmetro.com')}
+                          className="text-slate-500 hover:text-slate-900 font-semibold cursor-pointer"
+                        >
+                          {copiedEmail === 'chetan.sharma@npnewsmetro.com' ? (
+                            <span className="text-emerald-700 font-bold">{isHindi ? 'कॉपी हुआ' : 'Copied'}</span>
+                          ) : (
+                            <span>Copy Email</span>
+                          )}
+                        </button>
+                        <button
+                          onClick={() => onSelectAuthor('author-chetan-sharma')}
+                          className="text-red-800 hover:text-red-905 font-bold uppercase tracking-wider inline-flex items-center gap-1 hover:underline cursor-pointer"
+                        >
+                          <span>View Articles</span>
+                          <ArrowRight className="w-3 h-3" />
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </article>
               )}
             </div>
-          </div>
+          </section>
         )}
 
-        {/* =========================================================================
-            4. DIGITAL MEDIA & AUDIENCE STRATEGY
-           ========================================================================= */}
+        {/* 4. Digital Media & Audience Strategy */}
         {showBhawana && (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
-              <h2 className="font-serif text-sm font-bold uppercase tracking-wider text-slate-900">
-                {isHindi ? 'डिजिटल मीडिया एवं ऑडियंस रणनीति' : 'Digital Media & Audience Strategy'}
-              </h2>
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                {isHindi ? 'सोशल मीडिया डेस्क' : 'Social Desk'}
+          <section className="py-10 border-b border-slate-300">
+            <div className="space-y-1 mb-8">
+              <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-red-800">
+                04 / Platform & Distribution
               </span>
+              <h2 className="font-serif text-2xl font-bold tracking-tight text-slate-955">
+                Digital Media & Audience Strategy
+              </h2>
             </div>
 
-            <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-xs hover:border-slate-300 transition-colors flex flex-col sm:flex-row gap-5 items-start">
-              <img
-                src={getAuthorAvatarUrl('/np-author-default.png')}
-                alt="Bhawana Pandey"
-                className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover border border-slate-200 mx-auto sm:mx-0"
-                onError={handleAvatarError}
-              />
-
-              <div className="flex-1 min-w-0 text-center sm:text-left space-y-2.5">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div>
-                    <h3
-                      onClick={() => onSelectAuthor('author-bhawana-pandey')}
-                      className="font-serif text-lg sm:text-xl font-bold text-slate-900 hover:text-primary cursor-pointer transition-colors"
-                    >
-                      {isHindi ? 'भावना पाण्डेय' : 'Bhawana Pandey'}
-                    </h3>
-                    <div className="inline-block bg-slate-100 text-slate-800 font-bold text-[9px] uppercase tracking-wider px-2 py-0.5 rounded mt-1 border border-slate-200">
-                      {isHindi ? 'सोशल मीडिया मैनेजर' : 'Social Media Manager'}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+              <div className="md:col-span-3 lg:col-span-2">
+                <div className="relative overflow-hidden border border-slate-200">
+                  <img
+                    src={getAuthorAvatarUrl('/np-author-default.png')}
+                    alt="Bhawana Pandey"
+                    className="w-full aspect-[4/5] object-cover grayscale contrast-[1.05] hover:grayscale-0 transition-all duration-300"
+                    onError={handleAvatarError}
+                  />
+                </div>
+              </div>
+              
+              <div className="md:col-span-9 lg:col-span-10 flex flex-col justify-between h-full space-y-4">
+                <div className="space-y-2">
+                  <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-slate-200 pb-2">
+                    <div>
+                      <h3
+                        onClick={() => onSelectAuthor('author-bhawana-pandey')}
+                        className="font-serif text-xl font-bold text-slate-955 hover:text-red-800 cursor-pointer transition-colors"
+                      >
+                        {isHindi ? 'भावना पाण्डेय' : 'Bhawana Pandey'}
+                      </h3>
+                      <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-red-800 block mt-0.5">
+                        Social Media Manager
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs text-slate-500 font-mono">
+                      <Mail className="w-3.5 h-3.5" />
+                      <a href="mailto:bhawana.pandey@npnewsmetro.com" className="hover:text-red-800">bhawana.pandey@npnewsmetro.com</a>
                     </div>
                   </div>
-
-                  <button
-                    onClick={() => handleCopy('bhawana.pandey@npnewsmetro.com')}
-                    className="px-3 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer self-center sm:self-auto shadow-2xs"
-                  >
-                    {copiedEmail === 'bhawana.pandey@npnewsmetro.com' ? (
-                      <span className="text-emerald-700 font-semibold flex items-center gap-1">
-                        <Check className="w-3 h-3" /> {isHindi ? 'कॉपी हुआ' : 'Copied'}
-                      </span>
-                    ) : (
-                      <>
-                        <Mail className="w-3 h-3 text-slate-500" />
-                        <span className="font-mono text-xs">bhawana.pandey@npnewsmetro.com</span>
-                      </>
-                    )}
-                  </button>
+                  <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-serif">
+                    {isHindi
+                      ? 'एनपी न्यूज़ मेट्रो की सोशल मीडिया मैनेजर, डिजिटल दर्शक सहभागिता, मल्टीमीडिया प्रसार और सोशल मीडिया रणनीतियों की प्रमुख।'
+                      : 'Social Media Manager at NP News Metro, spearheading digital audience growth, multimedia engagement, and multi-channel content distribution.'}
+                  </p>
                 </div>
 
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  {isHindi
-                    ? 'एनपी न्यूज़ मेट्रो की सोशल मीडिया मैनेजर, डिजिटल दर्शक सहभागिता, मल्टीमीडिया प्रसार और सोशल मीडिया रणनीतियों की प्रमुख।'
-                    : 'Social Media Manager at NP News Metro, spearheading digital audience growth, multimedia engagement, and multi-channel content distribution.'}
-                </p>
-
-                <div className="flex flex-wrap gap-1">
-                  {(isHindi 
-                    ? ['सोशल मीडिया रणनीति', 'ऑडियंस रीच', 'डिजिटल डिस्ट्रीब्यूशन']
-                    : ['Social Media Strategy', 'Audience Growth', 'Digital Distribution']
-                  ).map((b, i) => (
-                    <span key={i} className="bg-slate-50 text-slate-600 px-2.5 py-0.5 rounded text-[11px] font-medium border border-slate-200">
-                      {b}
-                    </span>
-                  ))}
+                <div className="flex flex-wrap gap-x-2 gap-y-1 text-[10px] font-sans font-bold text-slate-500 uppercase tracking-wider pt-2 border-t border-slate-100">
+                  <span>Social Media Strategy</span>
+                  <span className="text-slate-300">/</span>
+                  <span>Audience Growth</span>
+                  <span className="text-slate-300">/</span>
+                  <span>Digital Distribution</span>
+                </div>
+                
+                <div className="flex items-center gap-4 text-xs pt-2">
+                  <button
+                    onClick={() => handleCopy('bhawana.pandey@npnewsmetro.com')}
+                    className="text-slate-500 hover:text-slate-905 font-semibold cursor-pointer"
+                  >
+                    {copiedEmail === 'bhawana.pandey@npnewsmetro.com' ? (
+                      <span className="text-emerald-700 font-bold">{isHindi ? 'कॉपी हुआ' : 'Copied'}</span>
+                    ) : (
+                      <span>Copy Email</span>
+                    )}
+                  </button>
+                  <button
+                    onClick={() => onSelectAuthor('author-bhawana-pandey')}
+                    className="text-red-800 hover:text-red-905 font-bold uppercase tracking-wider inline-flex items-center gap-1 hover:underline cursor-pointer"
+                  >
+                    <span>View Articles</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               </div>
             </div>
-          </div>
+          </section>
         )}
 
-        {/* =========================================================================
-            5. NEWSROOM & FIELD REPORTING BUREAU
-           ========================================================================= */}
+        {/* Restrained Editorial Trust Statement */}
+        <section className="py-8 my-8 border-y border-slate-300 bg-slate-50/50 px-6">
+          <div className="max-w-4xl mx-auto text-center space-y-4">
+            <h3 className="font-serif italic text-base sm:text-lg text-slate-950 font-bold">
+              Our Institutional Principles
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-serif">
+              NP News Metro operates under strict principles of journalistic integrity, independent of commercial, corporate, or political influence. We commit to factual accuracy, multi-source verification, editorial autonomy, and strict compliance with the Press Council of India standards.
+            </p>
+            <div className="flex justify-center items-center gap-2 pt-2 text-[10px] font-sans font-bold uppercase tracking-wider text-slate-500">
+              <span>Independence</span>
+              <span className="text-slate-300">•</span>
+              <span>Verification</span>
+              <span className="text-slate-300">•</span>
+              <span>Accountability</span>
+            </div>
+          </div>
+        </section>
+
+        {/* 5. Newsroom & Field Reporting Bureau */}
         {showReportingSection && (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
-              <h2 className="font-serif text-sm font-bold uppercase tracking-wider text-slate-900">
-                {isHindi ? 'वरिष्ठ पत्रकार एवं रिपोर्टिंग ब्यूरो' : 'Newsroom & Field Reporting Bureau'}
-              </h2>
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                {isHindi ? 'फील्ड पत्रकार' : 'Field Journalists'}
+          <section className="py-10">
+            <div className="space-y-1 mb-8">
+              <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-red-800">
+                05 / Field Bureau
               </span>
+              <h2 className="font-serif text-2xl font-bold tracking-tight text-slate-955">
+                Newsroom & Field Reporting Bureau
+              </h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {/* Purnima Mishra */}
+            <div className="space-y-10">
+              {/* Row 1: Large Asymmetrical Row for Purnima Mishra */}
               {showPurnima && (
-                <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-xs hover:border-slate-300 transition-colors flex flex-col justify-between">
-                  <div className="space-y-3">
-                    <div className="flex items-start gap-3.5">
+                <article className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start border-b border-slate-200 pb-8">
+                  <div className="md:col-span-3">
+                    <div className="relative overflow-hidden border border-slate-200">
                       <img
                         src={getAuthorAvatarUrl('/np-author-default.png')}
                         alt="Purnima Mishra"
-                        className="w-14 h-14 rounded-xl object-cover border border-slate-200"
+                        className="w-full aspect-[4/5] object-cover grayscale contrast-[1.05] hover:grayscale-0 transition-all duration-300"
                         onError={handleAvatarError}
                       />
-                      <div className="flex-1 min-w-0">
-                        <h3
-                          onClick={() => onSelectAuthor('author-purnima-mishra')}
-                          className="font-serif text-base sm:text-lg font-bold text-slate-900 hover:text-primary cursor-pointer transition-colors"
-                        >
-                          {isHindi ? 'पूर्णिमा मिश्रा' : 'Purnima Mishra'}
-                        </h3>
-                        <div className="inline-block bg-slate-100 text-slate-800 font-bold text-[9px] uppercase tracking-wider px-2 py-0.5 rounded border border-slate-200 mt-0.5">
-                          {isHindi ? 'वरिष्ठ संवाददाता' : 'Senior Reporter'}
+                    </div>
+                  </div>
+                  
+                  <div className="md:col-span-9 flex flex-col justify-between h-full min-h-[180px]">
+                    <div className="space-y-3">
+                      <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-slate-200 pb-2">
+                        <div>
+                          <h3
+                            onClick={() => onSelectAuthor('author-purnima-mishra')}
+                            className="font-serif text-xl font-bold text-slate-955 hover:text-red-800 cursor-pointer transition-colors"
+                          >
+                            {isHindi ? 'पूर्णिमा मिश्रा' : 'Purnima Mishra'}
+                          </h3>
+                          <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-red-800 block mt-0.5">
+                            Senior Reporter
+                          </span>
                         </div>
-                        <p className="text-[11px] text-slate-500 mt-1 font-mono truncate">
-                          purnima.mishra@npnewsmetro.com
-                        </p>
+                        <div className="flex items-center gap-1.5 text-xs text-slate-500 font-mono">
+                          <Mail className="w-3.5 h-3.5" />
+                          <a href="mailto:purnima.mishra@npnewsmetro.com" className="hover:text-red-800">purnima.mishra@npnewsmetro.com</a>
+                        </div>
+                      </div>
+                      
+                      <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-serif">
+                        {isHindi
+                          ? 'एनपी न्यूज़ मेट्रो की वरिष्ठ संवाददाता, लोक नीति, सामाजिक-आर्थिक विकास, नागरिक मुद्दों और ज़मीनी रिपोर्टिंग में विशेषज्ञ।'
+                          : 'Senior Reporter at NP News Metro, covering public policy, socio-economic developments, civic issues, and grassroots investigative journalism.'}
+                      </p>
+                    </div>
+
+                    <div className="space-y-3 pt-3 border-t border-slate-100 mt-4">
+                      <div className="flex flex-wrap gap-x-2 gap-y-1 text-[10px] font-sans font-bold text-slate-500 uppercase tracking-wider">
+                        <span>Public Policy</span>
+                        <span className="text-slate-300">/</span>
+                        <span>Social Affairs</span>
+                        <span className="text-slate-300">/</span>
+                        <span>Ground Reporting</span>
+                      </div>
+                      
+                      <div className="flex items-center justify-between text-xs pt-1">
+                        <button
+                          onClick={() => handleCopy('purnima.mishra@npnewsmetro.com')}
+                          className="text-slate-500 hover:text-slate-900 font-semibold cursor-pointer"
+                        >
+                          {copiedEmail === 'purnima.mishra@npnewsmetro.com' ? (
+                            <span className="text-emerald-700 font-bold">{isHindi ? 'कॉपी हुआ' : 'Copied'}</span>
+                          ) : (
+                            <span>Copy Email</span>
+                          )}
+                        </button>
+                        <button
+                          onClick={() => onSelectAuthor('author-purnima-mishra')}
+                          className="text-red-800 hover:text-red-905 font-bold uppercase tracking-wider inline-flex items-center gap-1 hover:underline cursor-pointer"
+                        >
+                          <span>Articles</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     </div>
-
-                    <p className="text-xs text-slate-600 leading-relaxed">
-                      {isHindi
-                        ? 'एनपी न्यूज़ मेट्रो की वरिष्ठ संवाददाता, लोक नीति, सामाजिक-आर्थिक विकास, नागरिक मुद्दों और महिला सशक्तिकरण पर ज़मीनी रिपोर्टिंग।'
-                        : 'Senior Reporter at NP News Metro, covering public policy, socio-economic developments, civic issues, and grassroots journalism.'}
-                    </p>
                   </div>
-
-                  <div className="pt-3 mt-3 border-t border-slate-100 space-y-3">
-                    <div className="flex flex-wrap gap-1">
-                      {(isHindi 
-                        ? ['लोक नीति', 'सामाजिक मामले', 'ज़मीनी पड़ताल']
-                        : ['Public Policy', 'Social Affairs', 'Ground Reporting']
-                      ).map((beat, i) => (
-                        <span key={i} className="bg-slate-50 text-slate-600 px-2 py-0.5 rounded text-[10px] font-medium border border-slate-200">
-                          {beat}
-                        </span>
-                      ))}
-                    </div>
-
-                    <div className="flex items-center justify-between text-xs pt-1">
-                      <button
-                        onClick={() => handleCopy('purnima.mishra@npnewsmetro.com')}
-                        className="text-slate-500 hover:text-primary flex items-center gap-1 text-xs cursor-pointer"
-                      >
-                        {copiedEmail === 'purnima.mishra@npnewsmetro.com' ? (
-                          <span className="text-emerald-700 font-semibold flex items-center gap-1">
-                            <Check className="w-3.5 h-3.5" /> {isHindi ? 'कॉपी हुआ' : 'Copied'}
-                          </span>
-                        ) : (
-                          <>
-                            <Copy className="w-3 h-3" />
-                            <span>{isHindi ? 'ईमेल कॉपी' : 'Copy Email'}</span>
-                          </>
-                        )}
-                      </button>
-
-                      <button
-                        onClick={() => onSelectAuthor('author-purnima-mishra')}
-                        className="text-primary hover:text-primary-container font-bold text-xs flex items-center gap-1 group cursor-pointer"
-                      >
-                        <span>{isHindi ? 'लेख' : 'Articles'}</span>
-                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                </article>
               )}
 
-              {/* CL Tripathi */}
-              {showTripathi && (
-                <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-xs hover:border-slate-300 transition-colors flex flex-col justify-between">
-                  <div className="space-y-3">
-                    <div className="flex items-start gap-3.5">
+              {/* Row 2: Two-column grid for CL Tripathi & Laxmi Kant Mishra */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* CL Tripathi */}
+                {showTripathi && (
+                  <article className="flex flex-col sm:flex-row gap-5 items-start border-b border-slate-200 pb-6 md:border-b-0 md:pb-0">
+                    <div className="w-24 sm:w-28 relative overflow-hidden border border-slate-200 flex-shrink-0">
                       <img
                         src={getAuthorAvatarUrl('/np-author-default.png')}
                         alt="CL Tripathi"
-                        className="w-14 h-14 rounded-xl object-cover border border-slate-200"
+                        className="w-full aspect-[4/5] object-cover grayscale contrast-[1.05] hover:grayscale-0 transition-all duration-300"
                         onError={handleAvatarError}
                       />
-                      <div className="flex-1 min-w-0">
-                        <h3
-                          onClick={() => onSelectAuthor('author-cl-tripathi')}
-                          className="font-serif text-base sm:text-lg font-bold text-slate-900 hover:text-primary cursor-pointer transition-colors"
-                        >
-                          {isHindi ? 'सी. एल. त्रिपाठी' : 'CL Tripathi'}
-                        </h3>
-                        <div className="inline-block bg-slate-100 text-slate-800 font-bold text-[9px] uppercase tracking-wider px-2 py-0.5 rounded border border-slate-200 mt-0.5">
-                          {isHindi ? 'वरिष्ठ संवाददाता' : 'Senior Reporter'}
+                    </div>
+                    
+                    <div className="flex-1 flex flex-col justify-between h-full min-h-[140px]">
+                      <div className="space-y-2">
+                        <div>
+                          <h3
+                            onClick={() => onSelectAuthor('author-cl-tripathi')}
+                            className="font-serif text-base sm:text-lg font-bold text-slate-955 hover:text-red-800 cursor-pointer transition-colors"
+                          >
+                            {isHindi ? 'सी. एल. त्रिपाठी' : 'CL Tripathi'}
+                          </h3>
+                          <span className="text-[9px] font-sans font-bold uppercase tracking-wider text-red-800 block mt-0.5">
+                            Senior Reporter
+                          </span>
                         </div>
-                        <p className="text-[11px] text-slate-500 mt-1 font-mono truncate">
-                          cl.tripathi@npnewsmetro.com
+                        <p className="text-xs text-slate-700 leading-relaxed font-serif line-clamp-3">
+                          {isHindi
+                            ? 'एनपी न्यूज़ मेट्रो के वरिष्ठ संवाददाता, ज़मीनी राजनीतिक पड़ताल, विधायी घटनाक्रम, नागरिक मामलों और निष्पक्ष जन-पत्रकारिता में विशेषज्ञ।'
+                            : 'Senior Reporter at NP News Metro, specializing in ground-level political investigations, legislative developments, civic affairs, and grassroots reporting.'}
                         </p>
                       </div>
-                    </div>
-
-                    <p className="text-xs text-slate-600 leading-relaxed">
-                      {isHindi
-                        ? 'एनपी न्यूज़ मेट्रो के वरिष्ठ संवाददाता, ज़मीनी राजनीतिक पड़ताल, विधायी घटनाक्रम, नागरिक मामलों और निष्पक्ष जन-पत्रकारिता में विशेषज्ञ।'
-                        : 'Senior Reporter at NP News Metro, specializing in political investigations, legislative developments, and grassroots reporting.'}
-                    </p>
-                  </div>
-
-                  <div className="pt-3 mt-3 border-t border-slate-100 space-y-3">
-                    <div className="flex flex-wrap gap-1">
-                      {(isHindi 
-                        ? ['राजनीतिक मामले', 'विधायी पड़ताल', 'ज़मीनी रिपोर्टिंग']
-                        : ['Political Affairs', 'Legislative Scrutiny', 'Ground Reporting']
-                      ).map((beat, i) => (
-                        <span key={i} className="bg-slate-50 text-slate-600 px-2 py-0.5 rounded text-[10px] font-medium border border-slate-200">
-                          {beat}
+                      
+                      <div className="space-y-2 pt-2 border-t border-slate-100 mt-2">
+                        <span className="text-[9px] font-sans font-bold text-slate-500 uppercase tracking-wider block">
+                          {isHindi ? 'क्षेत्र: ' : 'Beats: '}
+                          Political Affairs / Legislative Scrutiny / Ground Reporting
                         </span>
-                      ))}
+                        
+                        <div className="flex items-center justify-between text-xs pt-1">
+                          <button
+                            onClick={() => handleCopy('cl.tripathi@npnewsmetro.com')}
+                            className="text-slate-500 hover:text-slate-900 font-semibold cursor-pointer"
+                          >
+                            {copiedEmail === 'cl.tripathi@npnewsmetro.com' ? (
+                              <span className="text-emerald-700 font-bold">{isHindi ? 'कॉपी हुआ' : 'Copied'}</span>
+                            ) : (
+                              <span>Copy Email</span>
+                            )}
+                          </button>
+                          <button
+                            onClick={() => onSelectAuthor('author-cl-tripathi')}
+                            className="text-red-800 hover:text-red-905 font-bold uppercase tracking-wider inline-flex items-center gap-1 hover:underline cursor-pointer"
+                          >
+                            <span>Articles</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
                     </div>
+                  </article>
+                )}
 
-                    <div className="flex items-center justify-between text-xs pt-1">
-                      <button
-                        onClick={() => handleCopy('cl.tripathi@npnewsmetro.com')}
-                        className="text-slate-500 hover:text-primary flex items-center gap-1 text-xs cursor-pointer"
-                      >
-                        {copiedEmail === 'cl.tripathi@npnewsmetro.com' ? (
-                          <span className="text-emerald-700 font-semibold flex items-center gap-1">
-                            <Check className="w-3.5 h-3.5" /> {isHindi ? 'कॉपी हुआ' : 'Copied'}
-                          </span>
-                        ) : (
-                          <>
-                            <Copy className="w-3 h-3" />
-                            <span>{isHindi ? 'ईमेल कॉपी' : 'Copy Email'}</span>
-                          </>
-                        )}
-                      </button>
-
-                      <button
-                        onClick={() => onSelectAuthor('author-cl-tripathi')}
-                        className="text-primary hover:text-primary-container font-bold text-xs flex items-center gap-1 group cursor-pointer"
-                      >
-                        <span>{isHindi ? 'लेख' : 'Articles'}</span>
-                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Laxmi Kant Mishra */}
-              {showLaxmi && (
-                <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-xs hover:border-slate-300 transition-colors flex flex-col justify-between">
-                  <div className="space-y-3">
-                    <div className="flex items-start gap-3.5">
+                {/* Laxmi Kant Mishra */}
+                {showLaxmi && (
+                  <article className="flex flex-col sm:flex-row gap-5 items-start">
+                    <div className="w-24 sm:w-28 relative overflow-hidden border border-slate-200 flex-shrink-0">
                       <img
                         src={getAuthorAvatarUrl('/uploads/laxmi-kant-mishra.jpg')}
                         alt="Laxmi Kant Mishra"
-                        className="w-14 h-14 rounded-xl object-cover border border-slate-200"
+                        className="w-full aspect-[4/5] object-cover grayscale contrast-[1.05] hover:grayscale-0 transition-all duration-300"
                         onError={handleAvatarError}
                       />
-                      <div className="flex-1 min-w-0">
-                        <h3
-                          onClick={() => onSelectAuthor('author-laxmi-kant-mishra')}
-                          className="font-serif text-base sm:text-lg font-bold text-slate-900 hover:text-primary cursor-pointer transition-colors"
-                        >
-                          {isHindi ? 'लक्ष्मी कांत मिश्रा' : 'Laxmi Kant Mishra'}
-                        </h3>
-                        <div className="inline-block bg-slate-100 text-slate-800 font-bold text-[9px] uppercase tracking-wider px-2 py-0.5 rounded border border-slate-200 mt-0.5">
-                          {isHindi ? 'संवाददाता' : 'Reporter'}
+                    </div>
+                    
+                    <div className="flex-1 flex flex-col justify-between h-full min-h-[140px]">
+                      <div className="space-y-2">
+                        <div>
+                          <h3
+                            onClick={() => onSelectAuthor('author-laxmi-kant-mishra')}
+                            className="font-serif text-base sm:text-lg font-bold text-slate-955 hover:text-red-800 cursor-pointer transition-colors"
+                          >
+                            {isHindi ? 'लक्ष्मी कांत मिश्रा' : 'Laxmi Kant Mishra'}
+                          </h3>
+                          <span className="text-[9px] font-sans font-bold uppercase tracking-wider text-red-800 block mt-0.5">
+                            Reporter
+                          </span>
                         </div>
-                        <p className="text-[11px] text-slate-500 mt-1 font-mono truncate">
-                          laxmikant.mishra@npnewsmetro.com
+                        <p className="text-xs text-slate-700 leading-relaxed font-serif line-clamp-3">
+                          {isHindi
+                            ? 'एनपी न्यूज़ मेट्रो के संवाददाता, क्षेत्रीय राजनीति, नागरिक अवसंरचना, कानून व न्याय और स्थानीय जनसरोकारों पर समर्पित रिपोर्टर।'
+                            : 'Reporter at NP News Metro, reporting on regional politics, civic infrastructure, law & justice, and local community updates.'}
                         </p>
                       </div>
-                    </div>
-
-                    <p className="text-xs text-slate-600 leading-relaxed">
-                      {isHindi
-                        ? 'एनपी न्यूज़ मेट्रो के संवाददाता, क्षेत्रीय राजनीति, नागरिक अवसंरचना, कानून व न्याय और स्थानीय जनसरोकारों पर समर्पित रिपोर्टर।'
-                        : 'Reporter at NP News Metro, reporting on regional politics, civic infrastructure, law & justice, and local community updates.'}
-                    </p>
-                  </div>
-
-                  <div className="pt-3 mt-3 border-t border-slate-100 space-y-3">
-                    <div className="flex flex-wrap gap-1">
-                      {(isHindi 
-                        ? ['नागरिक रिपोर्टिंग', 'प्रादेशिक समाचार', 'कानून व न्याय']
-                        : ['Civic Reporting', 'Regional News', 'Legal Affairs']
-                      ).map((beat, i) => (
-                        <span key={i} className="bg-slate-50 text-slate-600 px-2 py-0.5 rounded text-[10px] font-medium border border-slate-200">
-                          {beat}
+                      
+                      <div className="space-y-2 pt-2 border-t border-slate-100 mt-2">
+                        <span className="text-[9px] font-sans font-bold text-slate-500 uppercase tracking-wider block">
+                          {isHindi ? 'क्षेत्र: ' : 'Beats: '}
+                          Civic Reporting / Regional News / Legal Affairs
                         </span>
-                      ))}
+                        
+                        <div className="flex items-center justify-between text-xs pt-1">
+                          <button
+                            onClick={() => handleCopy('laxmikant.mishra@npnewsmetro.com')}
+                            className="text-slate-500 hover:text-slate-900 font-semibold cursor-pointer"
+                          >
+                            {copiedEmail === 'laxmikant.mishra@npnewsmetro.com' ? (
+                              <span className="text-emerald-700 font-bold">{isHindi ? 'कॉपी हुआ' : 'Copied'}</span>
+                            ) : (
+                              <span>Copy Email</span>
+                            )}
+                          </button>
+                          <button
+                            onClick={() => onSelectAuthor('author-laxmi-kant-mishra')}
+                            className="text-red-800 hover:text-red-905 font-bold uppercase tracking-wider inline-flex items-center gap-1 hover:underline cursor-pointer"
+                          >
+                            <span>Articles</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
                     </div>
+                  </article>
+                )}
+              </div>
 
-                    <div className="flex items-center justify-between text-xs pt-1">
-                      <button
-                        onClick={() => handleCopy('laxmikant.mishra@npnewsmetro.com')}
-                        className="text-slate-500 hover:text-primary flex items-center gap-1 text-xs cursor-pointer"
-                      >
-                        {copiedEmail === 'laxmikant.mishra@npnewsmetro.com' ? (
-                          <span className="text-emerald-700 font-semibold flex items-center gap-1">
-                            <Check className="w-3.5 h-3.5" /> {isHindi ? 'कॉपी हुआ' : 'Copied'}
-                          </span>
-                        ) : (
-                          <>
-                            <Copy className="w-3 h-3" />
-                            <span>{isHindi ? 'ईमेल कॉपी' : 'Copy Email'}</span>
-                          </>
-                        )}
-                      </button>
-
-                      <button
-                        onClick={() => onSelectAuthor('author-laxmi-kant-mishra')}
-                        className="text-primary hover:text-primary-container font-bold text-xs flex items-center gap-1 group cursor-pointer"
-                      >
-                        <span>{isHindi ? 'लेख देखें' : 'Articles'}</span>
-                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
-          </div>
+          </section>
         )}
 
-        {/* =========================================================================
-            6. EDITORIAL CHARTER & NEWSROOM VALUES (4 PILLARS)
-           ========================================================================= */}
-        <div className="space-y-4 pt-6 border-t border-slate-200">
-          <div className="flex items-center gap-2">
-            <Scale className="w-4 h-4 text-slate-700" />
-            <h2 className="font-serif text-sm font-bold uppercase tracking-wider text-slate-900">
-              {isHindi ? 'संपादकीय मूल्य एवं पत्रकारिता मानक' : 'Editorial Charter & Journalistic Standards'}
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
-              <span className="text-[10px] uppercase font-bold text-slate-400 font-mono tracking-wider">Pillar 01</span>
-              <h4 className="font-serif font-bold text-sm text-slate-900">
-                {isHindi ? 'प्राथमिक तथ्य-सत्यापन' : 'Fact-First Rigor'}
-              </h4>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                {isHindi 
-                  ? 'प्रत्येक समाचार का प्रकाशन कम से कम दो स्वतंत्र व आधिकारिक स्रोतों से पुष्टि के बाद ही किया जाता है।' 
-                  : 'Every report is corroborated with multi-tier official documentation before publishing.'}
-              </p>
-            </div>
-
-            <div className="p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
-              <span className="text-[10px] uppercase font-bold text-slate-400 font-mono tracking-wider">Pillar 02</span>
-              <h4 className="font-serif font-bold text-sm text-slate-900">
-                {isHindi ? 'संपादकीय स्वायत्तता' : 'Editorial Independence'}
-              </h4>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                {isHindi 
-                  ? 'न्यूज़रूम कॉर्पोरेट, विज्ञापनदाता या राजनीतिक दबाव से 100% मुक्त होकर निर्णय लेता है।' 
-                  : 'Our newsroom operates behind a strict firewall isolated from commercial or corporate influence.'}
-              </p>
-            </div>
-
-            <div className="p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
-              <span className="text-[10px] uppercase font-bold text-slate-400 font-mono tracking-wider">Pillar 03</span>
-              <h4 className="font-serif font-bold text-sm text-slate-900">
-                {isHindi ? 'पारदर्शी संशोधन' : 'Transparent Corrections'}
-              </h4>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                {isHindi 
-                  ? 'यदि कोई तथ्यात्मक त्रुटि होती है, तो उसे 24 घंटे के भीतर सार्वजनिक नोट के साथ सुधारा जाता है।' 
-                  : 'Any factual error is promptly acknowledged with a dated and timestamped editorial note.'}
-              </p>
-            </div>
-
-            <div className="p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
-              <span className="text-[10px] uppercase font-bold text-slate-400 font-mono tracking-wider">Pillar 04</span>
-              <h4 className="font-serif font-bold text-sm text-slate-900">
-                {isHindi ? 'संवैधानिक मर्यादा' : 'Constitutional Ethos'}
-              </h4>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                {isHindi 
-                  ? 'भारतीय संविधान के मूल्यों, लोकतांत्रिक संवाद और जन-कल्याण के प्रति हमारी अटूट निष्ठा है।' 
-                  : 'Committed to democratic discourse, public interest journalism, and constitutional values.'}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* =========================================================================
-            7. DIRECT NEWSROOM CONTACT & TIP-OFF HOTLINE
-           ========================================================================= */}
-        <div className="p-6 sm:p-8 bg-slate-900 rounded-2xl text-white flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="space-y-2 text-center md:text-left">
-            <span className="text-[10px] font-bold tracking-widest text-amber-400 uppercase">
-              {isHindi ? 'सुरक्षित संचार हॉटलाइन' : 'Secure Communication Hotline'}
-            </span>
-            <h3 className="font-serif text-lg sm:text-xl lg:text-2xl font-bold text-white">
-              {isHindi ? 'क्या आपके पास कोई खोजी खबर या महत्वपूर्ण सुझाव है?' : 'Have an Investigative Tip-Off or Whistleblower Lead?'}
-            </h3>
-            <p className="text-xs text-slate-300 max-w-xl leading-relaxed">
-              {isHindi
-                ? 'एनपी न्यूज़ मेट्रो का खोजी डेस्क स्रोतों की पूर्ण गोपनीयता की गारंटी देता है। सीधे प्रधान संपादक या स्पेशल इन्वेस्टिगेशन डेस्क से संपर्क करें।'
-                : 'Our investigative editors guarantee absolute confidentiality for whistleblowers and sensitive news sources under Indian press protection norms.'}
-            </p>
-          </div>
-
-          <div className="flex flex-col sm:flex-row md:flex-col gap-2.5 flex-shrink-0 w-full sm:w-auto">
-            <a
-              href="mailto:tips@npnewsmetro.com"
-              className="px-5 py-2.5 bg-rose-700 hover:bg-rose-600 text-white font-bold text-xs rounded-lg flex items-center justify-center gap-2 transition-colors"
-            >
-              <Lock className="w-3.5 h-3.5" />
-              <span>{isHindi ? 'गोपनीय सुझाव (tips@)' : 'Send Secure Tip (tips@)'}</span>
-            </a>
-            <a
-              href="mailto:editor@npnewsmetro.com"
-              className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-semibold text-xs rounded-lg flex items-center justify-center gap-2 transition-colors"
-            >
-              <Mail className="w-3.5 h-3.5 text-amber-400" />
-              <span>{isHindi ? 'प्रधान संपादक से संपर्क' : 'Contact Editors'}</span>
-            </a>
-          </div>
-        </div>
       </article>
     );
-  };
-
-const activeItemLabel = menuItems.find((m) => m.id === currentPage)?.label || (isHindi ? 'परिचय' : 'About');
+  };const activeItemLabel = menuItems.find((m) => m.id === currentPage)?.label || (isHindi ? 'परिचय' : 'About');
 
   return (
     <div className="bg-canvas min-h-screen">
