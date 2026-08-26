@@ -5,7 +5,7 @@
  */
 
 export const DEFAULT_SITE_ORIGIN = 'https://www.npnewsmetro.com';
-export const DEFAULT_OG_IMAGE = 'https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&q=80&w=1200';
+export const DEFAULT_OG_IMAGE = 'https://www.npnewsmetro.com/uploads/dr-deepak-goswami.jpg';
 
 /**
  * Returns the current site origin in browser or default production domain

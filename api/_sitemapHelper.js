@@ -153,7 +153,7 @@ export const FALLBACK_ARTICLES = [
     category: 'politics',
     title: 'Parliament Clears Landmark Digital Public Infrastructure & Data Protection Amendment Bill in Monsoon Session',
     publishedAt: '2026-08-19T09:00:00.000Z',
-    featuredImage: 'https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&q=80&w=1200',
+    featuredImage: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&q=80&w=1200',
     caption: 'The Parliament House illuminated during monsoon session.',
     tags: ['Parliament', 'Data Protection', 'Digital India']
   },

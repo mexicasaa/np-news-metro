@@ -100,7 +100,7 @@ export const mapDbToWpPost = (row: any, joinedTags?: string[]): WpPost => {
     publishedAt: row.published_at || row.created_at || new Date().toISOString(),
     updatedAt: row.updated_at || undefined,
     readTime: readTimeStr,
-    featuredImage: row.featured_image_url || 'https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&q=80&w=1200',
+    featuredImage: row.featured_image_url || '',
     imageCaption: row.featured_image_caption || '',
     imageCaptionHi: undefined,
     imageCredit: row.image_credit || 'NP News Metro Photo Desk',

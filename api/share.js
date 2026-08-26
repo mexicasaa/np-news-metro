@@ -29,7 +29,7 @@ function sendResponse(res, statusCode, contentType, body) {
   res.statusCode = statusCode;
   if (typeof res.setHeader === 'function') {
     res.setHeader('Content-Type', contentType);
-    res.setHeader('Cache-Control', 'public, max-age=3600, stale-while-revalidate=600');
+    res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=60, stale-while-revalidate=30');
   }
   if (typeof res.status === 'function' && typeof res.send === 'function') {
     return res.status(statusCode).send(body);
@@ -122,20 +122,25 @@ const FALLBACK_SLUGS = {
 export default async function handler(req, res) {
   try {
     const url = new URL(req.url || '/', SITE_ORIGIN);
-    const slugParam = (req.query?.slug || url.searchParams.get('slug') || '').trim();
-    const categoryParam = (req.query?.category || url.searchParams.get('category') || 'india').trim().toLowerCase();
+    const rawSlugParam = (req.query?.slug || url.searchParams.get('slug') || '').trim();
+    const rawCatParam = (req.query?.category || url.searchParams.get('category') || 'india').trim().toLowerCase();
     const pathParam = (req.query?.path || url.searchParams.get('path') || '').trim();
 
-    let cleanSlug = slugParam;
-    let cleanCategory = categoryParam;
+    let cleanSlug = rawSlugParam;
+    let cleanCategory = rawCatParam;
+
+    try {
+      if (cleanSlug) cleanSlug = decodeURIComponent(cleanSlug).trim();
+      if (cleanCategory) cleanCategory = decodeURIComponent(cleanCategory).trim().toLowerCase();
+    } catch (e) {}
 
     if (!cleanSlug && pathParam) {
       const parts = pathParam.replace(/^\/+|\/+$/g, '').split('/');
       if (parts.length >= 2) {
-        cleanCategory = parts[0].toLowerCase();
-        cleanSlug = parts[1];
+        cleanCategory = decodeURIComponent(parts[0]).toLowerCase();
+        cleanSlug = decodeURIComponent(parts[1]);
       } else if (parts.length === 1) {
-        cleanSlug = parts[0];
+        cleanSlug = decodeURIComponent(parts[0]);
       }
     }
 
@@ -281,7 +286,7 @@ export default async function handler(req, res) {
     // 3. CHECK ARTICLES IN SUPABASE
     if (!mediaItem && cleanSlug) {
       try {
-        const { data } = await supabase
+        let { data } = await supabase
           .from('articles')
           .select(`
             title, 
@@ -303,6 +308,33 @@ export default async function handler(req, res) {
           `)
           .eq('slug', cleanSlug)
           .maybeSingle();
+
+        // Fallback: If not found with decoded slug, try rawSlugParam or lowercase
+        if (!data && rawSlugParam && rawSlugParam !== cleanSlug) {
+          const { data: rawData } = await supabase
+            .from('articles')
+            .select(`
+              title, 
+              seo_title, 
+              excerpt, 
+              meta_description, 
+              content,
+              blocks,
+              category_id, 
+              featured_image_url, 
+              featured_image_caption,
+              author_name,
+              author_role,
+              custom_author,
+              published_at, 
+              updated_at,
+              slug,
+              categories (slug, name)
+            `)
+            .eq('slug', rawSlugParam)
+            .maybeSingle();
+          if (rawData) data = rawData;
+        }
 
         if (data) {
           const resolvedCat = (data.categories && data.categories.slug) ? data.categories.slug : cleanCategory;
@@ -497,6 +529,8 @@ export default async function handler(req, res) {
   <meta name="twitter:title" content="${escapeHtml(title)}" />
   <meta name="twitter:description" content="${escapeHtml(description)}" />
   <meta name="twitter:image" content="${image}" />
+  <meta name="twitter:image:src" content="${image}" />
+  <link rel="image_src" href="${image}" />
 
   <script type="application/ld+json">
   ${JSON.stringify(structuredData, null, 2)}

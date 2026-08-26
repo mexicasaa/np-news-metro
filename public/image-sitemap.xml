@@ -2,6 +2,14 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
+    <loc>https://www.npnewsmetro.com/india/aatha-dashaka-kee-prateekshaa-ke-baada-vaishvika-shikhara-para-st</loc>
+    <image:image>
+      <image:loc>https://jkzrjqclgqpfjdqxsnut.supabase.co/storage/v1/object/public/article-images/articles/09e825b4-5aae-4338-9d88-61e3c3215727/1005515420-mt9vxbro.jpg</image:loc>
+      <image:caption>आठ दशक की प्रतीक्षा के बाद वैश्विक शिखर पर स्त्री-शक्ति की दस्तक</image:caption>
+      <image:title>आठ दशक की प्रतीक्षा के बाद वैश्विक शिखर पर स्त्री-शक्ति की दस्तक</image:title>
+    </image:image>
+  </url>
+  <url>
     <loc>https://www.npnewsmetro.com/politics/chhaha-maheene-men-eka-laakha-yuvaaon-ko-sarakaaree-naukaree-deng</loc>
     <image:image>
       <image:loc>https://jkzrjqclgqpfjdqxsnut.supabase.co/storage/v1/object/public/article-images/articles/9fb7875a-925e-4f27-8edd-3c204a255c88/1005512003-mt8z5ld1-mt9qyo4b.jpg</image:loc>
@@ -228,7 +236,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/politics/parliament-clears-digital-public-infrastructure-bill-monsoon-session</loc>
     <image:image>
-      <image:loc>https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&amp;fit=crop&amp;q=80&amp;w=1200</image:loc>
+      <image:loc>https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&amp;fit=crop&amp;q=80&amp;w=1200</image:loc>
       <image:caption>The Parliament House illuminated during monsoon session.</image:caption>
       <image:title>Parliament Clears Landmark Digital Public Infrastructure &amp; Data Protection Amendment Bill in Monsoon Session</image:title>
     </image:image>

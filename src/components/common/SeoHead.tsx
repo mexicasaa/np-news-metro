@@ -80,7 +80,16 @@ export const SeoHead: React.FC<SeoHeadProps> = ({ metadata, structuredData }) =>
     setMetaTag('meta[name="twitter:image"]', 'name', 'twitter:image', finalImage);
     setMetaTag('meta[name="twitter:image:src"]', 'name', 'twitter:image:src', finalImage);
 
-    // 5. Canonical Link
+    // 5. Image Src Link (for legacy/WhatsApp scrapers)
+    let imageSrcLink = document.querySelector('link[rel="image_src"]') as HTMLLinkElement;
+    if (!imageSrcLink) {
+      imageSrcLink = document.createElement('link');
+      imageSrcLink.setAttribute('rel', 'image_src');
+      document.head.appendChild(imageSrcLink);
+    }
+    imageSrcLink.setAttribute('href', finalImage);
+
+    // 6. Canonical Link
     let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
     if (!canonicalLink) {
       canonicalLink = document.createElement('link');
@@ -89,7 +98,7 @@ export const SeoHead: React.FC<SeoHeadProps> = ({ metadata, structuredData }) =>
     }
     canonicalLink.setAttribute('href', finalUrl);
 
-    // 6. JSON-LD Structured Data
+    // 7. JSON-LD Structured Data
     const SCRIPT_ID = 'npnews-structured-data';
     let scriptEl = document.getElementById(SCRIPT_ID);
     if (structuredData) {

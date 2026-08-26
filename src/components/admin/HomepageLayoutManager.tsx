@@ -301,7 +301,7 @@ export const HomepageLayoutManager: React.FC<HomepageLayoutManagerProps> = ({
                     <>
                       <div className="aspect-[16/9] w-full rounded-2xs overflow-hidden bg-slate-900 mb-2.5">
                         <img
-                          src="https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&q=80&w=400"
+                          src="https://www.npnewsmetro.com/uploads/dr-deepak-goswami.jpg"
                           alt="Story thumbnail"
                           className="w-full h-full object-cover"
                         />

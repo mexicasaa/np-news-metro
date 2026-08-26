@@ -1369,7 +1369,7 @@ export const mockPosts: WpPost[] = [
     authorId: 'author-1',
     publishedAt: '2026-08-19T14:30:00+05:30',
     readTime: '5 min read',
-    featuredImage: 'https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&q=80&w=1200',
+    featuredImage: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&q=80&w=1200',
     imageCaption: 'The historic Parliament House illuminated during the concluding days of the monsoon legislative session.',
     imageCaptionHi: 'मानसून सत्र के दौरान भव्य रोशनी में जगमगाता संसद भवन।',
     imageCredit: 'NP News Metro / Anil Kumar',

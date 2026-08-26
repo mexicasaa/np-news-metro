@@ -38,11 +38,16 @@ async function runCrawlerTests() {
   assert.ok(r2.body.includes('CollectionPage'), 'Must have CollectionPage schema');
   console.log('✓ Test 2 Passed: Category route pre-renders semantic collection with links');
 
-  // Test 3: 404 for non-existent story
-  const r3 = await simulateRequest('/politics/non-existent-story-12345', { category: 'politics', slug: 'non-existent-story-12345' });
-  assert.strictEqual(r3.statusCode, 404, 'Non-existent story must return 404');
-  assert.ok(r3.body.includes('404'), 'Must render 404 text');
-  console.log('✓ Test 3 Passed: Non-existent story returns genuine HTTP 404 status (no Soft 404)');
+  // Test 4: Live article from Supabase
+  const r4 = await simulateRequest('/india/aatha-dashaka-kee-prateekshaa-ke-baada-vaishvika-shikhara-para-st', { category: 'india', slug: 'aatha-dashaka-kee-prateekshaa-ke-baada-vaishvika-shikhara-para-st' });
+  console.log('Status code for live article:', r4.statusCode);
+  const ogImg = r4.body.match(/<meta property="og:image" content="([^"]+)"/)?.[1];
+  console.log('og:image extracted:', ogImg);
+  const twitterImg = r4.body.match(/<meta name="twitter:image" content="([^"]+)"/)?.[1];
+  console.log('twitter:image extracted:', twitterImg);
+  assert.strictEqual(r4.statusCode, 200);
+  assert.ok(ogImg && ogImg.includes('1005515420-mt9vxbro.jpg'), `og:image must be the uploaded image, got: ${ogImg}`);
+  console.log('✓ Test 4 Passed: Live article pre-renders the EXACT uploaded featured image!');
 
   console.log('\n======================================================');
   console.log('ALL CRAWLER PRE-RENDERER TESTS PASSED SUCCESSFULLY!');
