@@ -28,6 +28,13 @@ export const getAbsoluteImageUrl = (imageUrl?: string, customOrigin?: string): s
 
   const trimmed = imageUrl.trim();
 
+  // If Supabase storage, route via first-party /api/image endpoint to avoid x-robots-tag: none and ensure 100% crawlability
+  if (trimmed.includes('supabase.co/storage/v1/object/public/')) {
+    const origin = customOrigin || getSiteOrigin();
+    const cleanOrigin = origin.replace(/\/+$/, '');
+    return `${cleanOrigin}/api/image?url=${encodeURIComponent(trimmed)}`;
+  }
+
   // Already a full absolute HTTP/HTTPS URL or data URI
   if (/^https?:\/\//i.test(trimmed)) {
     return trimmed;

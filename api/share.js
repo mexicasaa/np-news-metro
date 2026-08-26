@@ -10,6 +10,9 @@ const DEFAULT_OG_IMAGE = 'https://www.npnewsmetro.com/uploads/dr-deepak-goswami.
 function getAbsoluteUrl(img) {
   if (!img || typeof img !== 'string' || !img.trim()) return DEFAULT_OG_IMAGE;
   const trimmed = img.trim();
+  if (trimmed.includes('supabase.co/storage/v1/object/public/')) {
+    return `${SITE_ORIGIN}/api/image?url=${encodeURIComponent(trimmed)}`;
+  }
   if (/^https?:\/\//i.test(trimmed)) return trimmed;
   const cleanPath = trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
   return `${SITE_ORIGIN}${cleanPath}`;
@@ -513,10 +516,8 @@ export default async function handler(req, res) {
   <meta property="og:description" content="${escapeHtml(description)}" />
   <meta property="og:url" content="${canonicalUrl}" />
   <meta property="og:image" content="${image}" />
+  <meta property="og:image:url" content="${image}" />
   <meta property="og:image:secure_url" content="${image}" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:alt" content="${escapeHtml(title)}" />
   <meta property="article:published_time" content="${publishedIso}" />
   <meta property="article:modified_time" content="${modifiedIso}" />
