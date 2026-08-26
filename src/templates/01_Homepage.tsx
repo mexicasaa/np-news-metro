@@ -57,7 +57,7 @@ export const Homepage: React.FC<HomepageProps> = ({
   const latestTenPosts = sortedPosts.slice(0, 10);
   const leadPost = latestTenPosts.find((p) => p.isLead) || latestTenPosts[0] || sortedPosts[0];
   const featuredPosts = latestTenPosts;
-  const supportingLeadPosts = sortedPosts.filter((p) => p.id !== leadPost?.id).slice(0, 3);
+  const supportingLeadPosts = sortedPosts.filter((p) => p.id !== leadPost?.id).slice(0, 6);
   const latestPosts = sortedPosts.slice(0, visibleLatestCount);
   const indiaPosts = sortedPosts.filter((p) => p.category === 'india' || p.category === 'politics');
   const businessPosts = sortedPosts.filter((p) => p.category === 'business' || p.category === 'economy');
