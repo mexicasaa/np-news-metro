@@ -109,7 +109,11 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                     : 'bg-surface-lowest border border-border-subtle text-ink hover:bg-surface-container'
                 }`}
               >
-                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-secondary-gold' : 'text-ink-muted'}`} />
+                {item.id === 'editorial-team' ? (
+                  <img src="/logo-circle.png" alt="NP Logo" className="w-3.5 h-3.5 rounded-full object-cover flex-shrink-0" />
+                ) : (
+                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-secondary-gold' : 'text-ink-muted'}`} />
+                )}
                 <span>{item.label}</span>
               </button>
             );
@@ -119,11 +123,14 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
           {/* Left Navigation Sidebar */}
           <aside className="hidden lg:block lg:col-span-4 bg-surface-lowest border border-border-subtle p-4 rounded-sm shadow-subtle space-y-1 sticky top-24">
-            <div className="px-3 py-2 border-b border-border-subtle mb-2">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-editorial-red block">NP News Metro</span>
-              <h3 className="font-serif text-base font-bold text-ink">
-                {isHindi ? 'संस्थागत डायरेक्टरी' : 'Institutional Directory'}
-              </h3>
+            <div className="px-3 py-2 border-b border-border-subtle mb-2 flex items-center gap-2.5">
+              <img src="/logo-circle.png" alt="NP News Metro" className="w-7 h-7 rounded-full object-cover border border-border-subtle shadow-2xs flex-shrink-0" />
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-editorial-red block">NP News Metro</span>
+                <h3 className="font-serif text-base font-bold text-ink leading-tight">
+                  {isHindi ? 'संस्थागत डायरेक्टरी' : 'Institutional Directory'}
+                </h3>
+              </div>
             </div>
 
             {menuItems.map((item) => {
@@ -145,7 +152,11 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                       : 'text-ink hover:bg-surface-container hover:text-primary'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-secondary-gold' : 'text-ink-muted'}`} />
+                  {item.id === 'editorial-team' ? (
+                    <img src="/logo-circle.png" alt="NP Logo" className="w-4 h-4 rounded-full object-cover flex-shrink-0" />
+                  ) : (
+                    <Icon className={`w-4 h-4 ${isActive ? 'text-secondary-gold' : 'text-ink-muted'}`} />
+                  )}
                   <span>{item.label}</span>
                 </button>
               );
@@ -794,11 +805,13 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
               <article className="space-y-8">
                 {/* Header & Masthead Banner */}
                 <div className="border-b-2 border-primary pb-5">
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <span className="inline-block w-2 h-2 rounded-full bg-editorial-red"></span>
-                    <span className="text-[11px] font-bold uppercase tracking-widest text-secondary">
-                      {isHindi ? 'एनपी न्यूज़ मेट्रो • संस्थागत संपादकीय मंडल' : 'NP NEWS METRO • INSTITUTIONAL MASTHEAD'}
-                    </span>
+                  <div className="flex items-center gap-2.5 mb-2">
+                    <img src="/logo-circle.png" alt="NP News Metro Logo" className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover border border-border-subtle shadow-2xs flex-shrink-0" />
+                    <div>
+                      <span className="text-[11px] font-bold uppercase tracking-widest text-secondary font-sans block">
+                        {isHindi ? 'एनपी न्यूज़ मेट्रो • संस्थागत संपादकीय मंडल' : 'NP NEWS METRO • INSTITUTIONAL MASTHEAD'}
+                      </span>
+                    </div>
                   </div>
                   <h1 className="font-serif text-3xl sm:text-4xl font-extrabold text-ink tracking-tight">
                     {isHindi ? 'संपादकीय बोर्ड एवं नेतृत्व' : 'Editorial Board & Leadership'}
