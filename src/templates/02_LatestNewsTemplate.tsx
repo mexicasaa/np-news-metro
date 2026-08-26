@@ -178,11 +178,10 @@ export const LatestNewsTemplate: React.FC<LatestNewsTemplateProps> = ({
                 </button>
               </div>
 
-              <div className="space-y-3">
-                {trendingRanking.map((post, idx) => (
+              <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs divide-y divide-slate-100 overflow-hidden">
+                {trendingRanking.map((post) => (
                   <RankingItem
                     key={post.id}
-                    rank={idx + 1}
                     post={post}
                     onSelect={onSelectPost}
                   />

@@ -1,19 +1,18 @@
 import React from 'react';
-import { ArrowRight, Clock } from 'lucide-react';
+import { Clock } from 'lucide-react';
 import { WpPost } from '../../types/wordpress';
 import { handleImageError } from '../../utils/imageFallback';
 import { useLanguage } from '../../context/LanguageContext';
 import { getLocalizedPost } from '../../data/mockWpData';
 
 interface RankingItemProps {
-  rank: number;
+  rank?: number;
   post: WpPost;
   onSelect: (post: WpPost) => void;
   showMetrics?: boolean;
 }
 
 export const RankingItem: React.FC<RankingItemProps> = ({
-  rank,
   post,
   onSelect,
 }) => {
@@ -23,13 +22,8 @@ export const RankingItem: React.FC<RankingItemProps> = ({
   return (
     <article
       onClick={() => onSelect(post)}
-      className="group bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs hover:shadow-md hover:-translate-y-0.5 cursor-pointer transition-all duration-300 flex items-start gap-4 overflow-hidden"
+      className="group p-4 sm:p-4.5 hover:bg-slate-50/80 transition-colors flex items-center justify-between gap-4 cursor-pointer"
     >
-      {/* Elegant Rank Badge */}
-      <span className="font-serif text-3xl sm:text-4xl font-black text-slate-300 group-hover:text-red-700 leading-none w-7 sm:w-8 flex-shrink-0 pt-0.5 transition-colors">
-        {rank < 10 ? `0${rank}` : rank}
-      </span>
-
       {/* Story Content */}
       <div className="flex-1 min-w-0 space-y-1.5">
         {/* Category & Read Time */}
@@ -59,7 +53,7 @@ export const RankingItem: React.FC<RankingItemProps> = ({
 
       {/* Mini Thumbnail */}
       {post.featuredImage && (
-        <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-slate-100 border border-slate-100 flex-shrink-0">
+        <div className="relative w-20 h-20 sm:w-22 sm:h-22 rounded-xl overflow-hidden bg-slate-100 border border-slate-100 flex-shrink-0 shadow-3xs">
           <img
             src={localized.featuredImage}
             alt={localized.imageAlt || localized.title}

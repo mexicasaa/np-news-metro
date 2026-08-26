@@ -62,7 +62,7 @@ export const Homepage: React.FC<HomepageProps> = ({
   const indiaPosts = sortedPosts.filter((p) => p.category === 'india' || p.category === 'politics');
   const businessPosts = sortedPosts.filter((p) => p.category === 'business' || p.category === 'economy');
   const techWorldPosts = sortedPosts.filter((p) => p.category === 'technology' || p.category === 'world');
-  const trendingRanking = [...allPosts].sort((a, b) => (b.viewsCount || 0) - (a.viewsCount || 0)).slice(0, 5);
+  const trendingRanking = [...allPosts].sort((a, b) => (b.viewsCount || 0) - (a.viewsCount || 0)).slice(0, 6);
 
   return (
     <main className="max-w-site mx-auto px-3 sm:px-4 py-4 sm:py-6 space-y-6 sm:space-y-8">
@@ -157,8 +157,8 @@ export const Homepage: React.FC<HomepageProps> = ({
             )}
           </div>
 
-          {/* Most Read Ranking (01-05) */}
-          <div className="lg:col-span-5 space-y-3">
+          {/* Most Read Ranking (Single Unified Card, No Numbers) */}
+          <div className="lg:col-span-5 space-y-3 flex flex-col justify-between">
             <div className="flex items-center justify-between pb-2 border-b-2 border-secondary">
               <div className="flex items-center gap-2">
                 <Flame className="w-4 h-4 text-secondary" />
@@ -175,14 +175,13 @@ export const Homepage: React.FC<HomepageProps> = ({
               </button>
             </div>
 
-            <div className="space-y-3">
-              {trendingRanking.map((post, idx) => (
+            {/* Single Unified Card */}
+            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs divide-y divide-slate-100 overflow-hidden">
+              {trendingRanking.map((post) => (
                 <RankingItem
                   key={post.id}
-                  rank={idx + 1}
                   post={post}
                   onSelect={onSelectPost}
-                  showMetrics={true}
                 />
               ))}
             </div>
