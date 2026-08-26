@@ -132,8 +132,8 @@ export const LatestNewsTemplate: React.FC<LatestNewsTemplateProps> = ({
             )}
 
             {/* Chronological Stream */}
-            <div className="bg-surface-lowest border border-border-subtle rounded-sm p-3 divide-y divide-border-subtle shadow-subtle">
-              <div className="p-2 text-xs font-bold uppercase tracking-wider text-ink-muted flex items-center justify-between">
+            <div className="space-y-3">
+              <div className="p-2 bg-surface-lowest rounded-lg border border-border-subtle text-xs font-bold uppercase tracking-wider text-ink-muted flex items-center justify-between shadow-2xs">
                 <span>{isHindi ? 'आज के समय-चिह्नित समाचार' : "Today's Time-stamped Stories"}</span>
                 <span>{isHindi ? 'भारतीय मानक समय' : 'IST Timezone'}</span>
               </div>
@@ -162,8 +162,8 @@ export const LatestNewsTemplate: React.FC<LatestNewsTemplateProps> = ({
             {showAds && <AdSlot zone="A3" />}
 
             {/* Most Read Ranking */}
-            <div className="bg-surface-lowest border border-border-subtle p-4 rounded-sm shadow-subtle">
-              <div className="flex items-center justify-between pb-2 border-b-2 border-secondary mb-3">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between pb-2 border-b-2 border-secondary mb-1">
                 <div className="flex items-center gap-1.5">
                   <Flame className="w-4 h-4 text-secondary" />
                   <h3 className="font-serif text-base font-bold text-ink">
@@ -172,13 +172,13 @@ export const LatestNewsTemplate: React.FC<LatestNewsTemplateProps> = ({
                 </div>
                 <button
                   onClick={onNavigateTrending}
-                  className="text-[11px] font-bold uppercase text-secondary hover:underline"
+                  className="text-[11px] font-bold uppercase text-secondary hover:underline cursor-pointer"
                 >
                   {isHindi ? 'सभी देखें' : 'View All'}
                 </button>
               </div>
 
-              <div className="divide-y divide-border-subtle">
+              <div className="space-y-3">
                 {trendingRanking.map((post, idx) => (
                   <RankingItem
                     key={post.id}

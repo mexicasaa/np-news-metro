@@ -133,12 +133,13 @@ export const Homepage: React.FC<HomepageProps> = ({
               </button>
             </div>
 
-            <div className="bg-surface-lowest border border-border-subtle rounded-md divide-y divide-slate-100 shadow-xs overflow-hidden">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
               {latestPosts.map((post) => (
                 <LatestNewsRow
                   key={post.id}
                   post={post}
                   onSelect={onSelectPost}
+                  showThumbnail={true}
                 />
               ))}
             </div>
@@ -174,7 +175,7 @@ export const Homepage: React.FC<HomepageProps> = ({
               </button>
             </div>
 
-            <div className="bg-surface-lowest border border-border-subtle rounded-md divide-y divide-slate-100 shadow-xs overflow-hidden">
+            <div className="space-y-3">
               {trendingRanking.map((post, idx) => (
                 <RankingItem
                   key={post.id}
