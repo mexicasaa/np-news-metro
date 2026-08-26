@@ -62,7 +62,7 @@ export const Homepage: React.FC<HomepageProps> = ({
   const indiaPosts = sortedPosts.filter((p) => p.category === 'india' || p.category === 'politics');
   const businessPosts = sortedPosts.filter((p) => p.category === 'business' || p.category === 'economy');
   const techWorldPosts = sortedPosts.filter((p) => p.category === 'technology' || p.category === 'world');
-  const trendingRanking = [...allPosts].sort((a, b) => (b.viewsCount || 0) - (a.viewsCount || 0)).slice(0, 6);
+  const trendingRanking = [...allPosts].sort((a, b) => (b.viewsCount || 0) - (a.viewsCount || 0)).slice(0, 7);
 
   return (
     <main className="max-w-site mx-auto px-3 sm:px-4 py-4 sm:py-6 space-y-6 sm:space-y-8">
