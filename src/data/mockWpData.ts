@@ -89,7 +89,7 @@ export const mockAuthors: Record<string, WpAuthor> = {
     slug: 'laxmi-kant-mishra',
     role: 'Reporter',
     roleHi: 'संवाददाता',
-    avatar: '/np-author-default.png',
+    avatar: '/uploads/laxmi-kant-mishra.jpg',
     bio: 'Reporter at NP News Metro, reporting on regional politics, civic infrastructure, law & justice, and local community updates.',
     bioHi: 'एनपी न्यूज़ मेट्रो के संवाददाता, क्षेत्रीय राजनीति, नागरिक अवसंरचना, कानून व न्याय और स्थानीय जनसरोकारों पर समर्पित रिपोर्टर।',
     verified: true,

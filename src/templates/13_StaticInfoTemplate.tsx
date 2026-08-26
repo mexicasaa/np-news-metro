@@ -1299,7 +1299,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                         <div className="flex items-start gap-4">
                           <div className="relative flex-shrink-0">
                             <img
-                              src={getAuthorAvatarUrl('/np-author-default.png')}
+                              src={getAuthorAvatarUrl('/uploads/laxmi-kant-mishra.jpg')}
                               alt="Laxmi Kant Mishra"
                               className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-border-subtle"
                               onError={handleAvatarError}
