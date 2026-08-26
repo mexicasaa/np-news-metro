@@ -953,15 +953,16 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                   </div>
                 </div>
 
-                {/* 2. CHIEF MENTOR & ADVISOR */}
-                <div className="space-y-3">
+                {/* 2. MENTORSHIP & ADVISORY BOARD */}
+                <div className="space-y-4">
                   <div className="flex items-center gap-2 pb-1 border-b border-border-subtle">
                     <Sparkles className="w-4 h-4 text-secondary-gold" />
                     <h2 className="font-serif text-sm font-bold uppercase tracking-wider text-ink">
-                      {isHindi ? 'मुख्य मार्गदर्शक मंडल (Chief Mentor & Advisor)' : 'Mentorship & Advisory Board (Chief Mentor & Advisor)'}
+                      {isHindi ? 'मार्गदर्शक मंडल एवं सलाहकार परिषद' : 'Mentorship & Advisory Board'}
                     </h2>
                   </div>
 
+                  {/* Chief Mentor & Advisor: Dr. Neelima Pandey */}
                   <div className="bg-gradient-to-br from-white via-surface-lowest to-surface-container/30 border-2 border-secondary-gold/30 hover:border-secondary-gold/60 transition-colors p-6 rounded-sm shadow-subtle relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none" />
                     
@@ -1047,6 +1048,167 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                             className="text-primary hover:text-primary-container font-semibold text-xs flex items-center gap-1 group cursor-pointer"
                           >
                             <span>{isHindi ? 'प्रोफ़ाइल एवं लेख देखें' : 'View Profile & Articles'}</span>
+                            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Advisory Board Members Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+                    {/* Diwan Chand Arya (D. C. Arya) */}
+                    <div className="bg-surface-lowest border border-border-subtle hover:border-secondary-gold/50 transition-all p-5 rounded-sm shadow-subtle flex flex-col justify-between">
+                      <div className="space-y-3">
+                        <div className="flex items-start gap-4">
+                          <div className="relative flex-shrink-0">
+                            <img
+                              src={getAuthorAvatarUrl('/np-author-default.png')}
+                              alt="Diwan Chand Arya (D. C. Arya)"
+                              className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-border-subtle"
+                              onError={handleAvatarError}
+                            />
+                            <span className="absolute bottom-0 right-0 bg-amber-600 text-white p-0.5 rounded-full border border-white" title="Verified Advisory Member">
+                              <ShieldCheck className="w-3 h-3" />
+                            </span>
+                          </div>
+
+                          <div className="flex-1 min-w-0">
+                            <h3
+                              onClick={() => onSelectAuthor('author-diwan-chand-arya')}
+                              className="font-serif text-lg font-bold text-ink hover:text-primary cursor-pointer transition-colors"
+                            >
+                              {isHindi ? 'दीवान चंद आर्य (डी. सी. आर्य)' : 'Diwan Chand Arya (D. C. Arya)'}
+                            </h3>
+                            <div className="inline-block bg-amber-50 text-amber-900 border border-amber-200 font-bold text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-xs mt-1">
+                              {isHindi ? 'सलाहकार मंडल सदस्य' : 'Advisory Board Member'}
+                            </div>
+                            <p className="text-[11px] text-ink-muted mt-1 font-mono">
+                              dc.arya@npnewsmetro.com
+                            </p>
+                          </div>
+                        </div>
+
+                        <p className="text-xs text-ink-secondary leading-relaxed">
+                          {isHindi
+                            ? 'एनपी न्यूज़ मेट्रो के सलाहकार मंडल सदस्य, संस्थागत प्रशासन, सामाजिक सरोकारों और सार्वजनिक शुचिता पर रणनीतिक मार्गदर्शन प्रदान करते हैं।'
+                            : 'Advisory Board Member at NP News Metro, providing strategic guidance on institutional governance, community affairs, and public integrity.'}
+                        </p>
+                      </div>
+
+                      <div className="pt-3 mt-3 border-t border-border-subtle space-y-2.5">
+                        <div className="flex flex-wrap gap-1">
+                          {(isHindi 
+                            ? ['प्रशासन एवं नीति', 'सामाजिक सरोकार', 'संस्थागत रणनीति']
+                            : ['Governance & Policy', 'Public Affairs', 'Institutional Strategy']
+                          ).map((beat, i) => (
+                            <span key={i} className="bg-surface-container text-ink-secondary px-2 py-0.5 rounded-sm text-[10px] font-medium border border-border-subtle">
+                              {beat}
+                            </span>
+                          ))}
+                        </div>
+
+                        <div className="flex items-center justify-between text-xs pt-1">
+                          <button
+                            onClick={() => handleCopy('dc.arya@npnewsmetro.com')}
+                            className="text-ink-muted hover:text-primary flex items-center gap-1 text-[11px] cursor-pointer"
+                          >
+                            {copiedEmail === 'dc.arya@npnewsmetro.com' ? (
+                              <span className="text-emerald-700 font-semibold flex items-center gap-1">
+                                <Check className="w-3 h-3" /> {isHindi ? 'कॉपी हुआ' : 'Copied'}
+                              </span>
+                            ) : (
+                              <>
+                                <Copy className="w-3 h-3" />
+                                <span>{isHindi ? 'ईमेल कॉपी करें' : 'Copy Email'}</span>
+                              </>
+                            )}
+                          </button>
+
+                          <button
+                            onClick={() => onSelectAuthor('author-diwan-chand-arya')}
+                            className="text-primary hover:text-primary-container font-semibold text-xs flex items-center gap-1 group cursor-pointer"
+                          >
+                            <span>{isHindi ? 'प्रोफ़ाइल देखें' : 'View Profile'}</span>
+                            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Raj Kumar Agarwal */}
+                    <div className="bg-surface-lowest border border-border-subtle hover:border-secondary-gold/50 transition-all p-5 rounded-sm shadow-subtle flex flex-col justify-between">
+                      <div className="space-y-3">
+                        <div className="flex items-start gap-4">
+                          <div className="relative flex-shrink-0">
+                            <img
+                              src={getAuthorAvatarUrl('/np-author-default.png')}
+                              alt="Raj Kumar Agarwal"
+                              className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-border-subtle"
+                              onError={handleAvatarError}
+                            />
+                            <span className="absolute bottom-0 right-0 bg-amber-600 text-white p-0.5 rounded-full border border-white" title="Verified Advisory Member">
+                              <ShieldCheck className="w-3 h-3" />
+                            </span>
+                          </div>
+
+                          <div className="flex-1 min-w-0">
+                            <h3
+                              onClick={() => onSelectAuthor('author-raj-kumar-agarwal')}
+                              className="font-serif text-lg font-bold text-ink hover:text-primary cursor-pointer transition-colors"
+                            >
+                              {isHindi ? 'राज कुमार अग्रवाल' : 'Raj Kumar Agarwal'}
+                            </h3>
+                            <div className="inline-block bg-amber-50 text-amber-900 border border-amber-200 font-bold text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-xs mt-1">
+                              {isHindi ? 'सलाहकार मंडल सदस्य' : 'Advisory Board Member'}
+                            </div>
+                            <p className="text-[11px] text-ink-muted mt-1 font-mono">
+                              rk.agarwal@npnewsmetro.com
+                            </p>
+                          </div>
+                        </div>
+
+                        <p className="text-xs text-ink-secondary leading-relaxed">
+                          {isHindi
+                            ? 'एनपी न्यूज़ मेट्रो के सलाहकार मंडल सदस्य, आर्थिक नीतियों, उद्यम स्थिरता, मीडिया आचार संहिता और सामाजिक विकास के विशेषज्ञ सलाहकार।'
+                            : 'Advisory Board Member at NP News Metro, advising on economic policy, enterprise sustainability, media ethics, and societal development.'}
+                        </p>
+                      </div>
+
+                      <div className="pt-3 mt-3 border-t border-border-subtle space-y-2.5">
+                        <div className="flex flex-wrap gap-1">
+                          {(isHindi 
+                            ? ['आर्थिक नीतियां', 'उद्यम मामले', 'नैतिक मानक']
+                            : ['Economic Policy', 'Enterprise Affairs', 'Ethical Standards']
+                          ).map((beat, i) => (
+                            <span key={i} className="bg-surface-container text-ink-secondary px-2 py-0.5 rounded-sm text-[10px] font-medium border border-border-subtle">
+                              {beat}
+                            </span>
+                          ))}
+                        </div>
+
+                        <div className="flex items-center justify-between text-xs pt-1">
+                          <button
+                            onClick={() => handleCopy('rk.agarwal@npnewsmetro.com')}
+                            className="text-ink-muted hover:text-primary flex items-center gap-1 text-[11px] cursor-pointer"
+                          >
+                            {copiedEmail === 'rk.agarwal@npnewsmetro.com' ? (
+                              <span className="text-emerald-700 font-semibold flex items-center gap-1">
+                                <Check className="w-3 h-3" /> {isHindi ? 'कॉपी हुआ' : 'Copied'}
+                              </span>
+                            ) : (
+                              <>
+                                <Copy className="w-3 h-3" />
+                                <span>{isHindi ? 'ईमेल कॉपी करें' : 'Copy Email'}</span>
+                              </>
+                            )}
+                          </button>
+
+                          <button
+                            onClick={() => onSelectAuthor('author-raj-kumar-agarwal')}
+                            className="text-primary hover:text-primary-container font-semibold text-xs flex items-center gap-1 group cursor-pointer"
+                          >
+                            <span>{isHindi ? 'प्रोफ़ाइल देखें' : 'View Profile'}</span>
                             <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                           </button>
                         </div>
@@ -1326,16 +1488,16 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                     </h2>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Purnima Mishra */}
                     <div className="bg-surface-lowest border border-border-subtle hover:border-primary/40 transition-all p-5 rounded-sm shadow-subtle flex flex-col justify-between">
                       <div className="space-y-3">
-                        <div className="flex items-start gap-4">
+                        <div className="flex items-start gap-3.5">
                           <div className="relative flex-shrink-0">
                             <img
                               src={getAuthorAvatarUrl('/np-author-default.png')}
                               alt="Purnima Mishra"
-                              className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-border-subtle"
+                              className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-border-subtle"
                               onError={handleAvatarError}
                             />
                             <span className="absolute bottom-0 right-0 bg-emerald-600 text-white p-0.5 rounded-full border border-white" title="Verified Reporter">
@@ -1347,7 +1509,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                             <div className="flex items-center gap-1.5 flex-wrap">
                               <h3
                                 onClick={() => onSelectAuthor('author-purnima-mishra')}
-                                className="font-serif text-lg font-bold text-ink hover:text-primary cursor-pointer transition-colors"
+                                className="font-serif text-base font-bold text-ink hover:text-primary cursor-pointer transition-colors"
                               >
                                 {isHindi ? 'पूर्णिमा मिश्रा' : 'Purnima Mishra'}
                               </h3>
@@ -1355,7 +1517,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                             <div className="inline-block bg-surface-container text-primary font-bold text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-xs border border-border-subtle mt-1">
                               {isHindi ? 'वरिष्ठ संवाददाता' : 'Senior Reporter'}
                             </div>
-                            <p className="text-[11px] text-ink-muted mt-1 font-mono">
+                            <p className="text-[10px] text-ink-muted mt-1 font-mono truncate">
                               purnima.mishra@npnewsmetro.com
                             </p>
                           </div>
@@ -1363,7 +1525,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
 
                         <p className="text-xs text-ink-secondary leading-relaxed">
                           {isHindi
-                            ? 'एनपी न्यूज़ मेट्रो की वरिष्ठ संवाददाता, लोक नीति, सामाजिक-आर्थिक विकास, नागरिक मुद्दों, शिक्षा और महिला सशक्तिकरण पर ज़मीनी रिपोर्टिंग में विशेषज्ञ।'
+                            ? 'एनपी न्यूज़ मेट्रो की वरिष्ठ संवाददाता, लोक नीति, सामाजिक-आर्थिक विकास, नागरिक मुद्दों और महिला सशक्तिकरण पर ज़मीनी रिपोर्टिंग।'
                             : 'Senior Reporter at NP News Metro, covering public policy, socio-economic developments, civic issues, and grassroots investigative journalism.'}
                         </p>
                       </div>
@@ -1374,7 +1536,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                             ? ['लोक नीति', 'सामाजिक मामले', 'ज़मीनी पड़ताल']
                             : ['Public Policy', 'Social Affairs', 'Ground Reporting']
                           ).map((beat, i) => (
-                            <span key={i} className="bg-surface-container text-ink-secondary px-2 py-0.5 rounded-sm text-[10px] font-medium border border-border-subtle">
+                            <span key={i} className="bg-surface-container text-ink-secondary px-1.5 py-0.5 rounded-sm text-[10px] font-medium border border-border-subtle">
                               {beat}
                             </span>
                           ))}
@@ -1392,7 +1554,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                             ) : (
                               <>
                                 <Copy className="w-3 h-3" />
-                                <span>{isHindi ? 'ईमेल कॉपी करें' : 'Copy Email'}</span>
+                                <span>{isHindi ? 'ईमेल कॉपी' : 'Copy Email'}</span>
                               </>
                             )}
                           </button>
@@ -1401,7 +1563,88 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                             onClick={() => onSelectAuthor('author-purnima-mishra')}
                             className="text-primary hover:text-primary-container font-semibold text-xs flex items-center gap-1 group cursor-pointer"
                           >
-                            <span>{isHindi ? 'लेख देखें' : 'View Articles'}</span>
+                            <span>{isHindi ? 'लेख' : 'Articles'}</span>
+                            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* CL Tripathi */}
+                    <div className="bg-surface-lowest border border-border-subtle hover:border-primary/40 transition-all p-5 rounded-sm shadow-subtle flex flex-col justify-between">
+                      <div className="space-y-3">
+                        <div className="flex items-start gap-3.5">
+                          <div className="relative flex-shrink-0">
+                            <img
+                              src={getAuthorAvatarUrl('/np-author-default.png')}
+                              alt="CL Tripathi"
+                              className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-border-subtle"
+                              onError={handleAvatarError}
+                            />
+                            <span className="absolute bottom-0 right-0 bg-emerald-600 text-white p-0.5 rounded-full border border-white" title="Verified Reporter">
+                              <ShieldCheck className="w-3 h-3" />
+                            </span>
+                          </div>
+
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <h3
+                                onClick={() => onSelectAuthor('author-cl-tripathi')}
+                                className="font-serif text-base font-bold text-ink hover:text-primary cursor-pointer transition-colors"
+                              >
+                                {isHindi ? 'सी. एल. त्रिपाठी' : 'CL Tripathi'}
+                              </h3>
+                            </div>
+                            <div className="inline-block bg-surface-container text-primary font-bold text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-xs border border-border-subtle mt-1">
+                              {isHindi ? 'वरिष्ठ संवाददाता' : 'Senior Reporter'}
+                            </div>
+                            <p className="text-[10px] text-ink-muted mt-1 font-mono truncate">
+                              cl.tripathi@npnewsmetro.com
+                            </p>
+                          </div>
+                        </div>
+
+                        <p className="text-xs text-ink-secondary leading-relaxed">
+                          {isHindi
+                            ? 'एनपी न्यूज़ मेट्रो के वरिष्ठ संवाददाता, ज़मीनी राजनीतिक पड़ताल, विधायी घटनाक्रम, नागरिक मामलों और निष्पक्ष जन-पत्रकारिता में विशेषज्ञ।'
+                            : 'Senior Reporter at NP News Metro, specializing in ground-level political investigations, legislative developments, and grassroots reporting.'}
+                        </p>
+                      </div>
+
+                      <div className="pt-3 mt-3 border-t border-border-subtle space-y-2.5">
+                        <div className="flex flex-wrap gap-1">
+                          {(isHindi 
+                            ? ['राजनीतिक मामले', 'विधायी पड़ताल', 'ज़मीनी रिपोर्टिंग']
+                            : ['Political Affairs', 'Legislative Scrutiny', 'Ground Reporting']
+                          ).map((beat, i) => (
+                            <span key={i} className="bg-surface-container text-ink-secondary px-1.5 py-0.5 rounded-sm text-[10px] font-medium border border-border-subtle">
+                              {beat}
+                            </span>
+                          ))}
+                        </div>
+
+                        <div className="flex items-center justify-between text-xs pt-1">
+                          <button
+                            onClick={() => handleCopy('cl.tripathi@npnewsmetro.com')}
+                            className="text-ink-muted hover:text-primary flex items-center gap-1 text-[11px] cursor-pointer"
+                          >
+                            {copiedEmail === 'cl.tripathi@npnewsmetro.com' ? (
+                              <span className="text-emerald-700 font-semibold flex items-center gap-1">
+                                <Check className="w-3 h-3" /> {isHindi ? 'कॉपी हुआ' : 'Copied'}
+                              </span>
+                            ) : (
+                              <>
+                                <Copy className="w-3 h-3" />
+                                <span>{isHindi ? 'ईमेल कॉपी' : 'Copy Email'}</span>
+                              </>
+                            )}
+                          </button>
+
+                          <button
+                            onClick={() => onSelectAuthor('author-cl-tripathi')}
+                            className="text-primary hover:text-primary-container font-semibold text-xs flex items-center gap-1 group cursor-pointer"
+                          >
+                            <span>{isHindi ? 'लेख' : 'Articles'}</span>
                             <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                           </button>
                         </div>
@@ -1411,12 +1654,12 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                     {/* Laxmi Kant Mishra */}
                     <div className="bg-surface-lowest border border-border-subtle hover:border-primary/40 transition-all p-5 rounded-sm shadow-subtle flex flex-col justify-between">
                       <div className="space-y-3">
-                        <div className="flex items-start gap-4">
+                        <div className="flex items-start gap-3.5">
                           <div className="relative flex-shrink-0">
                             <img
                               src={getAuthorAvatarUrl('/uploads/laxmi-kant-mishra.jpg')}
                               alt="Laxmi Kant Mishra"
-                              className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-border-subtle"
+                              className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-border-subtle"
                               onError={handleAvatarError}
                             />
                             <span className="absolute bottom-0 right-0 bg-emerald-600 text-white p-0.5 rounded-full border border-white" title="Verified Reporter">
@@ -1428,7 +1671,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                             <div className="flex items-center gap-1.5 flex-wrap">
                               <h3
                                 onClick={() => onSelectAuthor('author-laxmi-kant-mishra')}
-                                className="font-serif text-lg font-bold text-ink hover:text-primary cursor-pointer transition-colors"
+                                className="font-serif text-base font-bold text-ink hover:text-primary cursor-pointer transition-colors"
                               >
                                 {isHindi ? 'लक्ष्मी कांत मिश्रा' : 'Laxmi Kant Mishra'}
                               </h3>
@@ -1436,7 +1679,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                             <div className="inline-block bg-surface-container text-primary font-bold text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-xs border border-border-subtle mt-1">
                               {isHindi ? 'संवाददाता' : 'Reporter'}
                             </div>
-                            <p className="text-[11px] text-ink-muted mt-1 font-mono">
+                            <p className="text-[10px] text-ink-muted mt-1 font-mono truncate">
                               laxmikant.mishra@npnewsmetro.com
                             </p>
                           </div>
@@ -1455,7 +1698,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                             ? ['नागरिक रिपोर्टिंग', 'प्रादेशिक समाचार', 'कानून व न्याय']
                             : ['Civic Reporting', 'Regional News', 'Legal Affairs']
                           ).map((beat, i) => (
-                            <span key={i} className="bg-surface-container text-ink-secondary px-2 py-0.5 rounded-sm text-[10px] font-medium border border-border-subtle">
+                            <span key={i} className="bg-surface-container text-ink-secondary px-1.5 py-0.5 rounded-sm text-[10px] font-medium border border-border-subtle">
                               {beat}
                             </span>
                           ))}
@@ -1473,7 +1716,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                             ) : (
                               <>
                                 <Copy className="w-3 h-3" />
-                                <span>{isHindi ? 'ईमेल कॉपी करें' : 'Copy Email'}</span>
+                                <span>{isHindi ? 'ईमेल कॉपी' : 'Copy Email'}</span>
                               </>
                             )}
                           </button>
@@ -1482,7 +1725,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                             onClick={() => onSelectAuthor('author-laxmi-kant-mishra')}
                             className="text-primary hover:text-primary-container font-semibold text-xs flex items-center gap-1 group cursor-pointer"
                           >
-                            <span>{isHindi ? 'लेख देखें' : 'View Articles'}</span>
+                            <span>{isHindi ? 'लेख' : 'Articles'}</span>
                             <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                           </button>
                         </div>
