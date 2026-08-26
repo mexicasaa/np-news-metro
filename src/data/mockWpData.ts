@@ -9,10 +9,10 @@ export const mockAuthors: Record<string, WpAuthor> = {
     role: 'Founder & Chief Technology Officer (CTO)',
     roleHi: 'संस्थापक एवं मुख्य प्रौद्योगिकी अधिकारी (CTO)',
     avatar: '/uploads/umang-pandey.jpg',
-    bio: 'Founder & Chief Technology Officer (CTO) of NP News Metro, architecting high-performance digital publishing infrastructure, AI-driven news systems, editorial integrity frameworks, and media technologies.',
-    bioHi: 'एनपी न्यूज़ मेट्रो के संस्थापक एवं मुख्य प्रौद्योगिकी अधिकारी (CTO), जो उच्च-प्रदर्शन डिजिटल पब्लिशिंग अवसंरचना, एआई-संचालित समाचार प्रणालियों, तकनीकी नवाचार और पत्रकारिता आचार संहिता का नेतृत्व कर रहे हैं।',
+    bio: 'Founder & Chief Technology Officer (CTO) of NP News Metro, architecting high-performance digital publishing infrastructure, platform engineering, editorial integrity frameworks, and media technologies.',
+    bioHi: 'एनपी न्यूज़ मेट्रो के संस्थापक एवं मुख्य प्रौद्योगिकी अधिकारी (CTO), जो उच्च-प्रदर्शन डिजिटल पब्लिशिंग अवसंरचना, डिजिटल समाचार प्रणालियों, तकनीकी नवाचार और पत्रकारिता आचार संहिता का नेतृत्व कर रहे हैं।',
     verified: true,
-    beats: ['Technology & Architecture', 'AI & Digital Systems', 'Media Strategy', 'Public Affairs'],
+    beats: ['Technology & Architecture', 'Platform & Digital Systems', 'Media Strategy', 'Public Affairs'],
     social: {
       email: 'umang.pandey@npnewsmetro.com',
     },
