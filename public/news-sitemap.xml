@@ -2,6 +2,17 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
   <url>
+    <loc>https://www.npnewsmetro.com/india/navavarsha-melaa-samiti-ke-shivira-51-nara-naariyon-ne-daana-kiya</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-26T16:51:46.422Z</news:publication_date>
+      <news:title>नववर्ष मेला समिति के शिविर 51 नर-नारियों ने दान किया लहू</news:title>
+    </news:news>
+  </url>
+  <url>
     <loc>https://www.npnewsmetro.com/india/krishnajanmabhoomi-kee-mukti-aandolana-kee-mashaala-jena-jee-ne-t</loc>
     <news:news>
       <news:publication>

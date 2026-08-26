@@ -57,7 +57,7 @@ export const mockAuthors: Record<string, WpAuthor> = {
     slug: 'chetan-sharma',
     role: 'Editor-in-Chief',
     roleHi: 'प्रधान संपादक',
-    avatar: '/np-author-default.png',
+    avatar: '/uploads/chetan-sharma.jpg',
     bio: 'Editor-in-Chief at NP News Metro, directing newsroom policy, strategic investigations, breaking coverage, and editorial integrity.',
     bioHi: 'एनपी न्यूज़ मेट्रो के प्रधान संपादक, न्यूज़रूम नीति, रणनीतिक जांच, ब्रेकिंग कवरेज और पत्रकारिता अखंडता के मार्गदर्शक।',
     verified: true,
