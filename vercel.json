@@ -113,6 +113,14 @@
       "destination": "/api/BingSiteAuth"
     },
     {
+      "source": "/968b4404627f469a8e29b9a607c4b1e7.txt",
+      "destination": "/api/indexnow-key"
+    },
+    {
+      "source": "/indexnow",
+      "destination": "/api/indexnow"
+    },
+    {
       "source": "/category/:category",
       "has": [
         {
@@ -221,6 +229,19 @@
     },
     {
       "source": "/ads\\.txt",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/plain; charset=utf-8"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, stale-while-revalidate=3600"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)\\.txt",
       "headers": [
         {
           "key": "Content-Type",

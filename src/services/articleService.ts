@@ -417,6 +417,17 @@ export const saveArticle = async (
         channel.postMessage({ type: 'NEWS_PUBLISHED', articleId: resultArticle.id });
         channel.close();
       }
+
+      // Automatically ping IndexNow for instant search engine indexing (Bing, Yandex, etc.)
+      if (targetStatus === 'published' && resultArticle?.slug) {
+        const catSlug = resultArticle.categories?.slug || CATEGORY_ID_TO_SLUG[resultArticle.category_id] || 'india';
+        const articleUrl = `https://www.npnewsmetro.com/${catSlug}/${resultArticle.slug}`;
+        fetch('/api/indexnow', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ urls: [articleUrl, 'https://www.npnewsmetro.com/'] }),
+        }).catch(err => console.warn('IndexNow auto-ping failed (non-fatal):', err));
+      }
     } catch (e) {}
 
     const finalPost = mapDbToWpPost(resultArticle, postData.tags);
