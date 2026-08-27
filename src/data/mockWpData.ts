@@ -261,7 +261,7 @@ export const mockCategories: WpCategory[] = [
   { id: 'cat-7', name: 'Sports', slug: 'sports', description: 'Cricket, Olympic sports, badminton, football, and grassroots talent.', count: 52, subcategories: ['Cricket', 'Olympics', 'Badminton', 'Football'] },
   { id: 'cat-8', name: 'Entertainment', slug: 'entertainment', description: 'Cinema, OTT reviews, theater, and arts across regional industries.', count: 45, subcategories: ['Cinema', 'OTT', 'Books', 'Music'] },
   { id: 'cat-9', name: 'Lifestyle', slug: 'lifestyle', description: 'Health, sustainable living, urban architecture, and travel.', count: 39, subcategories: ['Health', 'Architecture', 'Urban Living', 'Travel'] },
-  { id: 'cat-10', name: 'Opinion', slug: 'opinion', description: 'Uncompromising editorial commentary, scholarly analysis, and guest columns.', count: 70, subcategories: ['Editorials', 'Columns', 'Guest Voices', 'Letters'] },
+  { id: 'cat-10', name: 'Metromat', nameHi: 'मैट्रो मत', slug: 'opinion', description: 'Uncompromising editorial commentary, scholarly analysis, guest columns, and daily public opinion pulse.', count: 70, subcategories: ['Editorials', 'Columns', 'Guest Voices', 'Letters', 'Public Pulse'] },
   { id: 'cat-11', name: 'Videos', slug: 'videos', description: 'Newsroom explainers, field documentaries, and leadership interviews.', count: 48, subcategories: ['Explainers', 'Interviews', 'Field Reports', 'Shorts'] },
   { id: 'cat-12', name: 'Photos', slug: 'photos', description: 'Visual journalism capturing pivotal moments across the subcontinent.', count: 32, subcategories: ['Photo Essays', 'Spot News', 'Wildlife', 'Culture'] },
 ];
@@ -1258,7 +1258,7 @@ export const mockPosts: WpPost[] = [
     dek: 'Unchecked vertical expansion without distributed public transport networks risks turning Mumbai and Bengaluru into climate-vulnerable heat traps.',
     dekHi: 'सार्वजनिक परिवहन के बिना अनियंत्रित ऊर्ध्वाधर विस्तार मुंबई और बेंगलुरु को जलवायु-संवेदनशील हीट ट्रैप में बदल रहा है।',
     category: 'opinion',
-    categoryHi: 'विचार',
+    categoryHi: 'मैट्रो मत',
     tags: ['Urban Planning', 'Sustainability', 'Climate', 'Architecture', 'Opinion'],
     authorId: 'author-4',
     publishedAt: '2026-08-18T18:00:00+05:30',

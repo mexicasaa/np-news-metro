@@ -16,6 +16,7 @@ import { RankingItem } from '../components/cards/RankingItem';
 import { VideoCard } from '../components/cards/VideoCard';
 import { AdSlot } from '../components/commercial/AdSlot';
 import { NewsletterModule } from '../components/common/NewsletterModule';
+import { MetromatPoll } from '../components/common/MetromatPoll';
 import { useLanguage } from '../context/LanguageContext';
 
 interface HomepageProps {
@@ -353,7 +354,42 @@ export const Homepage: React.FC<HomepageProps> = ({
         </div>
       </section>
 
-      {/* 9. Inline Newsletter Subscription Module */}
+      {/* 9. Metromat: Editorial Voice & Today's Public Poll */}
+      <section aria-label="Metromat Section" className="pt-2 sm:pt-4">
+        <div className="flex items-center justify-between pb-2 border-b-2 border-primary mb-6">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 bg-primary rotate-45 inline-block"></span>
+            <h2 className="font-serif text-2xl font-bold text-ink">
+              {isHindi ? 'मैट्रो मत — विचार एवं जनमत' : 'Metromat — Editorial & Public Pulse'}
+            </h2>
+          </div>
+          <button
+            onClick={() => onSelectCategory('opinion')}
+            className="text-xs font-bold uppercase tracking-wider text-primary hover:underline flex items-center gap-1 cursor-pointer"
+          >
+            <span>{isHindi ? 'सभी मत देखें' : 'View All Metromat'}</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div className="lg:col-span-6">
+            <MetromatPoll onNavigateMetromat={() => onSelectCategory('opinion')} />
+          </div>
+          <div className="lg:col-span-6 space-y-4">
+            {allPosts.filter(p => p.category === 'opinion' || p.isOpinion).slice(0, 2).map((post) => (
+              <HorizontalStoryCard
+                key={post.id}
+                post={post}
+                onSelect={onSelectPost}
+                onSelectCategory={onSelectCategory}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 10. Inline Newsletter Subscription Module */}
       <section aria-label="Newsletter Box" className="pt-4">
         <NewsletterModule inline={true} />
       </section>

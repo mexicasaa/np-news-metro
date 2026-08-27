@@ -12,6 +12,7 @@ import { RankingItem } from '../components/cards/RankingItem';
 import { AdSlot } from '../components/commercial/AdSlot';
 import { Breadcrumbs } from '../components/layout/Breadcrumbs';
 import { Pagination } from '../components/common/Pagination';
+import { MetromatPoll } from '../components/common/MetromatPoll';
 import { useLanguage } from '../context/LanguageContext';
 
 interface CategoryTemplateProps {
@@ -90,6 +91,14 @@ export const CategoryTemplate: React.FC<CategoryTemplateProps> = ({
               : category.description}
           </p>
 
+          {(categorySlug === 'opinion' || categorySlug === 'metromat') && (
+            <div className="mt-3 inline-flex items-center gap-2 px-3 py-1 rounded-md bg-amber-50 border border-amber-200 text-xs text-ink">
+              <span className="font-bold text-amber-900">RNI Reg. No:</span>
+              <span className="font-mono font-bold text-ink">DEL HIN/2010/31544</span>
+              <span className="text-ink-secondary">({isHindi ? 'मैट्रो मत दिल्ली' : 'by Metromat Delhi'})</span>
+            </div>
+          )}
+
           {/* Subcategory Filter Tabs */}
           {subcategories.length > 0 && (
             <div className="flex items-center gap-2 mt-4 overflow-x-auto hide-scrollbar text-xs font-semibold">
@@ -112,6 +121,13 @@ export const CategoryTemplate: React.FC<CategoryTemplateProps> = ({
             </div>
           )}
         </div>
+
+        {/* Metromat Signature Interactive Poll */}
+        {(categorySlug === 'opinion' || categorySlug === 'metromat') && (
+          <div className="mb-10">
+            <MetromatPoll />
+          </div>
+        )}
 
         {/* Top Featured Hero of Category */}
         {heroPost && (

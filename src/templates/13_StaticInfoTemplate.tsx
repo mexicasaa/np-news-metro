@@ -1264,7 +1264,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                     DEL HIN/2010/31544
                   </span>
                   <span className="text-ink-secondary text-[10px] block">
-                    {isHindi ? 'द्वारा: मेट्रोमैट दिल्ली' : 'by Metromat Delhi'}
+                    {isHindi ? 'द्वारा: मैट्रो मत दिल्ली' : 'by Metromat Delhi'}
                   </span>
                 </div>
 
@@ -1402,7 +1402,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                       <span>{isHindi ? 'आरएनआई एवं संस्थागत पंजीकरण विवरण:' : 'RNI & Institutional Registration Credentials:'}</span>
                     </div>
                     <p className="text-[11px] text-ink-secondary">
-                      <strong>RNI Title Code / Reg. No.:</strong> <span className="font-mono font-bold text-ink">DEL HIN/2010/31544</span> (by Metromat Delhi / मेट्रोमैट दिल्ली)
+                      <strong>RNI Title Code / Reg. No.:</strong> <span className="font-mono font-bold text-ink">DEL HIN/2010/31544</span> (by Metromat Delhi / मैट्रो मत दिल्ली)
                     </p>
                   </div>
                 </div>

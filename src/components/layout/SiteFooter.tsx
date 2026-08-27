@@ -125,9 +125,10 @@ export const SiteFooter: React.FC<SiteFooterProps> = ({
 
           <div>
             <h5 className="font-bold text-white uppercase tracking-wider text-[11px] mb-3 pb-1 border-b border-slate-700">
-              {isHindi ? 'विचार एवं विश्लेषण' : 'Opinion & Analysis'}
+              {isHindi ? 'मैट्रो मत (विचार)' : 'Metromat (Opinion)'}
             </h5>
             <ul className="space-y-1.5 text-slate-300">
+              <li><a href="/category/opinion" onClick={(e) => { e.preventDefault(); onNavigateCategory('opinion'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'आज का मैट्रो मत (जनमत)' : "Today's Metromat Poll"}</a></li>
               <li><a href="/category/opinion" onClick={(e) => { e.preventDefault(); onNavigateCategory('opinion'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'दैनिक संपादकीय' : 'The Daily Editorial'}</a></li>
               <li><a href="/category/opinion" onClick={(e) => { e.preventDefault(); onNavigateCategory('opinion'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'स्तंभकार एवं निबंध' : 'Columnists & Essays'}</a></li>
               <li><a href="/category/opinion" onClick={(e) => { e.preventDefault(); onNavigateCategory('opinion'); }} className="hover:text-secondary-gold transition-colors">{isHindi ? 'नीतिगत शोधपत्र' : 'Policy Papers'}</a></li>
@@ -199,7 +200,7 @@ export const SiteFooter: React.FC<SiteFooterProps> = ({
             <p>{t.footerCopyright} {t.allRightsReserved}</p>
             <p className="text-[10px] text-slate-400 mt-0.5">
               {isHindi 
-                ? 'आरएनआई पंजी. सं.: DEL HIN/2010/31544 (मेट्रोमैट दिल्ली) • पंजीकृत कार्यालय: कनाट प्लेस, नई दिल्ली 110001'
+                ? 'आरएनआई पंजी. सं.: DEL HIN/2010/31544 (मैट्रो मत दिल्ली) • पंजीकृत कार्यालय: कनाट प्लेस, नई दिल्ली 110001'
                 : 'RNI Reg. No.: DEL HIN/2010/31544 (by Metromat Delhi) • Registered Office: Connaught Place, New Delhi 110001'}
             </p>
           </div>

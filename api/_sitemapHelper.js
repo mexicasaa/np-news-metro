@@ -18,7 +18,7 @@ export const escapeXml = (unsafe) => {
 
 export const DEFAULT_CATEGORIES = [
   'india', 'politics', 'business', 'economy', 'technology', 'world',
-  'sports', 'entertainment', 'lifestyle', 'opinion'
+  'sports', 'entertainment', 'lifestyle', 'opinion', 'metromat'
 ];
 
 export const FALLBACK_ARTICLES = [

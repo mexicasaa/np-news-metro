@@ -22,7 +22,7 @@ import { getCurrentUserProfile, ensureAuthenticatedSession, signOut as authSignO
 import { getVideos } from './services/taxonomyService';
 import { getVideoBySlug, getPublishedVideos } from './services/videoService';
 import { supabase } from './lib/supabase';
-import { LanguageProvider } from './context/LanguageContext';
+import { LanguageProvider, useLanguage } from './context/LanguageContext';
 
 // 14 Public Reader Templates
 import { Homepage } from './templates/01_Homepage';
@@ -292,10 +292,11 @@ const parseUrlRoute = (currentPosts: WpPost[], currentVideos: WpVideo[], isIniti
   // 7. Category Desk (/category/:slug)
   if (cleanPath.startsWith('category/')) {
     const cSlug = cleanPath.replace(/^category\//, '');
+    const normalizedCat = (cSlug === 'metromat' || cSlug === 'metro-mat') ? 'opinion' : cSlug;
     return {
       viewMode: 'public',
       template: 'category',
-      category: cSlug,
+      category: normalizedCat,
       authorId: 'author-1',
       staticPage: 'about',
       searchQuery: '',
@@ -317,13 +318,14 @@ const parseUrlRoute = (currentPosts: WpPost[], currentVideos: WpVideo[], isIniti
     };
   }
 
-  // 9. Single category slug directly: /india, /politics, /business, /economy, /technology, /world, /sports, /entertainment, /lifestyle, /opinion
-  const knownDeskSlugs = ['india', 'politics', 'business', 'economy', 'technology', 'world', 'sports', 'entertainment', 'lifestyle', 'opinion'];
+  // 9. Single category slug directly: /india, /politics, /business, /economy, /technology, /world, /sports, /entertainment, /lifestyle, /opinion, /metromat
+  const knownDeskSlugs = ['india', 'politics', 'business', 'economy', 'technology', 'world', 'sports', 'entertainment', 'lifestyle', 'opinion', 'metromat', 'metro-mat'];
   if (knownDeskSlugs.includes(cleanPath)) {
+    const normalizedCat = (cleanPath === 'metromat' || cleanPath === 'metro-mat') ? 'opinion' : cleanPath;
     return {
       viewMode: 'public',
       template: 'category',
-      category: cleanPath,
+      category: normalizedCat,
       authorId: 'author-1',
       staticPage: 'about',
       searchQuery: '',
@@ -377,6 +379,7 @@ const parseUrlRoute = (currentPosts: WpPost[], currentVideos: WpVideo[], isIniti
 };
 
 function AppContent() {
+  const { isHindi } = useLanguage();
   // Check if we are in preview mode from URL query or hash
   const [isPreviewTab, setIsPreviewTab] = useState<boolean>(() => {
     return typeof window !== 'undefined' && (
@@ -1328,11 +1331,18 @@ function AppContent() {
     }
 
     if (currentTemplate === 'category') {
+      const isMetromat = selectedCategory === 'opinion' || selectedCategory === 'metromat';
+      const catTitle = isMetromat
+        ? (isHindi ? 'मैट्रो मत — संपादकीय विचार, स्तंभ एवं जनमत' : 'Metromat — Editorial Voice, Opinions & Public Pulse')
+        : `${selectedCategory.toUpperCase()} News & Latest Analysis`;
+      const catDesc = isMetromat
+        ? (isHindi ? 'एनपी न्यूज़ मेट्रो का संपादकीय एवं वैचारिक मंच — स्वतंत्र विश्लेषण, तीक्ष्ण दृष्टिकोण और दैनिक जनमत।' : 'The editorial, opinion and analytical desk of NP News Metro — independent analysis and public pulse.')
+        : `Latest breaking headlines, reports, and exclusive analysis in ${selectedCategory}.`;
       return {
         metadata: {
-          title: `${selectedCategory.toUpperCase()} News & Latest Analysis`,
-          description: `Latest breaking headlines, reports, and exclusive analysis in ${selectedCategory}.`,
-          canonicalUrl: `https://www.npnewsmetro.com/category/${selectedCategory}`,
+          title: catTitle,
+          description: catDesc,
+          canonicalUrl: isMetromat ? 'https://www.npnewsmetro.com/metromat' : `https://www.npnewsmetro.com/category/${selectedCategory}`,
         },
         structuredData: generateWebsiteStructuredData('NP News Metro', 'https://www.npnewsmetro.com'),
       };

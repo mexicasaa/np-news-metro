@@ -27,6 +27,8 @@ export interface Translations {
   nav_entertainment: string;
   nav_lifestyle: string;
   nav_opinion: string;
+  metromat: string;
+  metromatTagline: string;
   nav_videos: string;
   nav_photos: string;
   nav_trending: string;
@@ -128,7 +130,9 @@ export const translations: Record<Language, Translations> = {
     nav_sports: 'Sports',
     nav_entertainment: 'Entertainment',
     nav_lifestyle: 'Lifestyle',
-    nav_opinion: 'Opinion',
+    nav_opinion: 'Metromat',
+    metromat: 'Metromat',
+    metromatTagline: 'Editorial Voice, Public Pulse & Analysis',
     nav_videos: 'Videos',
     nav_photos: 'Photos',
     nav_trending: 'Trending',
@@ -229,7 +233,9 @@ export const translations: Record<Language, Translations> = {
     nav_sports: 'खेल',
     nav_entertainment: 'मनोरंजन',
     nav_lifestyle: 'लाइफस्टाइल',
-    nav_opinion: 'विचार',
+    nav_opinion: 'मैट्रो मत',
+    metromat: 'मैट्रो मत',
+    metromatTagline: 'संपादकीय विचार, जनमत एवं विश्लेषण',
     nav_videos: 'वीडियो',
     nav_photos: 'फ़ोटो',
     nav_trending: 'ट्रेंडिंग',

@@ -30,6 +30,7 @@ export const PrimaryNav: React.FC<PrimaryNavProps> = ({
     { label: t.nav_sports, slug: 'sports' },
     { label: t.nav_entertainment, slug: 'entertainment' },
     { label: t.nav_lifestyle, slug: 'lifestyle' },
+    { label: t.nav_opinion, slug: 'opinion' },
     { label: t.nav_videos, slug: 'videos' },
   ];
 
