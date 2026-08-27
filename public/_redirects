@@ -6,6 +6,7 @@
 /rss.xml             /rss.xml            200
 /robots.txt          /robots.txt         200
 /ads.txt             /ads.txt            200
+/BingSiteAuth.xml    /BingSiteAuth.xml   200
 /sitemap             /sitemap.xml        301
 /sitemaps            /sitemap_index.xml  301
 /sitemaps.xml        /sitemap_index.xml  301

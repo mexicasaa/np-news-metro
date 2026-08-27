@@ -109,6 +109,10 @@
       "destination": "/api/robots"
     },
     {
+      "source": "/BingSiteAuth.xml",
+      "destination": "/api/BingSiteAuth"
+    },
+    {
       "source": "/category/:category",
       "has": [
         {
