@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { mockPosts } from '../src/data/mockWpData';
+import { FALLBACK_ARTICLES } from './_sitemapHelper.js';
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://jkzrjqclgqpfjdqxsnut.supabase.co';
 const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprenJqcWNsZ3FwZmpkcXhzbnV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NjU0ODksImV4cCI6MjEwMzE0MTQ4OX0.tDPKLptID2tvWKAKstPVr73I7p_cFt3PPGX9AXL4l28';
@@ -168,15 +168,15 @@ export default async function handler(req, res) {
         }
       } catch (e) {}
 
-      // Fallback to mockPosts if no DB articles found
+      // Fallback to FALLBACK_ARTICLES if no DB articles found
       if (catArticles.length === 0) {
-        catArticles = mockPosts
+        catArticles = FALLBACK_ARTICLES
           .filter(a => a.category.toLowerCase() === targetCat || targetCat === 'latest')
           .slice(0, 15)
           .map(a => ({
             title: a.title,
             slug: a.slug,
-            excerpt: a.excerpt || a.title,
+            excerpt: a.caption || a.title,
             featured_image_url: a.featuredImage,
             published_at: a.publishedAt,
             categories: { slug: a.category }
@@ -393,22 +393,22 @@ export default async function handler(req, res) {
         }
       } catch (e) {}
 
-      // Check mockPosts from mockWpData if not found in db
+      // Check FALLBACK_ARTICLES from _sitemapHelper if not found in db
       if (!mediaItem) {
-        const mockArticle = mockPosts.find(p => p.slug === cleanSlug);
+        const mockArticle = FALLBACK_ARTICLES.find(p => p.slug === cleanSlug);
         if (mockArticle) {
           mediaItem = {
             title: mockArticle.title,
-            dek: mockArticle.excerpt || mockArticle.title,
+            dek: mockArticle.caption || mockArticle.title,
             category: mockArticle.category,
             image: mockArticle.featuredImage,
-            caption: mockArticle.title,
+            caption: mockArticle.caption || mockArticle.title,
             slug: cleanSlug,
             publishedAt: mockArticle.publishedAt || new Date().toISOString(),
-            modifiedAt: mockArticle.updatedAt || mockArticle.publishedAt || new Date().toISOString(),
-            author: mockArticle.customAuthor?.name || 'NP News Metro Bureau',
-            authorRole: mockArticle.customAuthor?.role || 'Editorial Desk',
-            paragraphs: [mockArticle.excerpt || mockArticle.title],
+            modifiedAt: mockArticle.publishedAt || new Date().toISOString(),
+            author: 'NP News Metro Bureau',
+            authorRole: 'Editorial Desk',
+            paragraphs: [mockArticle.caption || mockArticle.title],
             type: 'article',
           };
         }

@@ -2,6 +2,14 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
+    <loc>https://www.npnewsmetro.com/india/ananta-bandhana-akhanda-rakshaa-rakshaa-bandhana-para-vishesha</loc>
+    <image:image>
+      <image:loc>https://jkzrjqclgqpfjdqxsnut.supabase.co/storage/v1/object/public/article-images/articles/general/1005537465-mtbur5bp.jpg</image:loc>
+      <image:caption>अनन्त बंधन, अखंड रक्षा (रक्षा बंधन पर विशेष)</image:caption>
+      <image:title>अनन्त बंधन, अखंड रक्षा (रक्षा बंधन पर विशेष)</image:title>
+    </image:image>
+  </url>
+  <url>
     <loc>https://www.npnewsmetro.com/india/himaalaya-royaa-to-janajeevana-maidaana-doobaaa</loc>
     <image:image>
       <image:loc>https://jkzrjqclgqpfjdqxsnut.supabase.co/storage/v1/object/public/article-images/articles/general/1005537397-mtbu880l.jpg</image:loc>
