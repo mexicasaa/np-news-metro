@@ -518,6 +518,9 @@ export default async function handler(req, res) {
   <meta property="og:image" content="${image}" />
   <meta property="og:image:url" content="${image}" />
   <meta property="og:image:secure_url" content="${image}" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:alt" content="${escapeHtml(title)}" />
   <meta property="article:published_time" content="${publishedIso}" />
   <meta property="article:modified_time" content="${modifiedIso}" />

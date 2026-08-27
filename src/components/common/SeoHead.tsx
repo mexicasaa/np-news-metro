@@ -48,6 +48,9 @@ export const SeoHead: React.FC<SeoHeadProps> = ({ metadata, structuredData }) =>
     setMetaTag('meta[property="og:url"]', 'property', 'og:url', finalUrl);
     setMetaTag('meta[property="og:image"]', 'property', 'og:image', finalImage);
     setMetaTag('meta[property="og:image:secure_url"]', 'property', 'og:image:secure_url', finalImage);
+    setMetaTag('meta[property="og:image:width"]', 'property', 'og:image:width', '1200');
+    setMetaTag('meta[property="og:image:height"]', 'property', 'og:image:height', '630');
+    setMetaTag('meta[property="og:image:type"]', 'property', 'og:image:type', 'image/jpeg');
     setMetaTag('meta[property="og:image:alt"]', 'property', 'og:image:alt', metadata?.title || 'NP News Metro');
     setMetaTag('meta[property="og:type"]', 'property', 'og:type', metadata?.ogType || 'website');
     setMetaTag('meta[property="og:site_name"]', 'property', 'og:site_name', 'NP News Metro');

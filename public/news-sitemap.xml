@@ -2,6 +2,17 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
   <url>
+    <loc>https://www.npnewsmetro.com/india/himaalaya-royaa-to-janajeevana-maidaana-doobaaa</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-27T18:10:11.052Z</news:publication_date>
+      <news:title>हिमालय रोया तो जनजीवन मैदान डूबा</news:title>
+    </news:news>
+  </url>
+  <url>
     <loc>https://www.npnewsmetro.com/india/rakshaabandhana-para-jaanen-shubha-muhoorta-poojaa-vidhi-aura-12</loc>
     <news:news>
       <news:publication>

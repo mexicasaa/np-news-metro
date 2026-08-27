@@ -2,6 +2,14 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
+    <loc>https://www.npnewsmetro.com/india/himaalaya-royaa-to-janajeevana-maidaana-doobaaa</loc>
+    <image:image>
+      <image:loc>https://jkzrjqclgqpfjdqxsnut.supabase.co/storage/v1/object/public/article-images/articles/general/1005537397-mtbu880l.jpg</image:loc>
+      <image:caption>हिमालय रोया तो जनजीवन मैदान डूबा</image:caption>
+      <image:title>हिमालय रोया तो जनजीवन मैदान डूबा</image:title>
+    </image:image>
+  </url>
+  <url>
     <loc>https://www.npnewsmetro.com/india/rakshaabandhana-para-jaanen-shubha-muhoorta-poojaa-vidhi-aura-12</loc>
     <image:image>
       <image:loc>https://jkzrjqclgqpfjdqxsnut.supabase.co/storage/v1/object/public/article-images/articles/general/1005537142-mtbtdwa5.jpg</image:loc>
