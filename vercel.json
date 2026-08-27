@@ -187,6 +187,28 @@
       "destination": "/api/share?category=:category&slug=:slug"
     },
     {
+      "source": "/:slug",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(?i)(googlebot|bingbot|yandex|duckduckbot|baiduspider|facebookexternalhit|facebot|facebookcatalog|whatsapp|twitterbot|telegrambot|linkedinbot|discordbot|slackbot|applebot|skypeuripreview|snapchat|pinterest|google-inspectiontool|storebot-google|mediapartners-google|feedfetcher-google).*"
+        }
+      ],
+      "destination": "/api/share?slug=:slug"
+    },
+    {
+      "source": "/:slug/",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(?i)(googlebot|bingbot|yandex|duckduckbot|baiduspider|facebookexternalhit|facebot|facebookcatalog|whatsapp|twitterbot|telegrambot|linkedinbot|discordbot|slackbot|applebot|skypeuripreview|snapchat|pinterest|google-inspectiontool|storebot-google|mediapartners-google|feedfetcher-google).*"
+        }
+      ],
+      "destination": "/api/share?slug=:slug"
+    },
+    {
       "source": "/((?!api/|assets/|uploads/|.*\\..*).*)",
       "destination": "/index.html"
     }

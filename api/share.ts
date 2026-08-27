@@ -434,29 +434,22 @@ export default async function handler(req, res) {
       }
     }
 
-    // 4. IF ARTICLE/MEDIA ITEM NOT FOUND -> RETURN CLEAN 404 (No Soft 404)
+    // 4. IF ARTICLE/MEDIA ITEM NOT FOUND -> FALLBACK TO GENERIC METADATA
     if (!mediaItem && cleanSlug) {
-      const notFoundHtml = `<!DOCTYPE html>
-<html lang="hi">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Story Not Found | 404 | NP News Metro</title>
-  <meta name="robots" content="noindex, nofollow" />
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; text-align: center; padding: 50px 20px; color: #1e293b; }
-    h1 { font-family: Georgia, serif; font-size: 32px; color: #990000; }
-    p { color: #64748b; font-size: 16px; margin-bottom: 24px; }
-    a { display: inline-block; padding: 10px 20px; background-color: #990000; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold; }
-  </style>
-</head>
-<body>
-  <h1>404 — Story Not Found</h1>
-  <p>The news report you requested could not be located on NP News Metro.</p>
-  <p><a href="${SITE_ORIGIN}/">Return to Homepage</a></p>
-</body>
-</html>`;
-      return sendResponse(res, 404, 'text/html; charset=utf-8', notFoundHtml);
+      mediaItem = {
+        title: 'NP News Metro - Real News. Real Impact.',
+        dek: 'Independent, credible digital journalism for modern India.',
+        category: 'latest',
+        image: DEFAULT_OG_IMAGE,
+        caption: 'NP News Metro',
+        slug: cleanSlug,
+        publishedAt: new Date().toISOString(),
+        modifiedAt: new Date().toISOString(),
+        author: 'NP News Metro',
+        authorRole: 'Editorial',
+        paragraphs: ['Independent, credible digital journalism for modern India.'],
+        type: 'website'
+      };
     }
 
     // 5. CONSTRUCT CANONICAL METADATA FOR VALID STORY
