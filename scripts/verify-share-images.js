@@ -8,13 +8,29 @@ function getAbsoluteImageUrl(imageUrl, customOrigin) {
     return DEFAULT_OG_IMAGE;
   }
   const trimmed = imageUrl.trim();
+  const origin = (customOrigin || DEFAULT_SITE_ORIGIN).replace(/\/+$/, '');
+
+  if (trimmed.includes('supabase.co/storage/v1/object/public/')) {
+    const pathAfter = trimmed.split('/storage/v1/object/public/')[1];
+    if (pathAfter) {
+      return `${origin}/api/image/${pathAfter.replace(/^\/+/, '')}`;
+    }
+    return `${origin}/api/image?url=${encodeURIComponent(trimmed)}`;
+  }
+  if (trimmed.includes('supabase.co/storage/v1/render/image/public/')) {
+    const pathAfter = trimmed.split('/storage/v1/render/image/public/')[1]?.split('?')[0];
+    if (pathAfter) {
+      return `${origin}/api/image/${pathAfter.replace(/^\/+/, '')}`;
+    }
+    return `${origin}/api/image?url=${encodeURIComponent(trimmed)}`;
+  }
+
   if (/^https?:\/\//i.test(trimmed)) {
     return trimmed;
   }
   if (trimmed.startsWith('data:')) {
     return trimmed;
   }
-  const origin = (customOrigin || DEFAULT_SITE_ORIGIN).replace(/\/+$/, '');
   const cleanPath = trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
   return `${origin}${cleanPath}`;
 }
@@ -96,6 +112,40 @@ assert.ok(shareLinks.linkedin.includes('linkedin.com'));
 assert.strictEqual(shareLinks.absoluteImage, 'https://www.npnewsmetro.com/uploads/nayab-saini-patiala-teej.jpg');
 console.log('✓ Test 6 Passed: Social share links properly formatted and encoded');
 
-console.log('\n========================================');
-console.log('ALL FEATURED IMAGE SHARING TESTS PASSED!');
-console.log('========================================');
+// Test 7: Article 1 - Ananta Bandhana image URL conversion
+const sup1 = 'https://jkzrjqclgqpfjdqxsnut.supabase.co/storage/v1/object/public/article-images/articles/general/1005537465-mtbur5bp.jpg';
+const clean1 = getAbsoluteImageUrl(sup1);
+assert.strictEqual(clean1, 'https://www.npnewsmetro.com/api/image/article-images/articles/general/1005537465-mtbur5bp.jpg');
+console.log('✓ Test 7 Passed: Article 1 Supabase URL cleanly routed to /api/image/ path:', clean1);
+
+// Test 8: Article 2 - Himaalaya Royaa image URL conversion
+const sup2 = 'https://jkzrjqclgqpfjdqxsnut.supabase.co/storage/v1/object/public/article-images/articles/4524b399-18ca-4e9e-8c00-40055f45d5b4/1005537397-mtbu880l-mtbvs0et.jpg';
+const clean2 = getAbsoluteImageUrl(sup2);
+assert.strictEqual(clean2, 'https://www.npnewsmetro.com/api/image/article-images/articles/4524b399-18ca-4e9e-8c00-40055f45d5b4/1005537397-mtbu880l-mtbvs0et.jpg');
+console.log('✓ Test 8 Passed: Article 2 Supabase URL cleanly routed to /api/image/ path:', clean2);
+
+// Test 9: Verify image proxy serves transformed image < 300KB (WhatsApp requirement)
+import('../api/image.js').then(async (mod) => {
+  const handler = mod.default;
+  let headers = {};
+  let bodyBuffer = null;
+  const mockRes = {
+    statusCode: 200,
+    setHeader: (k, v) => { headers[k.toLowerCase()] = v; },
+    status: (code) => { mockRes.statusCode = code; return mockRes; },
+    send: (b) => { bodyBuffer = b; },
+    end: (b) => { if (b) bodyBuffer = b; }
+  };
+  await handler({ url: '/api/image?path=article-images/articles/general/1005537465-mtbur5bp.jpg', query: { path: 'article-images/articles/general/1005537465-mtbur5bp.jpg' } }, mockRes);
+  assert.strictEqual(mockRes.statusCode, 200, 'Image handler should return 200');
+  assert.strictEqual(headers['content-type'], 'image/jpeg', 'Content-Type must be image/jpeg');
+  assert.ok(bodyBuffer && bodyBuffer.length < 300 * 1024, `Image must be under 300KB for WhatsApp, got: ${bodyBuffer?.length} bytes`);
+  console.log(`✓ Test 9 Passed: Image handler served transformed image at ${bodyBuffer.length} bytes (< 300KB limit for WhatsApp)`);
+
+  console.log('\n========================================');
+  console.log('ALL FEATURED IMAGE SHARING TESTS PASSED!');
+  console.log('========================================');
+}).catch(e => {
+  console.error('Test 9 error:', e);
+  process.exit(1);
+});

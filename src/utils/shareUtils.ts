@@ -28,10 +28,23 @@ export const getAbsoluteImageUrl = (imageUrl?: string, customOrigin?: string): s
 
   const trimmed = imageUrl.trim();
 
-  // If Supabase storage, route via first-party /api/image endpoint to avoid x-robots-tag: none and ensure 100% crawlability
+  // If Supabase storage, route via first-party clean /api/image/path endpoint to avoid x-robots-tag: none and ensure 100% crawlability
   if (trimmed.includes('supabase.co/storage/v1/object/public/')) {
     const origin = customOrigin || getSiteOrigin();
     const cleanOrigin = origin.replace(/\/+$/, '');
+    const pathAfter = trimmed.split('/storage/v1/object/public/')[1];
+    if (pathAfter) {
+      return `${cleanOrigin}/api/image/${pathAfter.replace(/^\/+/, '')}`;
+    }
+    return `${cleanOrigin}/api/image?url=${encodeURIComponent(trimmed)}`;
+  }
+  if (trimmed.includes('supabase.co/storage/v1/render/image/public/')) {
+    const origin = customOrigin || getSiteOrigin();
+    const cleanOrigin = origin.replace(/\/+$/, '');
+    const pathAfter = trimmed.split('/storage/v1/render/image/public/')[1]?.split('?')[0];
+    if (pathAfter) {
+      return `${cleanOrigin}/api/image/${pathAfter.replace(/^\/+/, '')}`;
+    }
     return `${cleanOrigin}/api/image?url=${encodeURIComponent(trimmed)}`;
   }
 

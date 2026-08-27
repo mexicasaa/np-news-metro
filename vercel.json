@@ -81,6 +81,10 @@
   ],
   "rewrites": [
     {
+      "source": "/api/image/:path*",
+      "destination": "/api/image?path=:path*"
+    },
+    {
       "source": "/sitemap_index.xml",
       "destination": "/api/sitemap_index"
     },

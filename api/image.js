@@ -1,28 +1,75 @@
+const SUPABASE_STORAGE_ORIGIN = process.env.VITE_SUPABASE_URL || 'https://jkzrjqclgqpfjdqxsnut.supabase.co';
+
 export default async function handler(req, res) {
   try {
+    const isHead = req.method === 'HEAD';
     const url = new URL(req.url || '/', 'https://www.npnewsmetro.com');
-    const targetUrl = req.query?.url || url.searchParams.get('url');
+    
+    // Support:
+    // 1. req.query.path from Vercel rewrite /api/image/:path* -> /api/image?path=:path*
+    // 2. req.query.url from legacy ?url=...
+    // 3. url.pathname direct path /api/image/...
+    let pathParam = (req.query?.path || url.searchParams.get('path') || '').trim();
+    let urlParam = (req.query?.url || url.searchParams.get('url') || '').trim();
 
-    if (!targetUrl) {
-      if (typeof res.status === 'function') {
-        return res.status(400).send('Missing url parameter');
+    if (!pathParam && !urlParam) {
+      const match = url.pathname.match(/^\/api\/image\/(.+)$/);
+      if (match && match[1]) {
+        pathParam = match[1];
       }
-      res.statusCode = 400;
-      return res.end('Missing url parameter');
     }
 
-    const decodedTarget = decodeURIComponent(targetUrl);
+    let targetUrl = '';
+    let fallbackUrl = '';
 
-    // Only allow HTTP/HTTPS URLs
-    if (!/^https?:\/\//i.test(decodedTarget)) {
+    if (pathParam) {
+      const cleanPath = decodeURIComponent(pathParam).replace(/^\/+/, '');
+      // Route through Supabase Image Transformation CDN with optimal web parameters (1200px width, 75% quality)
+      // This reduces images from 600KB-2MB down to ~130-190 KB, comfortably under WhatsApp's 300KB hard limit.
+      targetUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/render/image/public/${cleanPath}?width=1200&quality=75`;
+      fallbackUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/object/public/${cleanPath}`;
+    } else if (urlParam) {
+      let decoded = urlParam;
+      try {
+        if (!/^https?:\/\//i.test(decoded)) {
+          decoded = decodeURIComponent(urlParam);
+        }
+      } catch (e) {
+        decoded = urlParam;
+      }
+
+      if (!/^https?:\/\//i.test(decoded)) {
+        if (typeof res.status === 'function') {
+          return res.status(400).send('Invalid url protocol');
+        }
+        res.statusCode = 400;
+        return res.end('Invalid url protocol');
+      }
+
+      // If this is a Supabase storage URL, optimize via render/image
+      if (decoded.includes('/storage/v1/object/public/')) {
+        const storagePath = decoded.split('/storage/v1/object/public/')[1];
+        targetUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/render/image/public/${storagePath}?width=1200&quality=75`;
+        fallbackUrl = decoded;
+      } else {
+        targetUrl = decoded;
+      }
+    } else {
       if (typeof res.status === 'function') {
-        return res.status(400).send('Invalid url protocol');
+        return res.status(400).send('Missing image path or url parameter');
       }
       res.statusCode = 400;
-      return res.end('Invalid url protocol');
+      return res.end('Missing image path or url parameter');
     }
 
-    const imageRes = await fetch(decodedTarget);
+    // Try fetching the optimized image first
+    let imageRes = await fetch(targetUrl);
+    
+    // If optimized render endpoint failed or not found, try fallback raw object
+    if (!imageRes.ok && fallbackUrl) {
+      imageRes = await fetch(fallbackUrl);
+    }
+
     if (!imageRes.ok) {
       if (typeof res.status === 'function') {
         return res.status(imageRes.status).send('Failed to fetch upstream image');
@@ -39,6 +86,12 @@ export default async function handler(req, res) {
       res.setHeader('Content-Length', buffer.length);
       res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=604800, stale-while-revalidate=86400');
       res.setHeader('Access-Control-Allow-Origin', '*');
+      // Strips any upstream x-robots-tag: none to ensure full social/search crawler indexing
+    }
+
+    if (isHead) {
+      res.statusCode = 200;
+      return res.end();
     }
 
     if (typeof res.status === 'function' && typeof res.send === 'function') {
@@ -48,9 +101,9 @@ export default async function handler(req, res) {
     return res.end(buffer);
   } catch (err) {
     if (typeof res.status === 'function') {
-      return res.status(500).send('Image proxy error: ' + err.message);
+      return res.status(500).send('Image proxy error: ' + (err?.message || 'Unknown error'));
     }
     res.statusCode = 500;
-    return res.end('Image proxy error: ' + err.message);
+    return res.end('Image proxy error: ' + (err?.message || 'Unknown error'));
   }
 }

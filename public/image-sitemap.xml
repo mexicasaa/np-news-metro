@@ -2,6 +2,22 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
+    <loc>https://www.npnewsmetro.com/india/mukhyamantree-sashakta-bahanaa-utsava-men-champaavata-ko-6297-kar</loc>
+    <image:image>
+      <image:loc>https://jkzrjqclgqpfjdqxsnut.supabase.co/storage/v1/object/public/article-images/articles/general/1005534298-mtbvuax5.jpg</image:loc>
+      <image:caption>मुख्यमंत्री सशक्त बहना उत्सव में चम्पावत को 62.97 करोड़ की 50 विकास योजनाओं की सौगात</image:caption>
+      <image:title>मुख्यमंत्री सशक्त बहना उत्सव में चम्पावत को 62.97 करोड़ की 50 विकास योजनाओं की सौगात</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/india/himaalaya-royaa-to-janajeevana-maidaana-doobaaa</loc>
+    <image:image>
+      <image:loc>https://jkzrjqclgqpfjdqxsnut.supabase.co/storage/v1/object/public/article-images/articles/4524b399-18ca-4e9e-8c00-40055f45d5b4/1005537397-mtbu880l-mtbvs0et.jpg</image:loc>
+      <image:caption>हिमालय रोया तो जनजीवन मैदान डूबा</image:caption>
+      <image:title>हिमालय रोया तो जनजीवन मैदान डूबा</image:title>
+    </image:image>
+  </url>
+  <url>
     <loc>https://www.npnewsmetro.com/india/ananta-bandhana-akhanda-rakshaa-rakshaa-bandhana-para-vishesha</loc>
     <image:image>
       <image:loc>https://jkzrjqclgqpfjdqxsnut.supabase.co/storage/v1/object/public/article-images/articles/general/1005537465-mtbur5bp.jpg</image:loc>
@@ -10,11 +26,19 @@
     </image:image>
   </url>
   <url>
-    <loc>https://www.npnewsmetro.com/india/himaalaya-royaa-to-janajeevana-maidaana-doobaaa</loc>
+    <loc>https://www.npnewsmetro.com/india/sabhee-mahaashaktiyon-kee-aashrayadaataa-hain-maan-bhagavatee-gur</loc>
     <image:image>
-      <image:loc>https://jkzrjqclgqpfjdqxsnut.supabase.co/storage/v1/object/public/article-images/articles/general/1005537397-mtbu880l.jpg</image:loc>
-      <image:caption>हिमालय रोया तो जनजीवन मैदान डूबा</image:caption>
-      <image:title>हिमालय रोया तो जनजीवन मैदान डूबा</image:title>
+      <image:loc>https://jkzrjqclgqpfjdqxsnut.supabase.co/storage/v1/object/public/article-images/articles/general/1005534124-mtbvddv3.jpg</image:loc>
+      <image:caption>सभी महाशक्तियों की आश्रयदाता हैं मां भगवती-गुरुचरण</image:caption>
+      <image:title>सभी महाशक्तियों की आश्रयदाता हैं मां भगवती-गुरुचरण</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/india/rakshaabandhana-se-pahale-khaadya-surakshaa-vibhaaga-kee-badee-ka</loc>
+    <image:image>
+      <image:loc>https://jkzrjqclgqpfjdqxsnut.supabase.co/storage/v1/object/public/article-images/articles/general/1005533424-mtbv4dr1.jpg</image:loc>
+      <image:caption>रक्षाबंधन से पहले खाद्य सुरक्षा विभाग की बड़ी कार्रवाई, 40 नमूने जांच को भेजे</image:caption>
+      <image:title>रक्षाबंधन से पहले खाद्य सुरक्षा विभाग की बड़ी कार्रवाई, 40 नमूने जांच को भेजे</image:title>
     </image:image>
   </url>
   <url>

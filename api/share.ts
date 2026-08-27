@@ -12,6 +12,17 @@ function getAbsoluteUrl(img) {
   if (!img || typeof img !== 'string' || !img.trim()) return DEFAULT_OG_IMAGE;
   const trimmed = img.trim();
   if (trimmed.includes('supabase.co/storage/v1/object/public/')) {
+    const pathAfter = trimmed.split('/storage/v1/object/public/')[1];
+    if (pathAfter) {
+      return `${SITE_ORIGIN}/api/image/${pathAfter.replace(/^\/+/, '')}`;
+    }
+    return `${SITE_ORIGIN}/api/image?url=${encodeURIComponent(trimmed)}`;
+  }
+  if (trimmed.includes('supabase.co/storage/v1/render/image/public/')) {
+    const pathAfter = trimmed.split('/storage/v1/render/image/public/')[1]?.split('?')[0];
+    if (pathAfter) {
+      return `${SITE_ORIGIN}/api/image/${pathAfter.replace(/^\/+/, '')}`;
+    }
     return `${SITE_ORIGIN}/api/image?url=${encodeURIComponent(trimmed)}`;
   }
   if (/^https?:\/\//i.test(trimmed)) return trimmed;
@@ -129,6 +140,7 @@ export default async function handler(req, res) {
     const rawSlugParam = (req.query?.slug || url.searchParams.get('slug') || '').trim();
     const rawCatParam = (req.query?.category || url.searchParams.get('category') || 'india').trim().toLowerCase();
     const pathParam = (req.query?.path || url.searchParams.get('path') || '').trim();
+    const rawVersionParam = (req.query?.v || url.searchParams.get('v') || '').trim();
 
     let cleanSlug = rawSlugParam;
     let cleanCategory = rawCatParam;
@@ -462,6 +474,9 @@ export default async function handler(req, res) {
     const canonicalUrl = slug 
       ? (isVideo ? `${SITE_ORIGIN}/videos/${slug}` : `${SITE_ORIGIN}/${category}/${slug}`)
       : `${SITE_ORIGIN}/`;
+    const shareUrl = rawVersionParam 
+      ? `${canonicalUrl}?v=${encodeURIComponent(rawVersionParam)}` 
+      : canonicalUrl;
     const publishedIso = mediaItem?.publishedAt || new Date().toISOString();
     const modifiedIso = mediaItem?.modifiedAt || publishedIso;
     const authorName = mediaItem?.author || 'NP News Metro Bureau';
@@ -544,7 +559,7 @@ export default async function handler(req, res) {
   <meta property="og:type" content="${mediaItem?.type || 'article'}" />
   <meta property="og:title" content="${escapeHtml(title)}" />
   <meta property="og:description" content="${escapeHtml(description)}" />
-  <meta property="og:url" content="${canonicalUrl}" />
+  <meta property="og:url" content="${shareUrl}" />
   <meta property="og:image" content="${image}" />
   <meta property="og:image:url" content="${image}" />
   <meta property="og:image:secure_url" content="${image}" />
@@ -562,6 +577,7 @@ export default async function handler(req, res) {
   <meta name="twitter:creator" content="@NPNewsMetro" />
   <meta name="twitter:title" content="${escapeHtml(title)}" />
   <meta name="twitter:description" content="${escapeHtml(description)}" />
+  <meta name="twitter:url" content="${shareUrl}" />
   <meta name="twitter:image" content="${image}" />
   <meta name="twitter:image:src" content="${image}" />
   <link rel="image_src" href="${image}" />
