@@ -3,14 +3,20 @@ import {
   Image as ImageIcon, Search, DollarSign, Users, BarChart3, 
   Settings, CheckCircle2, AlertTriangle, ShieldCheck, RefreshCw, 
   Plus, ExternalLink, Globe, Database, Cpu, Radio, Check,
-  FileText, Video as VideoIcon, Bot, Rss, Copy
+  FileText, Video as VideoIcon, Bot, Rss, Copy, UserPlus,
+  Trash2, Edit, X, Shield, Mail, Key, Loader2, Lock, Filter
 } from 'lucide-react';
 import { getSitemapStats, SitemapStats, getBaseSiteUrl } from '../../services/sitemapService';
 import { mockAuthors, mockCategories } from '../../data/mockWpData';
 import { mockAdminUsers } from '../../data/mockAdminData';
-import { ROLE_PERMISSIONS, UserProfile } from '../../types/admin';
+import { ROLE_PERMISSIONS, UserProfile, UserRole } from '../../types/admin';
 import { getMediaLibrary, uploadMedia, MediaAsset } from '../../services/mediaService';
-import { getProfilesList } from '../../services/authService';
+import { 
+  getProfilesList, 
+  createNewsroomUser, 
+  updateNewsroomUserRole, 
+  deleteNewsroomUser 
+} from '../../services/authService';
 
 import { YouTubeManagerModal } from './YouTubeManagerModal';
 
@@ -440,70 +446,818 @@ export const SeoHealthView: React.FC = () => {
   );
 };
 
-/* ======================================================================
-   4. USERS & ROLES VIEW
-   ====================================================================== */
+const AVAILABLE_ROLES: { value: UserRole; label: string; description: string; canPublish: boolean }[] = [
+  { value: 'admin', label: 'Admin', description: 'Full root newsroom administration and publishing control', canPublish: true },
+  { value: 'editor', label: 'Editor', description: 'Senior editor with full live publish, approvals, and breaking news control', canPublish: true },
+  { value: 'copy_editor', label: 'Copy Editor', description: 'Desk reviewer and copy polisher (Draft / Review Only)', canPublish: false },
+  { value: 'author', label: 'Author', description: 'Editorial columnist and feature author (Draft / Review Only)', canPublish: false },
+  { value: 'reporter', label: 'Reporter', description: 'Field reporter filing breaking dispatches (Draft / Review Only)', canPublish: false },
+  { value: 'seo_manager', label: 'SEO Manager', description: 'Sitemap, crawler directives, and metadata specialist', canPublish: false },
+  { value: 'ad_manager', label: 'Ad Manager', description: 'Commercial campaigns and sponsorship manager', canPublish: false },
+];
+
+const AVAILABLE_DEPARTMENTS = [
+  'Executive Editorial',
+  'National Bureau',
+  'Politics Desk',
+  'Economy Desk',
+  'Tech Bureau',
+  'Opinion Desk',
+  'Sports Desk',
+  'World Affairs',
+  'Multimedia & Video Desk',
+  'Regional Corridors',
+];
+
+const AVATAR_PRESETS = [
+  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
+  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400',
+  'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=400',
+  'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=400',
+  'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=400',
+  'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=400',
+];
+
 export const UsersView: React.FC = () => {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterRole, setFilterRole] = useState<string>('all');
+  const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  // Add Member Modal State
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [addForm, setAddForm] = useState<{
+    name: string;
+    email: string;
+    role: UserRole;
+    department: string;
+    password: string;
+    avatar: string;
+  }>({
+    name: '',
+    email: '',
+    role: 'reporter',
+    department: 'National Bureau',
+    password: 'Newsroom@2026',
+    avatar: AVATAR_PRESETS[0],
+  });
+  const [isSubmittingAdd, setIsSubmittingAdd] = useState(false);
+  const [addError, setAddError] = useState<string | null>(null);
+
+  // Edit Member Modal State
+  const [editingUser, setEditingUser] = useState<UserProfile | null>(null);
+  const [editForm, setEditForm] = useState<{
+    name: string;
+    role: UserRole;
+    department: string;
+  }>({
+    name: '',
+    role: 'author',
+    department: 'Editorial Bureau',
+  });
+  const [isSubmittingEdit, setIsSubmittingEdit] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
+
+  // Delete / Remove Modal State
+  const [deletingUser, setDeletingUser] = useState<UserProfile | null>(null);
+  const [isSubmittingDelete, setIsSubmittingDelete] = useState(false);
+
+  // Updating specific row inline
+  const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
+
+  const fetchUsers = async () => {
+    try {
+      const data = await getProfilesList();
+      setUsers(data);
+    } catch (e) {
+      console.error('Error loading users:', e);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
 
   useEffect(() => {
-    getProfilesList().then(data => {
-      setUsers(data);
-      setLoading(false);
-    });
+    fetchUsers();
   }, []);
+
+  const showNotification = (type: 'success' | 'error', message: string) => {
+    setNotification({ type, message });
+    setTimeout(() => {
+      setNotification(null);
+    }, 4000);
+  };
+
+  // 1. Assign / Quick Update Role
+  const handleRoleChange = async (user: UserProfile, newRole: UserRole) => {
+    if (user.role === newRole) return;
+    if (user.email === 'admin@npnews.com' && newRole !== 'admin') {
+      showNotification('error', 'Primary Root Administrator role cannot be downgraded.');
+      return;
+    }
+
+    setUpdatingUserId(user.id);
+    try {
+      const res = await updateNewsroomUserRole(user.id, newRole, user.department, user.name);
+      if (res.error) {
+        showNotification('error', `Failed to update role: ${res.error}`);
+      } else {
+        setUsers(prev => prev.map(u => u.id === user.id ? { ...u, role: newRole } : u));
+        showNotification('success', `Role for ${user.name} updated to ${newRole.replace('_', ' ').toUpperCase()} in database.`);
+      }
+    } catch (err: any) {
+      showNotification('error', err?.message || 'Error updating role.');
+    } finally {
+      setUpdatingUserId(null);
+    }
+  };
+
+  // 2. Add New Member (connected to Supabase Auth & Profiles)
+  const handleAddSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAddError(null);
+
+    if (!addForm.name.trim()) {
+      setAddError('Full name is required.');
+      return;
+    }
+    if (!addForm.email.trim() || !addForm.email.includes('@')) {
+      setAddError('Valid email address is required.');
+      return;
+    }
+
+    setIsSubmittingAdd(true);
+    try {
+      const res = await createNewsroomUser({
+        name: addForm.name.trim(),
+        email: addForm.email.trim().toLowerCase(),
+        role: addForm.role,
+        department: addForm.department.trim(),
+        password: addForm.password.trim() || 'Newsroom@2026',
+        avatar: addForm.avatar,
+      });
+
+      if (res.error) {
+        setAddError(res.error);
+      } else {
+        showNotification('success', `Team member ${addForm.name} successfully created and registered in database!`);
+        setIsAddModalOpen(false);
+        setAddForm({
+          name: '',
+          email: '',
+          role: 'reporter',
+          department: 'National Bureau',
+          password: 'Newsroom@2026',
+          avatar: AVATAR_PRESETS[Math.floor(Math.random() * AVATAR_PRESETS.length)],
+        });
+        await fetchUsers();
+      }
+    } catch (err: any) {
+      setAddError(err?.message || 'Failed to add newsroom user.');
+    } finally {
+      setIsSubmittingAdd(false);
+    }
+  };
+
+  // 3. Edit Existing Member
+  const handleOpenEdit = (user: UserProfile) => {
+    setEditingUser(user);
+    setEditForm({
+      name: user.name,
+      role: user.role,
+      department: user.department,
+    });
+    setEditError(null);
+  };
+
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingUser) return;
+    setEditError(null);
+
+    if (!editForm.name.trim()) {
+      setEditError('Name is required.');
+      return;
+    }
+
+    setIsSubmittingEdit(true);
+    try {
+      const res = await updateNewsroomUserRole(
+        editingUser.id,
+        editForm.role,
+        editForm.department,
+        editForm.name.trim()
+      );
+
+      if (res.error) {
+        setEditError(res.error);
+      } else {
+        setUsers(prev => prev.map(u => u.id === editingUser.id ? {
+          ...u,
+          name: editForm.name.trim(),
+          role: editForm.role,
+          department: editForm.department,
+        } : u));
+        showNotification('success', `Updated ${editForm.name}'s profile and role in database.`);
+        setEditingUser(null);
+      }
+    } catch (err: any) {
+      setEditError(err?.message || 'Error updating member.');
+    } finally {
+      setIsSubmittingEdit(false);
+    }
+  };
+
+  // 4. Remove / Deactivate Member
+  const handleConfirmDelete = async () => {
+    if (!deletingUser) return;
+    if (deletingUser.email === 'admin@npnews.com' || deletingUser.id === '04ad79d9-d871-4099-a633-bcb7a1e35055') {
+      showNotification('error', 'Cannot delete primary root administrator.');
+      setDeletingUser(null);
+      return;
+    }
+
+    setIsSubmittingDelete(true);
+    try {
+      const res = await deleteNewsroomUser(deletingUser.id, true);
+      if (!res.success) {
+        showNotification('error', res.error || 'Failed to remove user.');
+      } else {
+        setUsers(prev => prev.filter(u => u.id !== deletingUser.id));
+        showNotification('success', `Team member ${deletingUser.name} removed from newsroom.`);
+        setDeletingUser(null);
+      }
+    } catch (err: any) {
+      showNotification('error', err?.message || 'Error deleting member.');
+    } finally {
+      setIsSubmittingDelete(false);
+    }
+  };
+
+  // Filtered Users List
+  const filteredUsers = users.filter(u => {
+    const matchesSearch = 
+      u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      u.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      u.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      u.role.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRole = filterRole === 'all' || u.role === filterRole;
+    return matchesSearch && matchesRole;
+  });
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 animate-fadeIn">
-      <div>
-        <h1 className="font-serif text-2xl sm:text-3xl font-extrabold text-ink">
-          Newsroom Users & Role Permissions
-        </h1>
-        <p className="text-xs sm:text-sm text-ink-secondary mt-1">
-          Enforced server-side least-privilege role matrix across authoring, reviewing, publishing, and curation (Supabase Auth & Profiles).
-        </p>
+      {/* Toast Notification Banner */}
+      {notification && (
+        <div className={`p-3.5 rounded-sm flex items-center justify-between text-xs font-semibold shadow-md transition-all ${
+          notification.type === 'success' 
+            ? 'bg-emerald-900 text-emerald-50 border border-emerald-700' 
+            : 'bg-red-900 text-red-50 border border-red-700'
+        }`}>
+          <div className="flex items-center gap-2">
+            {notification.type === 'success' ? <CheckCircle2 className="w-4 h-4 text-emerald-300" /> : <AlertTriangle className="w-4 h-4 text-red-300" />}
+            <span>{notification.message}</span>
+          </div>
+          <button onClick={() => setNotification(null)} className="text-white/80 hover:text-white cursor-pointer">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
+      {/* Header & Main Actions */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="font-serif text-2xl sm:text-3xl font-extrabold text-ink">
+            Newsroom Users & Role Permissions
+          </h1>
+          <p className="text-xs sm:text-sm text-ink-secondary mt-1">
+            Enforced server-side least-privilege role matrix across authoring, reviewing, publishing, and curation (Supabase Auth & Profiles).
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2.5 shrink-0">
+          <button
+            onClick={() => {
+              setRefreshing(true);
+              fetchUsers();
+            }}
+            disabled={refreshing}
+            className="px-3 py-2 bg-surface-lowest hover:bg-slate-100 border border-border-subtle text-ink rounded-sm text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+            title="Reload team members from database"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-primary' : 'text-ink-muted'}`} />
+            <span>{refreshing ? 'Syncing...' : 'Sync DB'}</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setAddError(null);
+              setIsAddModalOpen(true);
+            }}
+            className="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-sm text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
+          >
+            <UserPlus className="w-4 h-4" />
+            <span>+ Add Team Member</span>
+          </button>
+        </div>
       </div>
 
-      <div className="bg-surface-lowest border border-border-subtle rounded-sm shadow-subtle overflow-hidden">
-        <table className="w-full text-left text-xs">
-          <thead>
-            <tr className="bg-slate-50 border-b border-border-subtle font-mono text-[11px] uppercase font-bold text-ink-muted">
-              <th className="p-3.5 pl-4">Team Member</th>
-              <th className="p-3.5">Department</th>
-              <th className="p-3.5">Role</th>
-              <th className="p-3.5">Publish Permission</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border-subtle">
-            {users.map((u) => {
-              const perms = ROLE_PERMISSIONS[u.role] || ROLE_PERMISSIONS.reporter;
-              return (
-                <tr key={u.id} className="hover:bg-slate-50">
-                  <td className="p-3.5 pl-4 flex items-center gap-3">
-                    <img src={u.avatar} alt={u.name} className="w-7 h-7 rounded-full object-cover" />
-                    <div>
-                      <p className="font-bold text-ink">{u.name}</p>
-                      <p className="text-[11px] text-ink-muted">{u.email}</p>
-                    </div>
-                  </td>
-                  <td className="p-3.5 text-ink-secondary">{u.department}</td>
-                  <td className="p-3.5 capitalize font-semibold">{u.role.replace('_', ' ')}</td>
-                  <td className="p-3.5">
-                    {perms.canPublish ? (
-                      <span className="text-emerald-700 font-bold font-mono text-[11px] flex items-center gap-1">
-                        <Check className="w-3.5 h-3.5" /> Full Live Publish
-                      </span>
-                    ) : (
-                      <span className="text-slate-400 font-mono text-[11px]">Draft / Review Only</span>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+      {/* Search & Role Filters */}
+      <div className="bg-surface-lowest border border-border-subtle p-3.5 rounded-sm shadow-subtle flex flex-col sm:flex-row items-center gap-3">
+        <div className="relative flex-1 w-full">
+          <Search className="w-4 h-4 text-ink-muted absolute left-3 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            placeholder="Search by name, email, department, or role..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-9 pr-4 py-2 text-xs bg-slate-50 border border-border-subtle rounded-sm focus:outline-none focus:border-primary text-ink"
+          />
+        </div>
+
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <Filter className="w-3.5 h-3.5 text-ink-muted shrink-0" />
+          <select
+            value={filterRole}
+            onChange={(e) => setFilterRole(e.target.value)}
+            className="text-xs bg-slate-50 border border-border-subtle rounded-sm px-3 py-2 text-ink font-semibold focus:outline-none focus:border-primary cursor-pointer w-full sm:w-auto"
+          >
+            <option value="all">All Roles ({users.length})</option>
+            {AVAILABLE_ROLES.map(r => (
+              <option key={r.value} value={r.value}>{r.label}</option>
+            ))}
+          </select>
+        </div>
       </div>
+
+      {/* Users & Permissions Table */}
+      <div className="bg-surface-lowest border border-border-subtle rounded-sm shadow-subtle overflow-hidden">
+        {loading ? (
+          <div className="py-16 text-center text-ink-muted flex flex-col items-center gap-3">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            <p className="text-xs font-semibold">Loading newsroom team from database...</p>
+          </div>
+        ) : filteredUsers.length === 0 ? (
+          <div className="py-16 text-center text-ink-muted">
+            <Users className="w-10 h-10 mx-auto mb-2 text-slate-300" />
+            <p className="text-sm font-bold text-ink">No team members match your criteria</p>
+            <p className="text-xs text-ink-muted mt-1">Try changing your search keywords or role filters.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs min-w-[700px]">
+              <thead>
+                <tr className="bg-slate-50 border-b border-border-subtle font-mono text-[11px] uppercase font-bold text-ink-muted">
+                  <th className="p-3.5 pl-4">Team Member</th>
+                  <th className="p-3.5">Department</th>
+                  <th className="p-3.5">Assigned Role</th>
+                  <th className="p-3.5">Publish Permission</th>
+                  <th className="p-3.5 text-right pr-4">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border-subtle">
+                {filteredUsers.map((u) => {
+                  const perms = ROLE_PERMISSIONS[u.role] || ROLE_PERMISSIONS.reporter;
+                  const isRootAdmin = u.email === 'admin@npnews.com' || u.id === '04ad79d9-d871-4099-a633-bcb7a1e35055';
+                  const isUpdating = updatingUserId === u.id;
+
+                  return (
+                    <tr key={u.id} className="hover:bg-slate-50/80 transition-colors">
+                      {/* Member info */}
+                      <td className="p-3.5 pl-4">
+                        <div className="flex items-center gap-3">
+                          <img 
+                            src={u.avatar} 
+                            alt={u.name} 
+                            className="w-8 h-8 rounded-full object-cover border border-slate-200 shrink-0" 
+                          />
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <p className="font-bold text-ink truncate">{u.name}</p>
+                              {isRootAdmin && (
+                                <span className="inline-flex items-center px-1.5 py-0.2 rounded-xs bg-amber-100 text-amber-800 text-[9px] font-mono font-bold uppercase tracking-wider">
+                                  Primary Root
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-[11px] text-ink-muted truncate font-mono">{u.email}</p>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Department */}
+                      <td className="p-3.5 text-ink-secondary font-medium">
+                        {u.department || 'Editorial Bureau'}
+                      </td>
+
+                      {/* Interactive Assigned Role Selector */}
+                      <td className="p-3.5">
+                        <div className="inline-flex items-center gap-1.5">
+                          <select
+                            value={u.role}
+                            disabled={isRootAdmin || isUpdating}
+                            onChange={(e) => handleRoleChange(u, e.target.value as UserRole)}
+                            className={`text-xs font-semibold px-2.5 py-1 rounded-sm border transition-colors cursor-pointer ${
+                              u.role === 'admin' 
+                                ? 'bg-amber-50 text-amber-900 border-amber-300 font-bold'
+                                : u.role === 'editor'
+                                ? 'bg-blue-50 text-blue-900 border-blue-300 font-bold'
+                                : u.role === 'copy_editor'
+                                ? 'bg-indigo-50 text-indigo-900 border-indigo-200'
+                                : 'bg-slate-50 text-slate-800 border-slate-200'
+                            } ${isRootAdmin ? 'cursor-not-allowed opacity-90' : 'hover:border-primary'}`}
+                          >
+                            {AVAILABLE_ROLES.map(r => (
+                              <option key={r.value} value={r.value}>{r.label}</option>
+                            ))}
+                          </select>
+                          {isUpdating && <Loader2 className="w-3.5 h-3.5 animate-spin text-primary shrink-0" />}
+                        </div>
+                      </td>
+
+                      {/* Publish Permission */}
+                      <td className="p-3.5">
+                        {perms.canPublish ? (
+                          <span className="text-emerald-700 font-bold font-mono text-[11px] flex items-center gap-1">
+                            <Check className="w-3.5 h-3.5" /> Full Live Publish
+                          </span>
+                        ) : (
+                          <span className="text-slate-400 font-mono text-[11px] flex items-center gap-1">
+                            Draft / Review Only
+                          </span>
+                        )}
+                      </td>
+
+                      {/* Action buttons (Edit / Remove) */}
+                      <td className="p-3.5 text-right pr-4">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            onClick={() => handleOpenEdit(u)}
+                            className="p-1.5 text-ink-muted hover:text-primary hover:bg-slate-100 rounded-sm transition-colors cursor-pointer"
+                            title="Edit user details & department"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+
+                          {isRootAdmin ? (
+                            <span 
+                              className="p-1.5 text-slate-300 cursor-not-allowed" 
+                              title="Primary root admin cannot be deleted"
+                            >
+                              <Lock className="w-4 h-4" />
+                            </span>
+                          ) : (
+                            <button
+                              onClick={() => setDeletingUser(u)}
+                              className="p-1.5 text-ink-muted hover:text-editorial-red hover:bg-red-50 rounded-sm transition-colors cursor-pointer"
+                              title="Remove team member from newsroom"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* ======================================================================
+         MODAL 1: ADD TEAM MEMBER (Connected to Supabase DB)
+         ====================================================================== */}
+      {isAddModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 backdrop-blur-xs p-4 animate-fadeIn">
+          <div className="bg-surface-lowest border border-border-subtle rounded-md shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="p-4 sm:p-5 border-b border-border-subtle bg-slate-50 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                  <UserPlus className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="font-serif font-bold text-base text-ink">Add Newsroom Team Member</h3>
+                  <p className="text-[11px] text-ink-muted">Create profile and provision Supabase newsroom credentials</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsAddModalOpen(false)}
+                className="text-ink-muted hover:text-ink p-1 rounded-sm cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Error banner */}
+            {addError && (
+              <div className="m-4 p-3 rounded-sm bg-red-50 border border-red-200 text-editorial-red text-xs flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 shrink-0" />
+                <span>{addError}</span>
+              </div>
+            )}
+
+            {/* Form */}
+            <form onSubmit={handleAddSubmit} className="p-4 sm:p-5 space-y-4 text-xs">
+              <div>
+                <label className="block font-bold text-ink mb-1 uppercase tracking-wider text-[11px]">
+                  Full Name *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Meera Joshi"
+                  value={addForm.name}
+                  onChange={(e) => setAddForm(prev => ({ ...prev, name: e.target.value }))}
+                  className="w-full px-3 py-2 bg-slate-50 border border-border-subtle rounded-sm focus:outline-none focus:border-primary text-ink"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-ink mb-1 uppercase tracking-wider text-[11px]">
+                  Newsroom Email *
+                </label>
+                <input
+                  type="email"
+                  required
+                  placeholder="e.g. meera.joshi@npnewsmetro.com"
+                  value={addForm.email}
+                  onChange={(e) => setAddForm(prev => ({ ...prev, email: e.target.value }))}
+                  className="w-full px-3 py-2 bg-slate-50 border border-border-subtle rounded-sm focus:outline-none focus:border-primary text-ink font-mono"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-ink mb-1 uppercase tracking-wider text-[11px]">
+                    Role Assignment *
+                  </label>
+                  <select
+                    value={addForm.role}
+                    onChange={(e) => setAddForm(prev => ({ ...prev, role: e.target.value as UserRole }))}
+                    className="w-full px-3 py-2 bg-slate-50 border border-border-subtle rounded-sm focus:outline-none focus:border-primary text-ink font-semibold"
+                  >
+                    {AVAILABLE_ROLES.map(r => (
+                      <option key={r.value} value={r.value}>{r.label}</option>
+                    ))}
+                  </select>
+                  <p className="text-[10px] text-ink-muted mt-1">
+                    {AVAILABLE_ROLES.find(r => r.value === addForm.role)?.description}
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-ink mb-1 uppercase tracking-wider text-[11px]">
+                    Department Desk *
+                  </label>
+                  <select
+                    value={addForm.department}
+                    onChange={(e) => setAddForm(prev => ({ ...prev, department: e.target.value }))}
+                    className="w-full px-3 py-2 bg-slate-50 border border-border-subtle rounded-sm focus:outline-none focus:border-primary text-ink font-semibold"
+                  >
+                    {AVAILABLE_DEPARTMENTS.map(dept => (
+                      <option key={dept} value={dept}>{dept}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-bold text-ink mb-1 uppercase tracking-wider text-[11px]">
+                  Initial Password
+                </label>
+                <input
+                  type="text"
+                  value={addForm.password}
+                  onChange={(e) => setAddForm(prev => ({ ...prev, password: e.target.value }))}
+                  placeholder="Defaults to Newsroom@2026"
+                  className="w-full px-3 py-2 bg-slate-50 border border-border-subtle rounded-sm focus:outline-none focus:border-primary text-ink font-mono"
+                />
+                <p className="text-[10px] text-ink-muted mt-0.5">The user can change their password upon first sign in.</p>
+              </div>
+
+              {/* Avatar Picker */}
+              <div>
+                <label className="block font-bold text-ink mb-1.5 uppercase tracking-wider text-[11px]">
+                  Avatar Preset
+                </label>
+                <div className="flex items-center gap-2.5 overflow-x-auto pb-1">
+                  {AVATAR_PRESETS.map((preset, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setAddForm(prev => ({ ...prev, avatar: preset }))}
+                      className={`relative rounded-full p-0.5 border-2 transition-all cursor-pointer ${
+                        addForm.avatar === preset ? 'border-primary scale-105' : 'border-transparent opacity-70 hover:opacity-100'
+                      }`}
+                    >
+                      <img src={preset} alt={`Avatar ${idx + 1}`} className="w-9 h-9 rounded-full object-cover" />
+                      {addForm.avatar === preset && (
+                        <span className="absolute bottom-0 right-0 w-3 h-3 bg-primary rounded-full border border-white flex items-center justify-center">
+                          <Check className="w-2 h-2 text-white" />
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-border-subtle">
+                <button
+                  type="button"
+                  onClick={() => setIsAddModalOpen(false)}
+                  className="px-4 py-2 border border-border-subtle rounded-sm font-semibold text-ink-secondary hover:bg-slate-100 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingAdd}
+                  className="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-sm font-bold flex items-center gap-1.5 shadow-sm cursor-pointer disabled:opacity-50"
+                >
+                  {isSubmittingAdd ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Saving to DB...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Check className="w-3.5 h-3.5" />
+                      <span>Create Member</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================================
+         MODAL 2: EDIT TEAM MEMBER
+         ====================================================================== */}
+      {editingUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 backdrop-blur-xs p-4 animate-fadeIn">
+          <div className="bg-surface-lowest border border-border-subtle rounded-md shadow-2xl max-w-md w-full">
+            {/* Header */}
+            <div className="p-4 sm:p-5 border-b border-border-subtle bg-slate-50 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <img src={editingUser.avatar} alt={editingUser.name} className="w-8 h-8 rounded-full object-cover border border-slate-200" />
+                <div>
+                  <h3 className="font-serif font-bold text-base text-ink">Edit Newsroom Member</h3>
+                  <p className="text-[11px] text-ink-muted font-mono">{editingUser.email}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setEditingUser(null)}
+                className="text-ink-muted hover:text-ink p-1 rounded-sm cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {editError && (
+              <div className="m-4 p-3 rounded-sm bg-red-50 border border-red-200 text-editorial-red text-xs flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 shrink-0" />
+                <span>{editError}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleEditSubmit} className="p-4 sm:p-5 space-y-4 text-xs">
+              <div>
+                <label className="block font-bold text-ink mb-1 uppercase tracking-wider text-[11px]">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editForm.name}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
+                  className="w-full px-3 py-2 bg-slate-50 border border-border-subtle rounded-sm focus:outline-none focus:border-primary text-ink"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-ink mb-1 uppercase tracking-wider text-[11px]">
+                  Assigned Role
+                </label>
+                <select
+                  value={editForm.role}
+                  disabled={editingUser.email === 'admin@npnews.com'}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, role: e.target.value as UserRole }))}
+                  className="w-full px-3 py-2 bg-slate-50 border border-border-subtle rounded-sm focus:outline-none focus:border-primary text-ink font-semibold"
+                >
+                  {AVAILABLE_ROLES.map(r => (
+                    <option key={r.value} value={r.value}>{r.label}</option>
+                  ))}
+                </select>
+                <p className="text-[10px] text-ink-muted mt-1">
+                  {AVAILABLE_ROLES.find(r => r.value === editForm.role)?.description}
+                </p>
+              </div>
+
+              <div>
+                <label className="block font-bold text-ink mb-1 uppercase tracking-wider text-[11px]">
+                  Department Desk
+                </label>
+                <select
+                  value={editForm.department}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, department: e.target.value }))}
+                  className="w-full px-3 py-2 bg-slate-50 border border-border-subtle rounded-sm focus:outline-none focus:border-primary text-ink font-semibold"
+                >
+                  {AVAILABLE_DEPARTMENTS.map(dept => (
+                    <option key={dept} value={dept}>{dept}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-border-subtle">
+                <button
+                  type="button"
+                  onClick={() => setEditingUser(null)}
+                  className="px-4 py-2 border border-border-subtle rounded-sm font-semibold text-ink-secondary hover:bg-slate-100 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingEdit}
+                  className="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-sm font-bold flex items-center gap-1.5 shadow-sm cursor-pointer disabled:opacity-50"
+                >
+                  {isSubmittingEdit ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Updating...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Check className="w-3.5 h-3.5" />
+                      <span>Save Changes</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================================
+         MODAL 3: DELETE / REMOVE CONFIRMATION
+         ====================================================================== */}
+      {deletingUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 backdrop-blur-xs p-4 animate-fadeIn">
+          <div className="bg-surface-lowest border-2 border-editorial-red rounded-md shadow-2xl max-w-md w-full p-5 space-y-4">
+            <div className="flex items-start gap-3">
+              <div className="p-2.5 bg-red-100 text-editorial-red rounded-full shrink-0">
+                <AlertTriangle className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="font-serif font-bold text-base text-ink">Remove Team Member?</h3>
+                <p className="text-xs text-ink-secondary mt-1">
+                  Are you sure you want to remove <strong>{deletingUser.name}</strong> ({deletingUser.email}) from the newsroom team?
+                </p>
+                <p className="text-[11px] text-ink-muted mt-2">
+                  This user will immediately lose publishing privileges and newsroom portal access.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-border-subtle">
+              <button
+                type="button"
+                onClick={() => setDeletingUser(null)}
+                className="px-4 py-2 border border-border-subtle rounded-sm text-xs font-semibold text-ink-secondary hover:bg-slate-100 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                disabled={isSubmittingDelete}
+                className="px-4 py-2 bg-editorial-red hover:bg-editorial-red/90 text-white rounded-sm text-xs font-bold flex items-center gap-1.5 shadow-sm cursor-pointer disabled:opacity-50"
+              >
+                {isSubmittingDelete ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Removing...</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Confirm Removal</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -2,6 +2,7 @@ import { WpPost, WpAuthor, WpCategory } from './wordpress';
 
 export type UserRole = 
   | 'reporter' 
+  | 'author'
   | 'copy_editor' 
   | 'editor' 
   | 'seo_manager' 
@@ -36,6 +37,22 @@ export interface RolePermission {
 
 export const ROLE_PERMISSIONS: Record<UserRole, RolePermission> = {
   reporter: {
+    canCreate: true,
+    canEditOwn: true,
+    canEditAny: false,
+    canReview: false,
+    canApprove: false,
+    canPublish: false,
+    canSchedule: false,
+    canPublishBreaking: false,
+    canManageHomepage: false,
+    canEditSeo: false,
+    canManageAds: false,
+    canManageUsers: false,
+    canManageSystem: false,
+    canCorrect: false,
+  },
+  author: {
     canCreate: true,
     canEditOwn: true,
     canEditAny: false,

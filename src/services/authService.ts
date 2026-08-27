@@ -147,7 +147,7 @@ export const getProfilesList = async (): Promise<UserProfile[]> => {
     return data.map((p) => ({
       id: p.id,
       name: p.full_name || p.display_name || 'Newsroom Staff',
-      email: `${p.display_name?.toLowerCase().replace(/\s+/g, '') || 'staff'}@npnewsmetro.com`,
+      email: p.email || `${p.display_name?.toLowerCase().replace(/\s+/g, '') || 'staff'}@npnewsmetro.com`,
       role: (p.role as UserRole) || 'author',
       avatar: getAuthorAvatarUrl(p.avatar_url),
       department: p.department || 'Editorial Bureau',
@@ -157,3 +157,100 @@ export const getProfilesList = async (): Promise<UserProfile[]> => {
     return mockAdminUsers;
   }
 };
+
+export const createNewsroomUser = async (params: {
+  name: string;
+  email: string;
+  role: UserRole;
+  department: string;
+  password?: string;
+  avatar?: string;
+}): Promise<{ user?: UserProfile; error?: string }> => {
+  try {
+    await ensureAuthenticatedSession();
+    const { data, error } = await (supabase.rpc as any)('create_newsroom_member', {
+      p_full_name: params.name.trim(),
+      p_email: params.email.trim().toLowerCase(),
+      p_role: params.role,
+      p_department: params.department.trim() || 'Editorial Bureau',
+      p_avatar_url: params.avatar || null,
+      p_password: params.password || 'Newsroom@2026',
+    });
+
+    if (error) {
+      return { error: error.message || 'Failed to create team member.' };
+    }
+
+    const created = data;
+    return {
+      user: {
+        id: created.id,
+        name: created.full_name || params.name,
+        email: created.email || params.email,
+        role: created.role as UserRole,
+        department: created.department || params.department,
+        avatar: getAuthorAvatarUrl(created.avatar_url),
+      },
+    };
+  } catch (err: any) {
+    return { error: err?.message || 'Error creating user in database.' };
+  }
+};
+
+export const updateNewsroomUserRole = async (
+  userId: string,
+  role: UserRole,
+  department?: string,
+  name?: string
+): Promise<{ user?: UserProfile; error?: string }> => {
+  try {
+    await ensureAuthenticatedSession();
+    const { data, error } = await (supabase.rpc as any)('update_newsroom_member', {
+      p_user_id: userId,
+      p_role: role,
+      p_department: department || 'Editorial Bureau',
+      p_full_name: name || null,
+      p_is_active: true,
+    });
+
+    if (error) {
+      return { error: error.message || 'Failed to update user role.' };
+    }
+
+    const updated = data;
+    return {
+      user: {
+        id: updated.id,
+        name: updated.full_name || 'Staff',
+        email: updated.email || 'staff@npnewsmetro.com',
+        role: updated.role as UserRole,
+        department: updated.department,
+        avatar: getAuthorAvatarUrl(updated.avatar_url),
+      },
+    };
+  } catch (err: any) {
+    return { error: err?.message || 'Error updating user in database.' };
+  }
+};
+
+export const deleteNewsroomUser = async (
+  userId: string,
+  hardDelete: boolean = false
+): Promise<{ success: boolean; error?: string }> => {
+  try {
+    await ensureAuthenticatedSession();
+    const { error } = await (supabase.rpc as any)('delete_newsroom_member', {
+      p_user_id: userId,
+      p_hard_delete: hardDelete,
+    });
+
+    if (error) {
+      return { success: false, error: error.message || 'Failed to delete user.' };
+    }
+
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err?.message || 'Error removing user from database.' };
+  }
+};
+

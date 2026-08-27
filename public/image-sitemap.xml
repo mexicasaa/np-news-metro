@@ -2,6 +2,14 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
+    <loc>https://www.npnewsmetro.com/india/vipaksha-kaanoona-vyavasthaa-kaa-paatha-padhaane-se-pahale-apanaa</loc>
+    <image:image>
+      <image:loc>https://jkzrjqclgqpfjdqxsnut.supabase.co/storage/v1/object/public/article-images/articles/general/1005536970-mtbt1tlc.jpg</image:loc>
+      <image:caption>विपक्ष कानून-व्यवस्था का पाठ पढ़ाने से पहले अपना शासनकाल देखे: मुख्यमंत्री नायब सिंह सैनी</image:caption>
+      <image:title>विपक्ष कानून-व्यवस्था का पाठ पढ़ाने से पहले अपना शासनकाल देखे: मुख्यमंत्री नायब सिंह सैनी</image:title>
+    </image:image>
+  </url>
+  <url>
     <loc>https://www.npnewsmetro.com/india/medikala-koleja-baharaaicha-men-pahalee-baara-doorabeena-se-kandh</loc>
     <image:image>
       <image:loc>https://jkzrjqclgqpfjdqxsnut.supabase.co/storage/v1/object/public/article-images/articles/8d204a21-3351-4584-b694-8b548134d281/1005524558-mtaeik28.jpg</image:loc>
