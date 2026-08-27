@@ -60,6 +60,22 @@ export const BreakingArticleTemplate: React.FC<BreakingArticleTemplateProps> = (
   const relatedBreaking = mockPosts.filter((p) => p.id !== post.id && p.isBreaking);
   const trendingRanking = [...mockPosts].sort((a, b) => b.viewsCount - a.viewsCount).slice(0, 5);
 
+  const formatDateTime = (dateStr: string) => {
+    try {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString(isHindi ? 'hi-IN' : 'en-IN', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+      }) + (isHindi ? ' भारतीय मानक समय (IST)' : ' IST');
+    } catch {
+      return dateStr;
+    }
+  };
+
   return (
     <div className="bg-canvas min-h-screen">
       {/* Top Urgent Breaking News Banner */}
@@ -111,18 +127,16 @@ export const BreakingArticleTemplate: React.FC<BreakingArticleTemplateProps> = (
                 {localized.dek}
               </p>
 
-              {/* Time Indicators */}
+              {/* Published Date & Time */}
               <div className="bg-surface-lowest border border-border-subtle p-3 rounded-sm flex items-center justify-between text-xs text-ink-muted flex-wrap gap-2">
                 <div className="flex items-center gap-2 text-ink">
                   <span className="font-bold">
                     {isHindi ? 'लेखक: ' : 'By '}{author?.name || (isHindi ? 'न्यूज़रूम टीम' : 'Newsroom Team')}
                   </span>
-                  <span>•</span>
-                  <span>{isHindi ? '25 मिनट पहले प्रकाशित' : 'Published 25m ago'}</span>
                 </div>
-                <div className="flex items-center gap-1.5 font-semibold text-editorial-red">
-                  <span className="w-2 h-2 rounded-full bg-editorial-red animate-ping"></span>
-                  <span>{isHindi ? 'अंतिम अपडेट: 3 मिनट पहले' : 'Last Updated: 3 minutes ago'}</span>
+                <div className="flex items-center gap-1.5 text-ink-secondary">
+                  <span className="font-semibold text-ink">{isHindi ? 'प्रकाशित:' : 'Published:'}</span>
+                  <span>{formatDateTime(post.publishedAt)}</span>
                 </div>
               </div>
             </header>

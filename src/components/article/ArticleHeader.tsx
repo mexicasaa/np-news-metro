@@ -147,18 +147,12 @@ export const ArticleHeader: React.FC<ArticleHeaderProps> = ({
           </div>
         )}
 
-        {/* Timestamps */}
-        <div className="text-xs text-ink-muted sm:text-right space-y-0.5">
+        {/* Published Date & Time */}
+        <div className="text-xs text-ink-muted sm:text-right">
           <div className="flex items-center sm:justify-end gap-1.5 text-ink-secondary">
             <span className="font-semibold text-ink">{isHindi ? 'प्रकाशित:' : 'Published:'}</span>
             <span>{formatDateTime(post.publishedAt)}</span>
           </div>
-          {post.updatedAt && (
-            <div className="flex items-center sm:justify-end gap-1.5 text-editorial-red font-medium">
-              <span>{isHindi ? 'अपडेट किया गया:' : 'Updated:'}</span>
-              <span>{formatDateTime(post.updatedAt)}</span>
-            </div>
-          )}
         </div>
       </div>
     </header>
