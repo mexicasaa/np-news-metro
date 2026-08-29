@@ -98,6 +98,9 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
     const showAgarwal = (activeDept === 'all' || activeDept === 'advisory') && 
       matchesSearch('Raj Kumar Agarwal', 'राज कुमार अग्रवाल', 'Advisory', 'सलाहकार', 'Economic', 'Enterprise');
 
+    const showUpmanyu = (activeDept === 'all' || activeDept === 'advisory') && 
+      matchesSearch('Bholeshwar Upmanyu', 'भोलेश्वर उपमन्यु', 'Advisory', 'सलाहकार', 'Journalist', 'पत्रकार', 'Grassroots', 'Braj');
+
     const showNeeraj = (activeDept === 'all' || activeDept === 'editorial') && 
       matchesSearch('Neeraj Kumar Pandey', 'नीरज कुमार पाण्डेय', 'Editor-in-Chief', 'प्रधान संपादक', 'Politics', 'Investigations');
 
@@ -116,11 +119,11 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
     const showLaxmi = (activeDept === 'all' || activeDept === 'reporting') && 
       matchesSearch('Laxmi Kant Mishra', 'लक्ष्मी कांत मिश्रा', 'Reporter', 'संवाददाता', 'Civic', 'Regional', 'Legal');
 
-    const showAdvisorySection = showNeelima || showArya || showAgarwal;
+    const showAdvisorySection = showNeelima || showArya || showAgarwal || showUpmanyu;
     const showEditorialSection = showNeeraj || showChetan;
     const showReportingSection = showPurnima || showTripathi || showLaxmi;
 
-    const totalVisible = [showExecutive, showNeelima, showArya, showAgarwal, showNeeraj, showChetan, showBhawana, showPurnima, showTripathi, showLaxmi].filter(Boolean).length;
+    const totalVisible = [showExecutive, showNeelima, showArya, showAgarwal, showUpmanyu, showNeeraj, showChetan, showBhawana, showPurnima, showTripathi, showLaxmi].filter(Boolean).length;
 
     return (
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 animate-fadeIn text-slate-900 font-sans">
@@ -412,7 +415,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               
               {/* 1. Diwan Chand Arya (D. C. Arya) */}
               {showArya && (
@@ -488,7 +491,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                         Advisory Board Member
                       </div>
                       <img
-                        src={getAuthorAvatarUrl('/np-author-default.png')}
+                        src={getAuthorAvatarUrl('/uploads/raj-kumar-agarwal.png')}
                         alt="Raj Kumar Agarwal"
                         className="w-full h-full object-cover object-top rounded-t-lg group-hover:scale-105 transition-transform duration-500"
                         onError={handleAvatarError}
@@ -535,6 +538,71 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                     </button>
                     <button
                       onClick={() => onSelectAuthor('author-raj-kumar-agarwal')}
+                      className="text-red-700 hover:text-red-800 font-bold inline-flex items-center gap-1 cursor-pointer text-[11px]"
+                    >
+                      <span>Profile & Articles</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </button>
+                  </div>
+                </article>
+              )}
+
+              {/* 3. Bholeshwar Upmanyu */}
+              {showUpmanyu && (
+                <article className="bg-white rounded-2xl p-3.5 sm:p-4 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between group border border-slate-100/90">
+                  <div>
+                    <div className="relative rounded-xl bg-gradient-to-b from-amber-50/70 to-orange-50/40 p-3 pb-0 flex justify-center overflow-hidden aspect-[4/3] max-h-48">
+                      <div className="absolute top-2.5 left-2.5 z-10 px-2.5 py-0.5 bg-white/90 backdrop-blur-md rounded-full text-[10px] font-bold text-slate-800 shadow-2xs border border-white/60">
+                        Advisory Board Member
+                      </div>
+                      <img
+                        src={getAuthorAvatarUrl('/uploads/bholeshwar-upmanyu.jpg')}
+                        alt="Bholeshwar Upmanyu"
+                        className="w-full h-full object-cover object-top rounded-t-lg group-hover:scale-105 transition-transform duration-500"
+                        onError={handleAvatarError}
+                      />
+                    </div>
+
+                    <div className="p-3 space-y-2">
+                      <div>
+                        <h3
+                          onClick={() => onSelectAuthor('author-bholeshwar-upmanyu')}
+                          className="font-serif text-base sm:text-lg font-bold text-slate-950 group-hover:text-red-700 cursor-pointer transition-colors"
+                        >
+                          {isHindi ? 'भोलेश्वर उपमन्यु' : 'Bholeshwar Upmanyu'}
+                        </h3>
+                        <span className="text-[11px] font-semibold text-red-700 block mt-0.5">
+                          {isHindi ? 'सलाहकार मंडल सदस्य' : 'Advisory Board Member'}
+                        </span>
+                      </div>
+
+                      <p className="text-xs text-slate-600 leading-relaxed line-clamp-2">
+                        {isHindi
+                          ? 'वरिष्ठ पत्रकार एवं लेखक, ब्रज क्षेत्र में ज़मीनी रिपोर्टिंग, प्रादेशिक मामलों और निष्पक्ष पत्रकारीय शुचिता के मार्गदर्शक।'
+                          : 'Veteran journalist and publisher guiding regional ground reporting, civic scrutiny, and editorial ethics in Braj & NCR.'}
+                      </p>
+
+                      <div className="flex flex-wrap gap-1 text-[9px] font-semibold text-slate-500 pt-0.5">
+                        <span className="px-2 py-0.5 bg-slate-100 rounded-full">Regional Affairs</span>
+                        <span className="px-2 py-0.5 bg-slate-100 rounded-full">Grassroots</span>
+                        <span className="px-2 py-0.5 bg-slate-100 rounded-full">Media Ethics</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-3 pt-2 border-t border-slate-100 mt-1 flex items-center justify-between text-xs">
+                    <button
+                      onClick={() => handleCopy('bholeshwar.upmanyu@npnewsmetro.com')}
+                      className="text-slate-500 hover:text-slate-900 font-semibold cursor-pointer text-[11px]"
+                    >
+                      {copiedEmail === 'bholeshwar.upmanyu@npnewsmetro.com' ? (
+                        <span className="text-emerald-600 font-bold">Copied</span>
+                      ) : (
+                        <span>Copy Email</span>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => onSelectAuthor('author-bholeshwar-upmanyu')}
                       className="text-red-700 hover:text-red-800 font-bold inline-flex items-center gap-1 cursor-pointer text-[11px]"
                     >
                       <span>Profile & Articles</span>
