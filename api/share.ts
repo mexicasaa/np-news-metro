@@ -467,11 +467,10 @@ export default async function handler(req, res) {
     // 5. CONSTRUCT CANONICAL METADATA FOR VALID STORY
     const title = mediaItem ? mediaItem.title : 'NP NEWS METRO — Real News. Real Impact.';
     const description = mediaItem ? mediaItem.dek : 'Independent, credible digital journalism for modern India.';
-    const imageVersion = mediaItem?.modifiedAt ? new Date(mediaItem.modifiedAt).getTime() : Date.now();
+    const imageVersion = mediaItem?.modifiedAt ? `${new Date(mediaItem.modifiedAt).getTime()}_v2` : `${Date.now()}_v2`;
     let image = mediaItem ? getAbsoluteUrl(mediaItem.image) : DEFAULT_OG_IMAGE;
-    if (image.includes('/api/image/')) {
-       image = image.includes('?') ? `${image}&v=${imageVersion}` : `${image}?v=${imageVersion}`;
-    }
+    // Always append version to image URL to force Twitterbot and WhatsApp to discard old blocked caches
+    image = image.includes('?') ? `${image}&v=${imageVersion}` : `${image}?v=${imageVersion}`;
     const category = mediaItem ? mediaItem.category : cleanCategory;
     const slug = mediaItem ? mediaItem.slug : cleanSlug;
     const isVideo = category === 'videos';
@@ -480,7 +479,7 @@ export default async function handler(req, res) {
       : `${SITE_ORIGIN}/`;
     const shareUrl = rawVersionParam 
       ? `${canonicalUrl}?v=${encodeURIComponent(rawVersionParam)}` 
-      : canonicalUrl;
+      : `${canonicalUrl}?v=${imageVersion}`;
     const publishedIso = mediaItem?.publishedAt || new Date().toISOString();
     const modifiedIso = mediaItem?.modifiedAt || publishedIso;
     const authorName = mediaItem?.author || 'NP News Metro Desk';

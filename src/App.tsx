@@ -94,7 +94,8 @@ const parseUrlRoute = (currentPosts: WpPost[], currentVideos: WpVideo[], isIniti
   }
 
   const rawPath = window.location.pathname;
-  const cleanPath = rawPath.replace(/^\/+|\/+$/g, '').toLowerCase();
+  let cleanPath = rawPath.replace(/^\/+|\/+$/g, '').toLowerCase();
+  try { cleanPath = decodeURIComponent(cleanPath); } catch (e) {}
   const hash = window.location.hash.toLowerCase();
   const search = window.location.search;
 
@@ -410,7 +411,8 @@ function AppContent() {
   // Immediate targeted fetching for single article / video if directly loaded via shared permalink
   React.useEffect(() => {
     if (typeof window === 'undefined') return;
-    const cleanPath = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
+    let cleanPath = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
+    try { cleanPath = decodeURIComponent(cleanPath); } catch (e) {}
     if (!cleanPath || cleanPath === 'admin' || cleanPath.startsWith('admin/')) return;
 
     if (cleanPath.startsWith('videos/')) {
@@ -423,8 +425,12 @@ function AppContent() {
             if (prev.some((v) => v.id === directVideo.id || v.slug === directVideo.slug)) return prev;
             return [directVideo, ...prev];
           });
+        } else {
+          setCurrentTemplate((prev) => prev === 'video-loading' ? 'not-found' : prev);
         }
-      }).catch(() => {});
+      }).catch(() => {
+        setCurrentTemplate((prev) => prev === 'video-loading' ? 'not-found' : prev);
+      });
       return;
     }
 
@@ -448,8 +454,12 @@ function AppContent() {
             if (prev.some((p) => p.id === directPost.id || p.slug === directPost.slug)) return prev;
             return [directPost, ...prev];
           });
+        } else {
+          setCurrentTemplate((prev) => prev === 'article-loading' ? 'not-found' : prev);
         }
-      }).catch(() => {});
+      }).catch(() => {
+        setCurrentTemplate((prev) => prev === 'article-loading' ? 'not-found' : prev);
+      });
     }
   }, []);
 

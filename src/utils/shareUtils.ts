@@ -83,14 +83,9 @@ export const getCanonicalArticleUrl = (
     url = `${origin}/${cleanCategory}/${slug}`;
   }
   
-  // Append cache busting parameter based on the last update time
-  // This completely solves WhatsApp/Facebook caching issues when featured images are updated multiple times
-  if (updatedAt) {
-    const timestamp = new Date(updatedAt).getTime();
-    if (!isNaN(timestamp)) {
-      url = `${url}?v=${timestamp}`;
-    }
-  }
+  // Append cache busting parameter with v2 suffix to force X and WhatsApp to re-crawl old links
+  const timestamp = updatedAt ? `${new Date(updatedAt).getTime()}_v2` : `${Date.now()}_v2`;
+  url = `${url}?v=${timestamp}`;
   return url;
 };
 
