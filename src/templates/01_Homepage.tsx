@@ -21,6 +21,7 @@ import { useLanguage } from '../context/LanguageContext';
 
 interface HomepageProps {
   posts?: WpPost[];
+  videos?: WpVideo[];
   onSelectPost: (post: WpPost) => void;
   onSelectVideo: (video: WpVideo) => void;
   onSelectCategory: (category: string) => void;
@@ -33,6 +34,7 @@ interface HomepageProps {
 
 export const Homepage: React.FC<HomepageProps> = ({
   posts: externalPosts,
+  videos: externalVideos,
   onSelectPost,
   onSelectVideo,
   onSelectCategory,
@@ -44,6 +46,7 @@ export const Homepage: React.FC<HomepageProps> = ({
 }) => {
   const { t, isHindi } = useLanguage();
   const allPosts = externalPosts && externalPosts.length > 0 ? externalPosts : getStoredPosts();
+  const activeVideos = externalVideos && externalVideos.length > 0 ? externalVideos : mockVideos;
   
   // Sort all posts by publishedAt (latest news first)
   const sortedPosts = [...allPosts].sort((a, b) => {
@@ -281,7 +284,7 @@ export const Homepage: React.FC<HomepageProps> = ({
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {mockVideos.slice(0, 4).map((vid) => (
+          {activeVideos.slice(0, 4).map((vid) => (
             <VideoCard
               key={vid.id}
               video={vid}

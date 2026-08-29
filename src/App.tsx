@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   UtilityBar 
 } from './components/layout/UtilityBar';
@@ -16,8 +16,8 @@ import { AdminLoginModal } from './components/admin/AdminLoginModal';
 
 import { WpPost, WpVideo, WpGallery } from './types/wordpress';
 import { mockPosts as initialMockPosts, mockVideos, mockGalleries } from './data/mockWpData';
-import { getStoredPosts, savePublishedPost } from './utils/newsStorage';
-import { getPublishedArticles, getArticleBySlug, saveArticle, deleteArticle, getDeletedArticles, restoreDeletedArticle, permanentDeleteArticle, DeletedArticle } from './services/articleService';
+import { getStoredPosts, savePublishedPost, popRefreshSession, clearAutoSaveSession, getStoredVideos } from './utils/newsStorage';
+import { getPublishedArticles, getEditorialArticles, getArticleBySlug, saveArticle, deleteArticle, getDeletedArticles, restoreDeletedArticle, permanentDeleteArticle, DeletedArticle } from './services/articleService';
 import { getCurrentUserProfile, ensureAuthenticatedSession, signOut as authSignOut } from './services/authService';
 import { getVideos } from './services/taxonomyService';
 import { getVideoBySlug, getPublishedVideos } from './services/videoService';
@@ -47,6 +47,7 @@ import { DashboardHome } from './components/admin/DashboardHome';
 import { PublishingCenter, PublishingTab } from './components/admin/PublishingCenter';
 import { ArticleEditor } from './components/admin/ArticleEditor';
 import { EditorialListView } from './components/admin/EditorialListView';
+import { VideoStudioManager } from './components/admin/VideoStudioManager';
 import { HomepageLayoutManager } from './components/admin/HomepageLayoutManager';
 import { PublishingReadinessModal } from './components/admin/PublishingReadinessModal';
 import { PublishOrchestratorModal } from './components/admin/PublishOrchestratorModal';
@@ -64,7 +65,7 @@ import {
 } from './services/seoService';
 import { 
   UserRole, UserProfile, PublishingOperation, ReadinessCheckResult, 
-  DuplicateMatch, ArticleRevision 
+  DuplicateMatch, ArticleRevision, EditorialStatus
 } from './types/admin';
 import { mockAdminUsers, mockFailedOperations } from './data/mockAdminData';
 
@@ -391,7 +392,7 @@ function AppContent() {
 
   // Reactive Posts State (Seeded from localStorage and synced with Supabase backend)
   const [posts, setPosts] = useState<WpPost[]>(getStoredPosts);
-  const [videos, setVideos] = useState<WpVideo[]>(mockVideos);
+  const [videos, setVideos] = useState<WpVideo[]>(getStoredVideos);
   const [isYouTubeModalOpen, setIsYouTubeModalOpen] = useState(false);
 
   // Compute Initial Route from URL (with isInitialLoad = true to show instant skeleton rather than 404)
@@ -472,13 +473,32 @@ function AppContent() {
   const [pendingAdminSection, setPendingAdminSection] = useState<AdminSection>('publishing');
   const [pendingPublishingTab, setPendingPublishingTab] = useState<PublishingTab | undefined>(undefined);
 
-  // Admin Workspace State
-  const [adminSection, setAdminSection] = useState<AdminSection>('dashboard');
+  // Check if this page load is an immediate accidental refresh while writing/editing an article
+  const refreshSession = React.useMemo(() => {
+    if (typeof window === 'undefined') return null;
+    return popRefreshSession();
+  }, []);
+
+  const [restoredFromMistakenRefresh, setRestoredFromMistakenRefresh] = useState<boolean>(Boolean(refreshSession));
+
+  // Admin Workspace State - defaults to 'dashboard' on reopening the admin page!
+  const [adminSection, setAdminSection] = useState<AdminSection>(() => {
+    if (refreshSession && (window.location.pathname === '/admin' || window.location.pathname.startsWith('/admin/'))) {
+      return refreshSession.adminSection as AdminSection;
+    }
+    return 'dashboard';
+  });
   const [currentUserRole, setCurrentUserRole] = useState<UserRole>('editor');
   const [activeEnvironment, setActiveEnvironment] = useState<'production' | 'staging'>('production');
   const [publishingTab, setPublishingTab] = useState<PublishingTab>('all');
-  const [activeEditingPost, setActiveEditingPost] = useState<WpPost | undefined>(undefined);
+  const [activeEditingPost, setActiveEditingPost] = useState<WpPost | undefined>(() => {
+    if (refreshSession && (window.location.pathname === '/admin' || window.location.pathname.startsWith('/admin/'))) {
+      return refreshSession.post as WpPost;
+    }
+    return undefined;
+  });
   const [deletedArticles, setDeletedArticles] = useState<DeletedArticle[]>([]);
+  const editorDraftSaverRef = useRef<(() => Promise<void>) | null>(null);
 
   // Apply route from current window.location
   const applyRouteFromUrl = React.useCallback((currentPosts: WpPost[], currentVideos: WpVideo[]) => {
@@ -502,13 +522,23 @@ function AppContent() {
         // Ensure valid Supabase session for admin operations
         ensureAuthenticatedSession().catch(() => {});
 
+        const isAdmin = viewMode === 'admin' || isAdminAuthenticated || (typeof window !== 'undefined' && window.location.pathname.includes('/admin'));
+
         const [livePosts, liveVideos] = await Promise.all([
-          getPublishedArticles(),
+          isAdmin ? getEditorialArticles('all') : getPublishedArticles(),
           getPublishedVideos(),
         ]);
         if (isMounted) {
           if (livePosts && livePosts.length > 0) {
-            setPosts(livePosts);
+            let combinedPosts = livePosts;
+            if (refreshSession?.post?.id) {
+              const sessionPost = refreshSession.post as WpPost;
+              const hasPost = livePosts.some(p => p.id === sessionPost.id);
+              if (!hasPost) {
+                combinedPosts = [sessionPost, ...livePosts];
+              }
+            }
+            setPosts(combinedPosts);
           }
           if (liveVideos && liveVideos.length > 0) {
             setVideos(liveVideos);
@@ -525,7 +555,7 @@ function AppContent() {
     return () => {
       isMounted = false;
     };
-  }, [isPreviewTab, applyRouteFromUrl]);
+  }, [isPreviewTab, applyRouteFromUrl, viewMode, isAdminAuthenticated]);
 
   // Cross-tab and multi-device Realtime listener for newly published/updated news from Supabase
   React.useEffect(() => {
@@ -534,9 +564,13 @@ function AppContent() {
       if (typeof BroadcastChannel !== 'undefined') {
         feedChannel = new BroadcastChannel('np_news_feed_channel');
         feedChannel.onmessage = async (event) => {
-          if (event.data?.type === 'NEWS_PUBLISHED') {
-            const fresh = await getPublishedArticles();
+          if (event.data?.type === 'NEWS_PUBLISHED' || event.data?.type === 'ARTICLE_DRAFT_SAVED') {
+            const isAdmin = viewMode === 'admin' || isAdminAuthenticated || window.location.pathname.includes('/admin');
+            const fresh = isAdmin ? await getEditorialArticles('all') : await getPublishedArticles();
             setPosts(fresh);
+          } else if (event.data?.type === 'VIDEOS_UPDATED') {
+            const freshVideos = await getPublishedVideos();
+            setVideos(freshVideos);
           }
         };
       }
@@ -550,8 +584,22 @@ function AppContent() {
         { event: '*', schema: 'public', table: 'articles' },
         async (payload) => {
           console.log('[Realtime] Database change detected:', payload.eventType);
-          const freshPosts = await getPublishedArticles();
+          const isAdmin = viewMode === 'admin' || isAdminAuthenticated || window.location.pathname.includes('/admin');
+          const freshPosts = isAdmin ? await getEditorialArticles('all') : await getPublishedArticles();
           setPosts(freshPosts);
+        }
+      )
+      .subscribe();
+
+    const realtimeVideosChannel = supabase
+      .channel('public:videos')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'videos' },
+        async (payload) => {
+          console.log('[Realtime] Database video change detected:', payload.eventType);
+          const freshVids = await getPublishedVideos();
+          setVideos(freshVids);
         }
       )
       .subscribe();
@@ -559,8 +607,9 @@ function AppContent() {
     return () => {
       feedChannel?.close();
       supabase.removeChannel(realtimeChannel);
+      supabase.removeChannel(realtimeVideosChannel);
     };
-  }, []);
+  }, [viewMode, isAdminAuthenticated]);
 
   // Live Cross-Tab Synchronization for Preview
   React.useEffect(() => {
@@ -835,6 +884,8 @@ function AppContent() {
 
     setPosts(prev => prev.filter(p => p.id !== post.id));
     if (activeEditingPost?.id === post.id) {
+      clearAutoSaveSession();
+      editorDraftSaverRef.current = null;
       setActiveEditingPost(undefined);
       setAdminSection('publishing');
     }
@@ -871,6 +922,7 @@ function AppContent() {
       setAdminLoginModalOpen(true);
       return;
     }
+    clearAutoSaveSession();
     setActiveEditingPost(undefined);
     setAdminSection('new-article');
     try {
@@ -887,6 +939,7 @@ function AppContent() {
       setAdminLoginModalOpen(true);
       return;
     }
+    clearAutoSaveSession();
     setActiveEditingPost(post);
     setAdminSection('edit-article');
     try {
@@ -1090,6 +1143,8 @@ function AppContent() {
       }
 
       savePublishedPost(savedDbPost);
+      clearAutoSaveSession();
+      editorDraftSaverRef.current = null;
       setPosts(prev => {
         const existingIdx = prev.findIndex(p => p.id === savedDbPost.id);
         if (existingIdx !== -1) {
@@ -1417,15 +1472,41 @@ function AppContent() {
       {viewMode === 'admin' && isAdminAuthenticated ? (
         <AdminLayout
           currentSection={adminSection}
-          onNavigateSection={(sec) => {
+          onNavigateSection={async (sec) => {
+            if ((adminSection === 'new-article' || adminSection === 'edit-article') && editorDraftSaverRef.current) {
+              try {
+                await editorDraftSaverRef.current();
+              } catch (e) {}
+            }
             if (sec === 'new-article') handleStartNewArticle();
             else setAdminSection(sec);
           }}
           currentUser={currentUser}
           onChangeUserRole={(role) => setCurrentUserRole(role)}
-          onExitToPublicSite={handleExitToPublicSite}
-          onLogout={handleAdminLogout}
-          onQuickCreate={handleStartNewArticle}
+          onExitToPublicSite={async () => {
+            if ((adminSection === 'new-article' || adminSection === 'edit-article') && editorDraftSaverRef.current) {
+              try {
+                await editorDraftSaverRef.current();
+              } catch (e) {}
+            }
+            handleExitToPublicSite();
+          }}
+          onLogout={async () => {
+            if ((adminSection === 'new-article' || adminSection === 'edit-article') && editorDraftSaverRef.current) {
+              try {
+                await editorDraftSaverRef.current();
+              } catch (e) {}
+            }
+            handleAdminLogout();
+          }}
+          onQuickCreate={async () => {
+            if ((adminSection === 'new-article' || adminSection === 'edit-article') && editorDraftSaverRef.current) {
+              try {
+                await editorDraftSaverRef.current();
+              } catch (e) {}
+            }
+            handleStartNewArticle();
+          }}
           activeEnvironment={activeEnvironment}
           onToggleEnvironment={setActiveEnvironment}
           breakingCount={posts.filter(p => p.isBreaking).length}
@@ -1438,6 +1519,8 @@ function AppContent() {
                 if (tab) setPublishingTab(tab as PublishingTab);
               }}
               onNewArticle={handleStartNewArticle}
+              onOpenVideos={() => setAdminSection('videos')}
+              videoCount={videos.length}
               userRole={currentUserRole}
               publishedCount={posts.length}
               breakingCount={posts.filter(p => p.isBreaking).length}
@@ -1478,7 +1561,11 @@ function AppContent() {
               initialPost={activeEditingPost}
               userRole={currentUserRole}
               currentAuthorId={currentUser.id}
-              onSaveDraft={async (postData) => {
+              registerSaveDraft={(fn) => {
+                editorDraftSaverRef.current = fn;
+              }}
+              onSaveDraft={async (postData, options) => {
+                const isEditingExisting = (postData as any)?.isEdit ?? (!!activeEditingPost?.id && activeEditingPost.id === postData.id);
                 const postId = postData.id || activeEditingPost?.id || `post-${Date.now()}`;
                 const fullPost: WpPost = {
                   id: postId,
@@ -1486,7 +1573,7 @@ function AppContent() {
                   titleHi: postData.titleHi || postData.title || '',
                   dek: postData.dek || '',
                   category: (postData.category as any) || 'india',
-                  authorId: postData.authorId || '04ad79d9-d871-4099-a633-bcb7a1e35055',
+                  authorId: postData.authorId || currentUser.id || '04ad79d9-d871-4099-a633-bcb7a1e35055',
                   customAuthor: postData.customAuthor,
                   featuredImage: postData.featuredImage || '',
                   imageAlt: postData.imageAlt || postData.title || '',
@@ -1494,37 +1581,42 @@ function AppContent() {
                   imageCaption: postData.imageCaption || '',
                   publishedAt: postData.publishedAt || new Date().toISOString(),
                   readTime: postData.readTime || '3 min read',
-                  viewsCount: activeEditingPost?.viewsCount || 100,
+                  viewsCount: activeEditingPost?.viewsCount || 0,
                   commentCount: activeEditingPost?.commentCount || 0,
                   sharesCount: activeEditingPost?.sharesCount || 0,
-                  isLead: activeEditingPost?.isLead || false,
+                  isLead: false,
                   isFeatured: true,
                   isBreaking: postData.isBreaking || false,
                   slug: postData.slug || 'story',
                   tags: postData.tags || ['National', 'Policy'],
+                  editorialStatus: 'draft',
+                  status: 'draft',
                   blocks: postData.blocks || [
                     { id: 'b1', type: 'paragraph', content: postData.dek || 'Draft content.' }
                   ],
                 };
 
-                const isEditingExisting = (postData as any)?.isEdit ?? (!!activeEditingPost?.id && activeEditingPost.id === postId);
                 const { post, error } = await saveArticle({ ...fullPost, isEdit: isEditingExisting }, 'draft');
-                if (error || !post) {
-                  alert(`Failed to save draft to database: ${error || 'Unknown error'}`);
-                  return;
-                }
+                const finalDraftPost = post || { ...fullPost, editorialStatus: 'draft' as EditorialStatus, status: 'draft' };
 
-                savePublishedPost(post);
+                savePublishedPost(finalDraftPost);
+                setActiveEditingPost(finalDraftPost);
+
                 setPosts(prev => {
-                  const existingIdx = prev.findIndex(p => p.id === post.id);
+                  const prevId = activeEditingPost?.id || postId;
+                  const existingIdx = prev.findIndex(p => p.id === finalDraftPost.id || p.id === prevId);
                   if (existingIdx !== -1) {
                     const updated = [...prev];
-                    updated[existingIdx] = post;
+                    updated[existingIdx] = finalDraftPost;
                     return updated;
                   }
-                  return [post, ...prev.filter(p => p.id !== postId)];
+                  return [finalDraftPost, ...prev.filter(p => p.id !== prevId && p.id !== finalDraftPost.id)];
                 });
-                alert('Story draft saved successfully in database.');
+
+                if (!options?.silent) {
+                  alert('Story draft saved successfully in database.');
+                }
+                return finalDraftPost;
               }}
               onSubmitForReview={async (postData) => {
                 const isEditingExisting = (postData as any)?.isEdit ?? (!!activeEditingPost?.id);
@@ -1594,7 +1686,18 @@ function AppContent() {
                 setPendingPostData(postData);
                 setReadinessModalOpen(true);
               }}
-              onBack={() => setAdminSection('publishing')}
+              onBack={() => {
+                editorDraftSaverRef.current = null;
+                setRestoredFromMistakenRefresh(false);
+                setAdminSection('publishing');
+                setPublishingTab('drafts');
+              }}
+              onRedirectToDashboard={() => {
+                editorDraftSaverRef.current = null;
+                setRestoredFromMistakenRefresh(false);
+                setAdminSection('dashboard');
+              }}
+              restoredFromMistakenRefresh={restoredFromMistakenRefresh}
               onOpenRevisions={() => setRevisionsModalOpen(true)}
               onDeleteArticle={handleDeleteArticle}
             />
@@ -1609,23 +1712,15 @@ function AppContent() {
             />
           )}
 
-          {adminSection === 'content' && (
-            <PublishingCenter
-              posts={posts}
-              initialTab="all"
+          {adminSection === 'videos' && (
+            <VideoStudioManager
+              videos={videos}
+              onRefreshVideos={async () => {
+                const fresh = await getPublishedVideos();
+                setVideos(fresh);
+              }}
+              onSelectVideo={handleSelectVideo}
               userRole={currentUserRole}
-              onNewArticle={handleStartNewArticle}
-              onEditArticle={handleStartEditArticle}
-              onEmergencyBreaking={() => setEmergencyBreakingOpen(true)}
-              onViewLiveStory={handleSelectPost}
-              onPublishPostDirect={handleExecutePublish}
-              onApprovePost={() => {}}
-              onSchedulePostModal={() => {}}
-              onRetryFailedOp={() => {}}
-              onDeleteArticle={handleDeleteArticle}
-              deletedArticles={deletedArticles}
-              onRestoreArticle={handleRestoreArticle}
-              onPermanentDelete={handlePermanentDeleteArticle}
             />
           )}
 
@@ -1724,6 +1819,7 @@ function AppContent() {
               {currentTemplate === 'homepage' && (
                 <Homepage
                   posts={posts}
+                  videos={videos}
                   onSelectPost={handleSelectPost}
                   onSelectVideo={handleSelectVideo}
                   onSelectCategory={handleSelectCategory}

@@ -1,3 +1,5 @@
+import { EditorialStatus } from './admin';
+
 export type EditorialCategorySlug = 
   | 'latest'
   | 'india'
@@ -106,6 +108,8 @@ export interface WpPost {
   commentCount: number;
   seoTitle?: string;
   seoDescription?: string;
+  editorialStatus?: EditorialStatus;
+  status?: EditorialStatus | string;
 }
 
 export interface WpVideo {

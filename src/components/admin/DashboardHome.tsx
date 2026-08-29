@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Plus, Newspaper, ArrowRight, CheckCircle2, AlertTriangle, ShieldCheck, 
-  Clock, Flame, RefreshCw, UserPlus, FileText, Check, ExternalLink, Zap
+  Clock, Flame, RefreshCw, UserPlus, FileText, Check, ExternalLink, Zap, Video
 } from 'lucide-react';
 import { UserRole, ROLE_PERMISSIONS } from '../../types/admin';
 import { mockAuditLogs } from '../../data/mockAdminData';
@@ -9,6 +9,8 @@ import { mockAuditLogs } from '../../data/mockAdminData';
 interface DashboardHomeProps {
   onOpenPublishingCenter: (initialTab?: string) => void;
   onNewArticle: () => void;
+  onOpenVideos?: () => void;
+  videoCount?: number;
   userRole: UserRole;
   publishedCount?: number;
   awaitingReviewCount?: number;
@@ -20,6 +22,8 @@ interface DashboardHomeProps {
 export const DashboardHome: React.FC<DashboardHomeProps> = ({
   onOpenPublishingCenter,
   onNewArticle,
+  onOpenVideos,
+  videoCount = 12,
   userRole,
   publishedCount = 42,
   awaitingReviewCount = 8,
@@ -68,6 +72,16 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3 flex-wrap sm:flex-nowrap w-full sm:w-auto">
+          {onOpenVideos && (
+            <button
+              onClick={onOpenVideos}
+              className="px-3.5 py-2 bg-surface-lowest border border-border-subtle hover:border-slate-400 rounded-sm text-xs font-bold text-ink shadow-2xs hover:shadow-xs flex items-center gap-2 transition-all cursor-pointer"
+            >
+              <Video className="w-3.5 h-3.5 text-red-600" />
+              <span>Video Studio ({videoCount})</span>
+            </button>
+          )}
+
           <button
             onClick={() => onOpenPublishingCenter('all')}
             className="px-4 py-2 bg-surface-lowest border border-border-subtle hover:border-slate-400 rounded-sm text-xs font-bold text-ink shadow-2xs hover:shadow-xs flex items-center gap-2 transition-all cursor-pointer"

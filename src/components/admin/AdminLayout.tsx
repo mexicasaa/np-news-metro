@@ -1,9 +1,9 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { 
   LayoutDashboard, Newspaper, FileText, LayoutTemplate, Image as ImageIcon, 
   DollarSign, Search, Users, BarChart3, Settings, Plus, Bell, 
   ExternalLink, CheckCircle2, Shield, AlertTriangle, Flame, Clock,
-  RefreshCw, Check, Sparkles, ChevronDown, LogOut, Menu, X
+  RefreshCw, Check, Sparkles, ChevronDown, LogOut, Menu, X, Video
 } from 'lucide-react';
 import { UserRole, UserProfile, ROLE_PERMISSIONS } from '../../types/admin';
 import { mockAdminUsers } from '../../data/mockAdminData';
@@ -14,7 +14,7 @@ export type AdminSection =
   | 'new-article'
   | 'edit-article'
   | 'editorial'
-  | 'content'
+  | 'videos'
   | 'homepage-layout'
   | 'media'
   | 'monetization'
@@ -62,7 +62,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'publishing', label: 'Publishing Center', icon: Newspaper, isP0: true, badge: reviewCount > 0 ? reviewCount : undefined },
     { id: 'editorial', label: 'Editorial', icon: FileText },
-    { id: 'content', label: 'Content', icon: FileText },
+    { id: 'videos', label: 'Videos (वीडियो)', icon: Video },
     { id: 'homepage-layout', label: 'Homepage', icon: LayoutTemplate },
     { id: 'media', label: 'Media', icon: ImageIcon },
     { id: 'monetization', label: 'Monetization', icon: DollarSign },

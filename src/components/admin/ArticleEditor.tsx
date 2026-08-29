@@ -5,16 +5,19 @@ import {
   ImagePlus, ExternalLink, RefreshCw, ArrowLeft, CheckCircle2, Sparkles,
   HelpCircle, Globe, Clock, ShieldCheck, Tag, Layout, Type, AlertCircle,
   UserCheck, Calendar, User, Image as ImageIcon, Trash2, ArrowUp, ArrowDown,
-  Plus, Check, MapPin, Newspaper, FileCheck, Award, Flame
+  Plus, Check, MapPin, Newspaper, FileCheck, Award, Flame, Crop
 } from 'lucide-react';
 import { WpPost, EditorialCategorySlug, GutenbergBlock } from '../../types/wordpress';
 import { UserRole, EditorialStatus } from '../../types/admin';
 import { StandardArticleTemplate } from '../../templates/04_StandardArticleTemplate';
+import { ImageEditorModal } from './ImageEditorModal';
+import { AvatarCropModal } from './AvatarCropModal';
 import { compressImageFile, compressAvatarFile } from '../../utils/imageCompressor';
 import { uploadArticleImage } from '../../services/mediaService';
 import { generateUniqueSlug } from '../../services/articleService';
 import { slugifyText } from '../../utils/slugify';
 import { getAuthorAvatarUrl, DEFAULT_AUTHOR_AVATAR, handleAvatarError } from '../../utils/imageFallback';
+import { saveAutoSaveSession, clearAutoSaveSession, savePublishedPost, setRefreshSession } from '../../utils/newsStorage';
 
 export interface EditorBlock {
   id: string;
@@ -30,7 +33,7 @@ interface ArticleEditorProps {
   initialPost?: WpPost;
   userRole: UserRole;
   currentAuthorId: string;
-  onSaveDraft: (postData: Partial<WpPost>) => void;
+  onSaveDraft: (postData: Partial<WpPost>, options?: { silent?: boolean }) => Promise<WpPost | undefined> | void;
   onSubmitForReview?: (postData: Partial<WpPost>) => void;
   onApproveCopy?: (postData: Partial<WpPost>) => void;
   onSchedulePost?: (postData: Partial<WpPost>, scheduleTime: string) => void;
@@ -39,6 +42,9 @@ interface ArticleEditorProps {
   onBack?: () => void;
   onOpenRevisions?: () => void;
   onDeleteArticle?: (post: WpPost) => void;
+  registerSaveDraft?: (saveFn: () => Promise<void>) => void;
+  restoredFromMistakenRefresh?: boolean;
+  onRedirectToDashboard?: () => void;
 }
 
 const CATEGORIES_LIST: { slug: EditorialCategorySlug; label: string; color: string }[] = [
@@ -80,6 +86,9 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
   onPublishNow,
   onBack,
   onDeleteArticle,
+  registerSaveDraft,
+  restoredFromMistakenRefresh = false,
+  onRedirectToDashboard,
 }) => {
   const featuredImageInputRef = useRef<HTMLInputElement>(null);
   const inlineImageInputRef = useRef<HTMLInputElement>(null);
@@ -156,7 +165,13 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
 
   const [lastSavedTime, setLastSavedTime] = useState<string>('Just now');
   const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [persistedDraftId, setPersistedDraftId] = useState<string | undefined>(initialPost?.id);
+  const [isEditMode, setIsEditMode] = useState<boolean>(Boolean(initialPost?.id));
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const isSavingRef = useRef<boolean>(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [isImageEditorOpen, setIsImageEditorOpen] = useState(false);
+  const [isAvatarCropOpen, setIsAvatarCropOpen] = useState(false);
   const [cursorPos, setCursorPos] = useState<number | null>(null);
   const [mobileTab, setMobileTab] = useState<"content" | "settings">("content");
 
@@ -176,14 +191,16 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
 
   // Auto-generate slug from title
   useEffect(() => {
-    if (!initialPost && title) {
+    if (!initialPost && !persistedDraftId && title) {
       setSlug(slugifyText(title));
     }
-  }, [title, initialPost]);
+  }, [title, initialPost, persistedDraftId]);
 
   // Synchronize state when initialPost changes (editing different articles or creating new)
   useEffect(() => {
     if (initialPost) {
+      setPersistedDraftId(initialPost.id);
+      setIsEditMode(true);
       setTitle(initialPost.title || '');
       setDek(initialPost.dek || '');
       if (initialPost.blocks && initialPost.blocks.length > 0) {
@@ -213,6 +230,8 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       setSlug(initialPost.slug || '');
     } else {
       // Clear form when starting a brand new article
+      setPersistedDraftId(undefined);
+      setIsEditMode(false);
       setTitle('');
       setDek('');
       setContent('');
@@ -252,10 +271,12 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
         const uploadRes = await uploadArticleImage(file, 'avatars');
         if (uploadRes.url) {
           setCustomAuthorAvatar(uploadRes.url);
+          setIsAvatarCropOpen(true);
           return;
         }
         const compressed = await compressAvatarFile(file);
         setCustomAuthorAvatar(compressed);
+        setIsAvatarCropOpen(true);
       } catch (err) {
         console.error('Error uploading author avatar:', err);
       }
@@ -400,12 +421,51 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     return new Date().toISOString();
   };
 
+  const isDirty = (): boolean => {
+    if (initialPost) {
+      const initialBlocksContent = initialPost.blocks?.length
+        ? initialPost.blocks.map(b => {
+            if (b.type === 'image') return `![${b.imageCaption || 'Image'}](${b.imageUrl || ''})`;
+            if (b.type === 'heading') return `## ${b.content}`;
+            if (b.type === 'pullquote') return `> "${b.content}"`;
+            return b.content;
+          }).join('\n\n')
+        : (initialPost.dek || '');
+
+      return (
+        (title || '') !== (initialPost.title || '') ||
+        (dek || '') !== (initialPost.dek || '') ||
+        content !== initialBlocksContent ||
+        category !== (initialPost.category || 'india') ||
+        (featuredImage || '') !== (initialPost.featuredImage || '') ||
+        (imageCaption || '') !== (initialPost.imageCaption || '') ||
+        (imageCredit || 'NP News Metro Photo Desk') !== (initialPost.imageCredit || 'NP News Metro Photo Desk') ||
+        (imageAlt || '') !== (initialPost.imageAlt || '') ||
+        isBreaking !== (initialPost.isBreaking || false) ||
+        (seoTitle || '') !== (initialPost.seoTitle || '') ||
+        (metaDescription || '') !== (initialPost.seoDescription || '') ||
+        (slug || '') !== (initialPost.slug || '')
+      );
+    }
+    // Brand-new article: considered dirty if user typed any text or selected media
+    return Boolean(
+      title.trim() ||
+      content.trim() ||
+      dek.trim() ||
+      featuredImage ||
+      (authorType === 'external' && customAuthorName.trim())
+    );
+  };
+
   const getPostData = (): Partial<WpPost> & { isEdit?: boolean } => {
     const blocks = parseBlocks(content);
     const effectiveSlug = slug && slug !== 'auto-draft' ? slug : slugifyText(title || 'story');
+    const effectiveId = persistedDraftId || initialPost?.id || `post-${Date.now()}`;
+    const effectiveIsEdit = isEditMode || Boolean(initialPost?.id) || Boolean(persistedDraftId);
+
     return {
-      id: initialPost?.id || `post-${Date.now()}`,
-      isEdit: !!initialPost?.id,
+      id: effectiveId,
+      isEdit: effectiveIsEdit,
       title: title || 'Untitled News Story',
       titleHi: title || 'Untitled News Story',
       slug: effectiveSlug,
@@ -442,11 +502,133 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       sharesCount: initialPost?.sharesCount || 0,
       isLead: initialPost?.isLead !== undefined ? initialPost.isLead : true,
       isFeatured: true,
+      editorialStatus: 'draft',
+      status: 'draft',
     };
   };
 
-  useEffect(() => {
+  const performSaveDraft = async (options: { silent?: boolean } = { silent: true }): Promise<WpPost | undefined> => {
+    if (!isDirty() && !persistedDraftId && !initialPost) return undefined;
+    if (isSavingRef.current) return undefined;
+
+    isSavingRef.current = true;
     setIsSaving(true);
+    setSaveStatus('saving');
+
+    const postData = getPostData();
+
+    // 1. Immediately write to published posts cache for drafts tab visibility
+    try {
+      savePublishedPost(postData as WpPost);
+    } catch (e) {}
+
+    // 2. Persist to database/parent
+    try {
+      const saved = await onSaveDraft(postData, options);
+      if (saved && saved.id) {
+        setPersistedDraftId(saved.id);
+        setIsEditMode(true);
+      }
+      setSaveStatus('saved');
+      setLastSavedTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+      return saved || (postData as WpPost);
+    } catch (err) {
+      console.warn('Auto-save to database failed, saved in local cache:', err);
+      setSaveStatus('saved');
+      setLastSavedTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' (locally)');
+      return postData as WpPost;
+    } finally {
+      setIsSaving(false);
+      isSavingRef.current = false;
+    }
+  };
+
+  // 1-minute inactivity countdown if restored after an accidental refresh
+  const [refreshInactivitySeconds, setRefreshInactivitySeconds] = useState<number | null>(
+    restoredFromMistakenRefresh ? 60 : null
+  );
+  const userHasInteractedRef = useRef(false);
+
+  const cancelInactivityTimer = React.useCallback(() => {
+    userHasInteractedRef.current = true;
+    setRefreshInactivitySeconds(null);
+  }, []);
+
+  // When user interacts or types anything, cancel the 1-minute countdown immediately
+  useEffect(() => {
+    if (!restoredFromMistakenRefresh || refreshInactivitySeconds === null) return;
+    const handleActivity = () => {
+      cancelInactivityTimer();
+    };
+    window.addEventListener('keydown', handleActivity, { once: true });
+    window.addEventListener('input', handleActivity, { once: true });
+    window.addEventListener('click', handleActivity, { once: true });
+    return () => {
+      window.removeEventListener('keydown', handleActivity);
+      window.removeEventListener('input', handleActivity);
+      window.removeEventListener('click', handleActivity);
+    };
+  }, [restoredFromMistakenRefresh, refreshInactivitySeconds, cancelInactivityTimer]);
+
+  // If user modifies any field state, cancel the timer
+  useEffect(() => {
+    if (userHasInteractedRef.current || refreshInactivitySeconds === null) return;
+    if (
+      (title && title !== (initialPost?.title || '')) ||
+      (dek && dek !== (initialPost?.dek || '')) ||
+      (content && content !== (initialPost?.blocks?.[0]?.content || initialPost?.dek || ''))
+    ) {
+      cancelInactivityTimer();
+    }
+  }, [title, dek, content, refreshInactivitySeconds, initialPost, cancelInactivityTimer]);
+
+  // Countdown effect: if 60s elapse with no activity, save to draft and redirect to dashboard
+  useEffect(() => {
+    if (refreshInactivitySeconds === null) return;
+
+    if (refreshInactivitySeconds <= 0) {
+      performSaveDraft({ silent: true }).then(() => {
+        if (onRedirectToDashboard) {
+          onRedirectToDashboard();
+        } else if (onBack) {
+          onBack();
+        }
+      });
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setRefreshInactivitySeconds(prev => (prev !== null && prev > 0 ? prev - 1 : 0));
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [refreshInactivitySeconds, onRedirectToDashboard, onBack]);
+
+  const handleBack = async () => {
+    cancelInactivityTimer();
+    if (isDirty()) {
+      await performSaveDraft({ silent: true });
+    }
+    if (onBack) {
+      onBack();
+    }
+  };
+
+  // Register draft saving callback with parent component (for sidebar navigation intercept)
+  useEffect(() => {
+    if (registerSaveDraft) {
+      registerSaveDraft(async () => {
+        await performSaveDraft({ silent: true });
+      });
+    }
+  }, [
+    registerSaveDraft, title, dek, content, category, featuredImage, tags,
+    persistedDraftId, isEditMode, authorType, customAuthorName, customAuthorRole,
+    customAuthorAvatar, slug, seoTitle, metaDescription, isBreaking
+  ]);
+
+  // Continuous background auto-save to draft
+  useEffect(() => {
     const postData = getPostData();
     try {
       localStorage.setItem('np_news_preview_draft', JSON.stringify(postData));
@@ -456,14 +638,72 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
         channel.close();
       }
     } catch (err) {}
-    
+
+    if (!isDirty()) return;
+
     const timer = setTimeout(() => {
-      setIsSaving(false);
-      setLastSavedTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-    }, 400);
+      performSaveDraft({ silent: true });
+    }, 2000);
 
     return () => clearTimeout(timer);
-  }, [title, dek, content, category, subcategory, articleType, location, sourceAgency, authorType, authorId, customAuthorName, customAuthorRole, customAuthorAvatar, publishDateType, customPublishDate, tags, featuredImage, imageCredit, imageCaption, imageAlt, isBreaking, seoTitle, metaDescription, slug, primaryTopic, focusKeyphrase, secondaryKeywords]);
+  }, [
+    title, dek, content, category, subcategory, articleType, location, sourceAgency,
+    authorType, authorId, customAuthorName, customAuthorRole, customAuthorAvatar,
+    publishDateType, customPublishDate, tags, featuredImage, imageCredit,
+    imageCaption, imageAlt, isBreaking, seoTitle, metaDescription, slug,
+    primaryTopic, focusKeyphrase, secondaryKeywords
+  ]);
+
+  // Lifecycle listeners: Save draft on accidental refresh (F5/reload) and page exit/hide
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (isDirty()) {
+        const postData = getPostData();
+        try {
+          setRefreshSession({
+            post: postData,
+            adminSection: (isEditMode || initialPost?.id) ? 'edit-article' : 'new-article',
+            isEdit: isEditMode || Boolean(initialPost?.id),
+            refreshedAt: Date.now(),
+          });
+          savePublishedPost(postData as WpPost);
+        } catch (err) {}
+        onSaveDraft(postData, { silent: true });
+      }
+    };
+
+    const handlePageHide = () => {
+      if (isDirty()) {
+        const postData = getPostData();
+        try {
+          savePublishedPost(postData as WpPost);
+        } catch (err) {}
+        onSaveDraft(postData, { silent: true });
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden' && isDirty()) {
+        performSaveDraft({ silent: true });
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('pagehide', handlePageHide);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('pagehide', handlePageHide);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [
+    title, dek, content, category, subcategory, articleType, location, sourceAgency,
+    authorType, authorId, customAuthorName, customAuthorRole, customAuthorAvatar,
+    publishDateType, customPublishDate, tags, featuredImage, imageCredit,
+    imageCaption, imageAlt, isBreaking, seoTitle, metaDescription, slug,
+    primaryTopic, focusKeyphrase, secondaryKeywords, persistedDraftId, isEditMode
+  ]);
 
   const handleOpenNewTabPreview = () => {
     const postData = getPostData();
@@ -510,9 +750,9 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
           <div className="flex items-center gap-3">
             {onBack && (
               <button
-                onClick={onBack}
+                onClick={handleBack}
                 className="p-2 -ml-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
-                title="Back to Publishing Center"
+                title="Save Draft & Back to Dashboard/Publishing Center"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
@@ -525,11 +765,17 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                 <span className="bg-blue-50 text-blue-700 border border-blue-200 text-xs font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider">
                   Publishing Center
                 </span>
+                <span className="bg-slate-100 text-slate-700 border border-slate-300 text-xs font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
+                  <span>Draft</span>
+                </span>
               </div>
               <div className="flex items-center gap-2 text-xs text-slate-400 mt-0.5">
-                <span className="flex items-center gap-1">
+                <span className="flex items-center gap-1.5">
                   <span className={`w-2 h-2 rounded-full ${isSaving ? 'bg-amber-400 animate-ping' : 'bg-emerald-500'}`}></span>
-                  {isSaving ? 'Syncing...' : `Autosaved at ${lastSavedTime}`}
+                  <span className={isSaving ? 'text-amber-600 font-semibold' : 'text-slate-500'}>
+                    {isSaving ? 'Saving draft to database...' : `Draft auto-saved at ${lastSavedTime}`}
+                  </span>
                 </span>
                 <span>•</span>
                 <span>By: <strong className="text-slate-600">{authorType === 'external' && customAuthorName.trim() ? customAuthorName.trim() : selectedAuthor.name}</strong></span>
@@ -570,9 +816,26 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
               <span>{initialPost ? 'Update Story (संपादित करें)' : 'Publish Story'}</span>
             </button>
           </div>
-
         </div>
       </header>
+
+      {refreshInactivitySeconds !== null && (
+        <div className="bg-amber-50 border-b border-amber-200 px-4 py-2.5 flex items-center justify-between text-xs text-amber-950 shadow-2xs">
+          <div className="flex items-center gap-2 flex-wrap">
+            <Clock className="w-4 h-4 text-amber-600 animate-pulse shrink-0" />
+            <span>
+              <strong>Restored after accidental refresh:</strong> Your article is preserved. If no changes are made within <strong className="text-amber-700 font-mono font-bold text-sm">{refreshInactivitySeconds}s</strong>, it will be kept in Drafts and you will return to the Dashboard.
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={cancelInactivityTimer}
+            className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded-md font-semibold text-xs transition-colors cursor-pointer shrink-0 ml-3 shadow-2xs"
+          >
+            Continue Editing (रखें)
+          </button>
+        </div>
+      )}
 
       <main className="max-w-[1340px] mx-auto px-3 sm:px-6 pt-3 sm:pt-6 pb-12">
         {/* Mobile Segmented Switcher (Visible on <lg screens) */}
@@ -919,10 +1182,11 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                     <div className="grid grid-cols-2 gap-2">
                       <button
                         type="button"
-                        onClick={() => onSaveDraft(getPostData())}
-                        className="py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold text-xs transition-colors text-center cursor-pointer"
+                        onClick={() => performSaveDraft({ silent: false })}
+                        className="py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold text-xs transition-colors text-center cursor-pointer flex items-center justify-center gap-1.5"
                       >
-                        Save Draft
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Save Draft</span>
                       </button>
                       <button
                         type="button"
@@ -1180,9 +1444,9 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                         <label className="block text-xs font-bold text-slate-700 mb-1.5">Author Photo / Avatar:</label>
                         <div className="flex items-center gap-3">
                           <div 
-                            onClick={() => authorAvatarInputRef.current?.click()}
-                            className="relative group/avatar w-12 h-12 rounded-full overflow-hidden border-2 border-amber-300 bg-white shrink-0 shadow-xs cursor-pointer"
-                            title="Click to upload author photo"
+                            onClick={() => setIsAvatarCropOpen(true)}
+                            className="relative group/avatar w-12 h-12 rounded-full overflow-hidden border-2 border-amber-400 bg-white shrink-0 shadow-xs cursor-pointer"
+                            title="Click to crop author avatar"
                           >
                             <img
                               src={getAuthorAvatarUrl(customAuthorAvatar || (selectedAuthor as any)?.avatar)}
@@ -1191,19 +1455,32 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                               onError={handleAvatarError}
                             />
                             <div className="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover/avatar:opacity-100 transition-opacity text-[10px] font-bold">
-                              <Camera className="w-3.5 h-3.5" />
+                              <Crop className="w-4 h-4" />
                             </div>
                           </div>
                           
-                          <div className="space-y-1 flex-1">
-                            <button
-                              type="button"
-                              onClick={() => authorAvatarInputRef.current?.click()}
-                              className="px-2.5 py-1 bg-white hover:bg-amber-100/60 text-slate-800 border border-slate-300 rounded-md text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
-                            >
-                              <Camera className="w-3.5 h-3.5 text-amber-700" />
-                              <span>{customAuthorAvatar ? 'Change Photo' : 'Upload Author Photo'}</span>
-                            </button>
+                          <div className="space-y-1.5 flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <button
+                                type="button"
+                                onClick={() => authorAvatarInputRef.current?.click()}
+                                className="px-2.5 py-1 bg-white hover:bg-amber-100/60 text-slate-800 border border-slate-300 rounded-md text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                              >
+                                <Camera className="w-3.5 h-3.5 text-amber-700" />
+                                <span>{customAuthorAvatar ? 'Change Photo' : 'Upload Photo'}</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => setIsAvatarCropOpen(true)}
+                                className="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 active:scale-[0.98] text-amber-900 border border-amber-300 rounded-md text-xs font-bold transition-all flex items-center gap-1 cursor-pointer shadow-2xs"
+                                title="Crop author photo for 1:1 circular avatar"
+                              >
+                                <Crop className="w-3.5 h-3.5 text-amber-700" />
+                                <span>Crop Photo (क्रॉप करें)</span>
+                              </button>
+                            </div>
+
                             {customAuthorAvatar && (
                               <button
                                 type="button"
@@ -1238,14 +1515,52 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                 <div className="p-5 space-y-3.5 text-xs">
                   {featuredImage ? (
                     <div className="space-y-3">
-                      <div className="relative aspect-video rounded-xl overflow-hidden border border-slate-200 group bg-slate-900">
+                      <div className="relative aspect-video rounded-xl overflow-hidden border border-slate-200 group bg-slate-900 shadow-2xs">
                         <img src={featuredImage} alt="Featured" className="w-full h-full object-cover" />
-                        <div 
-                          onClick={() => featuredImageInputRef.current?.click()}
-                          className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer text-white font-medium text-xs gap-1.5"
-                        >
-                          <Camera className="w-4 h-4" /> Replace Image
+                        
+                        {/* Hover Overlay with Edit & Replace buttons */}
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 p-2">
+                          <button
+                            type="button"
+                            onClick={() => setIsImageEditorOpen(true)}
+                            className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-bold text-xs flex items-center gap-1.5 shadow-md transition-all cursor-pointer"
+                            title="Crop and adjust photo"
+                          >
+                            <Crop className="w-3.5 h-3.5" />
+                            <span>Edit & Crop</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => featuredImageInputRef.current?.click()}
+                            className="px-2.5 py-1.5 bg-white/20 hover:bg-white/30 text-white rounded-lg font-semibold text-xs flex items-center gap-1 transition-colors cursor-pointer"
+                            title="Upload new image"
+                          >
+                            <Camera className="w-3.5 h-3.5" />
+                            <span>Replace</span>
+                          </button>
                         </div>
+                      </div>
+
+                      {/* Prominent Action Toolbar */}
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setIsImageEditorOpen(true)}
+                          className="flex-1 py-2 px-3 bg-blue-50 hover:bg-blue-100 active:scale-[0.99] text-blue-700 font-bold rounded-lg border border-blue-200 transition-all flex items-center justify-center gap-1.5 cursor-pointer text-xs shadow-2xs"
+                        >
+                          <Crop className="w-3.5 h-3.5 text-blue-600" />
+                          <span>Edit Image (क्रॉप व संपादन)</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => featuredImageInputRef.current?.click()}
+                          className="py-2 px-3 bg-slate-50 hover:bg-slate-100 text-slate-700 font-semibold rounded-lg border border-slate-200 transition-colors flex items-center justify-center gap-1 cursor-pointer text-xs"
+                          title="Choose a different image file"
+                        >
+                          <Camera className="w-3.5 h-3.5 text-slate-500" />
+                          <span>Replace</span>
+                        </button>
                       </div>
 
                       <div className="space-y-2">
@@ -1485,6 +1800,66 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
             
           </div>
         </div>
+      )}
+
+      {/* Featured Image Studio Modal */}
+      {isImageEditorOpen && featuredImage && (
+        <ImageEditorModal
+          isOpen={isImageEditorOpen}
+          imageUrl={featuredImage}
+          onClose={() => setIsImageEditorOpen(false)}
+          onSave={(editedImageUrl) => {
+            setFeaturedImage(editedImageUrl);
+            // Immediately sync updated postData to draft storage and live preview channel
+            const updatedPostData = {
+              ...getPostData(),
+              featuredImage: editedImageUrl,
+            };
+            try {
+              localStorage.setItem('np_news_preview_draft', JSON.stringify(updatedPostData));
+              if (typeof BroadcastChannel !== 'undefined') {
+                const channel = new BroadcastChannel('np_news_preview_channel');
+                channel.postMessage({ type: 'UPDATE_PREVIEW', post: updatedPostData });
+                channel.close();
+              }
+            } catch (err) {}
+            // Debounced draft auto-save
+            setTimeout(() => {
+              performSaveDraft({ silent: true });
+            }, 300);
+          }}
+        />
+      )}
+
+      {/* Author Avatar Crop Modal */}
+      {isAvatarCropOpen && (
+        <AvatarCropModal
+          isOpen={isAvatarCropOpen}
+          imageUrl={getAuthorAvatarUrl(customAuthorAvatar || (selectedAuthor as any)?.avatar)}
+          onClose={() => setIsAvatarCropOpen(false)}
+          onSave={(croppedAvatarUrl) => {
+            setCustomAuthorAvatar(croppedAvatarUrl);
+            const currentPost = getPostData();
+            const updatedPostData = {
+              ...currentPost,
+              customAuthor: {
+                ...((currentPost as any).customAuthor || {}),
+                avatar: croppedAvatarUrl,
+              },
+            };
+            try {
+              localStorage.setItem('np_news_preview_draft', JSON.stringify(updatedPostData));
+              if (typeof BroadcastChannel !== 'undefined') {
+                const channel = new BroadcastChannel('np_news_preview_channel');
+                channel.postMessage({ type: 'UPDATE_PREVIEW', post: updatedPostData });
+                channel.close();
+              }
+            } catch (err) {}
+            setTimeout(() => {
+              performSaveDraft({ silent: true });
+            }, 300);
+          }}
+        />
       )}
 
     </div>

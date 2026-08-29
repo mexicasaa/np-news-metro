@@ -118,6 +118,8 @@ export const mapDbToWpPost = (row: any, joinedTags?: string[]): WpPost => {
     commentCount: 0,
     seoTitle: row.seo_title || undefined,
     seoDescription: row.meta_description || undefined,
+    editorialStatus: (row.status || 'published') as EditorialStatus,
+    status: row.status || 'published',
   };
 };
 
@@ -255,14 +257,28 @@ export const getEditorialArticles = async (
       }));
     }
 
-    return data.map(row => ({
+    const liveEditorial = data.map(row => ({
       ...mapDbToWpPost(row),
       rawId: row.id,
       editorialStatus: (row.status || 'draft') as EditorialStatus,
+      status: row.status || 'draft',
     }));
+
+    // Merge with default mock posts to preserve coverage if few articles exist
+    const liveSlugs = new Set(liveEditorial.map(p => p.slug));
+    const supplementalMock = defaultMockPosts
+      .filter(m => !liveSlugs.has(m.slug))
+      .map((p, idx) => ({
+        ...p,
+        rawId: p.id,
+        editorialStatus: (idx === 0 ? 'published' : idx === 1 ? 'review' : idx === 2 ? 'scheduled' : 'draft') as EditorialStatus,
+        status: (idx === 0 ? 'published' : idx === 1 ? 'review' : idx === 2 ? 'scheduled' : 'draft'),
+      }));
+
+    return [...liveEditorial, ...supplementalMock];
   } catch (err) {
     console.error('Error fetching editorial articles:', err);
-    return defaultMockPosts.map(p => ({ ...p, rawId: p.id, editorialStatus: 'published' as EditorialStatus }));
+    return defaultMockPosts.map(p => ({ ...p, rawId: p.id, editorialStatus: 'published' as EditorialStatus, status: 'published' }));
   }
 };
 
@@ -430,7 +446,12 @@ export const saveArticle = async (
       }
     } catch (e) {}
 
-    const finalPost = mapDbToWpPost(resultArticle, postData.tags);
+    const mapped = mapDbToWpPost(resultArticle, postData.tags);
+    const finalPost: WpPost = {
+      ...mapped,
+      editorialStatus: (resultArticle.status || targetStatus) as EditorialStatus,
+      status: resultArticle.status || targetStatus,
+    };
     return { post: finalPost };
   } catch (err: any) {
     console.error('Unexpected error in saveArticle:', err);

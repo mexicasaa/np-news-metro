@@ -30,11 +30,11 @@ export const EditorialListView: React.FC<EditorialListViewProps> = ({
 
   const editorialArticles = allPosts.map((post, idx) => {
     const authorName = post.customAuthor?.name || mockAuthors[post.authorId]?.name || 'Staff Reporter';
-    let statusType = 'published';
-    let status = 'Published';
-    if (idx === 2) { status = 'Scheduled'; statusType = 'scheduled'; }
-    else if (idx === 3) { status = 'Draft'; statusType = 'draft'; }
-    else if (idx === 4) { status = 'Needs Review'; statusType = 'review'; }
+    const statusType: string = post.editorialStatus || (post as any).status || (idx === 2 ? 'scheduled' : idx === 3 ? 'draft' : idx === 4 ? 'review' : 'published');
+    const status = statusType === 'draft' ? 'Draft' :
+                   statusType === 'review' ? 'Needs Review' :
+                   statusType === 'approved' ? 'Approved' :
+                   statusType === 'scheduled' ? 'Scheduled' : 'Published';
 
     return {
       id: post.id,
