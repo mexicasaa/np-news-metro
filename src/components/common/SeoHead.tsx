@@ -73,12 +73,14 @@ export const SeoHead: React.FC<SeoHeadProps> = ({ metadata, structuredData }) =>
 
     // 4. Twitter / X Cards
     setMetaTag('meta[name="twitter:card"]', 'name', 'twitter:card', 'summary_large_image');
+    setMetaTag('meta[name="twitter:domain"]', 'name', 'twitter:domain', 'www.npnewsmetro.com');
     setMetaTag('meta[name="twitter:site"]', 'name', 'twitter:site', '@NPNewsMetro');
     setMetaTag('meta[name="twitter:creator"]', 'name', 'twitter:creator', '@NPNewsMetro');
     setMetaTag('meta[name="twitter:title"]', 'name', 'twitter:title', finalTitle);
     setMetaTag('meta[name="twitter:description"]', 'name', 'twitter:description', finalDesc);
     setMetaTag('meta[name="twitter:image"]', 'name', 'twitter:image', finalImage);
     setMetaTag('meta[name="twitter:image:src"]', 'name', 'twitter:image:src', finalImage);
+    setMetaTag('meta[name="twitter:image:alt"]', 'name', 'twitter:image:alt', finalTitle);
 
     // 5. Image Src Link (for legacy/WhatsApp scrapers)
     let imageSrcLink = document.querySelector('link[rel="image_src"]') as HTMLLinkElement;

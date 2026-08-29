@@ -467,7 +467,11 @@ export default async function handler(req, res) {
     // 5. CONSTRUCT CANONICAL METADATA FOR VALID STORY
     const title = mediaItem ? mediaItem.title : 'NP NEWS METRO — Real News. Real Impact.';
     const description = mediaItem ? mediaItem.dek : 'Independent, credible digital journalism for modern India.';
-    const image = mediaItem ? getAbsoluteUrl(mediaItem.image) : DEFAULT_OG_IMAGE;
+    const imageVersion = mediaItem?.modifiedAt ? new Date(mediaItem.modifiedAt).getTime() : Date.now();
+    let image = mediaItem ? getAbsoluteUrl(mediaItem.image) : DEFAULT_OG_IMAGE;
+    if (image.includes('/api/image/')) {
+       image = image.includes('?') ? `${image}&v=${imageVersion}` : `${image}?v=${imageVersion}`;
+    }
     const category = mediaItem ? mediaItem.category : cleanCategory;
     const slug = mediaItem ? mediaItem.slug : cleanSlug;
     const isVideo = category === 'videos';
@@ -479,64 +483,39 @@ export default async function handler(req, res) {
       : canonicalUrl;
     const publishedIso = mediaItem?.publishedAt || new Date().toISOString();
     const modifiedIso = mediaItem?.modifiedAt || publishedIso;
-    const authorName = mediaItem?.author || 'NP News Metro Bureau';
-    const authorRole = mediaItem?.authorRole || 'Staff Journalist';
+    const authorName = mediaItem?.author || 'NP News Metro Desk';
+    const authorRole = mediaItem?.authorRole || 'Editorial';
     const paragraphs = mediaItem?.paragraphs || [description];
 
-    // Schema.org Structured Data
-    const structuredData = isVideo ? {
-      '@context': 'https://schema.org',
-      '@type': 'VideoObject',
-      name: title,
-      description: description,
-      thumbnailUrl: [image],
-      uploadDate: publishedIso,
-      contentUrl: mediaItem.videoUrl || canonicalUrl,
-      publisher: {
-        '@type': 'NewsMediaOrganization',
-        name: 'NP News Metro',
-        url: `${SITE_ORIGIN}/`,
-        logo: {
-          '@type': 'ImageObject',
-          url: `${SITE_ORIGIN}/logo.png`
+    // 6. GENERATE STRUCTURED DATA (JSON-LD)
+    const structuredData = isVideo 
+      ? {
+          "@context": "https://schema.org",
+          "@type": "VideoObject",
+          "name": title,
+          "description": description,
+          "thumbnailUrl": image,
+          "uploadDate": publishedIso,
+          "embedUrl": mediaItem?.videoUrl || canonicalUrl,
+          "publisher": { "@type": "Organization", "name": "NP News Metro", "logo": { "@type": "ImageObject", "url": `${SITE_ORIGIN}/np_news_logo.png` } }
         }
-      }
-    } : {
-      '@context': 'https://schema.org',
-      '@type': 'NewsArticle',
-      mainEntityOfPage: {
-        '@type': 'WebPage',
-        '@id': canonicalUrl,
-      },
-      headline: title,
-      description: description,
-      image: [image],
-      datePublished: publishedIso,
-      dateModified: modifiedIso,
-      author: [
-        {
-          '@type': 'Person',
-          name: authorName,
-          jobTitle: authorRole,
-        }
-      ],
-      publisher: {
-        '@type': 'NewsMediaOrganization',
-        name: 'NP News Metro',
-        url: `${SITE_ORIGIN}/`,
-        logo: {
-          '@type': 'ImageObject',
-          url: `${SITE_ORIGIN}/logo.png`
-        }
-      },
-      articleSection: category.toUpperCase(),
-      inLanguage: /[\u0900-\u097F]/.test(title) ? 'hi-IN' : 'en-IN'
-    };
+      : {
+          "@context": "https://schema.org",
+          "@type": "NewsArticle",
+          "mainEntityOfPage": { "@type": "WebPage", "@id": canonicalUrl },
+          "headline": title,
+          "description": description,
+          "image": [image],
+          "datePublished": publishedIso,
+          "dateModified": modifiedIso,
+          "author": { "@type": "Person", "name": authorName },
+          "publisher": { "@type": "Organization", "name": "NP News Metro", "logo": { "@type": "ImageObject", "url": `${SITE_ORIGIN}/np_news_logo.png` } }
+        };
 
     const breadcrumbsData = {
-      '@context': 'https://schema.org',
-      '@type': 'BreadcrumbList',
-      itemListElement: [
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
         { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_ORIGIN}/` },
         { '@type': 'ListItem', position: 2, name: CATEGORY_NAMES[category] || category.toUpperCase(), item: `${SITE_ORIGIN}/category/${category}` },
         { '@type': 'ListItem', position: 3, name: title, item: canonicalUrl }
@@ -573,6 +552,7 @@ export default async function handler(req, res) {
   <meta property="article:author" content="${escapeHtml(authorName)}" />
 
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:domain" content="www.npnewsmetro.com" />
   <meta name="twitter:site" content="@NPNewsMetro" />
   <meta name="twitter:creator" content="@NPNewsMetro" />
   <meta name="twitter:title" content="${escapeHtml(title)}" />
@@ -580,6 +560,7 @@ export default async function handler(req, res) {
   <meta name="twitter:url" content="${shareUrl}" />
   <meta name="twitter:image" content="${image}" />
   <meta name="twitter:image:src" content="${image}" />
+  <meta name="twitter:image:alt" content="${escapeHtml(title)}" />
   <link rel="image_src" href="${image}" />
 
   <script type="application/ld+json">

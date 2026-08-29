@@ -1,11 +1,42 @@
-# Robots.txt - NP News Metro Search Engine Crawler Directives
+# Robots.txt - NP News Metro Search Engine & Social Crawler Directives
 User-agent: *
 Allow: /
+Allow: /api/image/
+Allow: /api/image
 Disallow: /admin/
 Disallow: /admin
 Disallow: /api/
 Disallow: /login
 Disallow: /auth/
+
+# Twitter / X Social Previews & Featured Images
+User-agent: Twitterbot
+Allow: /
+
+User-agent: Xbot
+Allow: /
+
+# Social Media & Messaging Platforms
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: WhatsApp
+Allow: /
+
+User-agent: TelegramBot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
+User-agent: Discordbot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: Pinterest
+Allow: /
 
 # Googlebot News Directives
 User-agent: Googlebot-News

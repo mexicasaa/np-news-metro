@@ -2,6 +2,182 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
   <url>
+    <loc>https://www.npnewsmetro.com/entertainment/khushiyon-kaa-paavarahaausa-hotee-hain-bahanen</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-28T17:43:24.602Z</news:publication_date>
+      <news:title>खुशियों का पावरहाउस होती हैं बहनें.....</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/politics/lohiyaaheda-men-paidala-pahunche-dhaamee-sthaaneeya-stola-para-ch</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-28T17:33:20.670Z</news:publication_date>
+      <news:title>लोहियाहेड में पैदल पहुंचे धामी, स्थानीय स्टॉल पर चखा टिकी का स्वाद</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/india/rakshaabandhana-para-dhaamee-sarakaara-kee-mahilaaon-ko-badee-sau</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-28T17:23:59.672Z</news:publication_date>
+      <news:title>रक्षाबंधन पर धामी सरकार की महिलाओं को बड़ी सौगात, 60 वर्ष से मुफ्त रोडवेज सफर</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/india/rakshaabandhana-ke-paavana-avasara-phalon-phoolon-se-khelee-gaee</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-28T17:05:20.341Z</news:publication_date>
+      <news:title>रक्षाबंधन के पावन अवसर फलों-फूलों से खेली गई ऐतिहासिक बग्वाल</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/politics/panjaaba-men-bhaajapaa-kee-sarakaara-banaane-kaa-mana-banaa-chuke</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-28T16:53:44.481Z</news:publication_date>
+      <news:title>पंजाब में भाजपा की सरकार बनाने का मन बना चुकी जनता : सैनी</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/india/santa-kabeera-kuteera-men-seeema-sainee-ne-manaayaa-rakshaabandha</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-28T16:41:56.345Z</news:publication_date>
+      <news:title>संत कबीर कुटीर में सीएम सैनी ने मनाया रक्षाबंधन</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/politics/yuvaaon-ke-lie-avasaron-kaa-majaboota-eeko-sistama-taiyaara-yogae</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-28T16:28:11.791Z</news:publication_date>
+      <news:title>युवाओं के लिए अवसरों का मजबूत ईको सिस्टम तैयार: योगी</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/india/60-varsha-se-adhika-umra-kee-mahilaaon-ke-lie-yoopee-rodaveja-men</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-28T16:19:15.653Z</news:publication_date>
+      <news:title>60 वर्ष से अधिक उम्र की महिलाओं के लिए यूपी रोडवेज में मुफ्त सफर की सौगात</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/india/betiyon-ko-milaa-mancha-to-khulakara-bole-sapane-mukhyamantree-yo</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-28T16:07:02.735Z</news:publication_date>
+      <news:title>बेटियों को मिला मंच तो खुलकर बोले सपने, मुख्यमंत्री योगी से छात्राओं ने पूछे बेझिझक सवाल</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/india/betiyon-kee-muskaana-se-khila-uthaa-mukhyamantree-aavaasa-yogee-k</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-28T15:58:31.586Z</news:publication_date>
+      <news:title>बेटियों की मुस्कान से खिल उठा मुख्यमंत्री आवास, योगी की कलाई पर बंधी स्नेह की डोर</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/entertainment/sanjaya-jheela-sthita-paandava-shaakhaa-men-harshollaasa-se-manaa</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-28T15:12:44.738Z</news:publication_date>
+      <news:title>संजय झील स्थित पांडव शाखा में हर्षोल्लास से मनाया गया रक्षाबंधन पर्व, स्वयंसेवकों ने बांधा रक्षा सूत्र</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/entertainment/29-agasta-kaa-raashiphala-shanivaara-ko-ina-raashiyon-ko-mila-sak</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-28T13:47:29.085Z</news:publication_date>
+      <news:title>29 अगस्त का राशिफल: शनिवार को इन राशियों को मिल सकता है लाभ, जानें सभी 12 राशियों का हाल</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/entertainment/dharatee-se-antariksha-taka-betiyon-kee-udaana-rakshaabandhana-pa</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-28T13:31:12.635Z</news:publication_date>
+      <news:title>धरती से अंतरिक्ष तक बेटियों की उड़ान, रक्षाबंधन पर मिला वैश्विक संदेश</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/lifestyle/kama-amh-ke-baavajooda-praakritika-garbhadhaarana-kee-ummeeda-pri</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-28T13:15:40.985Z</news:publication_date>
+      <news:title>कम AMH के बावजूद प्राकृतिक गर्भधारण की उम्मीद, प्रियंका की कहानी बनी प्रेरणा</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/india/phedareshana-opha-panjaabee-esosieshana-kaa-sevaa-sankalpa-30-jar</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-28T12:48:50.360Z</news:publication_date>
+      <news:title>फेडरेशन ऑफ पंजाबी एसोसिएशन का सेवा संकल्प, 30 जरूरतमंदों के होंगे निःशुल्क नेत्र ऑपरेशन</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/india/iskona-noedaa-men-dhoomadhaama-se-manaaee-gaee-balaraama-poornima</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-28T10:25:57.162Z</news:publication_date>
+      <news:title>इस्कॉन नोएडा में धूमधाम से मनाई गई बलराम पूर्णिमा, 1500 भक्तों ने लिया उत्सव में भाग</news:title>
+    </news:news>
+  </url>
+  <url>
     <loc>https://www.npnewsmetro.com/india/mukhyamantree-sashakta-bahanaa-utsava-men-champaavata-ko-6297-kar</loc>
     <news:news>
       <news:publication>

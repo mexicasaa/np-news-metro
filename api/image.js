@@ -24,10 +24,9 @@ export default async function handler(req, res) {
 
     if (pathParam) {
       const cleanPath = decodeURIComponent(pathParam).replace(/^\/+/, '');
-      // Route through Supabase Image Transformation CDN with optimal web parameters (1200px width, 75% quality)
-      // This reduces images from 600KB-2MB down to ~130-190 KB, comfortably under WhatsApp's 300KB hard limit.
-      targetUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/render/image/public/${cleanPath}?width=1200&quality=75`;
-      fallbackUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/object/public/${cleanPath}`;
+      // Serve raw, uncompressed image, removing previous render/image optimization
+      targetUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/object/public/${cleanPath}`;
+      fallbackUrl = targetUrl;
     } else if (urlParam) {
       let decoded = urlParam;
       try {
@@ -46,10 +45,9 @@ export default async function handler(req, res) {
         return res.end('Invalid url protocol');
       }
 
-      // If this is a Supabase storage URL, optimize via render/image
+      // If this is a Supabase storage URL, serve raw uncompressed
       if (decoded.includes('/storage/v1/object/public/')) {
-        const storagePath = decoded.split('/storage/v1/object/public/')[1];
-        targetUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/render/image/public/${storagePath}?width=1200&quality=75`;
+        targetUrl = decoded;
         fallbackUrl = decoded;
       } else {
         targetUrl = decoded;
@@ -86,6 +84,7 @@ export default async function handler(req, res) {
       res.setHeader('Content-Length', buffer.length);
       res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=604800, stale-while-revalidate=86400');
       res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('X-Robots-Tag', 'all, index, follow');
       // Strips any upstream x-robots-tag: none to ensure full social/search crawler indexing
     }
 
