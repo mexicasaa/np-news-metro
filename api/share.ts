@@ -467,7 +467,7 @@ export default async function handler(req, res) {
     // 5. CONSTRUCT CANONICAL METADATA FOR VALID STORY
     const title = mediaItem ? mediaItem.title : 'NP NEWS METRO — Real News. Real Impact.';
     const description = mediaItem ? mediaItem.dek : 'Independent, credible digital journalism for modern India.';
-    const imageVersion = mediaItem?.modifiedAt ? `${new Date(mediaItem.modifiedAt).getTime()}_v2` : `${Date.now()}_v2`;
+    const imageVersion = mediaItem?.modifiedAt ? `${new Date(mediaItem.modifiedAt).getTime()}_v3` : `${Date.now()}_v3`;
     let image = mediaItem ? getAbsoluteUrl(mediaItem.image) : DEFAULT_OG_IMAGE;
     // Always append version to image URL to force Twitterbot and WhatsApp to discard old blocked caches
     image = image.includes('?') ? `${image}&v=${imageVersion}` : `${image}?v=${imageVersion}`;
@@ -541,10 +541,9 @@ export default async function handler(req, res) {
   <meta property="og:image" content="${image}" />
   <meta property="og:image:url" content="${image}" />
   <meta property="og:image:secure_url" content="${image}" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
   <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:alt" content="${escapeHtml(title)}" />
+  <meta property="og:locale" content="hi_IN" />
   <meta property="article:published_time" content="${publishedIso}" />
   <meta property="article:modified_time" content="${modifiedIso}" />
   <meta property="article:section" content="${escapeHtml(category.toUpperCase())}" />

@@ -83,10 +83,21 @@ export const getCanonicalArticleUrl = (
     url = `${origin}/${cleanCategory}/${slug}`;
   }
   
-  // Append cache busting parameter with v2 suffix to force X and WhatsApp to re-crawl old links
-  const timestamp = updatedAt ? `${new Date(updatedAt).getTime()}_v2` : `${Date.now()}_v2`;
+  // Append cache busting parameter with v3 suffix to force X and WhatsApp to re-crawl old links
+  const timestamp = updatedAt ? `${new Date(updatedAt).getTime()}_v3` : `${Date.now()}_v3`;
   url = `${url}?v=${timestamp}`;
   return url;
+};
+
+/**
+ * Returns formatted share text with Title, Summary/Dek, 🔗 Read Full Story, and Canonical URL
+ * Follows exact WhatsApp / social media reference preview structure
+ */
+export const getShareablePostText = (title: string, summary?: string, url?: string): string => {
+  const cleanTitle = (title || '').trim();
+  const cleanSummary = (summary || '').trim();
+  const cleanUrl = (url || '').trim();
+  return `${cleanTitle}\n\n${cleanSummary ? `${cleanSummary}\n\n` : ''}🔗 Read Full Story:\n${cleanUrl}`;
 };
 
 /**

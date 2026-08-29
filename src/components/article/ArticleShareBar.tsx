@@ -17,6 +17,7 @@ import {
   shareArticleNative, 
   getAbsoluteImageUrl, 
   getCanonicalArticleUrl, 
+  getShareablePostText,
   ShareOptions 
 } from '../../utils/shareUtils';
 import { ShareModal } from './ShareModal';
@@ -67,11 +68,16 @@ export const ArticleShareBar: React.FC<ArticleShareBarProps> = ({
 
   const handleCopyLink = async () => {
     try {
-      await navigator.clipboard.writeText(url);
+      const shareText = getShareablePostText(title, summary, url);
+      await navigator.clipboard.writeText(shareText);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // fallback
+      try {
+        await navigator.clipboard.writeText(url);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch {}
     }
   };
 

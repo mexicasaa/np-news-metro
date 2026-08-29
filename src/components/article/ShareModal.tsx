@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { 
   X, 
   Send, 
@@ -17,6 +17,7 @@ import {
   generateSocialShareLinks, 
   shareArticleNative, 
   getAbsoluteImageUrl, 
+  getShareablePostText,
   ShareOptions 
 } from '../../utils/shareUtils';
 import { handleImageError } from '../../utils/imageFallback';
@@ -41,6 +42,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
   category,
 }) => {
   const [copied, setCopied] = useState(false);
+  const [postCopied, setPostCopied] = useState(false);
   const [imageCopied, setImageCopied] = useState(false);
   const [isSharingNative, setIsSharingNative] = useState(false);
   const { isHindi } = useLanguage();
@@ -57,6 +59,17 @@ export const ShareModal: React.FC<ShareModalProps> = ({
 
   const links = generateSocialShareLinks(shareOptions);
   const absoluteImage = links.absoluteImage;
+
+  const handleCopyFullPost = async () => {
+    try {
+      const text = getShareablePostText(title, summary, url);
+      await navigator.clipboard.writeText(text);
+      setPostCopied(true);
+      setTimeout(() => setPostCopied(false), 2500);
+    } catch {
+      handleCopyLink();
+    }
+  };
 
   const handleCopyLink = async () => {
     try {
@@ -268,27 +281,38 @@ export const ShareModal: React.FC<ShareModalProps> = ({
 
           {/* Copy Link & Featured Image Box */}
           <div className="space-y-2 pt-2 border-t border-border-subtle">
-            {/* Copy Article URL */}
-            <div className="flex items-center gap-2">
+            {/* Copy Article URL & Full Post */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
               <div className="flex-1 bg-surface-container border border-border-subtle px-3 py-2 rounded-md text-xs font-mono text-ink-muted truncate">
                 {url}
               </div>
-              <button
-                onClick={handleCopyLink}
-                className="flex items-center gap-1.5 px-3 py-2 bg-secondary hover:bg-secondary/90 text-white rounded-md text-xs font-semibold shadow-xs transition-colors flex-shrink-0"
-              >
-                {copied ? (
-                  <>
-                    <Check className="w-3.5 h-3.5 text-white" />
-                    <span>{isHindi ? 'कॉपी हो गया' : 'Copied!'}</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-3.5 h-3.5" />
-                    <span>{isHindi ? 'लिंक कॉपी करें' : 'Copy Link'}</span>
-                  </>
-                )}
-              </button>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <button
+                  onClick={handleCopyFullPost}
+                  className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-md text-xs font-semibold shadow-xs transition-colors"
+                  title="Copy Headline, Summary & Link (Matches WhatsApp layout)"
+                >
+                  {postCopied ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-white" />
+                      <span>{isHindi ? 'पोस्ट कॉपी हुई' : 'Post Copied!'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>{isHindi ? 'पूरी पोस्ट कॉपी' : 'Copy Full Post'}</span>
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={handleCopyLink}
+                  className="flex items-center justify-center gap-1 px-2.5 py-2 bg-surface-lowest hover:bg-surface-high border border-border-subtle rounded-md text-xs font-medium text-ink transition-colors"
+                  title="Copy URL Only"
+                >
+                  {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{copied ? (isHindi ? 'लिंक कॉपी हुआ' : 'Link Copied') : (isHindi ? 'सिर्फ लिंक' : 'Link Only')}</span>
+                </button>
+              </div>
             </div>
 
             {/* Direct Image Tools (Download or Copy for Status/Stories) */}
