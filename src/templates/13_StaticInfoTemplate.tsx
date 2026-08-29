@@ -426,7 +426,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                         Advisory Board Member
                       </div>
                       <img
-                        src={getAuthorAvatarUrl('/np-author-default.png')}
+                        src={getAuthorAvatarUrl('/uploads/diwan-chand-arya.jpg')}
                         alt="Diwan Chand Arya (D. C. Arya)"
                         className="w-full h-full object-cover object-top rounded-t-lg group-hover:scale-105 transition-transform duration-500"
                         onError={handleAvatarError}

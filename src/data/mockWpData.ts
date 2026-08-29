@@ -40,7 +40,7 @@ export const mockAuthors: Record<string, WpAuthor> = {
     slug: 'diwan-chand-arya',
     role: 'Advisory Board Member',
     roleHi: 'सलाहकार मंडल सदस्य',
-    avatar: '/np-author-default.png',
+    avatar: '/uploads/diwan-chand-arya.jpg',
     bio: 'Advisory Board Member at NP News Metro, providing strategic guidance on institutional governance, community affairs, and public integrity.',
     bioHi: 'एनपी न्यूज़ मेट्रो के सलाहकार मंडल सदस्य, संस्थागत प्रशासन, सामाजिक सरोकारों और सार्वजनिक शुचिता पर रणनीतिक मार्गदर्शन प्रदान करते हैं।',
     verified: true,
