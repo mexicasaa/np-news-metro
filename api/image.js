@@ -24,9 +24,11 @@ export default async function handler(req, res) {
 
     if (pathParam) {
       const cleanPath = decodeURIComponent(pathParam).replace(/^\/+/, '');
-      // Serve raw, uncompressed image, removing previous render/image optimization
-      targetUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/object/public/${cleanPath}`;
-      fallbackUrl = targetUrl;
+      // Route through Supabase Image Transformation CDN with optimal web parameters (1200px width, 75% quality)
+      // CRITICAL: This is REQUIRED because WhatsApp strictly drops ANY image > 300KB!
+      // This compression reduces large raw images (like 600KB) to ~130KB to guarantee they show in WhatsApp.
+      targetUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/render/image/public/${cleanPath}?width=1200&quality=75`;
+      fallbackUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/object/public/${cleanPath}`;
     } else if (urlParam) {
       let decoded = urlParam;
       try {
@@ -45,9 +47,10 @@ export default async function handler(req, res) {
         return res.end('Invalid url protocol');
       }
 
-      // If this is a Supabase storage URL, serve raw uncompressed
+      // If this is a Supabase storage URL, optimize via render/image
       if (decoded.includes('/storage/v1/object/public/')) {
-        targetUrl = decoded;
+        const storagePath = decoded.split('/storage/v1/object/public/')[1];
+        targetUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/render/image/public/${storagePath}?width=1200&quality=75`;
         fallbackUrl = decoded;
       } else {
         targetUrl = decoded;
