@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Search, Filter, X, ArrowRight, Sparkles, Compass } from 'lucide-react';
 import { WpPost } from '../types/wordpress';
 import { mockCategories, getLocalizedPost } from '../data/mockWpData';
-import { getStoredPosts } from '../utils/newsStorage';
+import { getStoredPosts, isPostPublished } from '../utils/newsStorage';
 import { HorizontalStoryCard } from '../components/cards/HorizontalStoryCard';
 import { EmptyState } from '../components/common/EmptyState';
 import { Breadcrumbs } from '../components/layout/Breadcrumbs';
@@ -28,7 +28,7 @@ export const SearchResultsTemplate: React.FC<SearchResultsTemplateProps> = ({
   const [sortBy, setSortBy] = useState<'relevance' | 'date'>('relevance');
   const { language, t, isHindi } = useLanguage();
 
-  const allPosts = externalPosts && externalPosts.length > 0 ? externalPosts : getStoredPosts();
+  const allPosts = (externalPosts && externalPosts.length > 0 ? externalPosts : getStoredPosts()).filter(isPostPublished);
 
   const filteredPosts = allPosts.filter((post) => {
     const localized = getLocalizedPost(post, language);

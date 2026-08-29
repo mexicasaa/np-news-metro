@@ -338,6 +338,7 @@ export default async function handler(req, res) {
             categories (slug, name)
           `)
           .eq('slug', cleanSlug)
+          .eq('status', 'published')
           .maybeSingle();
 
         // Fallback: If not found with decoded slug, try rawSlugParam or lowercase
@@ -363,6 +364,7 @@ export default async function handler(req, res) {
               categories (slug, name)
             `)
             .eq('slug', rawSlugParam)
+            .eq('status', 'published')
             .maybeSingle();
           if (rawData) data = rawData;
         }

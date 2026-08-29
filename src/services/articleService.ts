@@ -5,6 +5,7 @@ import { mockPosts as defaultMockPosts } from '../data/mockWpData';
 import { ensureAuthenticatedSession } from './authService';
 import { slugifyText } from '../utils/slugify';
 import { getAuthorAvatarUrl, DEFAULT_AUTHOR_AVATAR } from '../utils/imageFallback';
+import { isPostPublished } from '../utils/newsStorage';
 
 // Category mapping helper
 const CATEGORY_SLUG_TO_ID: Record<string, string> = {
@@ -182,25 +183,30 @@ export const getPublishedArticles = async (): Promise<WpPost[]> => {
     }
 
     if (!data || data.length === 0) {
-      return defaultMockPosts;
+      return defaultMockPosts.filter(isPostPublished);
     }
 
-    const livePosts = data.map(row => mapDbToWpPost(row));
+    const livePosts = data.map(row => mapDbToWpPost(row)).filter(isPostPublished);
     
     // Merge live posts with missing mock posts only to preserve category sample breadth if few articles exist
     const liveSlugs = new Set(livePosts.map(p => p.slug));
-    const supplementalMock = defaultMockPosts.filter(m => !liveSlugs.has(m.slug));
+    const supplementalMock = defaultMockPosts
+      .filter(isPostPublished)
+      .filter(m => !liveSlugs.has(m.slug));
     
     return [...livePosts, ...supplementalMock];
   } catch (err) {
     console.error('Unexpected error fetching published articles:', err);
-    return defaultMockPosts;
+    return defaultMockPosts.filter(isPostPublished);
   }
 };
 
-export const getArticleBySlug = async (slug: string): Promise<WpPost | null> => {
+export const getArticleBySlug = async (
+  slug: string, 
+  allowDraft: boolean = false
+): Promise<WpPost | null> => {
   try {
-    const { data, error } = await supabase
+    let query = supabase
       .from('articles')
       .select(`
         *,
@@ -209,18 +215,34 @@ export const getArticleBySlug = async (slug: string): Promise<WpPost | null> => 
           tags (id, name, slug)
         )
       `)
-      .eq('slug', slug)
-      .single();
+      .eq('slug', slug);
+
+    // If not in allowDraft mode (e.g. public website visitor), strictly enforce published status
+    if (!allowDraft) {
+      query = query.eq('status', 'published');
+    }
+
+    const { data, error } = await query.maybeSingle();
 
     if (error || !data) {
       const mock = defaultMockPosts.find(p => p.slug === slug);
-      return mock || null;
+      if (mock && (allowDraft || isPostPublished(mock))) {
+        return mock;
+      }
+      return null;
     }
 
-    return mapDbToWpPost(data);
+    const mapped = mapDbToWpPost(data);
+    if (!allowDraft && !isPostPublished(mapped)) {
+      return null;
+    }
+    return mapped;
   } catch (err) {
     const mock = defaultMockPosts.find(p => p.slug === slug);
-    return mock || null;
+    if (mock && (allowDraft || isPostPublished(mock))) {
+      return mock;
+    }
+    return null;
   }
 };
 
@@ -426,11 +448,15 @@ export const saveArticle = async (
       } catch (revErr) {}
     }
 
-    // Broadcast across tabs/windows for instant live sync
+    // Broadcast across tabs/windows for instant sync
     try {
       if (typeof BroadcastChannel !== 'undefined') {
         const channel = new BroadcastChannel('np_news_feed_channel');
-        channel.postMessage({ type: 'NEWS_PUBLISHED', articleId: resultArticle.id });
+        if (targetStatus === 'published') {
+          channel.postMessage({ type: 'NEWS_PUBLISHED', articleId: resultArticle.id });
+        } else {
+          channel.postMessage({ type: 'ARTICLE_DRAFT_SAVED', articleId: resultArticle.id });
+        }
         channel.close();
       }
 

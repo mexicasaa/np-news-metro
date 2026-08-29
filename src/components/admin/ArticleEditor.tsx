@@ -14,10 +14,9 @@ import { ImageEditorModal } from './ImageEditorModal';
 import { AvatarCropModal } from './AvatarCropModal';
 import { compressImageFile, compressAvatarFile } from '../../utils/imageCompressor';
 import { uploadArticleImage } from '../../services/mediaService';
-import { generateUniqueSlug } from '../../services/articleService';
 import { slugifyText } from '../../utils/slugify';
 import { getAuthorAvatarUrl, DEFAULT_AUTHOR_AVATAR, handleAvatarError } from '../../utils/imageFallback';
-import { saveAutoSaveSession, clearAutoSaveSession, savePublishedPost, setRefreshSession } from '../../utils/newsStorage';
+import { saveAutoSaveSession, clearAutoSaveSession, saveDraftPost, setRefreshSession } from '../../utils/newsStorage';
 
 export interface EditorBlock {
   id: string;
@@ -517,9 +516,9 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
 
     const postData = getPostData();
 
-    // 1. Immediately write to published posts cache for drafts tab visibility
+    // 1. Immediately write to isolated draft storage for safe persistence without publishing
     try {
-      savePublishedPost(postData as WpPost);
+      saveDraftPost(postData as WpPost);
     } catch (e) {}
 
     // 2. Persist to database/parent
@@ -666,7 +665,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
             isEdit: isEditMode || Boolean(initialPost?.id),
             refreshedAt: Date.now(),
           });
-          savePublishedPost(postData as WpPost);
+          saveDraftPost(postData as WpPost);
         } catch (err) {}
         onSaveDraft(postData, { silent: true });
       }
@@ -676,7 +675,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       if (isDirty()) {
         const postData = getPostData();
         try {
-          savePublishedPost(postData as WpPost);
+          saveDraftPost(postData as WpPost);
         } catch (err) {}
         onSaveDraft(postData, { silent: true });
       }

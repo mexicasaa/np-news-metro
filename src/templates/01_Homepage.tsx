@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import { WpPost, WpVideo } from '../types/wordpress';
 import { mockVideos, mockAuthors } from '../data/mockWpData';
-import { getStoredPosts } from '../utils/newsStorage';
+import { getStoredPosts, isPostPublished } from '../utils/newsStorage';
 import { HeroStory } from '../components/cards/HeroStory';
 import { LargeStoryCard } from '../components/cards/LargeStoryCard';
 import { MediumStoryCard } from '../components/cards/MediumStoryCard';
@@ -45,7 +45,7 @@ export const Homepage: React.FC<HomepageProps> = ({
   showAds = false,
 }) => {
   const { t, isHindi } = useLanguage();
-  const allPosts = externalPosts && externalPosts.length > 0 ? externalPosts : getStoredPosts();
+  const allPosts = (externalPosts && externalPosts.length > 0 ? externalPosts : getStoredPosts()).filter(isPostPublished);
   const activeVideos = externalVideos && externalVideos.length > 0 ? externalVideos : mockVideos;
   
   // Sort all posts by publishedAt (latest news first)

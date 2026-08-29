@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Filter, Flame, ChevronRight, Newspaper, ArrowRight } from 'lucide-react';
 import { WpCategory, WpPost } from '../types/wordpress';
 import { mockCategories } from '../data/mockWpData';
-import { getStoredPosts } from '../utils/newsStorage';
+import { getStoredPosts, isPostPublished } from '../utils/newsStorage';
 import { HeroStory } from '../components/cards/HeroStory';
 import { LargeStoryCard } from '../components/cards/LargeStoryCard';
 import { MediumStoryCard } from '../components/cards/MediumStoryCard';
@@ -38,7 +38,7 @@ export const CategoryTemplate: React.FC<CategoryTemplateProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const { t, isHindi } = useLanguage();
 
-  const allPosts = externalPosts && externalPosts.length > 0 ? externalPosts : getStoredPosts();
+  const allPosts = (externalPosts && externalPosts.length > 0 ? externalPosts : getStoredPosts()).filter(isPostPublished);
   const foundCategory = mockCategories.find((c) => c.slug === categorySlug);
   const categoryName = isHindi && foundCategory?.nameHi ? foundCategory.nameHi : (foundCategory?.name || (categorySlug.charAt(0).toUpperCase() + categorySlug.slice(1)));
 

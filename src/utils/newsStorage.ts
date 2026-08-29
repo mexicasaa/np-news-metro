@@ -9,22 +9,60 @@ const BROADCAST_CHANNEL_NAME = 'np_news_feed_channel';
  * Mirrors published articles for instant cross-tab updates and offline resilient cache.
  */
 
+/**
+ * Strict validator to check if an article is officially published.
+ * Drafts, articles in writing mode, in-review, approved, scheduled, or archived articles
+ * return FALSE and must NEVER be displayed on the live website.
+ */
+export const isPostPublished = (post: Partial<WpPost> | null | undefined): boolean => {
+  if (!post) return false;
+
+  // 1. If slug indicates draft
+  if (post.slug === 'auto-draft' || post.slug?.startsWith('auto-draft') || post.slug === 'draft') {
+    return false;
+  }
+
+  const rawStatus = (post.status || '').toLowerCase().trim();
+  const rawEditorialStatus = (post.editorialStatus || '').toLowerCase().trim();
+
+  // 2. Explicitly unpublished statuses
+  const unpublishedStatuses = ['draft', 'review', 'approved', 'scheduled', 'archived', 'failed'];
+  if (unpublishedStatuses.includes(rawStatus) || unpublishedStatuses.includes(rawEditorialStatus)) {
+    return false;
+  }
+
+  // 3. Explicitly published statuses
+  const publishedStatuses = ['published', 'updated', 'corrected'];
+  if (publishedStatuses.includes(rawStatus) || publishedStatuses.includes(rawEditorialStatus)) {
+    return true;
+  }
+
+  // 4. Fallback for static mock posts where status might be omitted
+  if (!rawStatus && !rawEditorialStatus && post.publishedAt) {
+    return true;
+  }
+
+  return false;
+};
+
 export const getStoredPosts = (): WpPost[] => {
-  if (typeof window === 'undefined') return defaultMockPosts;
+  if (typeof window === 'undefined') return defaultMockPosts.filter(isPostPublished);
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultMockPosts));
-      return defaultMockPosts;
+      const initial = defaultMockPosts.filter(isPostPublished);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
+      return initial;
     }
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed) && parsed.length > 0) {
-      return parsed;
+      // Strictly enforce that only published posts are returned
+      return parsed.filter(isPostPublished);
     }
-    return defaultMockPosts;
+    return defaultMockPosts.filter(isPostPublished);
   } catch (err) {
     console.error('Error reading stored posts from localStorage:', err);
-    return defaultMockPosts;
+    return defaultMockPosts.filter(isPostPublished);
   }
 };
 
@@ -96,62 +134,105 @@ export const popRefreshSession = (): RefreshSession | null => {
   }
 };
 
+const DRAFT_STORAGE_KEY = 'np_news_editorial_drafts';
+
+export const getStoredDraftPosts = (): WpPost[] => {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(DRAFT_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (e) {
+    return [];
+  }
+};
+
+export const saveDraftPost = (post: WpPost): void => {
+  if (typeof window === 'undefined') return;
+  try {
+    const drafts = getStoredDraftPosts();
+    const idx = drafts.findIndex(p => p.id === post.id || (p.slug && post.slug && p.slug === post.slug));
+    const draftPost: WpPost = {
+      ...post,
+      editorialStatus: 'draft',
+      status: 'draft',
+      updatedAt: new Date().toISOString(),
+    };
+    let updatedDrafts: WpPost[];
+    if (idx >= 0) {
+      updatedDrafts = [...drafts];
+      updatedDrafts[idx] = draftPost;
+    } else {
+      updatedDrafts = [draftPost, ...drafts];
+    }
+    localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(updatedDrafts.slice(0, 50)));
+  } catch (e) {}
+};
+
+export const removeStoredDraft = (postId: string): void => {
+  if (typeof window === 'undefined') return;
+  try {
+    const drafts = getStoredDraftPosts().filter(p => p.id !== postId && p.slug !== postId);
+    localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(drafts));
+  } catch (e) {}
+};
+
 export const savePublishedPost = (post: WpPost): WpPost[] => {
-  if (typeof window === 'undefined') return [post, ...defaultMockPosts];
+  if (typeof window === 'undefined') return [post, ...defaultMockPosts].filter(isPostPublished);
   try {
     const currentPosts = getStoredPosts();
+    const isPublished = isPostPublished(post);
+
+    // If the post is NOT published (draft, in-review, etc.), DO NOT put it into published posts!
+    // If it already existed in published storage, remove it (e.g. unpublishing or reverting to draft)
+    if (!isPublished) {
+      const filtered = currentPosts.filter(
+        p => p.id !== post.id && (!post.slug || p.slug !== post.slug)
+      );
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+      // Save to drafts cache instead
+      saveDraftPost(post);
+      return filtered;
+    }
+
+    // Since it is officially published, ensure it's removed from local drafts
+    removeStoredDraft(post.id);
+    if (post.slug) removeStoredDraft(post.slug);
+
     const existingIndex = currentPosts.findIndex(
       p => p.id === post.id || (p.slug && post.slug && p.slug === post.slug)
     );
 
-    const isDraft = post.editorialStatus === 'draft' || (post as any).status === 'draft';
-
     let updated: WpPost[];
-    if (isDraft) {
-      // Drafts should preserve their own state without hijacking homepage lead
-      if (existingIndex >= 0) {
-        const existing = currentPosts[existingIndex];
-        const mergedDraft: WpPost = {
-          ...existing,
-          ...post,
-          updatedAt: new Date().toISOString(),
-        };
-        updated = [...currentPosts];
-        updated[existingIndex] = mergedDraft;
-      } else {
-        const enrichedDraft: WpPost = {
-          ...post,
-          isLead: false,
-          isFeatured: false,
-          publishedAt: post.publishedAt || new Date().toISOString(),
-          viewsCount: post.viewsCount || 0,
-        };
-        updated = [enrichedDraft, ...currentPosts];
-      }
-    } else if (existingIndex >= 0) {
+    if (existingIndex >= 0) {
       const existing = currentPosts[existingIndex];
       const mergedPost: WpPost = {
         ...existing,
         ...post,
-        isLead: true,
-        isFeatured: true,
+        editorialStatus: 'published',
+        status: 'published',
+        isLead: post.isLead !== undefined ? post.isLead : existing.isLead,
+        isFeatured: post.isFeatured !== undefined ? post.isFeatured : existing.isFeatured,
         updatedAt: new Date().toISOString(),
       };
       updated = [
         mergedPost,
-        ...currentPosts.filter((_, idx) => idx !== existingIndex).map(p => ({ ...p, isLead: false }))
+        ...currentPosts.filter((_, idx) => idx !== existingIndex)
       ];
     } else {
       const enrichedPost: WpPost = {
         ...post,
-        isLead: true,
-        isFeatured: true,
+        editorialStatus: 'published',
+        status: 'published',
+        isLead: post.isLead !== undefined ? post.isLead : true,
+        isFeatured: post.isFeatured !== undefined ? post.isFeatured : true,
         publishedAt: post.publishedAt || new Date().toISOString(),
         viewsCount: post.viewsCount || 140,
       };
       updated = [
         enrichedPost,
-        ...currentPosts.map(p => ({ ...p, isLead: false }))
+        ...currentPosts
       ];
     }
 
@@ -176,7 +257,7 @@ export const savePublishedPost = (post: WpPost): WpPost[] => {
     return updated;
   } catch (err) {
     console.error('Error saving post to cache:', err);
-    return [post, ...defaultMockPosts];
+    return [post, ...defaultMockPosts].filter(isPostPublished);
   }
 };
 

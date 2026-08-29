@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Flame, TrendingUp, Calendar, Share2, Eye, Award } from 'lucide-react';
 import { WpPost } from '../types/wordpress';
 import { getLocalizedPost } from '../data/mockWpData';
-import { getStoredPosts } from '../utils/newsStorage';
+import { getStoredPosts, isPostPublished } from '../utils/newsStorage';
 import { RankingItem } from '../components/cards/RankingItem';
 import { LargeStoryCard } from '../components/cards/LargeStoryCard';
 import { AdSlot } from '../components/commercial/AdSlot';
@@ -27,7 +27,7 @@ export const TrendingTemplate: React.FC<TrendingTemplateProps> = ({
   const [timeframe, setTimeframe] = useState<'today' | 'week' | 'shared'>('today');
   const { language, t, isHindi } = useLanguage();
 
-  const allPosts = externalPosts && externalPosts.length > 0 ? externalPosts : getStoredPosts();
+  const allPosts = (externalPosts && externalPosts.length > 0 ? externalPosts : getStoredPosts()).filter(isPostPublished);
 
   // Sorted list for top 10
   const sortedPosts = [...allPosts].sort((a, b) => {

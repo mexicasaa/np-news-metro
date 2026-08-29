@@ -16,7 +16,7 @@ import { AdminLoginModal } from './components/admin/AdminLoginModal';
 
 import { WpPost, WpVideo, WpGallery } from './types/wordpress';
 import { mockPosts as initialMockPosts, mockVideos, mockGalleries } from './data/mockWpData';
-import { getStoredPosts, savePublishedPost, popRefreshSession, clearAutoSaveSession, getStoredVideos } from './utils/newsStorage';
+import { getStoredPosts, savePublishedPost, popRefreshSession, clearAutoSaveSession, getStoredVideos, isPostPublished } from './utils/newsStorage';
 import { getPublishedArticles, getEditorialArticles, getArticleBySlug, saveArticle, deleteArticle, getDeletedArticles, restoreDeletedArticle, permanentDeleteArticle, DeletedArticle } from './services/articleService';
 import { getCurrentUserProfile, ensureAuthenticatedSession, signOut as authSignOut } from './services/authService';
 import { getVideos } from './services/taxonomyService';
@@ -341,7 +341,23 @@ const parseUrlRoute = (currentPosts: WpPost[], currentVideos: WpVideo[], isIniti
   const allPosts = [...currentPosts, ...initialMockPosts];
   const foundPost = allPosts.find(p => p.slug?.toLowerCase() === candidateSlug.toLowerCase() || p.id === candidateSlug);
 
+  const isAuthAdmin = typeof window !== 'undefined' && (localStorage.getItem('np_news_admin_auth') === 'true' || sessionStorage.getItem('np_news_admin_auth') === 'true');
+  const isPreviewMode = typeof window !== 'undefined' && (window.location.search.includes('preview=true') || window.location.hash.includes('preview'));
+
   if (foundPost) {
+    // If not published AND neither admin nor preview mode, do NOT show the draft on live website!
+    if (!isPostPublished(foundPost) && !isAuthAdmin && !isPreviewMode) {
+      return {
+        viewMode: 'public',
+        template: 'not-found',
+        category: 'india',
+        authorId: 'author-1',
+        staticPage: 'about',
+        searchQuery: '',
+        isAdminLoginModalOpen: false,
+      };
+    }
+
     const tpl = foundPost.isBreaking ? 'article-breaking' : (foundPost.isOpinion ? 'article-opinion' : 'article-standard');
     return {
       viewMode: 'public',
@@ -390,10 +406,14 @@ function AppContent() {
     );
   });
 
-  // Reactive Posts State (Seeded from localStorage and synced with Supabase backend)
   const [posts, setPosts] = useState<WpPost[]>(getStoredPosts);
   const [videos, setVideos] = useState<WpVideo[]>(getStoredVideos);
   const [isYouTubeModalOpen, setIsYouTubeModalOpen] = useState(false);
+
+  // Strictly published posts feed for all public reader templates & live feeds
+  const publishedPosts = React.useMemo(() => {
+    return posts.filter(isPostPublished);
+  }, [posts]);
 
   // Compute Initial Route from URL (with isInitialLoad = true to show instant skeleton rather than 404)
   const initialRoute = React.useMemo(() => parseUrlRoute(posts, videos, true), []);
@@ -445,8 +465,12 @@ function AppContent() {
     }
 
     if (candidateSlug) {
-      getArticleBySlug(candidateSlug).then((directPost) => {
-        if (directPost) {
+      const isAuthAdmin = typeof window !== 'undefined' && (localStorage.getItem('np_news_admin_auth') === 'true' || sessionStorage.getItem('np_news_admin_auth') === 'true');
+      const isPreviewMode = typeof window !== 'undefined' && (window.location.search.includes('preview=true') || window.location.hash.includes('preview'));
+      const allowDraft = isAuthAdmin || isPreviewMode;
+
+      getArticleBySlug(candidateSlug, allowDraft).then((directPost) => {
+        if (directPost && (allowDraft || isPostPublished(directPost))) {
           setSelectedPost(directPost);
           const tpl = directPost.isBreaking ? 'article-breaking' : (directPost.isOpinion ? 'article-opinion' : 'article-standard');
           setCurrentTemplate(tpl);
@@ -564,10 +588,16 @@ function AppContent() {
       if (typeof BroadcastChannel !== 'undefined') {
         feedChannel = new BroadcastChannel('np_news_feed_channel');
         feedChannel.onmessage = async (event) => {
-          if (event.data?.type === 'NEWS_PUBLISHED' || event.data?.type === 'ARTICLE_DRAFT_SAVED') {
+          if (event.data?.type === 'NEWS_PUBLISHED') {
             const isAdmin = viewMode === 'admin' || isAdminAuthenticated || window.location.pathname.includes('/admin');
             const fresh = isAdmin ? await getEditorialArticles('all') : await getPublishedArticles();
             setPosts(fresh);
+          } else if (event.data?.type === 'ARTICLE_DRAFT_SAVED') {
+            const isAdmin = viewMode === 'admin' || isAdminAuthenticated || window.location.pathname.includes('/admin');
+            if (isAdmin) {
+              const fresh = await getEditorialArticles('all');
+              setPosts(fresh);
+            }
           } else if (event.data?.type === 'VIDEOS_UPDATED') {
             const freshVideos = await getPublishedVideos();
             setVideos(freshVideos);
@@ -1522,7 +1552,7 @@ function AppContent() {
               onOpenVideos={() => setAdminSection('videos')}
               videoCount={videos.length}
               userRole={currentUserRole}
-              publishedCount={posts.length}
+              publishedCount={publishedPosts.length}
               breakingCount={posts.filter(p => p.isBreaking).length}
             />
           )}
@@ -1599,7 +1629,6 @@ function AppContent() {
                 const { post, error } = await saveArticle({ ...fullPost, isEdit: isEditingExisting }, 'draft');
                 const finalDraftPost = post || { ...fullPost, editorialStatus: 'draft' as EditorialStatus, status: 'draft' };
 
-                savePublishedPost(finalDraftPost);
                 setActiveEditingPost(finalDraftPost);
 
                 setPosts(prev => {
@@ -1792,7 +1821,7 @@ function AppContent() {
 
           {/* GLOBAL SHELL 5: Breaking News Bar */}
           <BreakingNewsBar
-            breakingPosts={posts.filter((p) => p.isBreaking || p.isLead)}
+            breakingPosts={publishedPosts.filter((p) => p.isBreaking || p.isLead)}
             onSelectPost={handleSelectPost}
             isEmergencyMode={isEmergencyBreaking}
           />
@@ -1818,7 +1847,7 @@ function AppContent() {
             <>
               {currentTemplate === 'homepage' && (
                 <Homepage
-                  posts={posts}
+                  posts={publishedPosts}
                   videos={videos}
                   onSelectPost={handleSelectPost}
                   onSelectVideo={handleSelectVideo}
@@ -1833,7 +1862,7 @@ function AppContent() {
 
               {currentTemplate === 'latest' && (
                 <LatestNewsTemplate
-                  posts={posts}
+                  posts={publishedPosts}
                   onSelectPost={handleSelectPost}
                   onNavigateHome={handleNavigateHome}
                   onNavigateTrending={handleNavigateTrending}
@@ -1843,7 +1872,7 @@ function AppContent() {
 
               {currentTemplate === 'category' && (
                 <CategoryTemplate
-                  posts={posts}
+                  posts={publishedPosts}
                   categorySlug={selectedCategory}
                   onSelectPost={handleSelectPost}
                   onNavigateHome={handleNavigateHome}
@@ -1917,7 +1946,7 @@ function AppContent() {
 
               {currentTemplate === 'search' && (
                 <SearchResultsTemplate
-                  posts={posts}
+                  posts={publishedPosts}
                   initialQuery={searchQuery}
                   onSelectPost={handleSelectPost}
                   onNavigateHome={handleNavigateHome}
@@ -1936,7 +1965,7 @@ function AppContent() {
 
               {currentTemplate === 'trending' && (
                 <TrendingTemplate
-                  posts={posts}
+                  posts={publishedPosts}
                   onSelectPost={handleSelectPost}
                   onNavigateHome={handleNavigateHome}
                   onSelectCategory={handleSelectCategory}
@@ -2004,7 +2033,7 @@ function AppContent() {
 
           {/* Search Modal */}
           <SearchModal
-            posts={posts}
+            posts={publishedPosts}
             isOpen={searchOpen}
             onClose={() => setSearchOpen(false)}
             onSelectPost={handleSelectPost}

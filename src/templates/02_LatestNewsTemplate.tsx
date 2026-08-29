@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Clock, Filter, Radio, Calendar, Flame, ArrowUpDown, ChevronRight } from 'lucide-react';
 import { WpPost } from '../types/wordpress';
 import { mockCategories } from '../data/mockWpData';
-import { getStoredPosts } from '../utils/newsStorage';
+import { getStoredPosts, isPostPublished } from '../utils/newsStorage';
 import { LatestNewsRow } from '../components/cards/LatestNewsRow';
 import { LargeStoryCard } from '../components/cards/LargeStoryCard';
 import { RankingItem } from '../components/cards/RankingItem';
@@ -31,7 +31,7 @@ export const LatestNewsTemplate: React.FC<LatestNewsTemplateProps> = ({
   const { t, isHindi } = useLanguage();
 
   const itemsPerPage = 10;
-  const allPosts = externalPosts && externalPosts.length > 0 ? externalPosts : getStoredPosts();
+  const allPosts = (externalPosts && externalPosts.length > 0 ? externalPosts : getStoredPosts()).filter(isPostPublished);
   
   // Sort all posts chronologically
   const sortedPosts = [...allPosts].sort((a, b) => {

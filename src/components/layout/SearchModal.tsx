@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Search, X, Calendar, User, Tag, ArrowRight, Sparkles } from 'lucide-react';
 import { WpPost } from '../../types/wordpress';
 import { mockAuthors, mockCategories, getLocalizedPost } from '../../data/mockWpData';
-import { getStoredPosts } from '../../utils/newsStorage';
+import { getStoredPosts, isPostPublished } from '../../utils/newsStorage';
 import { useLanguage } from '../../context/LanguageContext';
 
 interface SearchModalProps {
@@ -36,7 +36,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
 
   if (!isOpen) return null;
 
-  const allPosts = externalPosts && externalPosts.length > 0 ? externalPosts : getStoredPosts();
+  const allPosts = (externalPosts && externalPosts.length > 0 ? externalPosts : getStoredPosts()).filter(isPostPublished);
 
   const filteredPosts = allPosts.filter((post) => {
     const localized = getLocalizedPost(post, language);
