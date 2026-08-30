@@ -2,6 +2,17 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
   <url>
+    <loc>https://www.npnewsmetro.com/politics/mana-kee-baata-raashtra-nirmaana-men-bhaageedaaree-ke-lie-karatee</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-30T15:04:36.576Z</news:publication_date>
+      <news:title>मन की बात राष्ट्र निर्माण में भागीदारी के लिए करती है प्रेरित : मुख्यमंत्री धामी</news:title>
+    </news:news>
+  </url>
+  <url>
     <loc>https://www.npnewsmetro.com/politics/story-10</loc>
     <news:news>
       <news:publication>

@@ -16,6 +16,8 @@ export interface UserProfile {
   role: UserRole;
   avatar: string;
   department: string;
+  designation?: string;
+  bio?: string;
 }
 
 export interface RolePermission {

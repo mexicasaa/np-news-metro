@@ -17,6 +17,7 @@ import { uploadArticleImage } from '../../services/mediaService';
 import { slugifyText } from '../../utils/slugify';
 import { getAuthorAvatarUrl, DEFAULT_AUTHOR_AVATAR, handleAvatarError } from '../../utils/imageFallback';
 import { saveAutoSaveSession, clearAutoSaveSession, saveDraftPost, setRefreshSession, isPostPublished } from '../../utils/newsStorage';
+import { getNewsroomAuthors } from '../../services/authService';
 
 export interface EditorBlock {
   id: string;
@@ -68,13 +69,13 @@ const ARTICLE_TYPES = [
   'Live Blog Dispatch'
 ];
 
-const AUTHORS_LIST = [
-  { id: 'author-1', name: 'नीरज पाण्डेय', role: 'वरिष्ठ संवाददाता', avatar: '/uploads/neeraj-pandey.jpg' },
-  { id: 'author-2', name: 'डॉ. दीपक गोस्वामी', role: 'मानवीय व्यवहार वैज्ञानिक व लेखक', avatar: '/uploads/dr-deepak-goswami.jpg' },
-  { id: 'author-3', name: 'Siddharth Varma', role: 'Senior National Affairs Editor', avatar: DEFAULT_AUTHOR_AVATAR },
-  { id: 'author-4', name: 'Ananya Deshmukh', role: 'Chief Economics Correspondent', avatar: DEFAULT_AUTHOR_AVATAR },
-  { id: 'author-5', name: 'Rohan Sen', role: 'Technology & Geopolitics Lead', avatar: DEFAULT_AUTHOR_AVATAR },
-  { id: 'author-desk', name: 'NP News Metro Desk', role: 'Editorial Staff Dispatch', avatar: DEFAULT_AUTHOR_AVATAR },
+const DEFAULT_AUTHORS_LIST = [
+  { id: 'author-1', name: 'नीरज पाण्डेय', role: 'वरिष्ठ संवाददाता', designation: 'वरिष्ठ संवाददाता', avatar: '/uploads/neeraj-pandey.jpg', email: 'neeraj.pandey@npnewsmetro.com' },
+  { id: 'author-2', name: 'डॉ. दीपक गोस्वामी', role: 'मानवीय व्यवहार वैज्ञानिक व लेखक', designation: 'मानवीय व्यवहार वैज्ञानिक व लेखक', avatar: '/uploads/dr-deepak-goswami.jpg', email: 'deepak.goswami@npnewsmetro.com' },
+  { id: 'author-3', name: 'Siddharth Varma', role: 'Senior National Affairs Editor', designation: 'Senior Political Editor', avatar: DEFAULT_AUTHOR_AVATAR, email: 'siddharth.admin@npnewsmetro.com' },
+  { id: 'author-4', name: 'Ananya Deshmukh', role: 'Chief Economics Correspondent', designation: 'Chief Copy Editor', avatar: DEFAULT_AUTHOR_AVATAR, email: 'ananya.copy@npnewsmetro.com' },
+  { id: 'author-5', name: 'Rohan Sen', role: 'Technology & Geopolitics Lead', designation: 'National Policy Correspondent', avatar: DEFAULT_AUTHOR_AVATAR, email: 'rohan.tech@npnewsmetro.com' },
+  { id: 'author-desk', name: 'NP News Metro Desk', role: 'Editorial Staff Dispatch', designation: 'Editorial Staff Dispatch', avatar: DEFAULT_AUTHOR_AVATAR, email: 'desk@npnewsmetro.com' },
 ];
 
 export const ArticleEditor: React.FC<ArticleEditorProps> = ({
@@ -134,6 +135,69 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
   const [customAuthorAvatar, setCustomAuthorAvatar] = useState<string>(
     initialPost?.customAuthor?.avatar || ''
   );
+
+  const [authorsList, setAuthorsList] = useState<Array<{
+    id: string;
+    name: string;
+    role: string;
+    designation?: string;
+    avatar: string;
+    email?: string;
+    bio?: string;
+  }>>(DEFAULT_AUTHORS_LIST);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchAuthors = async () => {
+      try {
+        const list = await getNewsroomAuthors();
+        if (isMounted && list && list.length > 0) {
+          const combined: Array<{
+            id: string;
+            name: string;
+            role: string;
+            designation?: string;
+            avatar: string;
+            email?: string;
+            bio?: string;
+          }> = [...list];
+          DEFAULT_AUTHORS_LIST.forEach(def => {
+            if (!combined.some(c => c.name.trim().toLowerCase() === def.name.trim().toLowerCase() || c.id === def.id)) {
+              combined.push(def);
+            }
+          });
+          setAuthorsList(combined);
+        }
+      } catch (err) {
+        console.warn('Could not fetch newsroom authors, using fallback list:', err);
+      }
+    };
+
+    fetchAuthors();
+
+    const handleUpdated = () => {
+      fetchAuthors();
+    };
+
+    window.addEventListener('NEWSROOM_USERS_UPDATED', handleUpdated);
+    let channel: BroadcastChannel | null = null;
+    try {
+      if (typeof BroadcastChannel !== 'undefined') {
+        channel = new BroadcastChannel('np_news_users_channel');
+        channel.onmessage = (msg) => {
+          if (msg?.data?.type === 'USERS_UPDATED') {
+            fetchAuthors();
+          }
+        };
+      }
+    } catch (e) {}
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener('NEWSROOM_USERS_UPDATED', handleUpdated);
+      channel?.close();
+    };
+  }, []);
 
   const [status, setStatus] = useState<EditorialStatus>(
     initialPost?.editorialStatus || (initialPost as any)?.status || 'draft'
@@ -479,8 +543,8 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
           : (customAuthorName.trim() || selectedAuthor.name),
         role: authorType === 'external' && customAuthorRole.trim() 
           ? customAuthorRole.trim() 
-          : (customAuthorRole.trim() && customAuthorRole !== 'Guest Contributor' ? customAuthorRole.trim() : selectedAuthor.role),
-        avatar: getAuthorAvatarUrl(customAuthorAvatar || selectedAuthor.avatar),
+          : (customAuthorRole.trim() && customAuthorRole !== 'Guest Contributor' ? customAuthorRole.trim() : (selectedAuthor.designation || selectedAuthor.role)),
+        avatar: getAuthorAvatarUrl(authorType === 'external' ? (customAuthorAvatar || selectedAuthor.avatar) : selectedAuthor.avatar),
         bio: (selectedAuthor as any)?.bio || '',
         isGuest: authorType === 'external',
       },
@@ -733,7 +797,11 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     window.open(previewUrl, '_blank');
   };
 
-  const selectedAuthor = AUTHORS_LIST.find(a => a.id === authorId) || AUTHORS_LIST[0];
+  const selectedAuthor = authorsList.find(a => 
+    a.id === authorId || 
+    a.name === authorId ||
+    (initialPost?.customAuthor?.name && a.name.trim().toLowerCase() === initialPost.customAuthor.name.trim().toLowerCase())
+  ) || authorsList[0] || DEFAULT_AUTHORS_LIST[0];
 
   // Dynamic SEO Checklist
   const seoChecklist = [
@@ -1399,13 +1467,20 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                   {authorType === 'staff' ? (
                     <div className="space-y-3">
                       <div className="flex items-center gap-3 p-2.5 bg-slate-50 rounded-xl border border-slate-200">
-                        <img src={selectedAuthor.avatar} alt={selectedAuthor.name} className="w-10 h-10 rounded-full object-cover border border-slate-200 shrink-0" />
+                        <img 
+                          src={getAuthorAvatarUrl(selectedAuthor.avatar)} 
+                          alt={selectedAuthor.name} 
+                          className="w-10 h-10 rounded-full object-cover border border-slate-200 shrink-0" 
+                          onError={handleAvatarError}
+                        />
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5">
                             <span className="font-bold text-xs text-slate-900 truncate">{selectedAuthor.name}</span>
                             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                           </div>
-                          <p className="text-[11px] text-slate-500 truncate">{selectedAuthor.role}</p>
+                          <p className="text-[11px] text-slate-500 truncate">
+                            {selectedAuthor.designation || selectedAuthor.role}
+                          </p>
                         </div>
                       </div>
 
@@ -1416,9 +1491,9 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                           onChange={(e) => setAuthorId(e.target.value)}
                           className="w-full text-xs bg-white border border-slate-300 rounded-lg p-2 text-slate-800 font-medium focus:border-blue-500 focus:outline-hidden"
                         >
-                          {AUTHORS_LIST.map((author) => (
+                          {authorsList.map((author) => (
                             <option key={author.id} value={author.id}>
-                              {author.name} — ({author.role})
+                              {author.name} — ({author.designation || author.role})
                             </option>
                           ))}
                         </select>

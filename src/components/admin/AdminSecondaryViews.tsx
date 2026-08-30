@@ -15,6 +15,7 @@ import {
   getProfilesList, 
   createNewsroomUser, 
   updateNewsroomUserRole, 
+  updateNewsroomUserProfile,
   deleteNewsroomUser 
 } from '../../services/authService';
 
@@ -493,15 +494,19 @@ export const UsersView: React.FC = () => {
     email: string;
     role: UserRole;
     department: string;
+    designation: string;
     password: string;
     avatar: string;
+    bio: string;
   }>({
     name: '',
     email: '',
     role: 'reporter',
     department: 'National Bureau',
+    designation: 'वरिष्ठ संवाददाता',
     password: 'Newsroom@2026',
     avatar: AVATAR_PRESETS[0],
+    bio: '',
   });
   const [isSubmittingAdd, setIsSubmittingAdd] = useState(false);
   const [addError, setAddError] = useState<string | null>(null);
@@ -512,10 +517,16 @@ export const UsersView: React.FC = () => {
     name: string;
     role: UserRole;
     department: string;
+    designation: string;
+    avatar: string;
+    bio: string;
   }>({
     name: '',
     role: 'author',
     department: 'Editorial Bureau',
+    designation: '',
+    avatar: AVATAR_PRESETS[0],
+    bio: '',
   });
   const [isSubmittingEdit, setIsSubmittingEdit] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
@@ -595,8 +606,10 @@ export const UsersView: React.FC = () => {
         email: addForm.email.trim().toLowerCase(),
         role: addForm.role,
         department: addForm.department.trim(),
+        designation: addForm.designation.trim() || 'संवाददाता',
         password: addForm.password.trim() || 'Newsroom@2026',
         avatar: addForm.avatar,
+        bio: addForm.bio.trim(),
       });
 
       if (res.error) {
@@ -609,8 +622,10 @@ export const UsersView: React.FC = () => {
           email: '',
           role: 'reporter',
           department: 'National Bureau',
+          designation: 'वरिष्ठ संवाददाता',
           password: 'Newsroom@2026',
           avatar: AVATAR_PRESETS[Math.floor(Math.random() * AVATAR_PRESETS.length)],
+          bio: '',
         });
         await fetchUsers();
       }
@@ -628,6 +643,9 @@ export const UsersView: React.FC = () => {
       name: user.name,
       role: user.role,
       department: user.department,
+      designation: user.designation || '',
+      avatar: user.avatar || AVATAR_PRESETS[0],
+      bio: user.bio || '',
     });
     setEditError(null);
   };
@@ -644,12 +662,15 @@ export const UsersView: React.FC = () => {
 
     setIsSubmittingEdit(true);
     try {
-      const res = await updateNewsroomUserRole(
-        editingUser.id,
-        editForm.role,
-        editForm.department,
-        editForm.name.trim()
-      );
+      const res = await updateNewsroomUserProfile({
+        userId: editingUser.id,
+        name: editForm.name.trim(),
+        role: editForm.role,
+        department: editForm.department,
+        designation: editForm.designation.trim(),
+        avatar: editForm.avatar,
+        bio: editForm.bio.trim(),
+      });
 
       if (res.error) {
         setEditError(res.error);
@@ -659,6 +680,9 @@ export const UsersView: React.FC = () => {
           name: editForm.name.trim(),
           role: editForm.role,
           department: editForm.department,
+          designation: editForm.designation.trim(),
+          avatar: editForm.avatar,
+          bio: editForm.bio.trim(),
         } : u));
         showNotification('success', `Updated ${editForm.name}'s profile and role in database.`);
         setEditingUser(null);
@@ -842,6 +866,11 @@ export const UsersView: React.FC = () => {
                                 </span>
                               )}
                             </div>
+                            {u.designation && (
+                              <p className="text-[11px] text-blue-700 font-semibold truncate">
+                                {u.designation}
+                              </p>
+                            )}
                             <p className="text-[11px] text-ink-muted truncate font-mono">{u.email}</p>
                           </div>
                         </div>
@@ -979,6 +1008,22 @@ export const UsersView: React.FC = () => {
 
               <div>
                 <label className="block font-bold text-ink mb-1 uppercase tracking-wider text-[11px]">
+                  Newsroom Designation / Title (Byline Role)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. वरिष्ठ संवाददाता / विशेष संवाददाता / Senior Reporter"
+                  value={addForm.designation}
+                  onChange={(e) => setAddForm(prev => ({ ...prev, designation: e.target.value }))}
+                  className="w-full px-3 py-2 bg-slate-50 border border-border-subtle rounded-sm focus:outline-none focus:border-primary text-ink font-medium"
+                />
+                <p className="text-[10px] text-ink-muted mt-1">
+                  Shown in the Article Editor reporter dropdown and public story byline card.
+                </p>
+              </div>
+
+              <div>
+                <label className="block font-bold text-ink mb-1 uppercase tracking-wider text-[11px]">
                   Newsroom Email *
                 </label>
                 <input
@@ -1043,9 +1088,19 @@ export const UsersView: React.FC = () => {
               {/* Avatar Picker */}
               <div>
                 <label className="block font-bold text-ink mb-1.5 uppercase tracking-wider text-[11px]">
-                  Avatar Preset
+                  Avatar / Profile Photo
                 </label>
-                <div className="flex items-center gap-2.5 overflow-x-auto pb-1">
+                <div className="flex items-center gap-3 mb-2">
+                  <img src={addForm.avatar} alt="Avatar" className="w-10 h-10 rounded-full object-cover border-2 border-primary shrink-0" />
+                  <input
+                    type="text"
+                    placeholder="Custom Photo URL: /uploads/... or https://..."
+                    value={addForm.avatar}
+                    onChange={(e) => setAddForm(prev => ({ ...prev, avatar: e.target.value }))}
+                    className="flex-1 px-3 py-1.5 bg-slate-50 border border-border-subtle rounded-sm text-xs text-ink"
+                  />
+                </div>
+                <div className="flex items-center gap-2 overflow-x-auto pb-1">
                   {AVATAR_PRESETS.map((preset, idx) => (
                     <button
                       key={idx}
@@ -1055,10 +1110,10 @@ export const UsersView: React.FC = () => {
                         addForm.avatar === preset ? 'border-primary scale-105' : 'border-transparent opacity-70 hover:opacity-100'
                       }`}
                     >
-                      <img src={preset} alt={`Avatar ${idx + 1}`} className="w-9 h-9 rounded-full object-cover" />
+                      <img src={preset} alt={`Avatar ${idx + 1}`} className="w-8 h-8 rounded-full object-cover" />
                       {addForm.avatar === preset && (
-                        <span className="absolute bottom-0 right-0 w-3 h-3 bg-primary rounded-full border border-white flex items-center justify-center">
-                          <Check className="w-2 h-2 text-white" />
+                        <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-primary rounded-full border border-white flex items-center justify-center">
+                          <Check className="w-1.5 h-1.5 text-white" />
                         </span>
                       )}
                     </button>
@@ -1138,8 +1193,59 @@ export const UsersView: React.FC = () => {
                   required
                   value={editForm.name}
                   onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
-                  className="w-full px-3 py-2 bg-slate-50 border border-border-subtle rounded-sm focus:outline-none focus:border-primary text-ink"
+                  className="w-full px-3 py-2 bg-slate-50 border border-border-subtle rounded-sm focus:outline-none focus:border-primary text-ink font-semibold"
                 />
+              </div>
+
+              <div>
+                <label className="block font-bold text-ink mb-1 uppercase tracking-wider text-[11px]">
+                  Newsroom Designation / Title (Byline Role)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. वरिष्ठ संवाददाता / मानवीय व्यवहार वैज्ञानिक व लेखक / Bureau Chief"
+                  value={editForm.designation}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, designation: e.target.value }))}
+                  className="w-full px-3 py-2 bg-slate-50 border border-border-subtle rounded-sm focus:outline-none focus:border-primary text-ink font-medium"
+                />
+                <p className="text-[10px] text-ink-muted mt-1">
+                  Shown in the Article Editor reporter dropdown and public story byline card.
+                </p>
+              </div>
+
+              <div>
+                <label className="block font-bold text-ink mb-1 uppercase tracking-wider text-[11px]">
+                  Profile Photo / Avatar
+                </label>
+                <div className="flex items-center gap-3 mb-2">
+                  <img src={editForm.avatar} alt="Avatar" className="w-11 h-11 rounded-full object-cover border-2 border-primary shrink-0" />
+                  <input
+                    type="text"
+                    placeholder="Custom Image URL: /uploads/... or https://..."
+                    value={editForm.avatar}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, avatar: e.target.value }))}
+                    className="flex-1 px-3 py-1.5 bg-slate-50 border border-border-subtle rounded-sm text-xs text-ink"
+                  />
+                </div>
+                <div className="flex items-center gap-2 overflow-x-auto pb-1">
+                  {AVATAR_PRESETS.map((preset, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setEditForm(prev => ({ ...prev, avatar: preset }))}
+                      className={`relative rounded-full p-0.5 border-2 transition-all cursor-pointer ${
+                        editForm.avatar === preset ? 'border-primary scale-105' : 'border-transparent opacity-70 hover:opacity-100'
+                      }`}
+                    >
+                      <img src={preset} alt={`Avatar ${idx + 1}`} className="w-8 h-8 rounded-full object-cover" />
+                      {editForm.avatar === preset && (
+                        <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-primary rounded-full border border-white flex items-center justify-center">
+                          <Check className="w-1.5 h-1.5 text-white" />
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               <div>
@@ -1174,6 +1280,19 @@ export const UsersView: React.FC = () => {
                     <option key={dept} value={dept}>{dept}</option>
                   ))}
                 </select>
+              </div>
+
+              <div>
+                <label className="block font-bold text-ink mb-1 uppercase tracking-wider text-[11px]">
+                  Reporter / Author Bio (Optional)
+                </label>
+                <textarea
+                  rows={2}
+                  placeholder="Short author bio for public articles..."
+                  value={editForm.bio}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, bio: e.target.value }))}
+                  className="w-full px-3 py-2 bg-slate-50 border border-border-subtle rounded-sm focus:outline-none focus:border-primary text-ink text-xs"
+                />
               </div>
 
               <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-border-subtle">
