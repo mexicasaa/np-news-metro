@@ -25,16 +25,16 @@ export const isPostPublished = (post: Partial<WpPost> | null | undefined): boole
   const rawStatus = (post.status || '').toLowerCase().trim();
   const rawEditorialStatus = (post.editorialStatus || '').toLowerCase().trim();
 
-  // 2. Explicitly unpublished statuses
-  const unpublishedStatuses = ['draft', 'review', 'approved', 'scheduled', 'archived', 'failed'];
-  if (unpublishedStatuses.includes(rawStatus) || unpublishedStatuses.includes(rawEditorialStatus)) {
-    return false;
-  }
-
-  // 3. Explicitly published statuses
+  // 2. Explicitly published statuses (takes precedence when officially published)
   const publishedStatuses = ['published', 'updated', 'corrected'];
   if (publishedStatuses.includes(rawStatus) || publishedStatuses.includes(rawEditorialStatus)) {
     return true;
+  }
+
+  // 3. Explicitly unpublished statuses
+  const unpublishedStatuses = ['draft', 'review', 'approved', 'scheduled', 'archived', 'failed'];
+  if (unpublishedStatuses.includes(rawStatus) || unpublishedStatuses.includes(rawEditorialStatus)) {
+    return false;
   }
 
   // 4. Fallback for static mock posts where status might be omitted
@@ -170,10 +170,14 @@ export const saveDraftPost = (post: WpPost): void => {
   } catch (e) {}
 };
 
-export const removeStoredDraft = (postId: string): void => {
+export const removeStoredDraft = (postId: string, title?: string): void => {
   if (typeof window === 'undefined') return;
   try {
-    const drafts = getStoredDraftPosts().filter(p => p.id !== postId && p.slug !== postId);
+    const drafts = getStoredDraftPosts().filter(p => {
+      if (p.id === postId || (p.slug && p.slug === postId)) return false;
+      if (title && p.title && p.title.trim().toLowerCase() === title.trim().toLowerCase()) return false;
+      return true;
+    });
     localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(drafts));
   } catch (e) {}
 };
@@ -197,8 +201,8 @@ export const savePublishedPost = (post: WpPost): WpPost[] => {
     }
 
     // Since it is officially published, ensure it's removed from local drafts
-    removeStoredDraft(post.id);
-    if (post.slug) removeStoredDraft(post.slug);
+    removeStoredDraft(post.id, post.title);
+    if (post.slug) removeStoredDraft(post.slug, post.title);
 
     const existingIndex = currentPosts.findIndex(
       p => p.id === post.id || (p.slug && post.slug && p.slug === post.slug)

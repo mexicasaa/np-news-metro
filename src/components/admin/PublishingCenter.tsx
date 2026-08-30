@@ -13,7 +13,7 @@ import {
 } from '../../types/admin';
 import { mockAuthors, mockCategories } from '../../data/mockWpData';
 import { mockFailedOperations } from '../../data/mockAdminData';
-import { getStoredPosts } from '../../utils/newsStorage';
+import { getStoredPosts, isPostPublished } from '../../utils/newsStorage';
 
 export type PublishingTab = 
   | 'all'
@@ -69,12 +69,19 @@ export const PublishingCenter: React.FC<PublishingCenterProps> = ({
   const [selectedAuthorFilter, setSelectedAuthorFilter] = useState('all');
   const [showWorkflowGuide, setShowWorkflowGuide] = useState(true);
 
+  React.useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
+
   const permissions = ROLE_PERMISSIONS[userRole];
   const allPosts = externalPosts && externalPosts.length > 0 ? externalPosts : getStoredPosts();
 
   // Extended posts with status & word counts
   const extendedPosts = allPosts.map((post: any) => {
-    const status: EditorialStatus = post.editorialStatus || post.status || 'published';
+    const isPub = isPostPublished(post) || post.status === 'published' || post.editorialStatus === 'published';
+    const status: EditorialStatus = isPub ? 'published' : (post.editorialStatus || post.status || 'draft');
     return {
       ...post,
       editorialStatus: status as EditorialStatus,
@@ -83,11 +90,11 @@ export const PublishingCenter: React.FC<PublishingCenterProps> = ({
     };
   });
 
-  const draftsCount = extendedPosts.filter(p => p.editorialStatus === 'draft').length;
+  const draftsCount = extendedPosts.filter(p => p.editorialStatus === 'draft' && !isPostPublished(p) && p.status !== 'published').length;
   const reviewCount = extendedPosts.filter(p => p.editorialStatus === 'review').length;
   const approvedCount = extendedPosts.filter(p => p.editorialStatus === 'approved').length;
   const scheduledCount = extendedPosts.filter(p => p.editorialStatus === 'scheduled').length;
-  const publishedCount = extendedPosts.filter(p => p.editorialStatus === 'published').length;
+  const publishedCount = extendedPosts.filter(p => p.editorialStatus === 'published' || isPostPublished(p) || p.status === 'published').length;
   const breakingCount = extendedPosts.filter(p => p.isBreaking || p.isLead).length;
 
   // Tab definitions with counts and human-friendly icons
@@ -104,12 +111,16 @@ export const PublishingCenter: React.FC<PublishingCenterProps> = ({
   ];
 
   const filteredPosts = extendedPosts.filter((post) => {
-    // Tab Filter
-    if (activeTab === 'drafts' && post.editorialStatus !== 'draft') return false;
+    // Tab Filter: Drafts tab strictly excludes any published article
+    if (activeTab === 'drafts') {
+      if (post.editorialStatus !== 'draft' || isPostPublished(post) || post.status === 'published') return false;
+    }
     if (activeTab === 'review' && post.editorialStatus !== 'review') return false;
     if (activeTab === 'approved' && post.editorialStatus !== 'approved') return false;
     if (activeTab === 'scheduled' && post.editorialStatus !== 'scheduled') return false;
-    if (activeTab === 'published' && post.editorialStatus !== 'published') return false;
+    if (activeTab === 'published') {
+      if (post.editorialStatus !== 'published' && !isPostPublished(post) && post.status !== 'published') return false;
+    }
     if (activeTab === 'breaking' && !post.isBreaking && !post.isLead) return false;
 
     // Search Query

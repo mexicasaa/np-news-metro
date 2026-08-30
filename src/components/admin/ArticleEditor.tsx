@@ -135,7 +135,9 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     initialPost?.customAuthor?.avatar || ''
   );
 
-  const [status, setStatus] = useState<EditorialStatus>('draft');
+  const [status, setStatus] = useState<EditorialStatus>(
+    initialPost?.editorialStatus || (initialPost as any)?.status || 'draft'
+  );
   const [visibility, setVisibility] = useState('Public');
   const [isBreaking, setIsBreaking] = useState(initialPost?.isBreaking || false);
   const [publishDateType, setPublishDateType] = useState<'now' | 'custom'>('now');
@@ -456,11 +458,12 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     );
   };
 
-  const getPostData = (): Partial<WpPost> & { isEdit?: boolean } => {
+  const getPostData = (overrideStatus?: EditorialStatus): Partial<WpPost> & { isEdit?: boolean } => {
     const blocks = parseBlocks(content);
     const effectiveSlug = slug && slug !== 'auto-draft' ? slug : slugifyText(title || 'story');
     const effectiveId = persistedDraftId || initialPost?.id || `post-${Date.now()}`;
     const effectiveIsEdit = isEditMode || Boolean(initialPost?.id) || Boolean(persistedDraftId);
+    const effectiveStatus = overrideStatus || status || 'draft';
 
     return {
       id: effectiveId,
@@ -501,8 +504,8 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       sharesCount: initialPost?.sharesCount || 0,
       isLead: initialPost?.isLead !== undefined ? initialPost.isLead : true,
       isFeatured: true,
-      editorialStatus: 'draft',
-      status: 'draft',
+      editorialStatus: effectiveStatus,
+      status: effectiveStatus,
     };
   };
 
@@ -514,7 +517,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     setIsSaving(true);
     setSaveStatus('saving');
 
-    const postData = getPostData();
+    const postData = getPostData('draft');
 
     // 1. Immediately write to isolated draft storage for safe persistence without publishing
     try {
@@ -808,7 +811,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
 
             <button
               type="button"
-              onClick={() => onPublishNow(getPostData())}
+              onClick={() => onPublishNow(getPostData('published'))}
               className="px-5 py-2 bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white rounded-lg text-xs sm:text-sm font-bold shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
             >
               <Sparkles className="w-4 h-4" />
@@ -1298,7 +1301,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                   <div className="pt-3 border-t border-slate-100">
                     <button
                       type="button"
-                      onClick={() => onPublishNow(getPostData())}
+                      onClick={() => onPublishNow(getPostData('published'))}
                       className="w-full py-3 bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white rounded-xl font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <Sparkles className="w-4 h-4" />

@@ -5,7 +5,7 @@ import { mockPosts as defaultMockPosts } from '../data/mockWpData';
 import { ensureAuthenticatedSession } from './authService';
 import { slugifyText } from '../utils/slugify';
 import { getAuthorAvatarUrl, DEFAULT_AUTHOR_AVATAR } from '../utils/imageFallback';
-import { isPostPublished } from '../utils/newsStorage';
+import { isPostPublished, removeStoredDraft } from '../utils/newsStorage';
 
 // Category mapping helper
 const CATEGORY_SLUG_TO_ID: Record<string, string> = {
@@ -272,29 +272,34 @@ export const getEditorialArticles = async (
     const { data, error } = await query;
 
     if (error || !data || data.length === 0) {
-      return defaultMockPosts.map((p, idx) => ({
+      return defaultMockPosts.map(p => ({
         ...p,
         rawId: p.id,
-        editorialStatus: (idx === 0 ? 'published' : idx === 1 ? 'review' : idx === 2 ? 'scheduled' : 'draft') as EditorialStatus,
+        editorialStatus: 'published' as EditorialStatus,
+        status: 'published',
       }));
     }
 
-    const liveEditorial = data.map(row => ({
-      ...mapDbToWpPost(row),
-      rawId: row.id,
-      editorialStatus: (row.status || 'draft') as EditorialStatus,
-      status: row.status || 'draft',
-    }));
+    const liveEditorial = data.map(row => {
+      const isPub = (row.status || '').toLowerCase() === 'published';
+      const statusVal = isPub ? 'published' : (row.status || 'draft');
+      return {
+        ...mapDbToWpPost(row),
+        rawId: row.id,
+        editorialStatus: statusVal as EditorialStatus,
+        status: statusVal,
+      };
+    });
 
     // Merge with default mock posts to preserve coverage if few articles exist
     const liveSlugs = new Set(liveEditorial.map(p => p.slug));
     const supplementalMock = defaultMockPosts
       .filter(m => !liveSlugs.has(m.slug))
-      .map((p, idx) => ({
+      .map(p => ({
         ...p,
         rawId: p.id,
-        editorialStatus: (idx === 0 ? 'published' : idx === 1 ? 'review' : idx === 2 ? 'scheduled' : 'draft') as EditorialStatus,
-        status: (idx === 0 ? 'published' : idx === 1 ? 'review' : idx === 2 ? 'scheduled' : 'draft'),
+        editorialStatus: 'published' as EditorialStatus,
+        status: 'published',
       }));
 
     return [...liveEditorial, ...supplementalMock];
@@ -338,12 +343,25 @@ export const saveArticle = async (
       ? parseInt(postData.readTime.replace(/[^\d]/g, ''), 10) || 3 
       : 3;
 
-    // STRICT CHECK: An UPDATE only occurs if an existing valid UUID is provided
-    // and isEdit is true (user explicitly editing an existing story).
-    // Creating a new article MUST NEVER update or replace an existing article!
+    // STRICT CHECK: An UPDATE occurs if:
+    // 1. postData.id is a valid UUID (meaning the record already exists in Supabase as draft or published)
+    // 2. OR when targetStatus is 'published', check if an existing draft exists for this title or ID
     let existingId: string | null = null;
-    if (postData.id && isValidUUID(postData.id) && postData.isEdit) {
+    if (postData.id && isValidUUID(postData.id)) {
       existingId = postData.id;
+    } else if (targetStatus === 'published') {
+      try {
+        const { data: draftMatches } = await supabase
+          .from('articles')
+          .select('id')
+          .eq('title', title)
+          .eq('status', 'draft')
+          .order('created_at', { ascending: false })
+          .limit(1);
+        if (draftMatches && draftMatches.length > 0) {
+          existingId = draftMatches[0].id;
+        }
+      } catch (e) {}
     }
 
     // Always generate a unique slug to guarantee no duplicates or collisions
@@ -446,6 +464,23 @@ export const saveArticle = async (
           status: targetStatus,
         });
       } catch (revErr) {}
+    }
+
+    // When published, purge any lingering draft records with the same title or ID from Supabase and local drafts cache
+    if (targetStatus === 'published' && resultArticle?.id) {
+      try {
+        await supabase
+          .from('articles')
+          .delete()
+          .eq('status', 'draft')
+          .eq('title', title)
+          .neq('id', resultArticle.id);
+      } catch (cleanErr) {}
+
+      try {
+        removeStoredDraft(resultArticle.id, title);
+        if (resultArticle.slug) removeStoredDraft(resultArticle.slug, title);
+      } catch (e) {}
     }
 
     // Broadcast across tabs/windows for instant sync

@@ -2,6 +2,127 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
   <url>
+    <loc>https://www.npnewsmetro.com/politics/story-10</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-29T20:22:21.423Z</news:publication_date>
+      <news:title>भाजपा का कांग्रेस पर बड़ा हमला, गुरु प्रकाश पासवान और सुधांशु त्रिवेदी ने राहुल गांधी को घेरा</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/sports/story-9-2</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-29T20:12:41.123Z</news:publication_date>
+      <news:title>उत्तराखंड क्रीड़ा विश्वविद्यालय का पहला चरण शुरू, धामी ने 43.50 करोड़  का  किया  शिलान्यास</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/politics/story-8-2</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-29T19:51:20.011Z</news:publication_date>
+      <news:title>रक्षाबंधन पर भाई-बहनों ने रोपे 1.09 लाख पौधे, यूपी में बनीं 59 रक्षाबंधन वाटिकाएं</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/politics/story-7-2</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-29T19:35:04.936Z</news:publication_date>
+      <news:title>सीएम योगी का अखिलेश पर हमला, बोले- पत्रकारों के सवाल पर गाली-गलौच करते हैं</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/entertainment/story-6-2</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-29T19:22:39.333Z</news:publication_date>
+      <news:title>हरियाणा में फिल्म शूटिंग का न्योता, लोकेशन के साथ सहयोग का CM सैनी ने दिया भरोसा</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/politics/story-5-2</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-29T19:10:45.540Z</news:publication_date>
+      <news:title>नूंह में रोजगार और विकास पर जोर, मुफ्त कोचिंग को मुख्यमंत्री ने दी मंजूरी</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/india/story-4-2</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-29T18:50:34.469Z</news:publication_date>
+      <news:title>हरियाणा में कचरे से बनेगी 50 मेगावाट बिजली, चार वेस्ट-टू-एनर्जी प्लांट के लिए एमओयू</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/opinion/badhataa-taapamaana-aura-bikharataa-jeevana-2</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-29T18:38:33.674Z</news:publication_date>
+      <news:title>बढ़ता तापमान और बिखरता जीवन</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/india/story-3-2</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-29T18:16:22.699Z</news:publication_date>
+      <news:title>बच्ची की हत्या के आरोपी से पुलिस की मुठभेड़, गोली लगने से आरोपी की मौत; हेड कांस्टेबल घायल</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/india/story-2-2</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-29T18:00:32.202Z</news:publication_date>
+      <news:title>30 मिनट में पुलिस ने तलाश की 3 साल की गुमशुदा बच्ची, सकुशल परिजनों को सौंपा</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/india/story-11</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-29T17:47:37.839Z</news:publication_date>
+      <news:title>सेवानिवृत्त पुलिसकर्मियों के अनुभवों का होगा बेहतर उपयोग</news:title>
+    </news:news>
+  </url>
+  <url>
     <loc>https://www.npnewsmetro.com/entertainment/khushiyon-kaa-paavarahaausa-hotee-hain-bahanen</loc>
     <news:news>
       <news:publication>

@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import { WpPost } from '../../types/wordpress';
 import { mockAuthors } from '../../data/mockWpData';
-import { getStoredPosts } from '../../utils/newsStorage';
+import { getStoredPosts, isPostPublished } from '../../utils/newsStorage';
 
 interface EditorialListViewProps {
   posts?: WpPost[];
@@ -28,9 +28,10 @@ export const EditorialListView: React.FC<EditorialListViewProps> = ({
 
   const allPosts = externalPosts && externalPosts.length > 0 ? externalPosts : getStoredPosts();
 
-  const editorialArticles = allPosts.map((post, idx) => {
+  const editorialArticles = allPosts.map((post) => {
     const authorName = post.customAuthor?.name || mockAuthors[post.authorId]?.name || 'Staff Reporter';
-    const statusType: string = post.editorialStatus || (post as any).status || (idx === 2 ? 'scheduled' : idx === 3 ? 'draft' : idx === 4 ? 'review' : 'published');
+    const isPub = isPostPublished(post) || post.status === 'published' || post.editorialStatus === 'published';
+    const statusType: string = isPub ? 'published' : (post.editorialStatus || (post as any).status || 'draft');
     const status = statusType === 'draft' ? 'Draft' :
                    statusType === 'review' ? 'Needs Review' :
                    statusType === 'approved' ? 'Approved' :
@@ -39,7 +40,7 @@ export const EditorialListView: React.FC<EditorialListViewProps> = ({
     return {
       id: post.id,
       title: post.title,
-      section: post.category.charAt(0).toUpperCase() + post.category.slice(1),
+      section: post.category ? post.category.charAt(0).toUpperCase() + post.category.slice(1) : 'India',
       author: authorName,
       status: status,
       statusType: statusType,
@@ -49,11 +50,32 @@ export const EditorialListView: React.FC<EditorialListViewProps> = ({
     };
   });
 
+  const filteredArticles = editorialArticles.filter((article) => {
+    if (statusFilter !== 'all') {
+      if (statusFilter === 'draft') {
+        if (article.statusType !== 'draft' || isPostPublished(article.rawPost) || article.rawPost.status === 'published') return false;
+      } else if (statusFilter === 'published') {
+        if (article.statusType !== 'published' && !isPostPublished(article.rawPost) && article.rawPost.status !== 'published') return false;
+      } else if (article.statusType !== statusFilter) {
+        return false;
+      }
+    }
+    if (categoryFilter !== 'all' && article.rawPost.category?.toLowerCase() !== categoryFilter.toLowerCase()) {
+      return false;
+    }
+    if (authorFilter !== 'all') {
+      const authorMatch = article.author.toLowerCase().includes(authorFilter.toLowerCase()) || 
+                          article.rawPost.authorId?.toLowerCase().includes(authorFilter.toLowerCase());
+      if (!authorMatch) return false;
+    }
+    return true;
+  });
+
   const toggleSelectAll = () => {
-    if (selectedIds.length === editorialArticles.length) {
+    if (filteredArticles.length > 0 && selectedIds.length === filteredArticles.length) {
       setSelectedIds([]);
     } else {
-      setSelectedIds(editorialArticles.map(a => a.id));
+      setSelectedIds(filteredArticles.map(a => a.id));
     }
   };
 
@@ -130,7 +152,12 @@ export const EditorialListView: React.FC<EditorialListViewProps> = ({
       <div className="bg-surface-lowest border border-border-subtle rounded-xs shadow-subtle overflow-hidden">
                 {/* Mobile Cards View (<md) */}
         <div className="md:hidden divide-y divide-border-subtle">
-          {editorialArticles.map((article) => {
+          {filteredArticles.length === 0 ? (
+            <div className="p-8 text-center text-ink-muted text-xs font-medium">
+              No articles found matching the selected filter.
+            </div>
+          ) : (
+            filteredArticles.map((article) => {
             const isSelected = selectedIds.includes(article.id);
             return (
               <div 
@@ -225,7 +252,7 @@ export const EditorialListView: React.FC<EditorialListViewProps> = ({
                 </div>
               </div>
             );
-          })}
+          }))}
         </div>
 
         {/* Desktop / Tablet Table View (hidden on mobile) */}
@@ -236,7 +263,7 @@ export const EditorialListView: React.FC<EditorialListViewProps> = ({
                 <th className="p-3.5 pl-4 w-10">
                   <input
                     type="checkbox"
-                    checked={selectedIds.length === editorialArticles.length}
+                    checked={filteredArticles.length > 0 && selectedIds.length === filteredArticles.length}
                     onChange={toggleSelectAll}
                     className="w-3.5 h-3.5 rounded border-slate-300 text-editorial-red cursor-pointer"
                   />
@@ -250,7 +277,14 @@ export const EditorialListView: React.FC<EditorialListViewProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-border-subtle">
-              {editorialArticles.map((article) => {
+              {filteredArticles.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="p-8 text-center text-ink-muted text-xs font-medium">
+                    No articles found matching the selected filter.
+                  </td>
+                </tr>
+              ) : (
+                filteredArticles.map((article) => {
                 const isSelected = selectedIds.includes(article.id);
 
                 return (
@@ -361,7 +395,7 @@ export const EditorialListView: React.FC<EditorialListViewProps> = ({
                     </td>
                   </tr>
                 );
-              })}
+              }))}
             </tbody>
           </table>
         </div>
@@ -369,7 +403,7 @@ export const EditorialListView: React.FC<EditorialListViewProps> = ({
         {/* Table Footer with Pagination (Matching Screenshot 2) */}
         <div className="p-4 bg-slate-50/70 border-t border-border-subtle flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
           <div className="font-mono text-ink-muted text-[11px]">
-            Showing 1-5 of 142 articles
+            Showing {filteredArticles.length} of {editorialArticles.length} stories
           </div>
 
           <div className="flex items-center gap-1 font-mono">

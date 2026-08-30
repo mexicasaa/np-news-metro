@@ -16,7 +16,7 @@ import { AdminLoginModal } from './components/admin/AdminLoginModal';
 
 import { WpPost, WpVideo, WpGallery } from './types/wordpress';
 import { mockPosts as initialMockPosts, mockVideos, mockGalleries } from './data/mockWpData';
-import { getStoredPosts, savePublishedPost, popRefreshSession, clearAutoSaveSession, getStoredVideos, isPostPublished } from './utils/newsStorage';
+import { getStoredPosts, savePublishedPost, popRefreshSession, clearAutoSaveSession, getStoredVideos, isPostPublished, removeStoredDraft } from './utils/newsStorage';
 import { getPublishedArticles, getEditorialArticles, getArticleBySlug, saveArticle, deleteArticle, getDeletedArticles, restoreDeletedArticle, permanentDeleteArticle, DeletedArticle } from './services/articleService';
 import { getCurrentUserProfile, ensureAuthenticatedSession, signOut as authSignOut } from './services/authService';
 import { getVideos } from './services/taxonomyService';
@@ -1152,13 +1152,20 @@ function AppContent() {
       isBreaking: postData.isBreaking || false,
       slug: postData.slug || 'live-story',
       tags: postData.tags || ['National', 'Policy'],
+      editorialStatus: 'published',
+      status: 'published',
       blocks: postData.blocks || [
         { id: 'b1', type: 'paragraph', content: postData.dek || 'Latest dispatch from newsroom.' }
       ],
     };
 
     try {
-      const isEditingExisting = (postData as any)?.isEdit ?? (!!activeEditingPost?.id && activeEditingPost.id === newPostId);
+      const isUUID = (id?: string) => Boolean(id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id));
+      const isEditingExisting = (postData as any)?.isEdit ?? (
+        isUUID(newPostId) || 
+        isUUID(activeEditingPost?.id) || 
+        posts.some(p => p.id === newPostId)
+      );
       const { post: savedDbPost, error: dbError } = await saveArticle({ ...fullPost, isEdit: isEditingExisting }, 'published');
 
       if (dbError || !savedDbPost) {
@@ -1173,16 +1180,21 @@ function AppContent() {
       }
 
       savePublishedPost(savedDbPost);
+      removeStoredDraft(savedDbPost.id, savedDbPost.title);
+      if (savedDbPost.slug) removeStoredDraft(savedDbPost.slug, savedDbPost.title);
       clearAutoSaveSession();
       editorDraftSaverRef.current = null;
+      setActiveEditingPost(undefined);
+      setPublishingTab('published');
       setPosts(prev => {
-        const existingIdx = prev.findIndex(p => p.id === savedDbPost.id);
-        if (existingIdx !== -1) {
-          const updated = [...prev];
-          updated[existingIdx] = savedDbPost;
-          return updated;
-        }
-        return [savedDbPost, ...prev.filter(p => p.id !== newPostId)];
+        // Clean out any old draft versions with the same title or ID or slug so they never linger in drafts
+        const cleaned = prev.filter(p => 
+          p.id !== savedDbPost.id && 
+          p.id !== newPostId && 
+          (!savedDbPost.slug || p.slug !== savedDbPost.slug) &&
+          (!savedDbPost.title || p.title.trim().toLowerCase() !== savedDbPost.title.trim().toLowerCase())
+        );
+        return [savedDbPost, ...cleaned];
       });
       setSelectedPost(savedDbPost);
 
@@ -1718,8 +1730,9 @@ function AppContent() {
               onBack={() => {
                 editorDraftSaverRef.current = null;
                 setRestoredFromMistakenRefresh(false);
+                const wasPublished = isPostPublished(activeEditingPost);
                 setAdminSection('publishing');
-                setPublishingTab('drafts');
+                setPublishingTab(wasPublished ? 'published' : 'drafts');
               }}
               onRedirectToDashboard={() => {
                 editorDraftSaverRef.current = null;
