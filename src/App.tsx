@@ -1185,6 +1185,7 @@ function AppContent() {
       clearAutoSaveSession();
       editorDraftSaverRef.current = null;
       setActiveEditingPost(undefined);
+      setAdminSection('publishing');
       setPublishingTab('published');
       setPosts(prev => {
         // Clean out any old draft versions with the same title or ID or slug so they never linger in drafts
@@ -1515,7 +1516,8 @@ function AppContent() {
         <AdminLayout
           currentSection={adminSection}
           onNavigateSection={async (sec) => {
-            if ((adminSection === 'new-article' || adminSection === 'edit-article') && editorDraftSaverRef.current) {
+            const isAlreadyPub = isPostPublished(activeEditingPost) || activeEditingPost?.status === 'published';
+            if ((adminSection === 'new-article' || adminSection === 'edit-article') && editorDraftSaverRef.current && !isAlreadyPub) {
               try {
                 await editorDraftSaverRef.current();
               } catch (e) {}
@@ -1526,7 +1528,8 @@ function AppContent() {
           currentUser={currentUser}
           onChangeUserRole={(role) => setCurrentUserRole(role)}
           onExitToPublicSite={async () => {
-            if ((adminSection === 'new-article' || adminSection === 'edit-article') && editorDraftSaverRef.current) {
+            const isAlreadyPub = isPostPublished(activeEditingPost) || activeEditingPost?.status === 'published';
+            if ((adminSection === 'new-article' || adminSection === 'edit-article') && editorDraftSaverRef.current && !isAlreadyPub) {
               try {
                 await editorDraftSaverRef.current();
               } catch (e) {}
@@ -1534,7 +1537,8 @@ function AppContent() {
             handleExitToPublicSite();
           }}
           onLogout={async () => {
-            if ((adminSection === 'new-article' || adminSection === 'edit-article') && editorDraftSaverRef.current) {
+            const isAlreadyPub = isPostPublished(activeEditingPost) || activeEditingPost?.status === 'published';
+            if ((adminSection === 'new-article' || adminSection === 'edit-article') && editorDraftSaverRef.current && !isAlreadyPub) {
               try {
                 await editorDraftSaverRef.current();
               } catch (e) {}
@@ -1542,7 +1546,8 @@ function AppContent() {
             handleAdminLogout();
           }}
           onQuickCreate={async () => {
-            if ((adminSection === 'new-article' || adminSection === 'edit-article') && editorDraftSaverRef.current) {
+            const isAlreadyPub = isPostPublished(activeEditingPost) || activeEditingPost?.status === 'published';
+            if ((adminSection === 'new-article' || adminSection === 'edit-article') && editorDraftSaverRef.current && !isAlreadyPub) {
               try {
                 await editorDraftSaverRef.current();
               } catch (e) {}
@@ -1607,6 +1612,16 @@ function AppContent() {
                 editorDraftSaverRef.current = fn;
               }}
               onSaveDraft={async (postData, options) => {
+                // If the article is already published, NEVER save it as a draft!
+                if (
+                  postData.status === 'published' || 
+                  postData.editorialStatus === 'published' || 
+                  isPostPublished(activeEditingPost) || 
+                  activeEditingPost?.status === 'published'
+                ) {
+                  return activeEditingPost;
+                }
+
                 const isEditingExisting = (postData as any)?.isEdit ?? (!!activeEditingPost?.id && activeEditingPost.id === postData.id);
                 const postId = postData.id || activeEditingPost?.id || `post-${Date.now()}`;
                 const fullPost: WpPost = {
@@ -2086,7 +2101,11 @@ function AppContent() {
       {publishOrchestratorOpen && (
         <PublishOrchestratorModal
           isOpen={publishOrchestratorOpen}
-          onClose={() => setPublishOrchestratorOpen(false)}
+          onClose={() => {
+            setPublishOrchestratorOpen(false);
+            setAdminSection('publishing');
+            setPublishingTab('published');
+          }}
           operation={currentOperation}
           onViewLiveStory={(id) => {
             setPublishOrchestratorOpen(false);
@@ -2110,6 +2129,7 @@ function AppContent() {
           onFinish={() => {
             setPublishOrchestratorOpen(false);
             setAdminSection('publishing');
+            setPublishingTab('published');
           }}
         />
       )}

@@ -16,7 +16,7 @@ import { compressImageFile, compressAvatarFile } from '../../utils/imageCompress
 import { uploadArticleImage } from '../../services/mediaService';
 import { slugifyText } from '../../utils/slugify';
 import { getAuthorAvatarUrl, DEFAULT_AUTHOR_AVATAR, handleAvatarError } from '../../utils/imageFallback';
-import { saveAutoSaveSession, clearAutoSaveSession, saveDraftPost, setRefreshSession } from '../../utils/newsStorage';
+import { saveAutoSaveSession, clearAutoSaveSession, saveDraftPost, setRefreshSession, isPostPublished } from '../../utils/newsStorage';
 
 export interface EditorBlock {
   id: string;
@@ -510,6 +510,16 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
   };
 
   const performSaveDraft = async (options: { silent?: boolean } = { silent: true }): Promise<WpPost | undefined> => {
+    // NEVER auto-save or revert a published story into a draft
+    if (
+      status === 'published' || 
+      initialPost?.status === 'published' || 
+      initialPost?.editorialStatus === 'published' || 
+      isPostPublished(initialPost)
+    ) {
+      return undefined;
+    }
+
     if (!isDirty() && !persistedDraftId && !initialPost) return undefined;
     if (isSavingRef.current) return undefined;
 
@@ -641,7 +651,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       }
     } catch (err) {}
 
-    if (!isDirty()) return;
+    if (!isDirty() || status === 'published' || isPostPublished(initialPost)) return;
 
     const timer = setTimeout(() => {
       performSaveDraft({ silent: true });
@@ -653,13 +663,15 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     authorType, authorId, customAuthorName, customAuthorRole, customAuthorAvatar,
     publishDateType, customPublishDate, tags, featuredImage, imageCredit,
     imageCaption, imageAlt, isBreaking, seoTitle, metaDescription, slug,
-    primaryTopic, focusKeyphrase, secondaryKeywords
+    primaryTopic, focusKeyphrase, secondaryKeywords, status, initialPost
   ]);
 
   // Lifecycle listeners: Save draft on accidental refresh (F5/reload) and page exit/hide
   useEffect(() => {
+    const isAlreadyPublished = status === 'published' || isPostPublished(initialPost) || initialPost?.status === 'published';
+
     const handleBeforeUnload = () => {
-      if (isDirty()) {
+      if (isDirty() && !isAlreadyPublished) {
         const postData = getPostData();
         try {
           setRefreshSession({
@@ -675,7 +687,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     };
 
     const handlePageHide = () => {
-      if (isDirty()) {
+      if (isDirty() && !isAlreadyPublished) {
         const postData = getPostData();
         try {
           saveDraftPost(postData as WpPost);
@@ -685,7 +697,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     };
 
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'hidden' && isDirty()) {
+      if (document.visibilityState === 'hidden' && isDirty() && !isAlreadyPublished) {
         performSaveDraft({ silent: true });
       }
     };

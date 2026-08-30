@@ -78,9 +78,18 @@ export const PublishingCenter: React.FC<PublishingCenterProps> = ({
   const permissions = ROLE_PERMISSIONS[userRole];
   const allPosts = externalPosts && externalPosts.length > 0 ? externalPosts : getStoredPosts();
 
+  const publishedTitles = new Set(
+    allPosts
+      .filter(p => isPostPublished(p) || p.status === 'published' || p.editorialStatus === 'published')
+      .map(p => (p.title || '').trim().toLowerCase())
+      .filter(Boolean)
+  );
+
   // Extended posts with status & word counts
   const extendedPosts = allPosts.map((post: any) => {
-    const isPub = isPostPublished(post) || post.status === 'published' || post.editorialStatus === 'published';
+    const isPubBySelf = isPostPublished(post) || post.status === 'published' || post.editorialStatus === 'published';
+    const isPubByMatch = Boolean(post.title && publishedTitles.has(post.title.trim().toLowerCase()));
+    const isPub = isPubBySelf || isPubByMatch;
     const status: EditorialStatus = isPub ? 'published' : (post.editorialStatus || post.status || 'draft');
     return {
       ...post,
@@ -90,11 +99,21 @@ export const PublishingCenter: React.FC<PublishingCenterProps> = ({
     };
   });
 
-  const draftsCount = extendedPosts.filter(p => p.editorialStatus === 'draft' && !isPostPublished(p) && p.status !== 'published').length;
+  const draftsCount = extendedPosts.filter(p => 
+    p.editorialStatus === 'draft' && 
+    !isPostPublished(p) && 
+    p.status !== 'published' &&
+    !(p.title && publishedTitles.has(p.title.trim().toLowerCase()))
+  ).length;
   const reviewCount = extendedPosts.filter(p => p.editorialStatus === 'review').length;
   const approvedCount = extendedPosts.filter(p => p.editorialStatus === 'approved').length;
   const scheduledCount = extendedPosts.filter(p => p.editorialStatus === 'scheduled').length;
-  const publishedCount = extendedPosts.filter(p => p.editorialStatus === 'published' || isPostPublished(p) || p.status === 'published').length;
+  const publishedCount = extendedPosts.filter(p => 
+    p.editorialStatus === 'published' || 
+    isPostPublished(p) || 
+    p.status === 'published' ||
+    (p.title && publishedTitles.has(p.title.trim().toLowerCase()))
+  ).length;
   const breakingCount = extendedPosts.filter(p => p.isBreaking || p.isLead).length;
 
   // Tab definitions with counts and human-friendly icons
@@ -111,9 +130,10 @@ export const PublishingCenter: React.FC<PublishingCenterProps> = ({
   ];
 
   const filteredPosts = extendedPosts.filter((post) => {
-    // Tab Filter: Drafts tab strictly excludes any published article
+    // Tab Filter: Drafts tab strictly excludes any published article or matching published title
     if (activeTab === 'drafts') {
       if (post.editorialStatus !== 'draft' || isPostPublished(post) || post.status === 'published') return false;
+      if (post.title && publishedTitles.has(post.title.trim().toLowerCase())) return false;
     }
     if (activeTab === 'review' && post.editorialStatus !== 'review') return false;
     if (activeTab === 'approved' && post.editorialStatus !== 'approved') return false;
@@ -138,6 +158,15 @@ export const PublishingCenter: React.FC<PublishingCenterProps> = ({
     // Author Filter
     if (selectedAuthorFilter !== 'all' && post.authorId !== selectedAuthorFilter) return false;
 
+    return true;
+  });
+
+  // Deduplicate stories in tab view so duplicate records never appear twice
+  const seenTabKeys = new Set<string>();
+  const displayedPosts = filteredPosts.filter((post) => {
+    const key = (post.title || post.id).trim().toLowerCase();
+    if (seenTabKeys.has(key)) return false;
+    seenTabKeys.add(key);
     return true;
   });
 
@@ -474,7 +503,7 @@ export const PublishingCenter: React.FC<PublishingCenterProps> = ({
               ))}
             </div>
           )
-        ) : filteredPosts.length === 0 ? (
+        ) : displayedPosts.length === 0 ? (
           <div className="bg-white border border-slate-200 rounded-lg p-12 text-center space-y-3">
             <FileText className="w-10 h-10 text-slate-300 mx-auto" />
             <h4 className="font-serif font-bold text-lg text-slate-800">
@@ -491,7 +520,7 @@ export const PublishingCenter: React.FC<PublishingCenterProps> = ({
             </button>
           </div>
         ) : (
-          filteredPosts.map((post) => (
+          displayedPosts.map((post) => (
             <div
               key={post.id}
               className="bg-white border border-slate-200 hover:border-slate-400 rounded-lg p-3.5 sm:p-5 shadow-2xs hover:shadow-xs transition-all flex flex-col md:flex-row md:items-center justify-between gap-3.5 sm:gap-4"

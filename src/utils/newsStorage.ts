@@ -142,7 +142,27 @@ export const getStoredDraftPosts = (): WpPost[] => {
     const raw = localStorage.getItem(DRAFT_STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    if (!Array.isArray(parsed)) return [];
+
+    // Filter out any draft that is already published
+    const published = getStoredPosts();
+    const publishedTitles = new Set(published.map(p => (p.title || '').trim().toLowerCase()));
+    const publishedIds = new Set(published.map(p => p.id));
+    const publishedSlugs = new Set(published.map(p => p.slug));
+
+    const cleanDrafts = parsed.filter((p: WpPost) => {
+      if (isPostPublished(p) || p.status === 'published' || p.editorialStatus === 'published') return false;
+      if (publishedIds.has(p.id)) return false;
+      if (p.slug && publishedSlugs.has(p.slug)) return false;
+      if (p.title && publishedTitles.has(p.title.trim().toLowerCase())) return false;
+      return true;
+    });
+
+    if (cleanDrafts.length !== parsed.length) {
+      localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(cleanDrafts));
+    }
+
+    return cleanDrafts;
   } catch (e) {
     return [];
   }
@@ -151,6 +171,24 @@ export const getStoredDraftPosts = (): WpPost[] => {
 export const saveDraftPost = (post: WpPost): void => {
   if (typeof window === 'undefined') return;
   try {
+    // If the post is already published, NEVER save it as a draft!
+    if (isPostPublished(post) || post.status === 'published' || post.editorialStatus === 'published') {
+      removeStoredDraft(post.id, post.title);
+      return;
+    }
+
+    // Check against published posts storage
+    const published = getStoredPosts();
+    const isAlreadyPublished = published.some(p => 
+      p.id === post.id || 
+      (p.slug && post.slug && p.slug === post.slug) ||
+      (p.title && post.title && p.title.trim().toLowerCase() === post.title.trim().toLowerCase())
+    );
+    if (isAlreadyPublished) {
+      removeStoredDraft(post.id, post.title);
+      return;
+    }
+
     const drafts = getStoredDraftPosts();
     const idx = drafts.findIndex(p => p.id === post.id || (p.slug && post.slug && p.slug === post.slug));
     const draftPost: WpPost = {
