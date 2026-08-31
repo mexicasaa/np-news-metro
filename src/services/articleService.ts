@@ -18,6 +18,10 @@ const CATEGORY_SLUG_TO_ID: Record<string, string> = {
   entertainment: '11111111-1111-1111-1111-111111110007',
   lifestyle: '11111111-1111-1111-1111-111111110008',
   opinion: '11111111-1111-1111-1111-111111110009',
+  crime: '11111111-1111-1111-1111-111111110010',
+  social: '11111111-1111-1111-1111-111111110011',
+  astrology: '11111111-1111-1111-1111-111111110012',
+  religion: '11111111-1111-1111-1111-111111110013',
 };
 
 const CATEGORY_ID_TO_SLUG: Record<string, EditorialCategorySlug> = {
@@ -30,6 +34,10 @@ const CATEGORY_ID_TO_SLUG: Record<string, EditorialCategorySlug> = {
   '11111111-1111-1111-1111-111111110007': 'entertainment',
   '11111111-1111-1111-1111-111111110008': 'lifestyle',
   '11111111-1111-1111-1111-111111110009': 'opinion',
+  '11111111-1111-1111-1111-111111110010': 'crime',
+  '11111111-1111-1111-1111-111111110011': 'social',
+  '11111111-1111-1111-1111-111111110012': 'astrology',
+  '11111111-1111-1111-1111-111111110013': 'religion',
 };
 
 const isValidUUID = (str?: string): boolean => {

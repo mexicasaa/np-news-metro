@@ -12,6 +12,10 @@ export type EditorialCategorySlug =
   | 'entertainment'
   | 'lifestyle'
   | 'opinion'
+  | 'crime'
+  | 'social'
+  | 'astrology'
+  | 'religion'
   | 'videos'
   | 'photos';
 
@@ -47,7 +51,7 @@ export interface WpCategory {
 
 export interface GutenbergBlock {
   id: string;
-  type: 'paragraph' | 'heading' | 'pullquote' | 'keypoints' | 'image' | 'table' | 'related_story' | 'ad_slot';
+  type: 'paragraph' | 'heading' | 'pullquote' | 'keypoints' | 'image' | 'table' | 'related_story' | 'ad_slot' | 'list';
   level?: 2 | 3;
   content?: string;
   items?: string[];

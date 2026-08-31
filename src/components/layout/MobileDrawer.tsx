@@ -154,6 +154,14 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                     ? t.nav_lifestyle
                     : cat.slug === 'opinion' || cat.slug === 'metromat'
                     ? t.nav_opinion
+                    : cat.slug === 'crime'
+                    ? t.nav_crime
+                    : cat.slug === 'social'
+                    ? t.nav_social
+                    : cat.slug === 'astrology'
+                    ? t.nav_astrology
+                    : cat.slug === 'religion'
+                    ? t.nav_religion
                     : cat.name}
                 </span>
                 <ChevronRight className="w-4 h-4 text-ink-muted" />

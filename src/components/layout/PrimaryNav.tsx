@@ -37,6 +37,10 @@ export const PrimaryNav: React.FC<PrimaryNavProps> = ({
   const secondaryItems = [
     { label: t.nav_photos, slug: 'photos', icon: Camera },
     { label: t.nav_trending, slug: 'trending', icon: TrendingUp },
+    { label: t.nav_crime, slug: 'crime' },
+    { label: t.nav_social, slug: 'social' },
+    { label: t.nav_astrology, slug: 'astrology' },
+    { label: t.nav_religion, slug: 'religion' },
     { label: isHindi ? 'पर्यावरण एवं जलवायु' : 'Environment & Climate', slug: 'lifestyle' },
     { label: isHindi ? 'शिक्षा एवं रोज़गार' : 'Education & Jobs', slug: 'india' },
     { label: isHindi ? 'विज्ञान एवं अंतरिक्ष' : 'Science & Space', slug: 'technology' },

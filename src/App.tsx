@@ -320,8 +320,8 @@ const parseUrlRoute = (currentPosts: WpPost[], currentVideos: WpVideo[], isIniti
     };
   }
 
-  // 9. Single category slug directly: /india, /politics, /business, /economy, /technology, /world, /sports, /entertainment, /lifestyle, /opinion, /metromat
-  const knownDeskSlugs = ['india', 'politics', 'business', 'economy', 'technology', 'world', 'sports', 'entertainment', 'lifestyle', 'opinion', 'metromat', 'metro-mat'];
+  // 9. Single category slug directly: /india, /politics, /business, /economy, /technology, /world, /sports, /entertainment, /lifestyle, /opinion, /metromat, /crime, /social, /astrology, /religion
+  const knownDeskSlugs = ['india', 'politics', 'business', 'economy', 'technology', 'world', 'sports', 'entertainment', 'lifestyle', 'opinion', 'metromat', 'metro-mat', 'crime', 'social', 'astrology', 'religion'];
   if (knownDeskSlugs.includes(cleanPath)) {
     const normalizedCat = (cleanPath === 'metromat' || cleanPath === 'metro-mat') ? 'opinion' : cleanPath;
     return {
@@ -457,7 +457,7 @@ function AppContent() {
 
     const segments = cleanPath.split('/');
     const candidateSlug = segments[segments.length - 1];
-    const knownDeskSlugs = ['latest', 'trending', 'photos', 'gallery', 'search', 'india', 'politics', 'business', 'economy', 'technology', 'world', 'sports', 'entertainment', 'lifestyle', 'opinion'];
+    const knownDeskSlugs = ['latest', 'trending', 'photos', 'gallery', 'search', 'india', 'politics', 'business', 'economy', 'technology', 'world', 'sports', 'entertainment', 'lifestyle', 'opinion', 'crime', 'social', 'astrology', 'religion'];
     const staticPages = ['about', 'privacy', 'terms', 'cookie-policy', 'ethics', 'editorial-team', 'corrections', 'advertise', 'contact', 'sitemap'];
     
     if (knownDeskSlugs.includes(cleanPath) || staticPages.includes(cleanPath) || cleanPath.startsWith('category/') || cleanPath.startsWith('author/')) {

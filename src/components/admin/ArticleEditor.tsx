@@ -57,6 +57,10 @@ const CATEGORIES_LIST: { slug: EditorialCategorySlug; label: string; color: stri
   { slug: 'entertainment', label: 'Entertainment', color: 'bg-purple-50 text-purple-800 border-purple-200' },
   { slug: 'lifestyle', label: 'Lifestyle', color: 'bg-pink-50 text-pink-800 border-pink-200' },
   { slug: 'opinion', label: 'Opinion / Editorial', color: 'bg-slate-100 text-slate-800 border-slate-300' },
+  { slug: 'crime', label: 'Crime & Legal', color: 'bg-rose-50 text-rose-800 border-rose-200' },
+  { slug: 'social', label: 'Social & Society', color: 'bg-teal-50 text-teal-800 border-teal-200' },
+  { slug: 'astrology', label: 'Astrology & Horoscope', color: 'bg-amber-50 text-amber-900 border-amber-300' },
+  { slug: 'religion', label: 'Religion & Culture', color: 'bg-orange-100 text-orange-900 border-orange-300' },
 ];
 
 const ARTICLE_TYPES = [
@@ -379,19 +383,39 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     }
   };
 
-  const insertTextFormatting = (before: string, after: string = '') => {
+  const insertTextFormatting = (before: string, after: string = '', defaultText: string = 'text') => {
     const textarea = textareaRef.current;
     if (!textarea) return;
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
     const previousText = textarea.value;
-    const selectedText = previousText.substring(start, end) || 'text';
-    const replacement = `${before}${selectedText}${after}`;
+    const selectedText = previousText.substring(start, end);
+    const textToInsert = selectedText || defaultText;
+    const replacement = `${before}${textToInsert}${after}`;
     const newContent = previousText.substring(0, start) + replacement + previousText.substring(end);
     setContent(newContent);
     setTimeout(() => {
       textarea.focus();
-      textarea.setSelectionRange(start + before.length, start + before.length + selectedText.length);
+      textarea.setSelectionRange(start + before.length, start + before.length + textToInsert.length);
+    }, 50);
+  };
+
+  const handleInsertLink = () => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const previousText = textarea.value;
+    const selectedText = previousText.substring(start, end).trim();
+    const linkText = selectedText || 'Link text';
+    const replacement = `[${linkText}](https://)`;
+    const newContent = previousText.substring(0, start) + replacement + previousText.substring(end);
+    setContent(newContent);
+    setTimeout(() => {
+      textarea.focus();
+      // Select the url placeholder 'https://'
+      const urlStart = start + linkText.length + 3;
+      textarea.setSelectionRange(urlStart, urlStart + 8);
     }, 50);
   };
 
@@ -435,6 +459,19 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
           id: `quote-${i}`,
           type: 'pullquote',
           content: quoteMatch[1].trim(),
+        } as GutenbergBlock;
+      }
+
+      // Check if chunk is a bullet list (lines starting with - or *)
+      const lines = chunk.split('\n').map(l => l.trim()).filter(Boolean);
+      const isBulletList = lines.length > 0 && lines.every(l => /^[-*]\s+/.test(l));
+      if (isBulletList) {
+        const items = lines.map(l => l.replace(/^[-*]\s+/, '').trim());
+        return {
+          id: `list-${i}`,
+          type: 'list',
+          items,
+          content: chunk,
         } as GutenbergBlock;
       }
       
@@ -1047,17 +1084,17 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                   </button>
                   <button
                     type="button"
-                    onClick={() => insertTextFormatting('\n- ', '')}
+                    onClick={() => insertTextFormatting('\n- ', '', 'List item')}
                     className="p-1.5 text-slate-600 hover:text-blue-600 hover:bg-white rounded transition-colors border border-transparent hover:border-slate-200 cursor-pointer"
-                    title="Bullet List"
+                    title="Bullet List (- item)"
                   >
                     <List className="w-4 h-4" />
                   </button>
                   <button
                     type="button"
-                    onClick={() => insertTextFormatting('[Link Text](', 'https://)')}
+                    onClick={handleInsertLink}
                     className="p-1.5 text-slate-600 hover:text-blue-600 hover:bg-white rounded transition-colors border border-transparent hover:border-slate-200 cursor-pointer"
-                    title="Add Hyperlink"
+                    title="Add Hyperlink [Text](URL)"
                   >
                     <Link2 className="w-4 h-4" />
                   </button>

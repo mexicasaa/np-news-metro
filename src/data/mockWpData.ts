@@ -280,6 +280,10 @@ export const mockCategories: WpCategory[] = [
   { id: 'cat-10', name: 'Metromat', nameHi: 'मैट्रो मत', slug: 'opinion', description: 'Uncompromising editorial commentary, scholarly analysis, guest columns, and daily public opinion pulse.', count: 70, subcategories: ['Editorials', 'Columns', 'Guest Voices', 'Letters', 'Public Pulse'] },
   { id: 'cat-11', name: 'Videos', slug: 'videos', description: 'Newsroom explainers, field documentaries, and leadership interviews.', count: 48, subcategories: ['Explainers', 'Interviews', 'Field Reports', 'Shorts'] },
   { id: 'cat-12', name: 'Photos', slug: 'photos', description: 'Visual journalism capturing pivotal moments across the subcontinent.', count: 32, subcategories: ['Photo Essays', 'Spot News', 'Wildlife', 'Culture'] },
+  { id: 'cat-13', name: 'Crime & Legal', nameHi: 'अपराध एवं कानून', slug: 'crime', description: 'Investigative crime reporting, legal developments, judicial verdicts, and cybercrime updates.', count: 38, subcategories: ['Cybercrime', 'Courts & Law', 'Investigations', 'Enforcement'] },
+  { id: 'cat-14', name: 'Social Issues', nameHi: 'सामाजिक सरोकार', slug: 'social', description: 'Grassroots movements, civil rights, healthcare, rural development, and social welfare.', count: 41, subcategories: ['Civil Rights', 'Public Health', 'Education', 'Environment', 'Welfare'] },
+  { id: 'cat-15', name: 'Astrology', nameHi: 'ज्योतिष एवं भविष्य', slug: 'astrology', description: 'Daily horoscopes, astrological forecasts, Vedic astrology insights, and planetary transits.', count: 29, subcategories: ['Daily Rashifal', 'Horoscope', 'Planetary Transit', 'Vedic Astrology', 'Vastu'] },
+  { id: 'cat-16', name: 'Religion & Culture', nameHi: 'धर्म एवं संस्कृति', slug: 'religion', description: 'Spiritual traditions, heritage festivals, sacred places, temple history, and cultural heritage.', count: 36, subcategories: ['Festivals', 'Spiritual Discourse', 'Heritage', 'Temples', 'Rituals'] },
 ];
 
 export const mockPosts: WpPost[] = [

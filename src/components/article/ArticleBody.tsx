@@ -13,6 +13,65 @@ interface ArticleBodyProps {
   showAds?: boolean;
 }
 
+/**
+ * Safely parses inline markdown syntax (bold, italic, links) into React elements.
+ */
+export const renderInlineMarkdown = (text?: string): React.ReactNode => {
+  if (!text) return '';
+
+  // Pattern matches:
+  // 1. Links: [anchor text](url)
+  // 2. Bold: **bold text**
+  // 3. Italic: *italic text*
+  const pattern = /(\[[^\]]+\]\([^)]+\)|\*\*[^*]+\*\*|\*[^*]+\*)/g;
+  const parts = text.split(pattern);
+
+  return parts.map((part, index) => {
+    if (!part) return null;
+
+    // Link: [text](url)
+    const linkMatch = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+    if (linkMatch) {
+      const linkText = linkMatch[1];
+      const linkHref = linkMatch[2].trim();
+      const isInternal = linkHref.startsWith('/') || linkHref.startsWith('#');
+      return (
+        <a
+          key={index}
+          href={linkHref}
+          target={isInternal ? undefined : '_blank'}
+          rel={isInternal ? undefined : 'noopener noreferrer'}
+          className="text-primary underline hover:text-primary-dark font-medium transition-colors cursor-pointer"
+        >
+          {linkText}
+        </a>
+      );
+    }
+
+    // Bold: **text**
+    const boldMatch = part.match(/^\*\*([^*]+)\*\*$/);
+    if (boldMatch) {
+      return (
+        <strong key={index} className="font-bold text-ink">
+          {boldMatch[1]}
+        </strong>
+      );
+    }
+
+    // Italic: *text*
+    const italicMatch = part.match(/^\*([^*]+)\*$/);
+    if (italicMatch) {
+      return (
+        <em key={index} className="italic">
+          {italicMatch[1]}
+        </em>
+      );
+    }
+
+    return part;
+  });
+};
+
 export const ArticleBody: React.FC<ArticleBodyProps> = ({
   post,
   onSelectRelatedStory,
@@ -27,6 +86,24 @@ export const ArticleBody: React.FC<ArticleBodyProps> = ({
         switch (block.type) {
           case 'paragraph': {
             const isFirstParagraph = index === 0;
+            const content = block.content || '';
+
+            // If a paragraph contains bullet items (e.g. lines starting with '- ' or '* ')
+            const lines = content.split('\n').map(l => l.trim()).filter(Boolean);
+            const isBulletGroup = lines.length > 1 && lines.every(l => /^[-*]\s+/.test(l));
+
+            if (isBulletGroup) {
+              return (
+                <ul key={block.id} className="list-disc list-outside pl-6 sm:pl-8 mb-6 space-y-2 text-base sm:text-lg text-ink-secondary leading-relaxed">
+                  {lines.map((line, lIdx) => (
+                    <li key={lIdx}>
+                      {renderInlineMarkdown(line.replace(/^[-*]\s+/, ''))}
+                    </li>
+                  ))}
+                </ul>
+              );
+            }
+
             return (
               <p
                 key={block.id}
@@ -36,23 +113,40 @@ export const ArticleBody: React.FC<ArticleBodyProps> = ({
                     : ''
                 }`}
               >
-                {block.content}
+                {renderInlineMarkdown(content)}
               </p>
             );
           }
 
           case 'heading': {
+            const headingContent = renderInlineMarkdown(block.content);
             if (block.level === 3) {
               return (
                 <h3 key={block.id} className="font-serif text-xl sm:text-2xl font-bold text-ink mt-8 mb-3">
-                  {block.content}
+                  {headingContent}
                 </h3>
               );
             }
             return (
               <h2 key={block.id} className="font-serif text-2xl sm:text-3xl font-bold text-ink mt-10 mb-4 border-b border-border-subtle pb-2">
-                {block.content}
+                {headingContent}
               </h2>
+            );
+          }
+
+          case 'list': {
+            const listItems = block.items && block.items.length > 0 
+              ? block.items 
+              : (block.content ? block.content.split('\n').map(l => l.replace(/^[-*]\s+/, '').trim()).filter(Boolean) : []);
+
+            return (
+              <ul key={block.id} className="list-disc list-outside pl-6 sm:pl-8 mb-6 space-y-2 text-base sm:text-lg text-ink-secondary leading-relaxed">
+                {listItems.map((item, iIdx) => (
+                  <li key={iIdx}>
+                    {renderInlineMarkdown(item)}
+                  </li>
+                ))}
+              </ul>
             );
           }
 
