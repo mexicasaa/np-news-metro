@@ -53,9 +53,9 @@ export const getAbsoluteImageUrl = (imageUrl?: string, customOrigin?: string): s
     return trimmed;
   }
 
-  // Data URLs shouldn't be prefixed
+  // Data URLs shouldn't be shared externally as image URLs
   if (trimmed.startsWith('data:')) {
-    return trimmed;
+    return DEFAULT_OG_IMAGE;
   }
 
   const origin = customOrigin || getSiteOrigin();

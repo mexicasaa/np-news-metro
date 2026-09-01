@@ -29,7 +29,7 @@ function getAbsoluteImageUrl(imageUrl, customOrigin) {
     return trimmed;
   }
   if (trimmed.startsWith('data:')) {
-    return trimmed;
+    return DEFAULT_OG_IMAGE;
   }
   const cleanPath = trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
   return `${origin}${cleanPath}`;
@@ -127,25 +127,51 @@ console.log('✓ Test 8 Passed: Article 2 Supabase URL cleanly routed to /api/im
 // Test 9: Verify image proxy serves transformed image < 300KB (WhatsApp requirement)
 import('../api/image.js').then(async (mod) => {
   const handler = mod.default;
-  let headers = {};
-  let bodyBuffer = null;
-  const mockRes = {
+
+  const testPaths = [
+    'article-images/articles/general/1005537465-mtbur5bp.jpg',
+    'article-images/articles/8b70bbd3-afaa-42ed-97b3-85008d03a2e3/shreekrishna-janmaashtamee-para-iskona-n-1788284717417.jpg',
+    'article-images/articles/57e0a0cf-ca7c-4900-ba65-e58653c4f7fa/noedaa-men-chora-samajhakara-yuvaka-se-m-1788284713786.jpg',
+    'article-images/articles/57a495c6-7aa2-4b40-a00b-22b17a4aa8fc/2-sitanbara-2026-kaa-raashiphala-1788284715519.jpg'
+  ];
+
+  for (let i = 0; i < testPaths.length; i++) {
+    const p = testPaths[i];
+    let headers = {};
+    let bodyBuffer = null;
+    const mockRes = {
+      statusCode: 200,
+      setHeader: (k, v) => { headers[k.toLowerCase()] = v; },
+      status: (code) => { mockRes.statusCode = code; return mockRes; },
+      send: (b) => { bodyBuffer = b; },
+      end: (b) => { if (b) bodyBuffer = b; }
+    };
+    await handler({ url: `/api/image?path=${p}`, query: { path: p } }, mockRes);
+    assert.strictEqual(mockRes.statusCode, 200, `Image handler should return 200 for ${p}`);
+    assert.strictEqual(headers['content-type'], 'image/jpeg', 'Content-Type must be image/jpeg');
+    assert.ok(bodyBuffer && bodyBuffer.length < 300 * 1024, `Image must be under 300KB for WhatsApp, got: ${bodyBuffer?.length} bytes`);
+    console.log(`✓ Test 9.${i + 1} Passed: Transformed image for "${p.split('/').pop()}" served at ${(bodyBuffer.length / 1024).toFixed(1)} KB (< 300KB limit for WhatsApp)`);
+  }
+
+  // Test 10: Slug-based image resolution
+  let slugHeaders = {};
+  let slugBuffer = null;
+  const mockSlugRes = {
     statusCode: 200,
-    setHeader: (k, v) => { headers[k.toLowerCase()] = v; },
-    status: (code) => { mockRes.statusCode = code; return mockRes; },
-    send: (b) => { bodyBuffer = b; },
-    end: (b) => { if (b) bodyBuffer = b; }
+    setHeader: (k, v) => { slugHeaders[k.toLowerCase()] = v; },
+    status: (code) => { mockSlugRes.statusCode = code; return mockSlugRes; },
+    send: (b) => { slugBuffer = b; },
+    end: (b) => { if (b) slugBuffer = b; }
   };
-  await handler({ url: '/api/image?path=article-images/articles/general/1005537465-mtbur5bp.jpg', query: { path: 'article-images/articles/general/1005537465-mtbur5bp.jpg' } }, mockRes);
-  assert.strictEqual(mockRes.statusCode, 200, 'Image handler should return 200');
-  assert.strictEqual(headers['content-type'], 'image/jpeg', 'Content-Type must be image/jpeg');
-  assert.ok(bodyBuffer && bodyBuffer.length < 300 * 1024, `Image must be under 300KB for WhatsApp, got: ${bodyBuffer?.length} bytes`);
-  console.log(`✓ Test 9 Passed: Image handler served transformed image at ${bodyBuffer.length} bytes (< 300KB limit for WhatsApp)`);
+  await handler({ url: '/api/image?slug=2-sitanbara-2026-kaa-raashiphala', query: { slug: '2-sitanbara-2026-kaa-raashiphala' } }, mockSlugRes);
+  assert.strictEqual(mockSlugRes.statusCode, 200, 'Slug resolution should return 200');
+  assert.ok(slugBuffer && slugBuffer.length < 300 * 1024, `Slug image must be under 300KB for WhatsApp, got: ${slugBuffer?.length} bytes`);
+  console.log(`✓ Test 10 Passed: Slug query served image at ${(slugBuffer.length / 1024).toFixed(1)} KB (< 300KB limit for WhatsApp)`);
 
   console.log('\n========================================');
   console.log('ALL FEATURED IMAGE SHARING TESTS PASSED!');
   console.log('========================================');
 }).catch(e => {
-  console.error('Test 9 error:', e);
+  console.error('Test error:', e);
   process.exit(1);
 });

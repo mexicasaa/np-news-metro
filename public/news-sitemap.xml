@@ -2,6 +2,83 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
   <url>
+    <loc>https://www.npnewsmetro.com/politics/seeema-dhaamee-kee-pahala-se-8-varsheeya-deva-kaa-hogaa-muphta-il</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-01T17:56:30.159Z</news:publication_date>
+      <news:title>सीएम धामी की पहल से 8 वर्षीय देव का होगा मुफ्त इलाज, प्रशासन ने शुरू की तैयारी</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/politics/khateemaa-men-nagara-vana-okseejana-paarka-kaa-lokaarpana-seeema</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-01T17:51:48.762Z</news:publication_date>
+      <news:title>खटीमा में नगर वन ऑक्सीजन पार्क का लोकार्पण, सीएम धामी ने की 6 बड़ी घोषणाएं</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/politics/banabasaa-seemaa-para-shaheeda-smaaraka-aura-vishaala-tirange-kaa</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-01T17:46:45.287Z</news:publication_date>
+      <news:title>बनबसा सीमा पर शहीद स्मारक और विशाल तिरंगे का लोकार्पण, सीएम धामी ने किया नमन</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/religion/noedaa-men-dhoomadhaama-se-manaayaa-gayaa-adhishthaapana-divasa-k</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-01T17:39:43.141Z</news:publication_date>
+      <news:title>नोएडा में धूमधाम से मनाया गया अधिष्ठापन दिवस, कान्हा संग सजी हरियाली तीज</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/astrology/2-sitanbara-2026-kaa-raashiphala</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-01T17:32:40.129Z</news:publication_date>
+      <news:title>2 सितंबर 2026 का  जानिए राशिफल</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/crime/noedaa-men-chora-samajhakara-yuvaka-se-maarapeeta-mauta-paancha-a</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-01T17:21:22.714Z</news:publication_date>
+      <news:title>नोएडा में चोर समझकर युवक से मारपीट, मौत; पांच आरोपी गिरफ्तार</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/entertainment/shreekrishna-janmaashtamee-para-iskona-noedaa-men-surakshaa-ke-pu</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-01T17:12:45.025Z</news:publication_date>
+      <news:title>श्रीकृष्ण जन्माष्टमी पर इस्कॉन नोएडा में सुरक्षा के पुख्ता इंतजाम, भक्तों को मिलेगी सुविधा</news:title>
+    </news:news>
+  </url>
+  <url>
     <loc>https://www.npnewsmetro.com/social/melaaghaata-roda-para-paidala-chale-seeema-dhaamee-sthaaneeya-der</loc>
     <news:news>
       <news:publication>

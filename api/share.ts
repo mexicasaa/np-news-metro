@@ -8,9 +8,15 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 const SITE_ORIGIN = 'https://www.npnewsmetro.com';
 const DEFAULT_OG_IMAGE = 'https://www.npnewsmetro.com/uploads/dr-deepak-goswami.jpg';
 
-function getAbsoluteUrl(img) {
+function getAbsoluteUrl(img, slug) {
   if (!img || typeof img !== 'string' || !img.trim()) return DEFAULT_OG_IMAGE;
   const trimmed = img.trim();
+  if (trimmed.startsWith('data:')) {
+    if (slug) {
+      return `${SITE_ORIGIN}/api/image?slug=${encodeURIComponent(slug)}`;
+    }
+    return DEFAULT_OG_IMAGE;
+  }
   if (trimmed.includes('supabase.co/storage/v1/object/public/')) {
     const pathAfter = trimmed.split('/storage/v1/object/public/')[1];
     if (pathAfter) {
@@ -468,13 +474,12 @@ export default async function handler(req, res) {
 
     // 5. CONSTRUCT CANONICAL METADATA FOR VALID STORY
     const title = mediaItem ? mediaItem.title : 'NP NEWS METRO — Real News. Real Impact.';
-    const description = mediaItem ? mediaItem.dek : 'Independent, credible digital journalism for modern India.';
-    const imageVersion = mediaItem?.modifiedAt ? `${new Date(mediaItem.modifiedAt).getTime()}_v3` : `${Date.now()}_v3`;
-    let image = mediaItem ? getAbsoluteUrl(mediaItem.image) : DEFAULT_OG_IMAGE;
-    // Always append version to image URL to force Twitterbot and WhatsApp to discard old blocked caches
-    image = image.includes('?') ? `${image}&v=${imageVersion}` : `${image}?v=${imageVersion}`;
     const category = mediaItem ? mediaItem.category : cleanCategory;
     const slug = mediaItem ? mediaItem.slug : cleanSlug;
+    const imageVersion = mediaItem?.modifiedAt ? `${new Date(mediaItem.modifiedAt).getTime()}_v3` : `${Date.now()}_v3`;
+    let image = mediaItem ? getAbsoluteUrl(mediaItem.image, slug) : DEFAULT_OG_IMAGE;
+    // Always append version to image URL to force Twitterbot and WhatsApp to discard old blocked caches
+    image = image.includes('?') ? `${image}&v=${imageVersion}` : `${image}?v=${imageVersion}`;
     const isVideo = category === 'videos';
     const canonicalUrl = slug 
       ? (isVideo ? `${SITE_ORIGIN}/videos/${slug}` : `${SITE_ORIGIN}/${category}/${slug}`)
@@ -544,6 +549,8 @@ export default async function handler(req, res) {
   <meta property="og:image:url" content="${image}" />
   <meta property="og:image:secure_url" content="${image}" />
   <meta property="og:image:type" content="image/jpeg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="${escapeHtml(title)}" />
   <meta property="og:locale" content="hi_IN" />
   <meta property="article:published_time" content="${publishedIso}" />
