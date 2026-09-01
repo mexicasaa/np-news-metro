@@ -94,20 +94,33 @@ export const AvatarCropModal: React.FC<AvatarCropModalProps> = ({
   const handleRotateLeft = () => setRotation((prev) => (prev - 90) % 360);
   const handleRotateRight = () => setRotation((prev) => (prev + 90) % 360);
 
+  const handleDragStartCoord = (clientX: number, clientY: number, handle: string | null = null) => {
+    setIsDragging(true);
+    setActiveHandle(handle);
+    setDragStart({ x: clientX, y: clientY });
+  };
+
   const handleMouseDown = (e: React.MouseEvent, handle: string | null = null) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsDragging(true);
-    setActiveHandle(handle);
-    setDragStart({ x: e.clientX, y: e.clientY });
+    handleDragStartCoord(e.clientX, e.clientY, handle);
   };
 
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!isDragging || !containerRef.current) return;
+  const handleTouchStart = (e: React.TouchEvent, handle: string | null = null) => {
+    e.stopPropagation();
+    if (e.touches.length > 0) {
+      handleDragStartCoord(e.touches[0].clientX, e.touches[0].clientY, handle);
+    }
+  };
+
+  const updateAvatarCropPosition = useCallback((clientX: number, clientY: number) => {
+    if (!containerRef.current) return;
 
     const rect = containerRef.current.getBoundingClientRect();
-    const deltaXPercent = ((e.clientX - dragStart.x) / rect.width) * 100;
-    const deltaYPercent = ((e.clientY - dragStart.y) / rect.height) * 100;
+    if (rect.width === 0 || rect.height === 0) return;
+
+    const deltaXPercent = ((clientX - dragStart.x) / rect.width) * 100;
+    const deltaYPercent = ((clientY - dragStart.y) / rect.height) * 100;
 
     setCropBox((prev) => {
       let { x, y, size } = prev;
@@ -134,10 +147,21 @@ export const AvatarCropModal: React.FC<AvatarCropModalProps> = ({
       return { x, y, size };
     });
 
-    setDragStart({ x: e.clientX, y: e.clientY });
-  }, [isDragging, dragStart, activeHandle]);
+    setDragStart({ x: clientX, y: clientY });
+  }, [dragStart, activeHandle]);
 
-  const handleMouseUp = useCallback(() => {
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!isDragging) return;
+    updateAvatarCropPosition(e.clientX, e.clientY);
+  }, [isDragging, updateAvatarCropPosition]);
+
+  const handleTouchMove = useCallback((e: TouchEvent) => {
+    if (!isDragging || e.touches.length === 0) return;
+    if (e.cancelable) e.preventDefault();
+    updateAvatarCropPosition(e.touches[0].clientX, e.touches[0].clientY);
+  }, [isDragging, updateAvatarCropPosition]);
+
+  const handleDragEnd = useCallback(() => {
     setIsDragging(false);
     setActiveHandle(null);
   }, []);
@@ -145,13 +169,19 @@ export const AvatarCropModal: React.FC<AvatarCropModalProps> = ({
   useEffect(() => {
     if (isDragging) {
       window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
+      window.addEventListener('mouseup', handleDragEnd);
+      window.addEventListener('touchmove', handleTouchMove, { passive: false });
+      window.addEventListener('touchend', handleDragEnd);
+      window.addEventListener('touchcancel', handleDragEnd);
       return () => {
         window.removeEventListener('mousemove', handleMouseMove);
-        window.removeEventListener('mouseup', handleMouseUp);
+        window.removeEventListener('mouseup', handleDragEnd);
+        window.removeEventListener('touchmove', handleTouchMove);
+        window.removeEventListener('touchend', handleDragEnd);
+        window.removeEventListener('touchcancel', handleDragEnd);
       };
     }
-  }, [isDragging, handleMouseMove, handleMouseUp]);
+  }, [isDragging, handleMouseMove, handleTouchMove, handleDragEnd]);
 
   const handleSaveAndExport = async () => {
     if (!imageRef.current) return;
@@ -226,20 +256,20 @@ export const AvatarCropModal: React.FC<AvatarCropModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-fadeIn select-none">
-      <div className="bg-slate-900 border border-slate-700/80 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col overflow-hidden text-slate-100">
+    <div className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 animate-fadeIn select-none">
+      <div className="bg-slate-900 border border-slate-700/80 rounded-xl sm:rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[96vh] overflow-hidden text-slate-100">
         
         {/* Header */}
-        <div className="px-5 py-4 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center font-bold">
-              <User className="w-4 h-4" />
+        <div className="px-4 sm:px-5 py-3 sm:py-4 bg-slate-950 border-b border-slate-800 flex items-center justify-between gap-2 shrink-0">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center font-bold shrink-0">
+              <User className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
-            <div>
-              <h3 className="font-serif text-base font-bold text-white">
+            <div className="min-w-0">
+              <h3 className="font-serif text-sm sm:text-base font-bold text-white truncate">
                 Crop Author Avatar (अवतार क्रॉप)
               </h3>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[10px] sm:text-[11px] text-slate-400 hidden xs:block sm:block truncate">
                 Position and frame author face for bylines and profile cards.
               </p>
             </div>
@@ -247,14 +277,15 @@ export const AvatarCropModal: React.FC<AvatarCropModalProps> = ({
 
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
+            className="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
+            title="Close modal"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Canvas / Viewport */}
-        <div className="p-6 bg-slate-950 flex items-center justify-center relative overflow-hidden min-h-[320px] max-h-[420px]">
+        <div className="p-3 sm:p-6 bg-slate-950 flex items-center justify-center relative overflow-hidden h-[36vh] min-h-[200px] sm:min-h-[260px] max-h-[360px] shrink-0">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center gap-2 text-slate-400">
               <RefreshCw className="w-6 h-6 animate-spin text-amber-500" />
@@ -262,7 +293,7 @@ export const AvatarCropModal: React.FC<AvatarCropModalProps> = ({
             </div>
           ) : loadError ? (
             <div className="text-center text-red-400 text-xs p-4">
-              <AlertCircle className="w-8 h-8 mx-auto mb-2" />
+              <AlertCircle className="w-7 h-7 mx-auto mb-2" />
               <span>{loadError}</span>
             </div>
           ) : (
@@ -278,7 +309,7 @@ export const AvatarCropModal: React.FC<AvatarCropModalProps> = ({
                 ref={imageRef}
                 src={blobUrlRef.current || imageUrl}
                 alt="Author avatar workspace"
-                className="max-h-[300px] max-w-full object-contain pointer-events-none rounded-sm"
+                className="max-h-[30vh] sm:max-h-[260px] max-w-full object-contain pointer-events-none rounded-sm"
                 style={{
                   transform: `rotate(${rotation}deg)`,
                 }}
@@ -302,7 +333,8 @@ export const AvatarCropModal: React.FC<AvatarCropModalProps> = ({
               {/* 1:1 Crop Box with Circular Avatar Preview Mask */}
               <div
                 onMouseDown={(e) => handleMouseDown(e, null)}
-                className="absolute border-2 border-amber-400 shadow-[0_0_0_1px_rgba(0,0,0,0.8)] cursor-move transition-shadow"
+                onTouchStart={(e) => handleTouchStart(e, null)}
+                className="absolute border-2 border-amber-400 shadow-[0_0_0_1px_rgba(0,0,0,0.8)] cursor-move transition-shadow touch-none"
                 style={{
                   left: `${cropBox.x}%`,
                   top: `${cropBox.y}%`,
@@ -310,17 +342,19 @@ export const AvatarCropModal: React.FC<AvatarCropModalProps> = ({
                   height: `${cropBox.size}%`,
                 }}
               >
-                {/* Circular Mask Outline (Shows how the round byline avatar will look!) */}
+                {/* Circular Mask Outline */}
                 <div className="absolute inset-0 rounded-full border-2 border-dashed border-white/80 pointer-events-none shadow-xs" />
 
                 {/* Corner Resize Handles */}
                 <div 
                   onMouseDown={(e) => handleMouseDown(e, 'nw')}
-                  className="absolute -top-1.5 -left-1.5 w-3.5 h-3.5 bg-amber-400 border border-slate-900 cursor-nwse-resize rounded-xs"
+                  onTouchStart={(e) => handleTouchStart(e, 'nw')}
+                  className="absolute -top-2 -left-2 sm:-top-1.5 sm:-left-1.5 w-4.5 h-4.5 sm:w-3.5 sm:h-3.5 bg-amber-400 border border-slate-900 cursor-nwse-resize rounded-xs touch-none shadow-sm"
                 />
                 <div 
                   onMouseDown={(e) => handleMouseDown(e, 'se')}
-                  className="absolute -bottom-1.5 -right-1.5 w-3.5 h-3.5 bg-amber-400 border border-slate-900 cursor-nwse-resize rounded-xs"
+                  onTouchStart={(e) => handleTouchStart(e, 'se')}
+                  className="absolute -bottom-2 -right-2 sm:-bottom-1.5 sm:-right-1.5 w-4.5 h-4.5 sm:w-3.5 sm:h-3.5 bg-amber-400 border border-slate-900 cursor-nwse-resize rounded-xs touch-none shadow-sm"
                 />
 
                 <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 bg-black/80 text-white font-mono text-[9px] px-1.5 py-0.2 rounded pointer-events-none whitespace-nowrap">
@@ -332,16 +366,16 @@ export const AvatarCropModal: React.FC<AvatarCropModalProps> = ({
         </div>
 
         {/* Controls Toolbar */}
-        <div className="p-4 bg-slate-900 border-t border-slate-800 space-y-3 text-xs">
+        <div className="p-3 sm:p-4 bg-slate-900 border-t border-slate-800 space-y-2.5 sm:space-y-3 text-xs overflow-y-auto">
           
           {/* Zoom Slider */}
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+          <div className="flex items-center justify-between gap-2 sm:gap-3">
+            <span className="text-[10px] sm:text-[11px] font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5 shrink-0">
               <span>Zoom</span>
               <span className="font-mono text-amber-400">{zoom.toFixed(1)}x</span>
             </span>
             <div className="flex items-center gap-2 flex-1 max-w-[240px]">
-              <ZoomOut className="w-3.5 h-3.5 text-slate-400" />
+              <ZoomOut className="w-3.5 h-3.5 text-slate-400 shrink-0" />
               <input
                 type="range"
                 min={1}
@@ -349,20 +383,20 @@ export const AvatarCropModal: React.FC<AvatarCropModalProps> = ({
                 step={0.1}
                 value={zoom}
                 onChange={(e) => setZoom(parseFloat(e.target.value))}
-                className="flex-1 accent-amber-500 cursor-pointer"
+                className="flex-1 accent-amber-500 cursor-pointer h-5 py-1"
               />
-              <ZoomIn className="w-3.5 h-3.5 text-slate-400" />
+              <ZoomIn className="w-3.5 h-3.5 text-slate-400 shrink-0" />
             </div>
           </div>
 
           {/* Rotate Actions */}
           <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-800/80">
-            <span className="text-[11px] font-bold text-slate-400 uppercase">Rotate:</span>
+            <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase shrink-0">Rotate:</span>
             <div className="flex items-center gap-1.5">
               <button
                 type="button"
                 onClick={handleRotateLeft}
-                className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-md text-[11px] flex items-center gap-1 transition-colors cursor-pointer"
+                className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-md text-[10px] sm:text-[11px] flex items-center gap-1 transition-colors cursor-pointer touch-manipulation"
               >
                 <RotateCcw className="w-3 h-3 text-slate-300" />
                 <span>-90°</span>
@@ -370,7 +404,7 @@ export const AvatarCropModal: React.FC<AvatarCropModalProps> = ({
               <button
                 type="button"
                 onClick={handleRotateRight}
-                className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-md text-[11px] flex items-center gap-1 transition-colors cursor-pointer"
+                className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-md text-[10px] sm:text-[11px] flex items-center gap-1 transition-colors cursor-pointer touch-manipulation"
               >
                 <RotateCw className="w-3 h-3 text-slate-300" />
                 <span>+90°</span>
@@ -382,7 +416,7 @@ export const AvatarCropModal: React.FC<AvatarCropModalProps> = ({
                   setZoom(1);
                   setCropBox({ x: 10, y: 10, size: 80 });
                 }}
-                className="px-2 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-md text-[11px] transition-colors cursor-pointer"
+                className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-md text-[10px] sm:text-[11px] transition-colors cursor-pointer touch-manipulation"
               >
                 Reset
               </button>
@@ -392,11 +426,11 @@ export const AvatarCropModal: React.FC<AvatarCropModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="p-4 bg-slate-950 border-t border-slate-800 flex items-center justify-end gap-2.5">
+        <div className="p-3 sm:p-4 bg-slate-950 border-t border-slate-800 flex items-center justify-end gap-2 sm:gap-2.5 shrink-0">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-semibold transition-colors cursor-pointer"
+            className="px-3 sm:px-4 py-2 sm:py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-semibold transition-colors cursor-pointer touch-manipulation"
           >
             Cancel
           </button>
@@ -404,16 +438,16 @@ export const AvatarCropModal: React.FC<AvatarCropModalProps> = ({
             type="button"
             onClick={handleSaveAndExport}
             disabled={isProcessing || isLoading}
-            className="px-5 py-2 bg-amber-500 hover:bg-amber-400 active:scale-[0.98] disabled:bg-slate-700 text-slate-950 font-bold rounded-lg text-xs sm:text-sm shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
+            className="px-4 sm:px-5 py-2 sm:py-2.5 bg-amber-500 hover:bg-amber-400 active:scale-[0.98] disabled:bg-slate-700 text-slate-950 font-bold rounded-lg text-xs sm:text-sm shadow-md transition-all flex items-center gap-1.5 cursor-pointer touch-manipulation"
           >
             {isProcessing ? (
               <>
-                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                <RefreshCw className="w-3.5 h-3.5 animate-spin shrink-0" />
                 <span>Cropping...</span>
               </>
             ) : (
               <>
-                <Check className="w-4 h-4" />
+                <Check className="w-4 h-4 shrink-0" />
                 <span>Apply & Save Avatar</span>
               </>
             )}
