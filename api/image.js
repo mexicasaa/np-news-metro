@@ -1,15 +1,16 @@
 const SUPABASE_STORAGE_ORIGIN = process.env.VITE_SUPABASE_URL || 'https://jkzrjqclgqpfjdqxsnut.supabase.co';
 const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprenJqcWNsZ3FwZmpkcXhzbnV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NjU0ODksImV4cCI6MjEwMzE0MTQ4OX0.tDPKLptID2tvWKAKstPVr73I7p_cFt3PPGX9AXL4l28';
+const FALLBACK_IMAGE_URL = 'https://www.npnewsmetro.com/uploads/dr-deepak-goswami.jpg';
 
 export default async function handler(req, res) {
+  const isHead = req.method === 'HEAD';
   try {
-    const isHead = req.method === 'HEAD';
     const url = new URL(req.url || '/', 'https://www.npnewsmetro.com');
     
     // Support:
     // 1. req.query.slug from /api/image?slug=... (for base64/dynamic image articles)
     // 2. req.query.path from Vercel rewrite /api/image/:path* -> /api/image?path=:path*
-    // 3. req.query.url from legacy ?url=...
+    // 3. req.query.url from legacy/external ?url=...
     // 4. url.pathname direct path /api/image/...
     let slugParam = (req.query?.slug || url.searchParams.get('slug') || '').trim();
     let pathParam = (req.query?.path || url.searchParams.get('path') || '').trim();
@@ -36,9 +37,10 @@ export default async function handler(req, res) {
           if (featured) {
             const trimmed = featured.trim();
             if (trimmed.startsWith('data:image/')) {
-              const match = trimmed.match(/^data:(image\/[a-zA-Z+]+);base64,(.+)$/s);
+              const match = trimmed.match(/^data:(image\/[a-zA-Z0-9+.-]+);base64,(.+)$/s);
               if (match) {
-                const contentType = match[1];
+                let contentType = match[1];
+                if (contentType.toLowerCase().includes('jpg')) contentType = 'image/jpeg';
                 const buffer = Buffer.from(match[2], 'base64');
                 if (typeof res.setHeader === 'function') {
                   res.setHeader('Content-Type', contentType);
@@ -75,9 +77,9 @@ export default async function handler(req, res) {
     if (pathParam) {
       const cleanPath = decodeURIComponent(pathParam).replace(/^\/+/, '');
       // Route through Supabase Image Transformation CDN with optimal web parameters (1200px width, 75% quality)
-      // CRITICAL: This is REQUIRED because WhatsApp strictly drops ANY image > 300KB!
-      // This compression reduces large raw images (like 600KB) to ~130KB to guarantee they show in WhatsApp.
-      targetUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/render/image/public/${cleanPath}?width=1200&quality=75`;
+      // CRITICAL: WhatsApp strictly drops ANY image >= 300KB!
+      // This compression reduces large raw images (e.g. 600KB) to ~90KB to guarantee they show in WhatsApp & X.
+      targetUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/render/image/public/${cleanPath}?width=1200&quality=75&resize=contain`;
       fallbackUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/object/public/${cleanPath}`;
     } else if (urlParam) {
       let decoded = urlParam;
@@ -89,28 +91,32 @@ export default async function handler(req, res) {
         decoded = urlParam;
       }
 
-      if (!/^https?:\/\//i.test(decoded)) {
-        if (typeof res.status === 'function') {
-          return res.status(400).send('Invalid url protocol');
-        }
-        res.statusCode = 400;
-        return res.end('Invalid url protocol');
-      }
-
-      // If this is a Supabase storage URL, optimize via render/image
       if (decoded.includes('/storage/v1/object/public/')) {
         const storagePath = decoded.split('/storage/v1/object/public/')[1];
-        targetUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/render/image/public/${storagePath}?width=1200&quality=75`;
+        targetUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/render/image/public/${storagePath}?width=1200&quality=75&resize=contain`;
         fallbackUrl = decoded;
-      } else {
+      } else if (decoded.includes('/storage/v1/render/image/public/')) {
+        const storagePath = decoded.split('/storage/v1/render/image/public/')[1]?.split('?')[0];
+        targetUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/render/image/public/${storagePath}?width=1200&quality=75&resize=contain`;
+        fallbackUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/object/public/${storagePath}`;
+      } else if (decoded.includes('images.unsplash.com')) {
+        try {
+          const u = new URL(decoded);
+          u.searchParams.set('w', '1200');
+          u.searchParams.set('q', '75');
+          u.searchParams.set('auto', 'format');
+          targetUrl = u.toString();
+        } catch (e) {
+          targetUrl = decoded;
+        }
+      } else if (/^https?:\/\//i.test(decoded)) {
         targetUrl = decoded;
+      } else {
+        targetUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/render/image/public/${decoded.replace(/^\/+/, '')}?width=1200&quality=75&resize=contain`;
+        fallbackUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/object/public/${decoded.replace(/^\/+/, '')}`;
       }
     } else {
-      if (typeof res.status === 'function') {
-        return res.status(400).send('Missing image path or url parameter');
-      }
-      res.statusCode = 400;
-      return res.end('Missing image path or url parameter');
+      targetUrl = FALLBACK_IMAGE_URL;
     }
 
     // Try fetching the optimized image first
@@ -121,26 +127,50 @@ export default async function handler(req, res) {
       imageRes = await fetch(fallbackUrl);
     }
 
-    if (!imageRes.ok) {
-      if (typeof res.status === 'function') {
-        return res.status(imageRes.status).send('Failed to fetch upstream image');
-      }
-      res.statusCode = imageRes.status;
-      return res.end('Failed to fetch upstream image');
+    // If still failed, fallback to default branded OG image
+    if (!imageRes.ok && targetUrl !== FALLBACK_IMAGE_URL) {
+      imageRes = await fetch(FALLBACK_IMAGE_URL);
     }
 
-    const contentType = imageRes.headers.get('content-type') || 'image/jpeg';
+    if (!imageRes.ok) {
+      if (typeof res.status === 'function') {
+        return res.status(imageRes.status).send('Failed to fetch image');
+      }
+      res.statusCode = imageRes.status;
+      return res.end('Failed to fetch image');
+    }
+
+    let contentType = imageRes.headers.get('content-type') || 'image/jpeg';
+    if (contentType.toLowerCase().includes('jpg')) contentType = 'image/jpeg';
     let buffer = Buffer.from(await imageRes.arrayBuffer());
 
     // CRITICAL: WhatsApp strictly drops ANY image >= 300KB (307,200 bytes).
-    // If transformed buffer is > 280KB and we have a storage path, re-fetch with 800px / q65 to guarantee < 300KB
-    if (buffer.length > 280 * 1024 && pathParam) {
+    // Tier 1 compression (800px / q60) if buffer > 250KB
+    if (buffer.length > 250 * 1024 && pathParam) {
       try {
         const cleanPath = decodeURIComponent(pathParam).replace(/^\/+/, '');
-        const compressedUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/render/image/public/${cleanPath}?width=800&quality=65`;
+        const compressedUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/render/image/public/${cleanPath}?width=800&quality=60&resize=contain`;
         const cRes = await fetch(compressedUrl);
         if (cRes.ok) {
-          buffer = Buffer.from(await cRes.arrayBuffer());
+          const cBuf = Buffer.from(await cRes.arrayBuffer());
+          if (cBuf.length > 0 && cBuf.length < buffer.length) {
+            buffer = cBuf;
+          }
+        }
+      } catch (ce) {}
+    }
+
+    // Tier 2 compression (600px / q50) if buffer still > 250KB
+    if (buffer.length > 250 * 1024 && pathParam) {
+      try {
+        const cleanPath = decodeURIComponent(pathParam).replace(/^\/+/, '');
+        const compressedUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/render/image/public/${cleanPath}?width=600&quality=50&resize=contain`;
+        const cRes = await fetch(compressedUrl);
+        if (cRes.ok) {
+          const cBuf = Buffer.from(await cRes.arrayBuffer());
+          if (cBuf.length > 0 && cBuf.length < buffer.length) {
+            buffer = cBuf;
+          }
         }
       } catch (ce) {}
     }
@@ -165,6 +195,30 @@ export default async function handler(req, res) {
     res.statusCode = 200;
     return res.end(buffer);
   } catch (err) {
+    // If an unexpected error occurs, attempt to serve fallback image
+    try {
+      const fbRes = await fetch(FALLBACK_IMAGE_URL);
+      if (fbRes.ok) {
+        const fbBuffer = Buffer.from(await fbRes.arrayBuffer());
+        if (typeof res.setHeader === 'function') {
+          res.setHeader('Content-Type', 'image/jpeg');
+          res.setHeader('Content-Length', fbBuffer.length);
+          res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=604800, stale-while-revalidate=86400');
+          res.setHeader('Access-Control-Allow-Origin', '*');
+          res.setHeader('X-Robots-Tag', 'all, index, follow');
+        }
+        if (isHead) {
+          res.statusCode = 200;
+          return res.end();
+        }
+        if (typeof res.status === 'function' && typeof res.send === 'function') {
+          return res.status(200).send(fbBuffer);
+        }
+        res.statusCode = 200;
+        return res.end(fbBuffer);
+      }
+    } catch (fe) {}
+
     if (typeof res.status === 'function') {
       return res.status(500).send('Image proxy error: ' + (err?.message || 'Unknown error'));
     }

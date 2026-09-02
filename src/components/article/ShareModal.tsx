@@ -30,6 +30,7 @@ interface ShareModalProps {
   imageUrl?: string;
   summary?: string;
   category?: string;
+  slug?: string;
 }
 
 export const ShareModal: React.FC<ShareModalProps> = ({
@@ -40,6 +41,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
   imageUrl,
   summary,
   category,
+  slug,
 }) => {
   const [copied, setCopied] = useState(false);
   const [postCopied, setPostCopied] = useState(false);
@@ -55,6 +57,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
     imageUrl,
     summary,
     category,
+    slug,
   };
 
   const links = generateSocialShareLinks(shareOptions);

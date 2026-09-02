@@ -21,17 +21,17 @@ export const getSiteOrigin = (): string => {
  * Converts any image path (relative /uploads/..., local asset, or external URL)
  * into a fully-qualified absolute URL required by social media crawlers (WhatsApp, Facebook, Twitter, Telegram, LinkedIn, etc.)
  */
-export const getAbsoluteImageUrl = (imageUrl?: string, customOrigin?: string): string => {
+export const getAbsoluteImageUrl = (imageUrl?: string, customOrigin?: string, slug?: string): string => {
   if (!imageUrl || typeof imageUrl !== 'string' || !imageUrl.trim()) {
     return DEFAULT_OG_IMAGE;
   }
 
   const trimmed = imageUrl.trim();
+  const origin = customOrigin || getSiteOrigin();
+  const cleanOrigin = origin.replace(/\/+$/, '');
 
   // If Supabase storage, route via first-party clean /api/image/path endpoint to avoid x-robots-tag: none and ensure 100% crawlability
   if (trimmed.includes('supabase.co/storage/v1/object/public/')) {
-    const origin = customOrigin || getSiteOrigin();
-    const cleanOrigin = origin.replace(/\/+$/, '');
     const pathAfter = trimmed.split('/storage/v1/object/public/')[1];
     if (pathAfter) {
       return `${cleanOrigin}/api/image/${pathAfter.replace(/^\/+/, '')}`;
@@ -39,8 +39,6 @@ export const getAbsoluteImageUrl = (imageUrl?: string, customOrigin?: string): s
     return `${cleanOrigin}/api/image?url=${encodeURIComponent(trimmed)}`;
   }
   if (trimmed.includes('supabase.co/storage/v1/render/image/public/')) {
-    const origin = customOrigin || getSiteOrigin();
-    const cleanOrigin = origin.replace(/\/+$/, '');
     const pathAfter = trimmed.split('/storage/v1/render/image/public/')[1]?.split('?')[0];
     if (pathAfter) {
       return `${cleanOrigin}/api/image/${pathAfter.replace(/^\/+/, '')}`;
@@ -48,20 +46,31 @@ export const getAbsoluteImageUrl = (imageUrl?: string, customOrigin?: string): s
     return `${cleanOrigin}/api/image?url=${encodeURIComponent(trimmed)}`;
   }
 
-  // Already a full absolute HTTP/HTTPS URL or data URI
-  if (/^https?:\/\//i.test(trimmed)) {
-    return trimmed;
-  }
-
-  // Data URLs shouldn't be shared externally as image URLs
+  // Handle data URIs
   if (trimmed.startsWith('data:')) {
+    if (slug) {
+      return `${cleanOrigin}/api/image?slug=${encodeURIComponent(slug)}`;
+    }
     return DEFAULT_OG_IMAGE;
   }
 
-  const origin = customOrigin || getSiteOrigin();
-  const cleanOrigin = origin.replace(/\/+$/, '');
-  const cleanPath = trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
+  // Already a full absolute HTTP/HTTPS URL
+  if (/^https?:\/\//i.test(trimmed)) {
+    if (trimmed.includes('images.unsplash.com')) {
+      try {
+        const u = new URL(trimmed);
+        u.searchParams.set('w', '1200');
+        u.searchParams.set('q', '75');
+        u.searchParams.set('auto', 'format');
+        return u.toString();
+      } catch {
+        return trimmed;
+      }
+    }
+    return trimmed;
+  }
 
+  const cleanPath = trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
   return `${cleanOrigin}${cleanPath}`;
 };
 
@@ -101,7 +110,7 @@ export const getShareablePostText = (title: string, summary?: string, url?: stri
 };
 
 /**
- * Fetches an image URL and converts it into a browser File object
+ * Fetches an image URL or decodes a Base64 URI and converts it into a browser File object
  * for native file sharing (Web Share API Level 2).
  */
 export const fetchImageAsFile = async (
@@ -109,7 +118,25 @@ export const fetchImageAsFile = async (
   fileName: string = 'npnews-article.jpg'
 ): Promise<File | null> => {
   try {
-    const absoluteUrl = getAbsoluteImageUrl(imageUrl);
+    const trimmed = (imageUrl || '').trim();
+    if (!trimmed) return null;
+
+    if (trimmed.startsWith('data:image/')) {
+      const match = trimmed.match(/^data:(image\/[a-zA-Z0-9+.-]+);base64,(.+)$/s);
+      if (match) {
+        const mimeType = match[1];
+        const byteCharacters = atob(match[2]);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: mimeType });
+        return new File([blob], fileName, { type: mimeType });
+      }
+    }
+
+    const absoluteUrl = getAbsoluteImageUrl(trimmed);
     const response = await fetch(absoluteUrl, { mode: 'cors' });
     if (!response.ok) return null;
     const blob = await response.blob();
@@ -127,6 +154,7 @@ export interface ShareOptions {
   imageUrl?: string;
   summary?: string;
   category?: string;
+  slug?: string;
 }
 
 /**
@@ -137,8 +165,9 @@ export const generateSocialShareLinks = ({
   url,
   imageUrl,
   summary,
+  slug,
 }: ShareOptions) => {
-  const absoluteImage = getAbsoluteImageUrl(imageUrl);
+  const absoluteImage = getAbsoluteImageUrl(imageUrl, undefined, slug);
   const cleanTitle = title.trim();
   const cleanUrl = url.trim();
   const cleanSummary = summary ? summary.trim() : '';

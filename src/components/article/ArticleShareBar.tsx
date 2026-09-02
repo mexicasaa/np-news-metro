@@ -61,6 +61,7 @@ export const ArticleShareBar: React.FC<ArticleShareBarProps> = ({
     imageUrl: featuredImage,
     summary,
     category,
+    slug: post?.slug,
   };
 
   const links = generateSocialShareLinks(shareOptions);
@@ -221,6 +222,7 @@ export const ArticleShareBar: React.FC<ArticleShareBarProps> = ({
         imageUrl={absoluteImage}
         summary={summary}
         category={category}
+        slug={post?.slug}
       />
     </>
   );

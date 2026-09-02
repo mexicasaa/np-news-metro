@@ -31,7 +31,20 @@ function getAbsoluteUrl(img, slug) {
     }
     return `${SITE_ORIGIN}/api/image?url=${encodeURIComponent(trimmed)}`;
   }
-  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  if (/^https?:\/\//i.test(trimmed)) {
+    if (trimmed.includes('images.unsplash.com')) {
+      try {
+        const u = new URL(trimmed);
+        u.searchParams.set('w', '1200');
+        u.searchParams.set('q', '75');
+        u.searchParams.set('auto', 'format');
+        return u.toString();
+      } catch (e) {
+        return trimmed;
+      }
+    }
+    return `${SITE_ORIGIN}/api/image?url=${encodeURIComponent(trimmed)}`;
+  }
   const cleanPath = trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
   return `${SITE_ORIGIN}${cleanPath}`;
 }
@@ -70,6 +83,13 @@ const CATEGORY_NAMES = {
   opinion: 'Opinion & Editorial',
   videos: 'Videos & Broadcasts',
   photos: 'Photo Galleries',
+  social: 'Social & Community',
+  astrology: 'Astrology & Horoscope',
+  crime: 'Crime & Legal',
+  state: 'State News',
+  culture: 'Culture & Heritage',
+  ncr: 'Delhi-NCR',
+  religion: 'Spiritual & Religion',
   latest: 'Latest News',
 };
 
@@ -476,6 +496,7 @@ export default async function handler(req, res) {
     const title = mediaItem ? mediaItem.title : 'NP NEWS METRO — Real News. Real Impact.';
     const category = mediaItem ? mediaItem.category : cleanCategory;
     const slug = mediaItem ? mediaItem.slug : cleanSlug;
+    const description = mediaItem ? (mediaItem.dek || mediaItem.title) : 'Independent, credible digital journalism for modern India.';
     const imageVersion = mediaItem?.modifiedAt ? `${new Date(mediaItem.modifiedAt).getTime()}_v3` : `${Date.now()}_v3`;
     let image = mediaItem ? getAbsoluteUrl(mediaItem.image, slug) : DEFAULT_OG_IMAGE;
     // Always append version to image URL to force Twitterbot and WhatsApp to discard old blocked caches
@@ -491,7 +512,9 @@ export default async function handler(req, res) {
     const modifiedIso = mediaItem?.modifiedAt || publishedIso;
     const authorName = mediaItem?.author || 'NP News Metro Desk';
     const authorRole = mediaItem?.authorRole || 'Editorial';
-    const paragraphs = mediaItem?.paragraphs || [description];
+    const paragraphs = (mediaItem?.paragraphs && mediaItem.paragraphs.length > 0)
+      ? mediaItem.paragraphs
+      : [description];
 
     // 6. GENERATE STRUCTURED DATA (JSON-LD)
     const structuredData = isVideo 

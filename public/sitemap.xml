@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://www.npnewsmetro.com/</loc>
-    <lastmod>2026-09-01</lastmod>
+    <lastmod>2026-09-02</lastmod>
     <changefreq>always</changefreq>
     <priority>1.0</priority>
   </url>
@@ -125,6 +125,36 @@
     <loc>https://www.npnewsmetro.com/advertise</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/astrology/3-sitanbara-kaa-dainika-raashiphala-jaanie-12-raashiyon-ke-lie-ka</loc>
+    <lastmod>2026-09-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/politics/mahangaaee-aama-aadamee-ko-dheemaa-jahara-de-rahee-hai-pandita-ra</loc>
+    <lastmod>2026-09-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/opinion/sanyukta-parivaara-aura-vyaayaamashaalaa-bhaarateeya-jeevana-dris</loc>
+    <lastmod>2026-09-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/opinion/nainana-kee-tirachhee-chhuree-sautana-sanga-bataraava-rasika-piya</loc>
+    <lastmod>2026-09-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/entertainment/rohinee-men-521-mahilaaon-ne-nikaalee-bhavya-kalasha-yaatraa-kris</loc>
+    <lastmod>2026-09-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>https://www.npnewsmetro.com/politics/seeema-dhaamee-kee-pahala-se-8-varsheeya-deva-kaa-hogaa-muphta-il</loc>
