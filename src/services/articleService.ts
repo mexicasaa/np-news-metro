@@ -208,7 +208,27 @@ export const EDITORIAL_SELECT = `
   )
 `;
 
+// Client-side in-memory cache to strictly protect Supabase DB and Egress limits
+let cachedHomepageArticles: { data: WpPost[]; timestamp: number } | null = null;
+const cachedCategoryArticles = new Map<string, { data: WpPost[]; timestamp: number }>();
+const cachedLatestArticles = new Map<string, { data: WpPost[]; timestamp: number }>();
+const cachedArticleBySlug = new Map<string, { data: WpPost; timestamp: number }>();
+
+const CLIENT_ARTICLE_TTL = 2 * 60 * 1000; // 2 minutes
+const CLIENT_SLUG_TTL = 5 * 60 * 1000;    // 5 minutes
+
+export const invalidateArticleClientCache = () => {
+  cachedHomepageArticles = null;
+  cachedCategoryArticles.clear();
+  cachedLatestArticles.clear();
+  cachedArticleBySlug.clear();
+};
+
 export const getPublishedArticles = async (): Promise<WpPost[]> => {
+  if (cachedHomepageArticles && Date.now() - cachedHomepageArticles.timestamp < CLIENT_ARTICLE_TTL) {
+    return cachedHomepageArticles.data;
+  }
+
   // 1. First attempt to fetch from Vercel Edge-cached public API
   try {
     if (typeof window !== 'undefined') {
@@ -221,7 +241,9 @@ export const getPublishedArticles = async (): Promise<WpPost[]> => {
           const supplementalMock = defaultMockPosts
             .filter(isPostPublished)
             .filter(m => !liveSlugs.has(m.slug));
-          return [...livePosts, ...supplementalMock];
+          const combined = [...livePosts, ...supplementalMock];
+          cachedHomepageArticles = { data: combined, timestamp: Date.now() };
+          return combined;
         }
       }
     }
@@ -245,7 +267,9 @@ export const getPublishedArticles = async (): Promise<WpPost[]> => {
     }
 
     if (!data || data.length === 0) {
-      return defaultMockPosts.filter(isPostPublished);
+      const fallback = defaultMockPosts.filter(isPostPublished);
+      cachedHomepageArticles = { data: fallback, timestamp: Date.now() };
+      return fallback;
     }
 
     const livePosts = data.map(row => mapDbToWpPost(row)).filter(isPostPublished);
@@ -254,7 +278,9 @@ export const getPublishedArticles = async (): Promise<WpPost[]> => {
       .filter(isPostPublished)
       .filter(m => !liveSlugs.has(m.slug));
     
-    return [...livePosts, ...supplementalMock];
+    const combined = [...livePosts, ...supplementalMock];
+    cachedHomepageArticles = { data: combined, timestamp: Date.now() };
+    return combined;
   } catch (err) {
     console.error('Unexpected error fetching published articles:', err);
     return defaultMockPosts.filter(isPostPublished);
@@ -266,6 +292,12 @@ export const getCategoryArticles = async (
   page: number = 1,
   limit: number = 20
 ): Promise<WpPost[]> => {
+  const cacheKey = `${categorySlug.toLowerCase()}:${page}:${limit}`;
+  const cached = cachedCategoryArticles.get(cacheKey);
+  if (cached && Date.now() - cached.timestamp < CLIENT_ARTICLE_TTL) {
+    return cached.data;
+  }
+
   // 1. First attempt to fetch from Vercel Edge-cached public API
   try {
     if (typeof window !== 'undefined') {
@@ -273,7 +305,9 @@ export const getCategoryArticles = async (
       if (res.ok) {
         const json = await res.json();
         if (json?.posts && Array.isArray(json.posts)) {
-          return json.posts.map((row: any) => mapDbToWpPost(row)).filter(isPostPublished);
+          const mapped = json.posts.map((row: any) => mapDbToWpPost(row)).filter(isPostPublished);
+          cachedCategoryArticles.set(cacheKey, { data: mapped, timestamp: Date.now() });
+          return mapped;
         }
       }
     }
@@ -302,7 +336,9 @@ export const getCategoryArticles = async (
       .range(offset, offset + limit - 1);
 
     if (error || !data) return [];
-    return data.map(row => mapDbToWpPost(row)).filter(isPostPublished);
+    const mapped = data.map(row => mapDbToWpPost(row)).filter(isPostPublished);
+    cachedCategoryArticles.set(cacheKey, { data: mapped, timestamp: Date.now() });
+    return mapped;
   } catch (err) {
     return [];
   }
@@ -312,6 +348,12 @@ export const getLatestArticles = async (
   page: number = 1,
   limit: number = 20
 ): Promise<WpPost[]> => {
+  const cacheKey = `${page}:${limit}`;
+  const cached = cachedLatestArticles.get(cacheKey);
+  if (cached && Date.now() - cached.timestamp < CLIENT_ARTICLE_TTL) {
+    return cached.data;
+  }
+
   // 1. First attempt to fetch from Vercel Edge-cached public API
   try {
     if (typeof window !== 'undefined') {
@@ -319,7 +361,9 @@ export const getLatestArticles = async (
       if (res.ok) {
         const json = await res.json();
         if (json?.posts && Array.isArray(json.posts)) {
-          return json.posts.map((row: any) => mapDbToWpPost(row)).filter(isPostPublished);
+          const mapped = json.posts.map((row: any) => mapDbToWpPost(row)).filter(isPostPublished);
+          cachedLatestArticles.set(cacheKey, { data: mapped, timestamp: Date.now() });
+          return mapped;
         }
       }
     }
@@ -336,7 +380,9 @@ export const getLatestArticles = async (
       .range(offset, offset + limit - 1);
 
     if (error || !data) return [];
-    return data.map(row => mapDbToWpPost(row)).filter(isPostPublished);
+    const mapped = data.map(row => mapDbToWpPost(row)).filter(isPostPublished);
+    cachedLatestArticles.set(cacheKey, { data: mapped, timestamp: Date.now() });
+    return mapped;
   } catch (err) {
     return [];
   }
@@ -383,6 +429,14 @@ export const getArticleBySlug = async (
   slug: string, 
   allowDraft: boolean = false
 ): Promise<WpPost | null> => {
+  // Check client cache if not in draft mode
+  if (!allowDraft) {
+    const cached = cachedArticleBySlug.get(slug);
+    if (cached && Date.now() - cached.timestamp < CLIENT_SLUG_TTL) {
+      return cached.data;
+    }
+  }
+
   // 1. For public visitors (not in draft preview), try edge-cached API first
   if (!allowDraft) {
     try {
@@ -393,6 +447,7 @@ export const getArticleBySlug = async (
           if (json?.post) {
             const mapped = mapDbToWpPost(json.post);
             if (isPostPublished(mapped)) {
+              cachedArticleBySlug.set(slug, { data: mapped, timestamp: Date.now() });
               return mapped;
             }
           }
@@ -426,12 +481,11 @@ export const getArticleBySlug = async (
     if (!allowDraft && !isPostPublished(mapped)) {
       return null;
     }
+    if (!allowDraft) {
+      cachedArticleBySlug.set(slug, { data: mapped, timestamp: Date.now() });
+    }
     return mapped;
   } catch (err) {
-    const mock = defaultMockPosts.find(p => p.slug === slug);
-    if (mock && (allowDraft || isPostPublished(mock))) {
-      return mock;
-    }
     return null;
   }
 };
@@ -665,6 +719,8 @@ export const saveArticle = async (
         if (resultArticle.slug) removeStoredDraft(resultArticle.slug, title);
       } catch (e) {}
     }
+
+    invalidateArticleClientCache();
 
     // Broadcast across tabs/windows for instant sync
     try {

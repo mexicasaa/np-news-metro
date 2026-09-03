@@ -31,7 +31,20 @@ export interface DbSiteSettings {
   timezone: string | null;
 }
 
+// Client-side in-memory cache to strictly protect Supabase DB and Egress limits
+let cachedCategories: { data: WpCategory[]; timestamp: number } | null = null;
+let cachedTags: { data: DbTag[]; timestamp: number } | null = null;
+let cachedSiteSettings: { data: DbSiteSettings | null; timestamp: number } | null = null;
+let cachedTaxonomyVideos: { data: WpVideo[]; timestamp: number } | null = null;
+
+const TAXONOMY_TTL = 30 * 60 * 1000; // 30 minutes
+const VIDEOS_TTL = 5 * 60 * 1000;    // 5 minutes
+
 export const getCategories = async (): Promise<WpCategory[]> => {
+  if (cachedCategories && Date.now() - cachedCategories.timestamp < TAXONOMY_TTL) {
+    return cachedCategories.data;
+  }
+
   try {
     const { data, error } = await supabase
       .from('categories')
@@ -45,13 +58,15 @@ export const getCategories = async (): Promise<WpCategory[]> => {
     }
 
     if (data && data.length > 0) {
-      return data.map((c) => ({
+      const mapped = data.map((c) => ({
         id: c.id,
         name: c.name,
         slug: c.slug,
         description: c.description || '',
         count: 12,
       }));
+      cachedCategories = { data: mapped, timestamp: Date.now() };
+      return mapped;
     }
 
     return mockCategories;
@@ -62,6 +77,10 @@ export const getCategories = async (): Promise<WpCategory[]> => {
 };
 
 export const getTags = async (): Promise<DbTag[]> => {
+  if (cachedTags && Date.now() - cachedTags.timestamp < TAXONOMY_TTL) {
+    return cachedTags.data;
+  }
+
   try {
     const { data, error } = await supabase
       .from('tags')
@@ -73,7 +92,9 @@ export const getTags = async (): Promise<DbTag[]> => {
       return [];
     }
 
-    return data || [];
+    const res = data || [];
+    cachedTags = { data: res, timestamp: Date.now() };
+    return res;
   } catch (err) {
     console.error('Unexpected error fetching tags:', err);
     return [];
@@ -81,6 +102,10 @@ export const getTags = async (): Promise<DbTag[]> => {
 };
 
 export const getSiteSettings = async (): Promise<DbSiteSettings | null> => {
+  if (cachedSiteSettings && Date.now() - cachedSiteSettings.timestamp < TAXONOMY_TTL) {
+    return cachedSiteSettings.data;
+  }
+
   try {
     const { data, error } = await supabase
       .from('site_settings')
@@ -93,6 +118,7 @@ export const getSiteSettings = async (): Promise<DbSiteSettings | null> => {
       return null;
     }
 
+    cachedSiteSettings = { data, timestamp: Date.now() };
     return data;
   } catch (err) {
     console.error('Unexpected error fetching site settings:', err);
@@ -101,6 +127,10 @@ export const getSiteSettings = async (): Promise<DbSiteSettings | null> => {
 };
 
 export const getVideos = async (): Promise<WpVideo[]> => {
+  if (cachedTaxonomyVideos && Date.now() - cachedTaxonomyVideos.timestamp < VIDEOS_TTL) {
+    return cachedTaxonomyVideos.data;
+  }
+
   try {
     const { data, error } = await supabase
       .from('videos')
@@ -112,7 +142,7 @@ export const getVideos = async (): Promise<WpVideo[]> => {
       return mockVideos;
     }
 
-    return data.map((v) => ({
+    const mapped = data.map((v) => ({
       id: v.id,
       title: v.title,
       slug: v.slug,
@@ -127,6 +157,9 @@ export const getVideos = async (): Promise<WpVideo[]> => {
       publishedAt: v.published_at || new Date().toISOString(),
       viewsCount: '12.4K',
     }));
+
+    cachedTaxonomyVideos = { data: mapped, timestamp: Date.now() };
+    return mapped;
   } catch (err) {
     console.error('Error fetching videos:', err);
     return mockVideos;

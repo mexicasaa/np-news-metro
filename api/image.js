@@ -1,5 +1,37 @@
 // @ts-nocheck
-import './_suppressWarnings.js';
+import url from 'node:url';
+
+// 1. Permanently silence DEP0169 url.parse deprecation warnings across all runtimes
+if (typeof process !== 'undefined' && process.emitWarning) {
+  const _origEmitWarning = process.emitWarning;
+  process.emitWarning = function (warning, ...args) {
+    if (
+      (typeof warning === 'string' && (warning.includes('url.parse') || warning.includes('DEP0169'))) ||
+      (args[0] === 'DEP0169' || args[1] === 'DEP0169') ||
+      (warning && typeof warning === 'object' && (warning.code === 'DEP0169' || warning.name === 'DEP0169' || (warning.message && warning.message.includes('url.parse'))))
+    ) {
+      return;
+    }
+    return _origEmitWarning.apply(process, [warning, ...args]);
+  };
+}
+
+if (url && typeof url.parse === 'function') {
+  const _origParse = url.parse;
+  url.parse = function (...args) {
+    if (typeof process !== 'undefined' && process.emitWarning) {
+      const savedEmit = process.emitWarning;
+      process.emitWarning = () => {};
+      try {
+        return _origParse.apply(this, args);
+      } finally {
+        process.emitWarning = savedEmit;
+      }
+    }
+    return _origParse.apply(this, args);
+  };
+}
+
 const SUPABASE_STORAGE_ORIGIN = process.env.VITE_SUPABASE_URL || 'https://bogjmdyolhazzvicjrjl.supabase.co';
 const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvZ2ptZHlvbGhhenp2aWNqcmpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0NDcxNDAsImV4cCI6MjEwNDAyMzE0MH0.taOdcGmN6pQ3sfuIC2UIVkSV-8j0Y_wuXS-7Un4xo_0';
 const FALLBACK_IMAGE_URL = 'https://www.npnewsmetro.com/uploads/dr-deepak-goswami.jpg';

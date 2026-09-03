@@ -183,7 +183,21 @@ const VIDEO_FIELDS = `
   categories (id, name, slug)
 `;
 
+// Client-side in-memory cache to strictly protect Supabase DB and Egress limits
+let cachedPublishedVideos: { data: WpVideo[]; timestamp: number } | null = null;
+const cachedVideoBySlug = new Map<string, { data: WpVideo | null; timestamp: number }>();
+const CLIENT_VIDEO_TTL = 3 * 60 * 1000; // 3 minutes
+
+export const invalidateVideoClientCache = () => {
+  cachedPublishedVideos = null;
+  cachedVideoBySlug.clear();
+};
+
 export const getPublishedVideos = async (): Promise<WpVideo[]> => {
+  if (cachedPublishedVideos && Date.now() - cachedPublishedVideos.timestamp < CLIENT_VIDEO_TTL) {
+    return cachedPublishedVideos.data;
+  }
+
   // 1. Try Vercel Edge cached API
   try {
     if (typeof window !== 'undefined') {
@@ -199,6 +213,7 @@ export const getPublishedVideos = async (): Promise<WpVideo[]> => {
               combined.push(sv);
             }
           }
+          cachedPublishedVideos = { data: combined, timestamp: Date.now() };
           return combined;
         }
       }
@@ -215,6 +230,7 @@ export const getPublishedVideos = async (): Promise<WpVideo[]> => {
 
     const stored = getStoredVideos();
     if (error || !data || data.length === 0) {
+      cachedPublishedVideos = { data: stored, timestamp: Date.now() };
       return stored;
     }
 
@@ -225,6 +241,7 @@ export const getPublishedVideos = async (): Promise<WpVideo[]> => {
         combined.push(sv);
       }
     }
+    cachedPublishedVideos = { data: combined, timestamp: Date.now() };
     return combined;
   } catch (err) {
     console.error('Error fetching videos from Supabase:', err);
@@ -233,6 +250,11 @@ export const getPublishedVideos = async (): Promise<WpVideo[]> => {
 };
 
 export const getVideoBySlug = async (slug: string): Promise<WpVideo | null> => {
+  const cached = cachedVideoBySlug.get(slug);
+  if (cached && Date.now() - cached.timestamp < CLIENT_VIDEO_TTL) {
+    return cached.data;
+  }
+
   // 1. Try Vercel Edge cached API
   try {
     if (typeof window !== 'undefined') {
@@ -240,7 +262,9 @@ export const getVideoBySlug = async (slug: string): Promise<WpVideo | null> => {
       if (res.ok) {
         const json = await res.json();
         if (json?.video) {
-          return mapDbToWpVideo(json.video);
+          const mapped = mapDbToWpVideo(json.video);
+          cachedVideoBySlug.set(slug, { data: mapped, timestamp: Date.now() });
+          return mapped;
         }
       }
     }
@@ -257,10 +281,14 @@ export const getVideoBySlug = async (slug: string): Promise<WpVideo | null> => {
     if (error || !data) {
       const stored = getStoredVideos();
       const mock = stored.find(v => v.slug === slug) || mockVideos.find(v => v.slug === slug);
-      return mock || null;
+      const res = mock || null;
+      cachedVideoBySlug.set(slug, { data: res, timestamp: Date.now() });
+      return res;
     }
 
-    return mapDbToWpVideo(data);
+    const mapped = mapDbToWpVideo(data);
+    cachedVideoBySlug.set(slug, { data: mapped, timestamp: Date.now() });
+    return mapped;
   } catch (err) {
     return null;
   }

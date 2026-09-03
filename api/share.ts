@@ -1,5 +1,37 @@
 // @ts-nocheck
-import './_suppressWarnings.js';
+import url from 'node:url';
+
+// 1. Permanently silence DEP0169 url.parse deprecation warnings across all runtimes
+if (typeof process !== 'undefined' && process.emitWarning) {
+  const _origEmitWarning = process.emitWarning;
+  process.emitWarning = function (warning: any, ...args: any[]) {
+    if (
+      (typeof warning === 'string' && (warning.includes('url.parse') || warning.includes('DEP0169'))) ||
+      (args[0] === 'DEP0169' || args[1] === 'DEP0169') ||
+      (warning && typeof warning === 'object' && (warning.code === 'DEP0169' || warning.name === 'DEP0169' || (warning.message && warning.message.includes('url.parse'))))
+    ) {
+      return;
+    }
+    return _origEmitWarning.apply(process, [warning, ...args]);
+  };
+}
+
+if (url && typeof url.parse === 'function') {
+  const _origParse = url.parse;
+  url.parse = function (...args: any[]) {
+    if (typeof process !== 'undefined' && process.emitWarning) {
+      const savedEmit = process.emitWarning;
+      process.emitWarning = () => {};
+      try {
+        return _origParse.apply(this, args);
+      } finally {
+        process.emitWarning = savedEmit;
+      }
+    }
+    return _origParse.apply(this, args);
+  };
+}
+
 import { createClient } from '@supabase/supabase-js';
 // @ts-ignore
 import { FALLBACK_ARTICLES } from './_sitemapHelper.js';
@@ -13,6 +45,10 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 
 const SITE_ORIGIN = 'https://www.npnewsmetro.com';
 const DEFAULT_OG_IMAGE = 'https://www.npnewsmetro.com/uploads/dr-deepak-goswami.jpg';
+
+// In-memory warm cache for crawler/bot requests to completely protect Supabase DB and Egress
+const shareWarmCache = new Map<string, { html: string; timestamp: number }>();
+const SHARE_CACHE_TTL = 15 * 60 * 1000; // 15 minutes
 
 function getAbsoluteUrl(img?: any, slug?: any): string {
   if (!img || typeof img !== 'string' || !img.trim()) return DEFAULT_OG_IMAGE;
@@ -69,7 +105,7 @@ function sendResponse(res: any, statusCode: number, contentType: string, body: a
   res.statusCode = statusCode;
   if (typeof res.setHeader === 'function') {
     res.setHeader('Content-Type', contentType);
-    res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=600, stale-while-revalidate=3600');
+    res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400');
   }
   if (typeof res.status === 'function' && typeof res.send === 'function') {
     return res.status(statusCode).send(body);
@@ -195,6 +231,12 @@ export default async function handler(req: any, res: any) {
     // 1. CATEGORY VIEW PRE-RENDERING
     if ((cleanCategory && !cleanSlug) || cleanCategory === 'category') {
       const targetCat = (cleanSlug || cleanCategory).toLowerCase();
+      const catCacheKey = `cat:${targetCat}`;
+      const cachedCat = shareWarmCache.get(catCacheKey);
+      if (cachedCat && Date.now() - cachedCat.timestamp < SHARE_CACHE_TTL) {
+        return sendResponse(res, 200, 'text/html; charset=utf-8', cachedCat.html);
+      }
+
       const catDisplayName = (CATEGORY_NAMES as Record<string, string>)[targetCat] || targetCat.toUpperCase();
       const canonicalCatUrl = `${SITE_ORIGIN}/category/${targetCat}`;
 
@@ -318,10 +360,16 @@ export default async function handler(req: any, res: any) {
   </footer>
 </body>
 </html>`;
+      shareWarmCache.set(catCacheKey, { html: catHtml, timestamp: Date.now() });
       return sendResponse(res, 200, 'text/html; charset=utf-8', catHtml);
     }
 
     let mediaItem = null;
+    const articleCacheKey = `item:${cleanCategory}:${cleanSlug || rawSlugParam}`;
+    const cachedItem = shareWarmCache.get(articleCacheKey);
+    if (cachedItem && Date.now() - cachedItem.timestamp < SHARE_CACHE_TTL) {
+      return sendResponse(res, 200, 'text/html; charset=utf-8', cachedItem.html);
+    }
 
     // 2. CHECK VIDEOS DESK
     if (cleanCategory === 'videos' && cleanSlug) {
@@ -349,7 +397,7 @@ export default async function handler(req: any, res: any) {
       } catch (e) {}
     }
 
-    // 3. CHECK ARTICLES IN SUPABASE
+    // 3. CHECK ARTICLES IN SUPABASE (Lean projection: NO heavy blocks or full content)
     if (!mediaItem && cleanSlug) {
       try {
         let { data } = await supabase
@@ -359,8 +407,6 @@ export default async function handler(req: any, res: any) {
             seo_title, 
             excerpt, 
             meta_description, 
-            content,
-            blocks,
             category_id, 
             featured_image_url, 
             featured_image_caption,
@@ -376,7 +422,7 @@ export default async function handler(req: any, res: any) {
           .eq('status', 'published')
           .maybeSingle();
 
-        // Fallback: If not found with decoded slug, try rawSlugParam or lowercase
+        // Fallback: If not found with decoded slug, try rawSlugParam
         if (!data && rawSlugParam && rawSlugParam !== cleanSlug) {
           const { data: rawData } = await supabase
             .from('articles')
@@ -385,8 +431,6 @@ export default async function handler(req: any, res: any) {
               seo_title, 
               excerpt, 
               meta_description, 
-              content,
-              blocks,
               category_id, 
               featured_image_url, 
               featured_image_caption,
@@ -407,22 +451,7 @@ export default async function handler(req: any, res: any) {
         if (data) {
           const rawCat = (data as any).categories;
           const resolvedCat = (Array.isArray(rawCat) ? rawCat[0]?.slug : rawCat?.slug) || cleanCategory;
-          let bodyParagraphs: string[] = [];
-
-          if (Array.isArray(data.blocks) && data.blocks.length > 0) {
-            bodyParagraphs = (data.blocks as any[])
-              .filter((b: any) => b.type === 'paragraph' && b.content)
-              .map((b: any) => b.content);
-          }
-          if (bodyParagraphs.length === 0 && data.content) {
-            bodyParagraphs = String(data.content)
-              .split(/\n\s*\n/)
-              .map((p: any) => p.trim())
-              .filter(Boolean);
-          }
-          if (bodyParagraphs.length === 0 && (data.meta_description || data.excerpt)) {
-            bodyParagraphs = [data.meta_description || data.excerpt];
-          }
+          const bodyParagraphs = [data.meta_description || data.excerpt || data.title];
 
           const authorName = (data as any).custom_author?.name || (data as any).author_name || 'NP News Metro Bureau';
 
@@ -682,6 +711,7 @@ export default async function handler(req: any, res: any) {
 </body>
 </html>`;
 
+    shareWarmCache.set(articleCacheKey, { html, timestamp: Date.now() });
     return sendResponse(res, 200, 'text/html; charset=utf-8', html);
   } catch (err: any) {
     return sendResponse(res, 500, 'text/plain; charset=utf-8', 'Server Error: ' + (err?.message || String(err)));
