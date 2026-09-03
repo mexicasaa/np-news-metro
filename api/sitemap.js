@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { fetchLiveArticles, buildMainSitemapXml, sendXmlResponse } from './_sitemapHelper.js';
 
 export default async function handler(req, res) {

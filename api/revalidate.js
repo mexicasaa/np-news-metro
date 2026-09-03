@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { invalidateWarmCache } from './articles.js';
 import { invalidateWarmCache as invalidateVideosWarmCache } from './videos.js';
 

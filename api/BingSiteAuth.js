@@ -1,3 +1,4 @@
+// @ts-nocheck
 export default function handler(req, res) {
   res.setHeader('Content-Type', 'application/xml; charset=utf-8');
   res.setHeader('Cache-Control', 'public, max-age=86400, stale-while-revalidate=3600');

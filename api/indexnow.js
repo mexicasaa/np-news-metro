@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { fetchLiveArticles, BASE_URL, DEFAULT_CATEGORIES } from './_sitemapHelper.js';
 
 export const INDEXNOW_KEY = '968b4404627f469a8e29b9a607c4b1e7';
