@@ -10,6 +10,16 @@
   "env": {
     "NODE_OPTIONS": "--no-deprecation"
   },
+  "functions": {
+    "api/**/*.js": {
+      "memory": 1024,
+      "maxDuration": 15
+    },
+    "api/**/*.ts": {
+      "memory": 1024,
+      "maxDuration": 15
+    }
+  },
   "redirects": [
     {
       "source": "/sitemap",
