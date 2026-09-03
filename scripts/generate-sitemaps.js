@@ -37,6 +37,5 @@ async function main() {
 }
 
 main().catch(err => {
-  console.error(err);
-  process.exit(1);
+  console.warn('Warning during static sitemap generation (using committed fallback sitemaps):', err?.message || err);
 });
