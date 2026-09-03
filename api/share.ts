@@ -1,4 +1,5 @@
 // @ts-nocheck
+import './_suppressWarnings.js';
 import { createClient } from '@supabase/supabase-js';
 // @ts-ignore
 import { FALLBACK_ARTICLES } from './_sitemapHelper.js';
