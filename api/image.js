@@ -1,5 +1,5 @@
-const SUPABASE_STORAGE_ORIGIN = process.env.VITE_SUPABASE_URL || 'https://jkzrjqclgqpfjdqxsnut.supabase.co';
-const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprenJqcWNsZ3FwZmpkcXhzbnV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NjU0ODksImV4cCI6MjEwMzE0MTQ4OX0.tDPKLptID2tvWKAKstPVr73I7p_cFt3PPGX9AXL4l28';
+const SUPABASE_STORAGE_ORIGIN = process.env.VITE_SUPABASE_URL || 'https://bogjmdyolhazzvicjrjl.supabase.co';
+const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvZ2ptZHlvbGhhenp2aWNqcmpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0NDcxNDAsImV4cCI6MjEwNDAyMzE0MH0.taOdcGmN6pQ3sfuIC2UIVkSV-8j0Y_wuXS-7Un4xo_0';
 const FALLBACK_IMAGE_URL = 'https://www.npnewsmetro.com/uploads/dr-deepak-goswami.jpg';
 
 export default async function handler(req, res) {
@@ -71,15 +71,17 @@ export default async function handler(req, res) {
       } catch (e) {}
     }
 
+    const reqWidth = parseInt(req.query?.width || req.query?.w || url.searchParams.get('width') || url.searchParams.get('w') || '1200', 10);
+    const validWidth = isNaN(reqWidth) ? 1200 : Math.min(1920, Math.max(100, reqWidth));
+    const reqQuality = parseInt(req.query?.quality || req.query?.q || url.searchParams.get('quality') || url.searchParams.get('q') || '75', 10);
+    const validQuality = isNaN(reqQuality) ? 75 : Math.min(100, Math.max(30, reqQuality));
+
     let targetUrl = '';
     let fallbackUrl = '';
 
     if (pathParam) {
       const cleanPath = decodeURIComponent(pathParam).replace(/^\/+/, '');
-      // Route through Supabase Image Transformation CDN with optimal web parameters (1200px width, 75% quality)
-      // CRITICAL: WhatsApp strictly drops ANY image >= 300KB!
-      // This compression reduces large raw images (e.g. 600KB) to ~90KB to guarantee they show in WhatsApp & X.
-      targetUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/render/image/public/${cleanPath}?width=1200&quality=75&resize=contain`;
+      targetUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/render/image/public/${cleanPath}?width=${validWidth}&quality=${validQuality}&resize=contain`;
       fallbackUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/object/public/${cleanPath}`;
     } else if (urlParam) {
       let decoded = urlParam;
@@ -93,17 +95,17 @@ export default async function handler(req, res) {
 
       if (decoded.includes('/storage/v1/object/public/')) {
         const storagePath = decoded.split('/storage/v1/object/public/')[1];
-        targetUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/render/image/public/${storagePath}?width=1200&quality=75&resize=contain`;
+        targetUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/render/image/public/${storagePath}?width=${validWidth}&quality=${validQuality}&resize=contain`;
         fallbackUrl = decoded;
       } else if (decoded.includes('/storage/v1/render/image/public/')) {
         const storagePath = decoded.split('/storage/v1/render/image/public/')[1]?.split('?')[0];
-        targetUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/render/image/public/${storagePath}?width=1200&quality=75&resize=contain`;
+        targetUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/render/image/public/${storagePath}?width=${validWidth}&quality=${validQuality}&resize=contain`;
         fallbackUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/object/public/${storagePath}`;
       } else if (decoded.includes('images.unsplash.com')) {
         try {
           const u = new URL(decoded);
-          u.searchParams.set('w', '1200');
-          u.searchParams.set('q', '75');
+          u.searchParams.set('w', String(validWidth));
+          u.searchParams.set('q', String(validQuality));
           u.searchParams.set('auto', 'format');
           targetUrl = u.toString();
         } catch (e) {
@@ -112,7 +114,7 @@ export default async function handler(req, res) {
       } else if (/^https?:\/\//i.test(decoded)) {
         targetUrl = decoded;
       } else {
-        targetUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/render/image/public/${decoded.replace(/^\/+/, '')}?width=1200&quality=75&resize=contain`;
+        targetUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/render/image/public/${decoded.replace(/^\/+/, '')}?width=${validWidth}&quality=${validQuality}&resize=contain`;
         fallbackUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/object/public/${decoded.replace(/^\/+/, '')}`;
       }
     } else {

@@ -170,20 +170,74 @@ export const generateUniqueSlug = async (
   }
 };
 
+export const CARD_PROJECTION_SELECT = `
+  id, slug, title, title_hi, excerpt, dek_hi, category_id,
+  categories (id, name, slug),
+  author_id, author_name, author_role, author_avatar,
+  published_at, updated_at, status,
+  is_breaking_news, is_lead, is_featured, is_opinion, is_sponsored,
+  reading_time_minutes, view_count,
+  featured_image_url, featured_image_alt, featured_image_caption
+`;
+
+export const ARTICLE_DETAIL_SELECT = `
+  id, slug, title, title_hi, excerpt, dek_hi, content, blocks, key_takeaways,
+  author_id, author_name, author_role, author_avatar, author_bio,
+  category_id, categories (id, name, slug),
+  published_at, updated_at, status,
+  is_breaking_news, is_lead, is_featured, is_opinion, is_sponsored, sponsor_name,
+  reading_time_minutes, view_count, location, image_credit,
+  seo_title, meta_description, canonical_url, robots_index, robots_follow,
+  featured_image_url, featured_image_alt, featured_image_caption, custom_author,
+  article_tags (
+    tags (id, name, slug)
+  )
+`;
+
+export const EDITORIAL_SELECT = `
+  id, slug, title, title_hi, excerpt, dek_hi, content, blocks, key_takeaways,
+  author_id, author_name, author_role, author_avatar, author_bio,
+  category_id, categories (id, name, slug),
+  published_at, updated_at, status, created_at,
+  is_breaking_news, is_lead, is_featured, is_opinion, is_sponsored, sponsor_name,
+  reading_time_minutes, view_count, location, image_credit,
+  seo_title, meta_description, canonical_url, robots_index, robots_follow,
+  featured_image_url, featured_image_alt, featured_image_caption, custom_author,
+  article_tags (
+    tags (id, name, slug)
+  )
+`;
+
 export const getPublishedArticles = async (): Promise<WpPost[]> => {
+  // 1. First attempt to fetch from Vercel Edge-cached public API
+  try {
+    if (typeof window !== 'undefined') {
+      const res = await fetch('/api/articles?view=homepage');
+      if (res.ok) {
+        const json = await res.json();
+        if (json?.posts && Array.isArray(json.posts) && json.posts.length > 0) {
+          const livePosts = json.posts.map((row: any) => mapDbToWpPost(row)).filter(isPostPublished);
+          const liveSlugs = new Set(livePosts.map((p: any) => p.slug));
+          const supplementalMock = defaultMockPosts
+            .filter(isPostPublished)
+            .filter(m => !liveSlugs.has(m.slug));
+          return [...livePosts, ...supplementalMock];
+        }
+      }
+    }
+  } catch (apiErr) {
+    // Fallback to direct Supabase client if /api is unreachable
+  }
+
+  // 2. Direct Supabase query with LEAN column projection (NO full content/blocks)
   try {
     const { data, error } = await supabase
       .from('articles')
-      .select(`
-        *,
-        categories (id, name, slug),
-        article_tags (
-          tags (id, name, slug)
-        )
-      `)
+      .select(CARD_PROJECTION_SELECT)
       .eq('status', 'published')
       .order('is_lead', { ascending: false })
-      .order('published_at', { ascending: false });
+      .order('published_at', { ascending: false })
+      .limit(40);
 
     if (error) {
       console.warn('Error fetching published articles from Supabase:', error.message);
@@ -195,8 +249,6 @@ export const getPublishedArticles = async (): Promise<WpPost[]> => {
     }
 
     const livePosts = data.map(row => mapDbToWpPost(row)).filter(isPostPublished);
-    
-    // Merge live posts with missing mock posts only to preserve category sample breadth if few articles exist
     const liveSlugs = new Set(livePosts.map(p => p.slug));
     const supplementalMock = defaultMockPosts
       .filter(isPostPublished)
@@ -209,23 +261,153 @@ export const getPublishedArticles = async (): Promise<WpPost[]> => {
   }
 };
 
+export const getCategoryArticles = async (
+  categorySlug: string,
+  page: number = 1,
+  limit: number = 20
+): Promise<WpPost[]> => {
+  // 1. First attempt to fetch from Vercel Edge-cached public API
+  try {
+    if (typeof window !== 'undefined') {
+      const res = await fetch(`/api/articles?category=${encodeURIComponent(categorySlug)}&page=${page}&limit=${limit}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json?.posts && Array.isArray(json.posts)) {
+          return json.posts.map((row: any) => mapDbToWpPost(row)).filter(isPostPublished);
+        }
+      }
+    }
+  } catch (apiErr) {}
+
+  // 2. Direct Supabase fallback
+  try {
+    const offset = (page - 1) * limit;
+    let query = supabase
+      .from('articles')
+      .select(CARD_PROJECTION_SELECT)
+      .eq('status', 'published');
+
+    const { data: catRow } = await supabase
+      .from('categories')
+      .select('id')
+      .eq('slug', categorySlug.toLowerCase())
+      .maybeSingle();
+
+    if (catRow?.id) {
+      query = query.eq('category_id', catRow.id);
+    }
+
+    const { data, error } = await query
+      .order('published_at', { ascending: false })
+      .range(offset, offset + limit - 1);
+
+    if (error || !data) return [];
+    return data.map(row => mapDbToWpPost(row)).filter(isPostPublished);
+  } catch (err) {
+    return [];
+  }
+};
+
+export const getLatestArticles = async (
+  page: number = 1,
+  limit: number = 20
+): Promise<WpPost[]> => {
+  // 1. First attempt to fetch from Vercel Edge-cached public API
+  try {
+    if (typeof window !== 'undefined') {
+      const res = await fetch(`/api/articles?view=latest&page=${page}&limit=${limit}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json?.posts && Array.isArray(json.posts)) {
+          return json.posts.map((row: any) => mapDbToWpPost(row)).filter(isPostPublished);
+        }
+      }
+    }
+  } catch (apiErr) {}
+
+  // 2. Direct Supabase fallback
+  try {
+    const offset = (page - 1) * limit;
+    const { data, error } = await supabase
+      .from('articles')
+      .select(CARD_PROJECTION_SELECT)
+      .eq('status', 'published')
+      .order('published_at', { ascending: false })
+      .range(offset, offset + limit - 1);
+
+    if (error || !data) return [];
+    return data.map(row => mapDbToWpPost(row)).filter(isPostPublished);
+  } catch (err) {
+    return [];
+  }
+};
+
+export const searchArticles = async (
+  queryText: string,
+  limit: number = 20
+): Promise<WpPost[]> => {
+  if (!queryText.trim()) return [];
+
+  // 1. First attempt to fetch from Vercel Edge-cached public API
+  try {
+    if (typeof window !== 'undefined') {
+      const res = await fetch(`/api/articles?search=${encodeURIComponent(queryText)}&limit=${limit}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json?.posts && Array.isArray(json.posts)) {
+          return json.posts.map((row: any) => mapDbToWpPost(row)).filter(isPostPublished);
+        }
+      }
+    }
+  } catch (apiErr) {}
+
+  // 2. Direct Supabase fallback
+  try {
+    const safeQ = queryText.replace(/[%_]/g, '');
+    const { data, error } = await supabase
+      .from('articles')
+      .select(CARD_PROJECTION_SELECT)
+      .eq('status', 'published')
+      .or(`title.ilike.%${safeQ}%,excerpt.ilike.%${safeQ}%,title_hi.ilike.%${safeQ}%`)
+      .order('published_at', { ascending: false })
+      .limit(limit);
+
+    if (error || !data) return [];
+    return data.map(row => mapDbToWpPost(row)).filter(isPostPublished);
+  } catch (err) {
+    return [];
+  }
+};
+
 export const getArticleBySlug = async (
   slug: string, 
   allowDraft: boolean = false
 ): Promise<WpPost | null> => {
+  // 1. For public visitors (not in draft preview), try edge-cached API first
+  if (!allowDraft) {
+    try {
+      if (typeof window !== 'undefined') {
+        const res = await fetch(`/api/articles?slug=${encodeURIComponent(slug)}`);
+        if (res.ok) {
+          const json = await res.json();
+          if (json?.post) {
+            const mapped = mapDbToWpPost(json.post);
+            if (isPostPublished(mapped)) {
+              return mapped;
+            }
+          }
+        }
+      }
+    } catch (apiErr) {}
+  }
+
+  // 2. Fallback to Supabase query with exact fields
   try {
     let query = supabase
       .from('articles')
-      .select(`
-        *,
-        categories (id, name, slug),
-        article_tags (
-          tags (id, name, slug)
-        )
-      `)
+      .select(ARTICLE_DETAIL_SELECT)
       .eq('slug', slug);
 
-    // If not in allowDraft mode (e.g. public website visitor), strictly enforce published status
     if (!allowDraft) {
       query = query.eq('status', 'published');
     }
@@ -258,15 +440,8 @@ export const getEditorialArticles = async (
   statusFilter?: string
 ): Promise<(WpPost & { editorialStatus: EditorialStatus; rawId: string })[]> => {
   try {
-    let query = supabase
-      .from('articles')
-      .select(`
-        *,
-        categories (id, name, slug),
-        article_tags (
-          tags (id, name, slug)
-        )
-      `)
+    let query = (supabase.from('articles') as any)
+      .select(EDITORIAL_SELECT)
       .order('updated_at', { ascending: false });
 
     if (statusFilter && statusFilter !== 'all') {
@@ -288,7 +463,7 @@ export const getEditorialArticles = async (
       }));
     }
 
-    const liveEditorial = data.map(row => {
+    const liveEditorial = (data as any[]).map((row: any) => {
       const isPub = (row.status || '').toLowerCase() === 'published';
       const statusVal = isPub ? 'published' : (row.status || 'draft');
       return {
@@ -300,7 +475,7 @@ export const getEditorialArticles = async (
     });
 
     // Merge with default mock posts to preserve coverage if few articles exist
-    const liveSlugs = new Set(liveEditorial.map(p => p.slug));
+    const liveSlugs = new Set(liveEditorial.map((p: any) => p.slug));
     const supplementalMock = defaultMockPosts
       .filter(m => !liveSlugs.has(m.slug))
       .map(p => ({
@@ -503,6 +678,16 @@ export const saveArticle = async (
         channel.close();
       }
 
+      // Trigger edge cache invalidation
+      if (resultArticle?.slug) {
+        const catSlug = resultArticle.categories?.slug || CATEGORY_ID_TO_SLUG[resultArticle.category_id] || 'india';
+        fetch('/api/revalidate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ slug: resultArticle.slug, category: catSlug, action: targetStatus }),
+        }).catch(() => {});
+      }
+
       // Automatically ping IndexNow for instant search engine indexing (Bing, Yandex, etc.)
       if (targetStatus === 'published' && resultArticle?.slug) {
         const catSlug = resultArticle.categories?.slug || CATEGORY_ID_TO_SLUG[resultArticle.category_id] || 'india';
@@ -604,6 +789,16 @@ export const deleteArticleWithRecovery = async (
     if (deleteError) {
       return { success: false, error: 'Failed to remove article from live table: ' + deleteError.message };
     }
+
+    try {
+      if (articleToArchive?.slug) {
+        fetch('/api/revalidate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ slug: articleToArchive.slug, category: articleToArchive.category_slug, action: 'delete' }),
+        }).catch(() => {});
+      }
+    } catch (e) {}
 
     return { 
       success: true, 

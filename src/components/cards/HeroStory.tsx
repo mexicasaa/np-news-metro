@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { WpPost } from '../../types/wordpress';
 import { mockAuthors, getLocalizedPost } from '../../data/mockWpData';
-import { handleImageError, getAuthorAvatarUrl, handleAvatarError } from '../../utils/imageFallback';
+import { handleImageError, getAuthorAvatarUrl, handleAvatarError, getOptimizedImageUrl } from '../../utils/imageFallback';
 import { useLanguage } from '../../context/LanguageContext';
 import { ShareModal } from '../article/ShareModal';
 import { getCanonicalArticleUrl } from '../../utils/shareUtils';
@@ -131,7 +131,7 @@ export const HeroStory: React.FC<HeroStoryProps> = ({
           {/* Background Image with subtle zoom on hover */}
           <img
             key={currentStory.id}
-            src={currentStory.featuredImage}
+            src={getOptimizedImageUrl(currentStory.featuredImage, 1200)}
             alt={currentStory.imageAlt || currentStory.title}
             onError={handleImageError}
             className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700 ease-out"

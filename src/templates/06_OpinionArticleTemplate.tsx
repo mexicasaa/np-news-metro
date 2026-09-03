@@ -10,7 +10,7 @@ import { RankingItem } from '../components/cards/RankingItem';
 import { AdSlot } from '../components/commercial/AdSlot';
 import { Breadcrumbs } from '../components/layout/Breadcrumbs';
 import { useLanguage } from '../context/LanguageContext';
-import { getAuthorAvatarUrl } from '../utils/imageFallback';
+import { getAuthorAvatarUrl, getOptimizedImageUrl } from '../utils/imageFallback';
 
 interface OpinionArticleTemplateProps {
   post: WpPost;
@@ -126,7 +126,7 @@ export const OpinionArticleTemplate: React.FC<OpinionArticleTemplateProps> = ({
               <figure className="my-6">
                 <div className="aspect-[16/9] w-full overflow-hidden rounded-sm bg-surface-container border border-border-subtle">
                   <img
-                    src={localized.featuredImage}
+                    src={getOptimizedImageUrl(localized.featuredImage, 1200)}
                     alt={localized.imageAlt || localized.title}
                     className="w-full h-full object-cover"
                     loading="eager"

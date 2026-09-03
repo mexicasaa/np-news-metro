@@ -1,7 +1,7 @@
 import React from 'react';
 import { Play, Eye, Clock } from 'lucide-react';
 import { WpVideo } from '../../types/wordpress';
-import { handleImageError } from '../../utils/imageFallback';
+import { handleImageError, getOptimizedImageUrl } from '../../utils/imageFallback';
 import { useLanguage } from '../../context/LanguageContext';
 import { getLocalizedVideo } from '../../data/mockWpData';
 
@@ -34,11 +34,12 @@ export const VideoCard: React.FC<VideoCardProps> = ({
           className="relative aspect-[16/9] w-full overflow-hidden bg-black rounded-sm mb-3 block"
         >
           <img
-            src={localized.posterUrl}
+            src={getOptimizedImageUrl(localized.posterUrl, 600)}
             alt={localized.title}
             onError={handleImageError}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-85 group-hover:opacity-100"
             loading="lazy"
+            decoding="async"
           />
 
           {/* Centered Frosted Play Button */}

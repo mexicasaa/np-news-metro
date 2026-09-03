@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://jkzrjqclgqpfjdqxsnut.supabase.co';
-const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprenJqcWNsZ3FwZmpkcXhzbnV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NjU0ODksImV4cCI6MjEwMzE0MTQ4OX0.tDPKLptID2tvWKAKstPVr73I7p_cFt3PPGX9AXL4l28';
+const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://bogjmdyolhazzvicjrjl.supabase.co';
+const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvZ2ptZHlvbGhhenp2aWNqcmpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0NDcxNDAsImV4cCI6MjEwNDAyMzE0MH0.taOdcGmN6pQ3sfuIC2UIVkSV-8j0Y_wuXS-7Un4xo_0';
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export const BASE_URL = 'https://www.npnewsmetro.com';
@@ -197,7 +197,15 @@ export const FALLBACK_VIDEOS = [
   }
 ];
 
+let cachedLiveArticles = null;
+let cachedLiveArticlesTime = 0;
+const SITEMAP_CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+
 export async function fetchLiveArticles() {
+  if (cachedLiveArticles && (Date.now() - cachedLiveArticlesTime < SITEMAP_CACHE_TTL)) {
+    return cachedLiveArticles;
+  }
+
   try {
     const { data, error } = await supabase
       .from('articles')
@@ -211,7 +219,7 @@ export async function fetchLiveArticles() {
       .order('published_at', { ascending: false });
 
     if (error || !data || data.length === 0) {
-      return FALLBACK_ARTICLES;
+      return cachedLiveArticles || FALLBACK_ARTICLES;
     }
 
     const liveArticles = data
@@ -234,9 +242,12 @@ export async function fetchLiveArticles() {
       });
 
     const liveSlugs = new Set(liveArticles.map(a => a.slug));
-    return [...liveArticles, ...FALLBACK_ARTICLES.filter(f => !liveSlugs.has(f.slug))];
+    const finalArticles = [...liveArticles, ...FALLBACK_ARTICLES.filter(f => !liveSlugs.has(f.slug))];
+    cachedLiveArticles = finalArticles;
+    cachedLiveArticlesTime = Date.now();
+    return finalArticles;
   } catch (err) {
-    return FALLBACK_ARTICLES;
+    return cachedLiveArticles || FALLBACK_ARTICLES;
   }
 }
 
@@ -528,7 +539,7 @@ export function sendXmlResponse(res, xmlBody) {
   res.statusCode = 200;
   if (typeof res.setHeader === 'function') {
     res.setHeader('Content-Type', 'application/xml; charset=utf-8');
-    res.setHeader('Cache-Control', 'public, max-age=3600, stale-while-revalidate=600');
+    res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400');
   }
   if (typeof res.status === 'function' && typeof res.send === 'function') {
     return res.status(200).send(xmlBody);
@@ -540,7 +551,7 @@ export function sendTextResponse(res, textBody) {
   res.statusCode = 200;
   if (typeof res.setHeader === 'function') {
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-    res.setHeader('Cache-Control', 'public, max-age=86400, stale-while-revalidate=3600');
+    res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=86400, stale-while-revalidate=86400');
   }
   if (typeof res.status === 'function' && typeof res.send === 'function') {
     return res.status(200).send(textBody);

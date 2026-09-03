@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Clock, ArrowRight, Share2 } from 'lucide-react';
 import { WpPost } from '../../types/wordpress';
 import { mockAuthors, getLocalizedPost } from '../../data/mockWpData';
-import { handleImageError, getAuthorAvatarUrl } from '../../utils/imageFallback';
+import { handleImageError, getAuthorAvatarUrl, getOptimizedImageUrl } from '../../utils/imageFallback';
 import { useLanguage } from '../../context/LanguageContext';
 import { ShareModal } from '../article/ShareModal';
 import { getCanonicalArticleUrl } from '../../utils/shareUtils';
@@ -45,11 +45,12 @@ export const HorizontalStoryCard: React.FC<HorizontalStoryCardProps> = ({
         className="relative w-full sm:w-44 md:w-48 aspect-[16/10] sm:aspect-[4/3] overflow-hidden bg-slate-950 rounded-sm flex-shrink-0 block"
       >
         <img
-          src={localized.featuredImage}
+          src={getOptimizedImageUrl(localized.featuredImage, 600)}
           alt={localized.imageAlt || localized.title}
           onError={handleImageError}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           loading="lazy"
+          decoding="async"
         />
         {post.isBreaking && (
           <span className="absolute top-2 left-2 bg-editorial-red text-white px-2 py-0.5 rounded-xs text-[9px] font-extrabold uppercase tracking-wider">

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Clock, Share2, ArrowRight } from 'lucide-react';
 import { WpPost } from '../../types/wordpress';
-import { handleImageError, getAuthorAvatarUrl, handleAvatarError } from '../../utils/imageFallback';
+import { handleImageError, getAuthorAvatarUrl, handleAvatarError, getOptimizedImageUrl } from '../../utils/imageFallback';
 import { useLanguage } from '../../context/LanguageContext';
 import { getLocalizedPost, mockAuthors } from '../../data/mockWpData';
 
@@ -47,11 +47,12 @@ export const LatestNewsRow: React.FC<LatestNewsRowProps> = ({
             className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100 block"
           >
             <img
-              src={localized.featuredImage}
+              src={getOptimizedImageUrl(localized.featuredImage, 600)}
               alt={localized.imageAlt || localized.title}
               onError={handleImageError}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               loading="lazy"
+              decoding="async"
             />
             {post.isBreaking && (
               <span className="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded-md shadow-sm">

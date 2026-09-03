@@ -1,7 +1,7 @@
 import React from 'react';
 import { Clock } from 'lucide-react';
 import { WpPost } from '../../types/wordpress';
-import { handleImageError } from '../../utils/imageFallback';
+import { handleImageError, getOptimizedImageUrl } from '../../utils/imageFallback';
 import { useLanguage } from '../../context/LanguageContext';
 import { getLocalizedPost } from '../../data/mockWpData';
 
@@ -34,11 +34,12 @@ export const MediumStoryCard: React.FC<MediumStoryCardProps> = ({
             }}
           >
             <img
-              src={localized.featuredImage}
+              src={getOptimizedImageUrl(localized.featuredImage, 600)}
               alt={localized.imageAlt || localized.title}
               onError={handleImageError}
               className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
               loading="lazy"
+              decoding="async"
             />
           </a>
         )}

@@ -538,62 +538,98 @@ function AppContent() {
     if (route.isAdminLoginModalOpen) setAdminLoginModalOpen(true);
   }, []);
 
-  // Load published articles & video content directly from Supabase
+  // Load published articles & video content with Admin/Public separation
   React.useEffect(() => {
     let isMounted = true;
-    const fetchSupabaseContent = async () => {
+    const fetchContent = async () => {
       try {
-        // Ensure valid Supabase session for admin operations
-        ensureAuthenticatedSession().catch(() => {});
-
         const isAdmin = viewMode === 'admin' || isAdminAuthenticated || (typeof window !== 'undefined' && window.location.pathname.includes('/admin'));
 
-        const [livePosts, liveVideos] = await Promise.all([
-          isAdmin ? getEditorialArticles('all') : getPublishedArticles(),
-          getPublishedVideos(),
-        ]);
-        if (isMounted) {
-          if (livePosts && livePosts.length > 0) {
-            let combinedPosts = livePosts;
-            if (refreshSession?.post?.id) {
-              const sessionPost = refreshSession.post as WpPost;
-              const hasPost = livePosts.some(p => p.id === sessionPost.id);
-              if (!hasPost) {
-                combinedPosts = [sessionPost, ...livePosts];
+        if (isAdmin) {
+          // Admin CMS mode: authenticated queries with full editorial fields
+          ensureAuthenticatedSession().catch(() => {});
+          const [editorialPosts, liveVideos] = await Promise.all([
+            getEditorialArticles('all'),
+            getPublishedVideos(),
+          ]);
+
+          if (isMounted) {
+            if (editorialPosts && editorialPosts.length > 0) {
+              let combinedPosts: WpPost[] = editorialPosts;
+              if (refreshSession?.post?.id) {
+                const sessionPost = refreshSession.post as WpPost;
+                const hasPost = editorialPosts.some(p => p.id === sessionPost.id);
+                if (!hasPost) {
+                  combinedPosts = [sessionPost, ...editorialPosts];
+                }
               }
+              setPosts(combinedPosts);
             }
-            setPosts(combinedPosts);
+            if (liveVideos && liveVideos.length > 0) {
+              setVideos(liveVideos);
+            }
+            applyRouteFromUrl(editorialPosts || posts, liveVideos || videos);
           }
-          if (liveVideos && liveVideos.length > 0) {
+          return;
+        }
+
+        // Public Reader mode:
+        // Purpose-specific lightweight fetch from Vercel Edge Cache (0 full content bodies)
+        const rawPath = typeof window !== 'undefined' ? window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase() : '';
+        const pathSegments = rawPath ? rawPath.split('/') : [];
+        const isDirectArticle = pathSegments.length > 1 &&
+          !rawPath.startsWith('category/') &&
+          !rawPath.startsWith('author/') &&
+          !rawPath.startsWith('admin');
+
+        const isCategoryRoute = rawPath.startsWith('category/') || (pathSegments.length === 1 && ['india', 'politics', 'business', 'economy', 'technology', 'world', 'sports', 'entertainment', 'lifestyle', 'opinion', 'metromat', 'crime', 'social', 'astrology', 'religion'].includes(rawPath));
+        const isLatestRoute = rawPath === 'latest';
+        const isSearchRoute = rawPath === 'search';
+        const isVideoRoute = rawPath.includes('video');
+
+        // Only fetch homepage card bundle if on homepage or if transitioning to homepage
+        const shouldFetchHomepageArticles = !isDirectArticle && !isCategoryRoute && !isLatestRoute && !isSearchRoute && !isVideoRoute;
+
+        if (shouldFetchHomepageArticles) {
+          const publicPosts = await getPublishedArticles();
+          if (isMounted && publicPosts && publicPosts.length > 0) {
+            setPosts(publicPosts);
+            applyRouteFromUrl(publicPosts, videos);
+          }
+        }
+
+        // Defer video fetching for public readers unless visiting a video route
+        if (isVideoRoute) {
+          const liveVideos = await getPublishedVideos();
+          if (isMounted && liveVideos && liveVideos.length > 0) {
             setVideos(liveVideos);
           }
-          // Re-evaluate URL route with newly loaded database content
-          applyRouteFromUrl(livePosts || posts, liveVideos || videos);
         }
       } catch (err) {
-        console.error('Error fetching Supabase content:', err);
+        console.error('Error fetching content:', err);
       }
     };
-    fetchSupabaseContent();
+
+    fetchContent();
 
     return () => {
       isMounted = false;
     };
   }, [isPreviewTab, applyRouteFromUrl, viewMode, isAdminAuthenticated]);
 
-  // Cross-tab and multi-device Realtime listener for newly published/updated news from Supabase
+  // Realtime listeners: Strictly restricted to Admin staff, with cross-tab BroadcastChannel
   React.useEffect(() => {
     let feedChannel: BroadcastChannel | null = null;
+    const isAdmin = viewMode === 'admin' || isAdminAuthenticated || (typeof window !== 'undefined' && window.location.pathname.includes('/admin'));
+
     try {
       if (typeof BroadcastChannel !== 'undefined') {
         feedChannel = new BroadcastChannel('np_news_feed_channel');
         feedChannel.onmessage = async (event) => {
           if (event.data?.type === 'NEWS_PUBLISHED') {
-            const isAdmin = viewMode === 'admin' || isAdminAuthenticated || window.location.pathname.includes('/admin');
             const fresh = isAdmin ? await getEditorialArticles('all') : await getPublishedArticles();
             setPosts(fresh);
           } else if (event.data?.type === 'ARTICLE_DRAFT_SAVED') {
-            const isAdmin = viewMode === 'admin' || isAdminAuthenticated || window.location.pathname.includes('/admin');
             if (isAdmin) {
               const fresh = await getEditorialArticles('all');
               setPosts(fresh);
@@ -606,38 +642,43 @@ function AppContent() {
       }
     } catch (e) {}
 
-    // Supabase Realtime Channel for Cross-Browser/Cross-Device Instant Sync
-    const realtimeChannel = supabase
-      .channel('public:articles')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'articles' },
-        async (payload) => {
-          console.log('[Realtime] Database change detected:', payload.eventType);
-          const isAdmin = viewMode === 'admin' || isAdminAuthenticated || window.location.pathname.includes('/admin');
-          const freshPosts = isAdmin ? await getEditorialArticles('all') : await getPublishedArticles();
-          setPosts(freshPosts);
-        }
-      )
-      .subscribe();
+    // Supabase Realtime Channels: ONLY active for authenticated editorial admin users.
+    // Public visitors NEVER hold WebSocket connections to Supabase.
+    let realtimeChannel: any = null;
+    let realtimeVideosChannel: any = null;
 
-    const realtimeVideosChannel = supabase
-      .channel('public:videos')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'videos' },
-        async (payload) => {
-          console.log('[Realtime] Database video change detected:', payload.eventType);
-          const freshVids = await getPublishedVideos();
-          setVideos(freshVids);
-        }
-      )
-      .subscribe();
+    if (isAdmin) {
+      realtimeChannel = supabase
+        .channel('admin:articles')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'articles' },
+          async (payload) => {
+            console.log('[Realtime Admin] Database change detected:', payload.eventType);
+            const freshPosts = await getEditorialArticles('all');
+            setPosts(freshPosts);
+          }
+        )
+        .subscribe();
+
+      realtimeVideosChannel = supabase
+        .channel('admin:videos')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'videos' },
+          async (payload) => {
+            console.log('[Realtime Admin] Video change detected:', payload.eventType);
+            const freshVids = await getPublishedVideos();
+            setVideos(freshVids);
+          }
+        )
+        .subscribe();
+    }
 
     return () => {
       feedChannel?.close();
-      supabase.removeChannel(realtimeChannel);
-      supabase.removeChannel(realtimeVideosChannel);
+      if (realtimeChannel) supabase.removeChannel(realtimeChannel);
+      if (realtimeVideosChannel) supabase.removeChannel(realtimeVideosChannel);
     };
   }, [viewMode, isAdminAuthenticated]);
 
@@ -685,6 +726,16 @@ function AppContent() {
   // URL Popstate Listener & Shortcuts
   React.useEffect(() => {
     const handlePopState = () => {
+      const clean = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
+      if (!clean && posts.length <= 1) {
+        getPublishedArticles().then((hp) => {
+          if (hp && hp.length > 0) {
+            setPosts(hp);
+            applyRouteFromUrl(hp, videos);
+          }
+        }).catch(() => {});
+        return;
+      }
       applyRouteFromUrl(posts, videos);
     };
 
@@ -733,6 +784,13 @@ function AppContent() {
     if (typeof window !== 'undefined') {
       window.history.pushState({ view: 'public' }, '', '/');
     }
+    if (posts.length <= 1) {
+      getPublishedArticles().then((hp) => {
+        if (hp && hp.length > 0) {
+          setPosts(hp);
+        }
+      }).catch(() => {});
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -751,6 +809,16 @@ function AppContent() {
       window.history.pushState({ view: 'public', type: 'article', slug: post.slug }, '', `/${categorySlug}/${post.slug}`);
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // If clicked from a lightweight card without full content blocks, load full article on-demand from CDN cache
+    if (!post.blocks || post.blocks.length === 0 || !(post as any).content) {
+      getArticleBySlug(post.slug).then((fullPost) => {
+        if (fullPost) {
+          setSelectedPost(fullPost);
+          setPosts(prev => prev.map(p => p.id === fullPost.id ? fullPost : p));
+        }
+      }).catch(() => {});
+    }
   };
 
   const handleSelectCategory = (slug: string) => {

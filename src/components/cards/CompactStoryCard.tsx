@@ -1,7 +1,7 @@
 import React from 'react';
 import { Clock, ChevronRight } from 'lucide-react';
 import { WpPost } from '../../types/wordpress';
-import { handleImageError } from '../../utils/imageFallback';
+import { handleImageError, getOptimizedImageUrl } from '../../utils/imageFallback';
 import { useLanguage } from '../../context/LanguageContext';
 import { getLocalizedPost } from '../../data/mockWpData';
 
@@ -34,11 +34,12 @@ export const CompactStoryCard: React.FC<CompactStoryCardProps> = ({
           className="relative w-20 h-20 sm:w-24 sm:h-20 flex-shrink-0 overflow-hidden rounded-md bg-surface-container border border-border-subtle shadow-2xs block"
         >
           <img
-            src={localized.featuredImage}
+            src={getOptimizedImageUrl(localized.featuredImage, 300)}
             alt={localized.imageAlt || localized.title}
             onError={handleImageError}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             loading="lazy"
+            decoding="async"
           />
           {post.isBreaking && (
             <span className="absolute top-1 left-1 bg-editorial-red text-white text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-2xs shadow-xs">

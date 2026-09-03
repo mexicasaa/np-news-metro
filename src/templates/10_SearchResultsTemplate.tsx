@@ -8,6 +8,8 @@ import { EmptyState } from '../components/common/EmptyState';
 import { Breadcrumbs } from '../components/layout/Breadcrumbs';
 import { useLanguage } from '../context/LanguageContext';
 
+import { searchArticles } from '../services/articleService';
+
 interface SearchResultsTemplateProps {
   posts?: WpPost[];
   initialQuery?: string;
@@ -26,9 +28,33 @@ export const SearchResultsTemplate: React.FC<SearchResultsTemplateProps> = ({
   const [query, setQuery] = useState(initialQuery);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'relevance' | 'date'>('relevance');
+  const [serverResults, setServerResults] = useState<WpPost[] | null>(null);
   const { language, t, isHindi } = useLanguage();
 
-  const allPosts = (externalPosts && externalPosts.length > 0 ? externalPosts : getStoredPosts()).filter(isPostPublished);
+  // Server-side edge search effect (debounced)
+  React.useEffect(() => {
+    let isMounted = true;
+    const trimmed = query.trim();
+    if (!trimmed) {
+      setServerResults(null);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      searchArticles(trimmed, 25).then((res) => {
+        if (isMounted && res) {
+          setServerResults(res);
+        }
+      }).catch(() => {});
+    }, 250);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timer);
+    };
+  }, [query]);
+
+  const allPosts = (serverResults || (externalPosts && externalPosts.length > 0 ? externalPosts : getStoredPosts())).filter(isPostPublished);
 
   const filteredPosts = allPosts.filter((post) => {
     const localized = getLocalizedPost(post, language);

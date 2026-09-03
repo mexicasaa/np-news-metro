@@ -176,11 +176,40 @@ export const mapDbToWpVideo = (row: any): WpVideo => {
   };
 };
 
+const VIDEO_FIELDS = `
+  id, slug, title, youtube_url, youtube_video_id, description,
+  thumbnail_url, channel_name, published_at, duration_seconds,
+  status, category_id,
+  categories (id, name, slug)
+`;
+
 export const getPublishedVideos = async (): Promise<WpVideo[]> => {
+  // 1. Try Vercel Edge cached API
+  try {
+    if (typeof window !== 'undefined') {
+      const res = await fetch('/api/videos');
+      if (res.ok) {
+        const json = await res.json();
+        if (json?.videos && Array.isArray(json.videos) && json.videos.length > 0) {
+          const liveVideos = json.videos.map(mapDbToWpVideo);
+          const stored = getStoredVideos();
+          const combined = [...liveVideos];
+          for (const sv of stored) {
+            if (!combined.some(c => c.id === sv.id || c.videoUrl === sv.videoUrl)) {
+              combined.push(sv);
+            }
+          }
+          return combined;
+        }
+      }
+    }
+  } catch (apiErr) {}
+
+  // 2. Direct Supabase fallback
   try {
     const { data, error } = await supabase
       .from('videos')
-      .select('*, categories (name, slug)')
+      .select(VIDEO_FIELDS)
       .eq('status', 'published')
       .order('published_at', { ascending: false });
 
@@ -204,10 +233,24 @@ export const getPublishedVideos = async (): Promise<WpVideo[]> => {
 };
 
 export const getVideoBySlug = async (slug: string): Promise<WpVideo | null> => {
+  // 1. Try Vercel Edge cached API
+  try {
+    if (typeof window !== 'undefined') {
+      const res = await fetch(`/api/videos?slug=${encodeURIComponent(slug)}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json?.video) {
+          return mapDbToWpVideo(json.video);
+        }
+      }
+    }
+  } catch (apiErr) {}
+
+  // 2. Direct Supabase fallback
   try {
     const { data, error } = await supabase
       .from('videos')
-      .select('*, categories (name, slug)')
+      .select(VIDEO_FIELDS)
       .eq('slug', slug)
       .single();
 
@@ -307,7 +350,7 @@ export const saveVideo = async (
         .from('videos')
         .update(payload)
         .eq('id', videoData.id)
-        .select('*, categories (name, slug)')
+        .select(VIDEO_FIELDS)
         .single();
 
       if (!error && data) {
@@ -317,7 +360,7 @@ export const saveVideo = async (
       const { data, error } = await supabase
         .from('videos')
         .insert(payload)
-        .select('*, categories (name, slug)')
+        .select(VIDEO_FIELDS)
         .single();
 
       if (!error && data) {
@@ -327,6 +370,16 @@ export const saveVideo = async (
 
     const finalVideo = result ? mapDbToWpVideo(result) : fallbackVideo;
     savePublishedVideo(finalVideo);
+
+    // Trigger edge cache invalidation
+    try {
+      fetch('/api/revalidate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug: finalVideo.slug, type: 'video', category: 'videos' }),
+      }).catch(() => {});
+    } catch (e) {}
+
     return { video: finalVideo };
   } catch (err: any) {
     savePublishedVideo(fallbackVideo);
@@ -342,6 +395,16 @@ export const deleteVideo = async (id: string): Promise<{ success: boolean; error
       if (error) console.warn('Supabase video delete warning:', error.message);
     }
     deleteStoredVideo(id);
+
+    // Trigger edge cache invalidation
+    try {
+      fetch('/api/revalidate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'video', category: 'videos' }),
+      }).catch(() => {});
+    } catch (e) {}
+
     return { success: true };
   } catch (err: any) {
     deleteStoredVideo(id);

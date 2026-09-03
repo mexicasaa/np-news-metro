@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Radio, Clock, AlertTriangle, Flame, Share2, RefreshCw, Pin } from 'lucide-react';
 import { WpPost } from '../types/wordpress';
 import { mockPosts, mockAuthors, mockLiveBlog, getLocalizedPost } from '../data/mockWpData';
-import { handleImageError } from '../utils/imageFallback';
+import { handleImageError, getOptimizedImageUrl } from '../utils/imageFallback';
 import { ArticleBody } from '../components/article/ArticleBody';
 import { ArticleShareBar } from '../components/article/ArticleShareBar';
 import { AuthorBioBox } from '../components/article/AuthorBioBox';
@@ -155,7 +155,7 @@ export const BreakingArticleTemplate: React.FC<BreakingArticleTemplateProps> = (
             <figure className="my-6">
               <div className="aspect-[16/9] w-full overflow-hidden rounded-sm bg-surface-container border border-border-subtle">
                 <img
-                  src={localized.featuredImage}
+                  src={getOptimizedImageUrl(localized.featuredImage, 1200)}
                   alt={localized.imageAlt || localized.title}
                   onError={handleImageError}
                   className="w-full h-full object-cover"

@@ -3,9 +3,11 @@ node_modules/
 dist/
 dist-ssr/
 
-# Zip Archives (Excluding all ZIP files as requested)
+# Zip Archives and Local Backups
 *.zip
 **/*.zip
+backup_supabase/
+scripts/*-manifest.json
 
 # Logs
 npm-debug.log*

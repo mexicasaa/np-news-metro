@@ -33,3 +33,56 @@ export const handleAvatarError = (e: React.SyntheticEvent<HTMLImageElement, Even
     target.src = DEFAULT_AUTHOR_AVATAR;
   }
 };
+
+/**
+ * Transforms raw Supabase Storage or external image URLs to use
+ * Vercel Edge-cached, compressed, and resized CDN delivery, eliminating
+ * direct Supabase Storage bandwidth egress for public readers.
+ */
+export const getOptimizedImageUrl = (
+  src?: string | null,
+  width: number = 800,
+  quality: number = 75
+): string => {
+  if (!src || typeof src !== 'string' || !src.trim()) {
+    return DEFAULT_FALLBACK_IMAGE;
+  }
+  const trimmed = src.trim();
+
+  // Local static or data URLs
+  if (trimmed.startsWith('data:') || trimmed.startsWith('/uploads/') || trimmed.startsWith('/assets/')) {
+    return trimmed;
+  }
+
+  // Supabase storage object URL -> route through /api/image/...
+  if (trimmed.includes('/storage/v1/object/public/')) {
+    const pathAfter = trimmed.split('/storage/v1/object/public/')[1];
+    if (pathAfter) {
+      return `/api/image/${pathAfter.replace(/^\/+/, '')}?w=${width}&q=${quality}`;
+    }
+  }
+
+  // Supabase render URL -> normalize to /api/image/...
+  if (trimmed.includes('/storage/v1/render/image/public/')) {
+    const pathAfter = trimmed.split('/storage/v1/render/image/public/')[1]?.split('?')[0];
+    if (pathAfter) {
+      return `/api/image/${pathAfter.replace(/^\/+/, '')}?w=${width}&q=${quality}`;
+    }
+  }
+
+  // Unsplash CDN parameters
+  if (trimmed.includes('images.unsplash.com')) {
+    try {
+      const u = new URL(trimmed);
+      u.searchParams.set('w', String(width));
+      u.searchParams.set('q', String(quality));
+      u.searchParams.set('auto', 'format');
+      return u.toString();
+    } catch (e) {
+      return trimmed;
+    }
+  }
+
+  return trimmed;
+};
+

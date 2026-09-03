@@ -35,7 +35,7 @@ export const getCategories = async (): Promise<WpCategory[]> => {
   try {
     const { data, error } = await supabase
       .from('categories')
-      .select('*')
+      .select('id, name, slug, description, sort_order, is_active')
       .eq('is_active', true)
       .order('sort_order', { ascending: true });
 
@@ -65,7 +65,7 @@ export const getTags = async (): Promise<DbTag[]> => {
   try {
     const { data, error } = await supabase
       .from('tags')
-      .select('*')
+      .select('id, name, slug')
       .order('name', { ascending: true });
 
     if (error) {
@@ -84,7 +84,7 @@ export const getSiteSettings = async (): Promise<DbSiteSettings | null> => {
   try {
     const { data, error } = await supabase
       .from('site_settings')
-      .select('*')
+      .select('id, site_name, site_description, logo_url, favicon_url, default_author_id, default_category_id, contact_email, timezone')
       .limit(1)
       .single();
 
@@ -104,7 +104,7 @@ export const getVideos = async (): Promise<WpVideo[]> => {
   try {
     const { data, error } = await supabase
       .from('videos')
-      .select('*')
+      .select('id, title, slug, youtube_url, youtube_video_id, thumbnail_url, description, channel_name, duration_seconds, published_at')
       .eq('status', 'published')
       .order('published_at', { ascending: false });
 

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Clock, ArrowRight, Share2 } from 'lucide-react';
 import { WpPost } from '../../types/wordpress';
 import { mockAuthors, getLocalizedPost } from '../../data/mockWpData';
-import { handleImageError, getAuthorAvatarUrl } from '../../utils/imageFallback';
+import { handleImageError, getAuthorAvatarUrl, getOptimizedImageUrl } from '../../utils/imageFallback';
 import { useLanguage } from '../../context/LanguageContext';
 import { ShareModal } from '../article/ShareModal';
 import { getCanonicalArticleUrl } from '../../utils/shareUtils';
@@ -11,12 +11,14 @@ interface LargeStoryCardProps {
   post: WpPost;
   onSelect: (post: WpPost) => void;
   onSelectCategory?: (category: string) => void;
+  onSelectAuthor?: (authorId: string) => void;
 }
 
 export const LargeStoryCard: React.FC<LargeStoryCardProps> = ({
   post,
   onSelect,
   onSelectCategory,
+  onSelectAuthor,
 }) => {
   const { language, t, isHindi } = useLanguage();
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
@@ -40,11 +42,12 @@ export const LargeStoryCard: React.FC<LargeStoryCardProps> = ({
         {/* Aspect 16:9 Image */}
         <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-950">
           <img
-            src={localized.featuredImage}
+            src={getOptimizedImageUrl(localized.featuredImage, 800)}
             alt={localized.imageAlt || localized.title}
             onError={handleImageError}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             loading="lazy"
+            decoding="async"
           />
 
           {/* Breaking Badge Overlay */}

@@ -11,6 +11,8 @@ import { Breadcrumbs } from '../components/layout/Breadcrumbs';
 import { Pagination } from '../components/common/Pagination';
 import { useLanguage } from '../context/LanguageContext';
 
+import { getLatestArticles } from '../services/articleService';
+
 interface LatestNewsTemplateProps {
   posts?: WpPost[];
   onSelectPost: (post: WpPost) => void;
@@ -28,10 +30,26 @@ export const LatestNewsTemplate: React.FC<LatestNewsTemplateProps> = ({
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [latestLivePosts, setLatestLivePosts] = useState<WpPost[] | null>(null);
   const { t, isHindi } = useLanguage();
 
   const itemsPerPage = 10;
-  const allPosts = (externalPosts && externalPosts.length > 0 ? externalPosts : getStoredPosts()).filter(isPostPublished);
+
+  // Purpose-specific latest news pagination
+  React.useEffect(() => {
+    let isMounted = true;
+    getLatestArticles(currentPage, itemsPerPage).then((res) => {
+      if (isMounted && res && res.length > 0) {
+        setLatestLivePosts(res);
+      }
+    }).catch(() => {});
+    return () => { isMounted = false; };
+  }, [currentPage]);
+
+  const allPosts = (latestLivePosts && latestLivePosts.length > 0
+    ? latestLivePosts
+    : (externalPosts && externalPosts.length > 0 ? externalPosts : getStoredPosts())
+  ).filter(isPostPublished);
   
   // Sort all posts chronologically
   const sortedPosts = [...allPosts].sort((a, b) => {
@@ -44,8 +62,15 @@ export const LatestNewsTemplate: React.FC<LatestNewsTemplateProps> = ({
     (p) => selectedCategory === 'all' || p.category === selectedCategory
   );
 
-  const totalPages = Math.max(1, Math.ceil(filteredPosts.length / itemsPerPage));
-  const paginatedPosts = filteredPosts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const isServerPaginated = Boolean(latestLivePosts && latestLivePosts.length > 0);
+  const totalPages = isServerPaginated
+    ? Math.max(8, currentPage + (latestLivePosts?.length === itemsPerPage ? 2 : 0))
+    : Math.max(1, Math.ceil(filteredPosts.length / itemsPerPage));
+
+  const paginatedPosts = isServerPaginated
+    ? filteredPosts
+    : filteredPosts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
   const featuredLatest = currentPage === 1 ? paginatedPosts[0] : null;
   const streamPosts = currentPage === 1 ? paginatedPosts.slice(1) : paginatedPosts;
   const trendingRanking = [...allPosts].sort((a, b) => (b.viewsCount || 0) - (a.viewsCount || 0)).slice(0, 5);

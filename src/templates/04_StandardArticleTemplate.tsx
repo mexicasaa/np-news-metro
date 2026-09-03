@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Clock, User, ShieldCheck, Flame, MessageSquare, AlertCircle, Share2, ExternalLink } from 'lucide-react';
 import { WpPost } from '../types/wordpress';
 import { mockPosts, mockAuthors, getLocalizedPost } from '../data/mockWpData';
-import { handleImageError } from '../utils/imageFallback';
+import { handleImageError, getOptimizedImageUrl } from '../utils/imageFallback';
 import { ArticleHeader } from '../components/article/ArticleHeader';
 import { ArticleBody } from '../components/article/ArticleBody';
 import { ArticleShareBar } from '../components/article/ArticleShareBar';
@@ -134,7 +134,7 @@ export const StandardArticleTemplate: React.FC<StandardArticleTemplateProps> = (
             <figure className="my-6">
               <div className="aspect-[16/10] sm:aspect-[16/9] w-full overflow-hidden rounded-sm bg-surface-container border border-border-subtle shadow-subtle">
                 <img
-                  src={localized.featuredImage}
+                  src={getOptimizedImageUrl(localized.featuredImage, 1200)}
                   alt={localized.imageAlt || localized.title}
                   onError={handleImageError}
                   className="w-full h-full object-cover"

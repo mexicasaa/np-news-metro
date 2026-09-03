@@ -1,7 +1,7 @@
 import React from 'react';
 import { Clock } from 'lucide-react';
 import { WpPost } from '../../types/wordpress';
-import { handleImageError } from '../../utils/imageFallback';
+import { handleImageError, getOptimizedImageUrl } from '../../utils/imageFallback';
 import { useLanguage } from '../../context/LanguageContext';
 import { getLocalizedPost } from '../../data/mockWpData';
 
@@ -55,11 +55,12 @@ export const RankingItem: React.FC<RankingItemProps> = ({
       {post.featuredImage && (
         <div className="relative w-20 h-20 sm:w-22 sm:h-22 rounded-xl overflow-hidden bg-slate-100 border border-slate-100 flex-shrink-0 shadow-3xs">
           <img
-            src={localized.featuredImage}
+            src={getOptimizedImageUrl(localized.featuredImage, 300)}
             alt={localized.imageAlt || localized.title}
             onError={handleImageError}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             loading="lazy"
+            decoding="async"
           />
         </div>
       )}

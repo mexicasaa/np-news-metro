@@ -15,6 +15,8 @@ import { Pagination } from '../components/common/Pagination';
 import { MetromatPoll } from '../components/common/MetromatPoll';
 import { useLanguage } from '../context/LanguageContext';
 
+import { getCategoryArticles } from '../services/articleService';
+
 interface CategoryTemplateProps {
   posts?: WpPost[];
   categorySlug: string;
@@ -36,11 +38,23 @@ export const CategoryTemplate: React.FC<CategoryTemplateProps> = ({
 }) => {
   const [activeSubcategory, setActiveSubcategory] = useState<string>('All');
   const [currentPage, setCurrentPage] = useState(1);
+  const [categoryLivePosts, setCategoryLivePosts] = useState<WpPost[] | null>(null);
   const { t, isHindi } = useLanguage();
 
   const allPosts = (externalPosts && externalPosts.length > 0 ? externalPosts : getStoredPosts()).filter(isPostPublished);
   const foundCategory = mockCategories.find((c) => c.slug === categorySlug);
   const categoryName = isHindi && foundCategory?.nameHi ? foundCategory.nameHi : (foundCategory?.name || (categorySlug.charAt(0).toUpperCase() + categorySlug.slice(1)));
+
+  // Purpose-specific category fetching from edge cache
+  React.useEffect(() => {
+    let isMounted = true;
+    getCategoryArticles(categorySlug, currentPage, 20).then((res) => {
+      if (isMounted && res && res.length > 0) {
+        setCategoryLivePosts(res);
+      }
+    }).catch(() => {});
+    return () => { isMounted = false; };
+  }, [categorySlug, currentPage]);
 
   const category = foundCategory || {
     id: 'cat-default',
@@ -55,12 +69,20 @@ export const CategoryTemplate: React.FC<CategoryTemplateProps> = ({
     'सभी', 'राष्ट्रीय', 'विश्लेषण', 'साक्षात्कार', 'विशेष रिपोर्ट'
   ] : (category.subcategories || ['All', 'National', 'Analysis', 'Interviews', 'Special Reports']);
 
-  const categoryPosts = allPosts.filter((p) => p.category === categorySlug);
+  const categoryPosts = (categoryLivePosts && categoryLivePosts.length > 0) 
+    ? categoryLivePosts 
+    : allPosts.filter((p) => p.category === categorySlug);
   const displayPosts = categoryPosts.length > 0 ? categoryPosts : allPosts;
-  const heroPost = displayPosts[0] || allPosts[0];
-  const topGridPosts = displayPosts.slice(1, 4);
-  const feedPosts = displayPosts.slice(4);
+  const isPageOne = currentPage === 1;
+  const heroPost = isPageOne ? (displayPosts[0] || allPosts[0]) : null;
+  const topGridPosts = isPageOne ? displayPosts.slice(1, 4) : [];
+  const feedPosts = isPageOne ? displayPosts.slice(4) : displayPosts;
   const trendingRanking = [...allPosts].sort((a, b) => (b.viewsCount || 0) - (a.viewsCount || 0)).slice(0, 5);
+
+  const isServerPaginated = Boolean(categoryLivePosts && categoryLivePosts.length > 0);
+  const totalPages = isServerPaginated
+    ? Math.max(currentPage, categoryLivePosts && categoryLivePosts.length === 20 ? currentPage + 1 : currentPage)
+    : Math.max(1, Math.ceil(displayPosts.length / 20));
 
   return (
     <div className="bg-canvas min-h-screen">
@@ -168,7 +190,7 @@ export const CategoryTemplate: React.FC<CategoryTemplateProps> = ({
                 {isHindi ? `सभी ${categoryName} ख़बरें एवं अभिलेखागार` : `All ${category.name} Stories & Archives`}
               </h3>
               <span className="text-xs text-ink-muted">
-                {isHindi ? `पृष्ठ ${currentPage} / 4` : `Page ${currentPage} of 4`}
+                {isHindi ? `पृष्ठ ${currentPage} / ${totalPages}` : `Page ${currentPage} of ${totalPages}`}
               </span>
             </div>
 
@@ -184,7 +206,7 @@ export const CategoryTemplate: React.FC<CategoryTemplateProps> = ({
 
             <Pagination
               currentPage={currentPage}
-              totalPages={4}
+              totalPages={totalPages}
               onPageChange={setCurrentPage}
             />
           </div>

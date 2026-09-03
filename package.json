@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "node scripts/generate-sitemaps.js && tsc && vite build",
+    "backup": "node scripts/backup-supabase.js",
     "indexnow": "node scripts/submit-indexnow.js",
     "preview": "vite preview"
   },
