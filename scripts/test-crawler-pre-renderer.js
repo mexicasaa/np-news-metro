@@ -1,5 +1,5 @@
 import assert from 'assert';
-import handler from '../api/share.ts';
+import handler from '../api/share.js';
 
 async function simulateRequest(path, query = {}) {
   let statusCode = 200;

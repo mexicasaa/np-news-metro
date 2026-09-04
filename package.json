@@ -22,19 +22,11 @@
     "@types/node": "^20.17.0",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
-    "@vercel/node": "^12.0.0",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
-    "cross-env": "^10.1.0",
     "postcss": "^8.5.2",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.7.3",
     "vite": "^6.1.0"
-  },
-  "allowScripts": {
-    "esbuild": true
-  },
-  "engines": {
-    "node": "20.x"
   }
 }
