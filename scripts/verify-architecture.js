@@ -366,12 +366,12 @@ async function runSuite() {
   // -------------------------------------------------------------
   console.log('[TEST 7] Serverless API Endpoints & Lambda Background Jobs Integrity');
   const requiredApiFiles = [
-    'api/likes.js',
-    'api/comments.js',
-    'api/subscribe.js',
-    'api/ads.js',
+    'api/engagement.js',
+    'api/feeds.js',
+    'api/articles.js',
     'api/trending.js',
-    'api/metrics.js',
+    'api/image.js',
+    'api/videos.js',
     'api/media-upload.js',
     'api/revalidate.js',
   ];

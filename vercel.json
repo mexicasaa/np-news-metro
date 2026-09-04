@@ -85,44 +85,64 @@
       "destination": "/api/image?path=:path*"
     },
     {
+      "source": "/api/likes",
+      "destination": "/api/engagement?action=likes"
+    },
+    {
+      "source": "/api/comments",
+      "destination": "/api/engagement?action=comments"
+    },
+    {
+      "source": "/api/subscribe",
+      "destination": "/api/engagement?action=subscribe"
+    },
+    {
+      "source": "/api/ads",
+      "destination": "/api/engagement?action=ads"
+    },
+    {
+      "source": "/api/metrics",
+      "destination": "/api/engagement?action=metrics"
+    },
+    {
       "source": "/sitemap_index.xml",
-      "destination": "/api/sitemap_index"
+      "destination": "/api/feeds?type=index"
     },
     {
       "source": "/sitemap.xml",
-      "destination": "/api/sitemap"
+      "destination": "/api/feeds?type=sitemap"
     },
     {
       "source": "/news-sitemap.xml",
-      "destination": "/api/news-sitemap"
+      "destination": "/api/feeds?type=news"
     },
     {
       "source": "/image-sitemap.xml",
-      "destination": "/api/image-sitemap"
+      "destination": "/api/feeds?type=image"
     },
     {
       "source": "/video-sitemap.xml",
-      "destination": "/api/video-sitemap"
+      "destination": "/api/feeds?type=video"
     },
     {
       "source": "/rss.xml",
-      "destination": "/api/rss"
+      "destination": "/api/feeds?type=rss"
     },
     {
       "source": "/robots.txt",
-      "destination": "/api/robots"
+      "destination": "/api/feeds?type=robots"
     },
     {
       "source": "/BingSiteAuth.xml",
-      "destination": "/api/BingSiteAuth"
+      "destination": "/api/feeds?type=BingSiteAuth"
     },
     {
       "source": "/968b4404627f469a8e29b9a607c4b1e7.txt",
-      "destination": "/api/indexnow-key"
+      "destination": "/api/feeds?type=indexnow-key"
     },
     {
       "source": "/indexnow",
-      "destination": "/api/indexnow"
+      "destination": "/api/feeds?type=indexnow"
     },
     {
       "source": "/category/:category",
