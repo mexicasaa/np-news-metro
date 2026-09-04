@@ -68,6 +68,22 @@ export const Homepage: React.FC<HomepageProps> = ({
   const techWorldPosts = sortedPosts.filter((p) => p.category === 'technology' || p.category === 'world');
   const trendingRanking = [...allPosts].sort((a, b) => (b.viewsCount || 0) - (a.viewsCount || 0)).slice(0, 7);
 
+  if (!leadPost || allPosts.length === 0) {
+    return (
+      <main className="max-w-site mx-auto px-3 sm:px-4 py-12 text-center">
+        <div className="bg-surface-lowest border border-border-subtle p-8 rounded-sm space-y-4 max-w-lg mx-auto shadow-subtle">
+          <Newspaper className="w-12 h-12 text-primary/40 mx-auto animate-pulse" />
+          <h2 className="font-serif text-xl font-bold text-ink">
+            {isHindi ? 'समाचार लोड हो रहे हैं...' : 'Loading News Stream...'}
+          </h2>
+          <p className="text-ink-muted text-sm">
+            {isHindi ? 'ताज़ा समाचार प्राप्त किए जा रहे हैं, कृपया एक क्षण प्रतीक्षा करें।' : 'Connecting to the editorial dispatch wire. One moment please.'}
+          </p>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="max-w-site mx-auto px-3 sm:px-4 py-4 sm:py-6 space-y-6 sm:space-y-8">
       {/* 1. Top Interstitial Billboard Ad (A1/A2) */}

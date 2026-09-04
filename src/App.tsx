@@ -41,23 +41,38 @@ import { StaticInfoTemplate, StaticPageType } from './templates/13_StaticInfoTem
 import { NotFoundTemplate } from './templates/14_NotFoundTemplate';
 import { ArticleLoadingTemplate } from './templates/15_ArticleLoadingTemplate';
 
-// P0 Admin & Daily Publishing Center Suite
-import { AdminLayout, AdminSection } from './components/admin/AdminLayout';
-import { DashboardHome } from './components/admin/DashboardHome';
-import { PublishingCenter, PublishingTab } from './components/admin/PublishingCenter';
-import { ArticleEditor } from './components/admin/ArticleEditor';
-import { EditorialListView } from './components/admin/EditorialListView';
-import { VideoStudioManager } from './components/admin/VideoStudioManager';
-import { HomepageLayoutManager } from './components/admin/HomepageLayoutManager';
-import { PublishingReadinessModal } from './components/admin/PublishingReadinessModal';
-import { PublishOrchestratorModal } from './components/admin/PublishOrchestratorModal';
-import { EmergencyBreakingModal } from './components/admin/EmergencyBreakingModal';
-import { RevisionHistoryModal } from './components/admin/RevisionHistoryModal';
-import { 
-  MediaLibraryView, MonetizationView, SeoHealthView, UsersView, SystemView,
-  AudienceView, AnalyticsDashboardView
-} from './components/admin/AdminSecondaryViews';
-import { YouTubeManagerModal } from './components/admin/YouTubeManagerModal';
+import { FrontendLoadingScreen } from './components/common/FrontendLoadingScreen';
+
+// P0 Admin & Daily Publishing Center Suite - Code-Split with React.lazy
+import type { AdminSection } from './components/admin/AdminLayout';
+import type { PublishingTab } from './components/admin/PublishingCenter';
+
+const AdminLayout = React.lazy(() => import('./components/admin/AdminLayout').then(m => ({ default: m.AdminLayout })));
+const DashboardHome = React.lazy(() => import('./components/admin/DashboardHome').then(m => ({ default: m.DashboardHome })));
+const PublishingCenter = React.lazy(() => import('./components/admin/PublishingCenter').then(m => ({ default: m.PublishingCenter })));
+const ArticleEditor = React.lazy(() => import('./components/admin/ArticleEditor').then(m => ({ default: m.ArticleEditor })));
+const EditorialListView = React.lazy(() => import('./components/admin/EditorialListView').then(m => ({ default: m.EditorialListView })));
+const VideoStudioManager = React.lazy(() => import('./components/admin/VideoStudioManager').then(m => ({ default: m.VideoStudioManager })));
+const HomepageLayoutManager = React.lazy(() => import('./components/admin/HomepageLayoutManager').then(m => ({ default: m.HomepageLayoutManager })));
+const PublishingReadinessModal = React.lazy(() => import('./components/admin/PublishingReadinessModal').then(m => ({ default: m.PublishingReadinessModal })));
+const PublishOrchestratorModal = React.lazy(() => import('./components/admin/PublishOrchestratorModal').then(m => ({ default: m.PublishOrchestratorModal })));
+const EmergencyBreakingModal = React.lazy(() => import('./components/admin/EmergencyBreakingModal').then(m => ({ default: m.EmergencyBreakingModal })));
+const RevisionHistoryModal = React.lazy(() => import('./components/admin/RevisionHistoryModal').then(m => ({ default: m.RevisionHistoryModal })));
+const YouTubeManagerModal = React.lazy(() => import('./components/admin/YouTubeManagerModal').then(m => ({ default: m.YouTubeManagerModal })));
+const MediaLibraryView = React.lazy(() => import('./components/admin/AdminSecondaryViews').then(m => ({ default: m.MediaLibraryView })));
+const MonetizationView = React.lazy(() => import('./components/admin/AdminSecondaryViews').then(m => ({ default: m.MonetizationView })));
+const SeoHealthView = React.lazy(() => import('./components/admin/AdminSecondaryViews').then(m => ({ default: m.SeoHealthView })));
+const UsersView = React.lazy(() => import('./components/admin/AdminSecondaryViews').then(m => ({ default: m.UsersView })));
+const SystemView = React.lazy(() => import('./components/admin/AdminSecondaryViews').then(m => ({ default: m.SystemView })));
+const AudienceView = React.lazy(() => import('./components/admin/AdminSecondaryViews').then(m => ({ default: m.AudienceView })));
+const AnalyticsDashboardView = React.lazy(() => import('./components/admin/AdminSecondaryViews').then(m => ({ default: m.AnalyticsDashboardView })));
+
+const AdminLoadingFallback = () => (
+  <div className="min-h-screen bg-slate-900 text-slate-200 flex flex-col items-center justify-center space-y-4">
+    <div className="w-10 h-10 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
+    <p className="font-mono text-sm tracking-wider uppercase text-slate-400">Loading Editorial Workspace...</p>
+  </div>
+);
 import { SeoHead } from './components/common/SeoHead';
 import { 
   generateArticleStructuredData, 
@@ -410,6 +425,9 @@ function AppContent() {
   const [posts, setPosts] = useState<WpPost[]>(getStoredPosts);
   const [videos, setVideos] = useState<WpVideo[]>(getStoredVideos);
   const [isYouTubeModalOpen, setIsYouTubeModalOpen] = useState(false);
+  const [isContentLoading, setIsContentLoading] = useState<boolean>(() => {
+    return typeof window !== 'undefined' && getStoredPosts().length === 0;
+  });
 
   // Strictly published posts feed for all public reader templates & live feeds
   const publishedPosts = React.useMemo(() => {
@@ -608,6 +626,10 @@ function AppContent() {
         }
       } catch (err) {
         console.error('Error fetching content:', err);
+      } finally {
+        if (isMounted) {
+          setIsContentLoading(false);
+        }
       }
     };
 
@@ -1545,14 +1567,18 @@ function AppContent() {
       <SeoHead metadata={currentSeoMetadata} structuredData={currentStructuredData} />
 
       {/* YouTube Video Manager Modal */}
-      <YouTubeManagerModal
-        isOpen={isYouTubeModalOpen}
-        onClose={() => setIsYouTubeModalOpen(false)}
-        onVideoSaved={(v) => {
-          setVideos(prev => [v, ...prev]);
-          setSelectedVideo(v);
-        }}
-      />
+      {isYouTubeModalOpen && (
+        <React.Suspense fallback={null}>
+          <YouTubeManagerModal
+            isOpen={isYouTubeModalOpen}
+            onClose={() => setIsYouTubeModalOpen(false)}
+            onVideoSaved={(v) => {
+              setVideos(prev => [v, ...prev]);
+              setSelectedVideo(v);
+            }}
+          />
+        </React.Suspense>
+      )}
       {/* Live Preview Notification Banner (Active only when previewing in new tab) */}
       {isPreviewTab && (
         <div className="bg-slate-900 border-b-2 border-amber-500 text-white px-4 py-2.5 flex items-center justify-between sticky top-0 z-[1000] shadow-xl text-xs sm:text-sm">
@@ -1582,7 +1608,8 @@ function AppContent() {
           A. ADMIN PUBLISHING CENTER SUITE (When viewMode === 'admin')
           ====================================================================== */}
       {viewMode === 'admin' && isAdminAuthenticated ? (
-        <AdminLayout
+        <React.Suspense fallback={<AdminLoadingFallback />}>
+          <AdminLayout
           currentSection={adminSection}
           onNavigateSection={async (sec) => {
             const isAlreadyPub = isPostPublished(activeEditingPost) || activeEditingPost?.status === 'published';
@@ -1868,6 +1895,7 @@ function AppContent() {
           {adminSection === 'users' && <UsersView />}
           {adminSection === 'system' && <SystemView />}
         </AdminLayout>
+      </React.Suspense>
       ) : (
         /* ======================================================================
             B. PUBLIC READER FRONTEND (14 Templates)
@@ -1931,15 +1959,8 @@ function AppContent() {
           )}
 
           {/* MAIN TEMPLATE CONTENT RENDERER */}
-          {isLoadingSkeleton ? (
-            <div className="max-w-site mx-auto px-4 py-8 space-y-6">
-              <SkeletonCard variant="hero" />
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <SkeletonCard variant="grid" />
-                <SkeletonCard variant="grid" />
-                <SkeletonCard variant="grid" />
-              </div>
-            </div>
+          {isLoadingSkeleton || (isContentLoading && publishedPosts.length === 0 && currentTemplate === 'homepage') ? (
+            <FrontendLoadingScreen />
           ) : (
             <>
               {currentTemplate === 'homepage' && (
@@ -2146,83 +2167,85 @@ function AppContent() {
       )}
 
       {/* ======================================================================
-          C. GLOBAL SHARED ADMIN MODALS
+          C. GLOBAL SHARED ADMIN MODALS (Lazy Loaded)
           ====================================================================== */}
-      {/* 1. Publishing Readiness & Duplicate Check Modal */}
-      {readinessModalOpen && pendingPostData && (
-        <PublishingReadinessModal
-          isOpen={readinessModalOpen}
-          onClose={() => setReadinessModalOpen(false)}
-          checks={getReadinessChecks(pendingPostData)}
-          duplicates={getDuplicateMatches(pendingPostData)}
-          onProceedToPublish={() => handleExecutePublish(pendingPostData)}
-          onReviewExistingStory={(id) => {
-            const match = posts.find(p => p.id === id);
-            if (match) {
-              setReadinessModalOpen(false);
-              handleSelectPost(match);
-            }
-          }}
-        />
-      )}
+      <React.Suspense fallback={null}>
+        {/* 1. Publishing Readiness & Duplicate Check Modal */}
+        {readinessModalOpen && pendingPostData && (
+          <PublishingReadinessModal
+            isOpen={readinessModalOpen}
+            onClose={() => setReadinessModalOpen(false)}
+            checks={getReadinessChecks(pendingPostData)}
+            duplicates={getDuplicateMatches(pendingPostData)}
+            onProceedToPublish={() => handleExecutePublish(pendingPostData)}
+            onReviewExistingStory={(id) => {
+              const match = posts.find(p => p.id === id);
+              if (match) {
+                setReadinessModalOpen(false);
+                handleSelectPost(match);
+              }
+            }}
+          />
+        )}
 
-      {/* 2. 15-Step Safe Publish Orchestrator & Health Panel Modal */}
-      {publishOrchestratorOpen && (
-        <PublishOrchestratorModal
-          isOpen={publishOrchestratorOpen}
-          onClose={() => {
-            setPublishOrchestratorOpen(false);
-            setAdminSection('publishing');
-            setPublishingTab('published');
-          }}
-          operation={currentOperation}
-          onViewLiveStory={(id) => {
-            setPublishOrchestratorOpen(false);
-            const freshPosts = getStoredPosts();
-            const found = freshPosts.find((p: WpPost) => p.id === id) || posts.find((p: WpPost) => p.id === id) || freshPosts[0];
-            handleSelectPost(found);
-          }}
-          onViewHomepage={() => {
-            setPublishOrchestratorOpen(false);
-            setCurrentTemplate('homepage');
-            setViewMode('public');
-          }}
-          onRetryStep={(stepNum) => {
-            if (currentOperation) {
-              const updatedSteps = currentOperation.steps.map(s => 
-                s.stepNumber === stepNum ? { ...s, status: 'success' as const } : s
-              );
-              setCurrentOperation({ ...currentOperation, steps: updatedSteps, status: 'published_healthy' });
-            }
-          }}
-          onFinish={() => {
-            setPublishOrchestratorOpen(false);
-            setAdminSection('publishing');
-            setPublishingTab('published');
-          }}
-        />
-      )}
+        {/* 2. 15-Step Safe Publish Orchestrator & Health Panel Modal */}
+        {publishOrchestratorOpen && (
+          <PublishOrchestratorModal
+            isOpen={publishOrchestratorOpen}
+            onClose={() => {
+              setPublishOrchestratorOpen(false);
+              setAdminSection('publishing');
+              setPublishingTab('published');
+            }}
+            operation={currentOperation}
+            onViewLiveStory={(id) => {
+              setPublishOrchestratorOpen(false);
+              const freshPosts = getStoredPosts();
+              const found = freshPosts.find((p: WpPost) => p.id === id) || posts.find((p: WpPost) => p.id === id) || freshPosts[0];
+              handleSelectPost(found);
+            }}
+            onViewHomepage={() => {
+              setPublishOrchestratorOpen(false);
+              setCurrentTemplate('homepage');
+              setViewMode('public');
+            }}
+            onRetryStep={(stepNum) => {
+              if (currentOperation) {
+                const updatedSteps = currentOperation.steps.map(s => 
+                  s.stepNumber === stepNum ? { ...s, status: 'success' as const } : s
+                );
+                setCurrentOperation({ ...currentOperation, steps: updatedSteps, status: 'published_healthy' });
+              }
+            }}
+            onFinish={() => {
+              setPublishOrchestratorOpen(false);
+              setAdminSection('publishing');
+              setPublishingTab('published');
+            }}
+          />
+        )}
 
-      {/* 3. Emergency Breaking News Modal */}
-      {emergencyBreakingOpen && (
-        <EmergencyBreakingModal
-          isOpen={emergencyBreakingOpen}
-          onClose={() => setEmergencyBreakingOpen(false)}
-          onPublishBreaking={handlePublishEmergencyBreaking}
-        />
-      )}
+        {/* 3. Emergency Breaking News Modal */}
+        {emergencyBreakingOpen && (
+          <EmergencyBreakingModal
+            isOpen={emergencyBreakingOpen}
+            onClose={() => setEmergencyBreakingOpen(false)}
+            onPublishBreaking={handlePublishEmergencyBreaking}
+          />
+        )}
 
-      {/* 4. Revision History Modal */}
-      {revisionsModalOpen && (
-        <RevisionHistoryModal
-          isOpen={revisionsModalOpen}
-          onClose={() => setRevisionsModalOpen(false)}
-          onRestoreVersion={(rev: ArticleRevision) => {
-            alert(`Restored article copy to Version ${rev.version}.0`);
-            setRevisionsModalOpen(false);
-          }}
-        />
-      )}
+        {/* 4. Revision History Modal */}
+        {revisionsModalOpen && (
+          <RevisionHistoryModal
+            isOpen={revisionsModalOpen}
+            onClose={() => setRevisionsModalOpen(false)}
+            onRestoreVersion={(rev: ArticleRevision) => {
+              alert(`Restored article copy to Version ${rev.version}.0`);
+              setRevisionsModalOpen(false);
+            }}
+          />
+        )}
+      </React.Suspense>
 
       {/* 5. Secure Admin Login Modal */}
       <AdminLoginModal

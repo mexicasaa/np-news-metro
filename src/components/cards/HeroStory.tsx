@@ -45,6 +45,8 @@ export const HeroStory: React.FC<HeroStoryProps> = ({
   }, [storyList.length, activeSlideIndex]);
 
   const rawStory = storyList[activeSlideIndex] || post;
+  if (!rawStory) return null;
+
   const currentStory = getLocalizedPost(rawStory, language);
   const author = rawStory.customAuthor?.name ? {
     id: 'custom-author',
