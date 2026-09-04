@@ -77,7 +77,288 @@ const ARTICLE_DETAIL_FIELDS = `
   )
 `;
 
+// Category mapping helper
+const CATEGORY_SLUG_TO_ID = {
+  india: '11111111-1111-1111-1111-111111110001',
+  politics: '11111111-1111-1111-1111-111111110002',
+  business: '11111111-1111-1111-1111-111111110003',
+  technology: '11111111-1111-1111-1111-111111110004',
+  world: '11111111-1111-1111-1111-111111110005',
+  sports: '11111111-1111-1111-1111-111111110006',
+  entertainment: '11111111-1111-1111-1111-111111110007',
+  lifestyle: '11111111-1111-1111-1111-111111110008',
+  opinion: '11111111-1111-1111-1111-111111110009',
+  crime: '11111111-1111-1111-1111-111111110010',
+  social: '11111111-1111-1111-1111-111111110011',
+  astrology: '11111111-1111-1111-1111-111111110012',
+  religion: '11111111-1111-1111-1111-111111110013',
+};
+
+const isValidUUID = (str) => {
+  if (!str) return false;
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+};
+
+const slugify = (text, maxLength = 65) => {
+  if (!text) return 'story-' + Date.now();
+  let clean = text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s\u0900-\u097F-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  if (clean.length > maxLength) {
+    clean = clean.substring(0, maxLength).replace(/-+$/, '');
+  }
+  return clean || 'story-' + Date.now();
+};
+
+async function purgeCloudflareEdge(slug, category) {
+  const zoneId = process.env.CLOUDFLARE_ZONE_ID;
+  const cfToken = process.env.CLOUDFLARE_API_TOKEN;
+  if (!zoneId || !cfToken) return;
+
+  const siteOrigin = 'https://www.npnewsmetro.com';
+  const filesToPurge = [
+    `${siteOrigin}/`,
+    `${siteOrigin}/api/articles?view=homepage`,
+    `${siteOrigin}/api/trending`,
+  ];
+  if (category) {
+    filesToPurge.push(`${siteOrigin}/category/${category}`);
+    filesToPurge.push(`${siteOrigin}/api/articles?category=${category}`);
+  }
+  if (slug) {
+    filesToPurge.push(`${siteOrigin}/api/articles?slug=${slug}`);
+    if (category) filesToPurge.push(`${siteOrigin}/${category}/${slug}`);
+  }
+
+  try {
+    await fetch(`https://api.cloudflare.com/client/v4/zones/${zoneId}/purge_cache`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${cfToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ files: filesToPurge }),
+    });
+  } catch (e) {}
+}
+
 export default async function handler(req, res) {
+  // CORS Preflight
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    return res.status(200).end();
+  }
+
+  // -----------------------------------------------------------------
+  // WRITE OPERATIONS: POST / PUT (Save or Publish Article)
+  // -----------------------------------------------------------------
+  if (req.method === 'POST' || req.method === 'PUT') {
+    let body = {};
+    if (typeof req.body === 'string') {
+      try { body = JSON.parse(req.body); } catch {}
+    } else {
+      body = req.body || {};
+    }
+
+    const { postData, targetStatus = 'draft' } = body;
+    if (!postData) {
+      return res.status(400).json({ error: 'postData payload is required' });
+    }
+
+    try {
+      const title = postData.title?.trim() || 'Untitled News Story';
+      const categoryId = postData.categoryId || postData.category_id || (postData.category && CATEGORY_SLUG_TO_ID[postData.category]) || '11111111-1111-1111-1111-111111110001';
+      const contentText = Array.isArray(postData.blocks) && postData.blocks.length > 0
+        ? postData.blocks.map(b => b.content || '').join('\n\n')
+        : postData.dek || '';
+
+      const readTimeMinutes = postData.readTime 
+        ? parseInt(String(postData.readTime).replace(/[^\d]/g, ''), 10) || 3 
+        : 3;
+
+      let existingId = null;
+      if (postData.id && isValidUUID(postData.id)) {
+        existingId = postData.id;
+      } else if (targetStatus === 'published') {
+        const { data: draftMatches } = await supabase
+          .from('articles')
+          .select('id')
+          .eq('title', title)
+          .eq('status', 'draft')
+          .order('created_at', { ascending: false })
+          .limit(1);
+        if (draftMatches && draftMatches.length > 0) {
+          existingId = draftMatches[0].id;
+        }
+      }
+
+      // Generate unique slug
+      const rawSlugCandidate = postData.slug && postData.slug !== 'auto-draft' && postData.slug.trim().length > 1
+        ? postData.slug.trim()
+        : title;
+      const baseSlug = slugify(rawSlugCandidate, 65);
+      let candidateSlug = baseSlug;
+      let counter = 1;
+      let isUnique = false;
+      while (!isUnique && counter <= 20) {
+        let q = supabase.from('articles').select('id').eq('slug', candidateSlug);
+        if (existingId) q = q.neq('id', existingId);
+        const { data: existingSlugs } = await q;
+        if (!existingSlugs || existingSlugs.length === 0) {
+          isUnique = true;
+        } else {
+          candidateSlug = `${baseSlug}-${counter}`;
+          counter++;
+        }
+      }
+
+      const authorName = postData.customAuthor?.name || postData.authorName || 'NP News Metro Bureau';
+      const authorRole = postData.customAuthor?.role || postData.authorRole || 'Staff Reporter';
+      const authorAvatar = postData.customAuthor?.avatar || postData.authorAvatar || null;
+      const authorBio = postData.customAuthor?.bio || postData.authorBio || null;
+
+      const dbPayload = {
+        title,
+        title_hi: postData.titleHi || title,
+        slug: candidateSlug,
+        excerpt: postData.dek || null,
+        dek_hi: postData.dekHi || null,
+        content: contentText,
+        category_id: categoryId,
+        status: targetStatus,
+        featured_image_url: postData.featuredImage || postData.featured_image_url || null,
+        featured_image_alt: postData.imageAlt || postData.featured_image_alt || title,
+        featured_image_caption: postData.imageCaption || postData.featured_image_caption || null,
+        image_credit: postData.imageCredit || postData.image_credit || 'NP News Metro Photo Desk',
+        is_breaking_news: !!postData.isBreaking,
+        is_lead: postData.isLead !== undefined ? !!postData.isLead : true,
+        is_featured: postData.isFeatured !== undefined ? !!postData.isFeatured : true,
+        is_opinion: !!postData.isOpinion,
+        is_sponsored: !!postData.isSponsored,
+        sponsor_name: postData.sponsorName || null,
+        location: postData.location || 'New Delhi',
+        author_id: postData.authorId || '04ad79d9-d871-4099-a633-bcb7a1e35055',
+        author_name: authorName,
+        author_role: authorRole,
+        author_avatar: authorAvatar,
+        author_bio: authorBio,
+        custom_author: postData.customAuthor || null,
+        blocks: postData.blocks || [],
+        key_takeaways: postData.keyTakeaways || [],
+        seo_title: postData.seoTitle || null,
+        meta_description: postData.seoDescription || null,
+        reading_time_minutes: readTimeMinutes,
+        published_at: targetStatus === 'published' 
+          ? (postData.publishedAt || new Date().toISOString()) 
+          : (postData.publishedAt || null),
+        updated_at: new Date().toISOString(),
+      };
+
+      let resultArticle = null;
+      if (existingId) {
+        const { data, error } = await supabase
+          .from('articles')
+          .update(dbPayload)
+          .eq('id', existingId)
+          .select(ARTICLE_DETAIL_FIELDS)
+          .single();
+        if (error) return res.status(500).json({ error: `Update error: ${error.message}` });
+        resultArticle = data;
+      } else {
+        const { data, error } = await supabase
+          .from('articles')
+          .insert(dbPayload)
+          .select(ARTICLE_DETAIL_FIELDS)
+          .single();
+        if (error) return res.status(500).json({ error: `Insert error: ${error.message}` });
+        resultArticle = data;
+      }
+
+      // Record revision
+      if (resultArticle?.id) {
+        try {
+          await supabase.from('article_revisions').insert({
+            article_id: resultArticle.id,
+            title: resultArticle.title,
+            excerpt: resultArticle.excerpt,
+            content: resultArticle.content,
+            status: targetStatus,
+          });
+        } catch (e) {}
+      }
+
+      // Purge drafts with same title if published
+      if (targetStatus === 'published' && resultArticle?.id) {
+        try {
+          await supabase.from('articles').delete().eq('status', 'draft').eq('title', title).neq('id', resultArticle.id);
+        } catch (e) {}
+      }
+
+      // Invalidate warm cache & Cloudflare Edge
+      invalidateWarmCache();
+      purgeCloudflareEdge(resultArticle.slug, postData.category);
+
+      return res.status(200).json({ post: resultArticle, success: true });
+    } catch (err) {
+      return res.status(500).json({ error: err.message || 'Error processing article' });
+    }
+  }
+
+  // -----------------------------------------------------------------
+  // DELETE OPERATION: Archive to deleted_articles & Remove from articles
+  // -----------------------------------------------------------------
+  if (req.method === 'DELETE') {
+    const idOrSlug = req.query?.id || req.query?.slug;
+    if (!idOrSlug) return res.status(400).json({ error: 'id or slug is required' });
+
+    try {
+      let q = supabase.from('articles').select('*');
+      if (isValidUUID(idOrSlug)) q = q.eq('id', idOrSlug);
+      else q = q.eq('slug', idOrSlug);
+
+      const { data: rows, error: findErr } = await q;
+      if (findErr || !rows || rows.length === 0) {
+        return res.status(404).json({ error: 'Article not found' });
+      }
+
+      const article = rows[0];
+
+      // Archive to deleted_articles
+      try {
+        await supabase.from('deleted_articles').insert({
+          original_article_id: article.id,
+          title: article.title,
+          slug: article.slug,
+          category_slug: article.category_slug || null,
+          author_id: article.author_id || null,
+          author_name: article.author_name || null,
+          status: article.status || 'published',
+          featured_image_url: article.featured_image_url || null,
+          article_payload: article,
+          deleted_at: new Date().toISOString(),
+        });
+      } catch (e) {}
+
+      // Delete from articles
+      await supabase.from('articles').delete().eq('id', article.id);
+
+      invalidateWarmCache();
+      purgeCloudflareEdge(article.slug, article.category_slug);
+
+      return res.status(200).json({ success: true });
+    } catch (err) {
+      return res.status(500).json({ error: err.message });
+    }
+  }
+
+  // -----------------------------------------------------------------
+  // READ OPERATIONS: GET
+  // -----------------------------------------------------------------
   const url = new URL(req.url || '/', 'https://www.npnewsmetro.com');
   const slug = (req.query?.slug || url.searchParams.get('slug') || '').trim();
   const category = (req.query?.category || url.searchParams.get('category') || '').trim();

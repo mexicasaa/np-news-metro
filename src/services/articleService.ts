@@ -450,6 +450,39 @@ export const saveArticle = async (
   postData: Partial<WpPost> & { isEdit?: boolean },
   targetStatus: EditorialStatus = 'draft'
 ): Promise<{ post?: WpPost; error?: string }> => {
+  // 1. Serverless Edge API first (Zero direct DB connection from browser, automatic warm cache & Cloudflare purge)
+  try {
+    if (typeof window !== 'undefined') {
+      const apiRes = await fetch('/api/articles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ postData, targetStatus }),
+      });
+      if (apiRes.ok) {
+        const json = await apiRes.json();
+        if (json?.post) {
+          const mapped = mapDbToWpPost(json.post);
+          invalidateArticleClientCache();
+          try {
+            if (typeof BroadcastChannel !== 'undefined') {
+              const channel = new BroadcastChannel('np_news_feed_channel');
+              if (targetStatus === 'published') {
+                channel.postMessage({ type: 'NEWS_PUBLISHED', articleId: mapped.id });
+              } else {
+                channel.postMessage({ type: 'ARTICLE_DRAFT_SAVED', articleId: mapped.id });
+              }
+              channel.close();
+            }
+          } catch (e) {}
+          return { post: mapped };
+        }
+      }
+    }
+  } catch (apiErr) {
+    console.warn('API saveArticle notice, proceeding to client fallback:', apiErr);
+  }
+
+  // 2. Direct Supabase fallback
   try {
     const title = postData.title?.trim() || 'Untitled News Story';
     const categoryId = CATEGORY_SLUG_TO_ID[postData.category || 'india'] || '11111111-1111-1111-1111-111111110001';
@@ -687,6 +720,19 @@ export interface DeletedArticle {
 export const deleteArticleWithRecovery = async (
   idOrSlug: string
 ): Promise<{ success: boolean; recoveredId?: string; error?: string }> => {
+  // 1. Try serverless Edge API first (Zero direct DB connection from browser)
+  try {
+    if (typeof window !== 'undefined') {
+      const apiRes = await fetch(`/api/articles?id=${encodeURIComponent(idOrSlug)}`, {
+        method: 'DELETE',
+      });
+      if (apiRes.ok) {
+        invalidateArticleClientCache();
+        return { success: true };
+      }
+    }
+  } catch (apiErr) {}
+
   try {
     const activeUserId = await ensureAuthenticatedSession();
 
