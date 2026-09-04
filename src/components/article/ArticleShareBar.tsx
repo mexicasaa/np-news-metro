@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Share2, 
   Bookmark, 
@@ -8,7 +8,8 @@ import {
   Send, 
   MoreHorizontal,
   Smartphone,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Heart
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { WpPost } from '../../types/wordpress';
@@ -21,6 +22,8 @@ import {
   ShareOptions 
 } from '../../utils/shareUtils';
 import { ShareModal } from './ShareModal';
+import { getArticleLikeState, toggleArticleLike } from '../../services/likeService';
+import { recordPageView } from '../../services/metricsService';
 
 interface ArticleShareBarProps {
   post?: WpPost;
@@ -46,7 +49,33 @@ export const ArticleShareBar: React.FC<ArticleShareBarProps> = ({
   const [copied, setCopied] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
   const { t, isHindi } = useLanguage();
+
+  useEffect(() => {
+    if (post?.id) {
+      getArticleLikeState(post.id).then((state) => {
+        setLiked(state.hasLiked);
+        setLikeCount(state.likeCount);
+      });
+      // Non-blocking view collection
+      recordPageView(post.id);
+    }
+  }, [post?.id]);
+
+  const handleToggleLike = async () => {
+    if (!post?.id) return;
+    const nextLiked = !liked;
+    const nextCount = nextLiked ? likeCount + 1 : Math.max(0, likeCount - 1);
+    setLiked(nextLiked);
+    setLikeCount(nextCount);
+    try {
+      const res = await toggleArticleLike(post.id);
+      setLiked(res.hasLiked);
+      setLikeCount(res.likeCount);
+    } catch {}
+  };
 
   const title = customTitle || post?.title || 'NP News Metro';
   const category = customCategory || post?.category || 'india';
@@ -177,8 +206,23 @@ export const ArticleShareBar: React.FC<ArticleShareBarProps> = ({
           </button>
         </div>
 
-        {/* Right: Bookmark, Print & Comments trigger */}
+        {/* Right: Likes, Bookmark, Print & Comments trigger */}
         <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Like Button */}
+          <button
+            onClick={handleToggleLike}
+            className={`px-2 py-1.5 rounded border transition-colors flex items-center gap-1 text-xs font-semibold cursor-pointer active:scale-95 ${
+              liked
+                ? 'bg-rose-50 border-rose-300 text-rose-600'
+                : 'border-border-subtle text-ink-muted hover:bg-surface-container hover:text-rose-600'
+            }`}
+            title={liked ? (isHindi ? 'पसंद किया गया' : 'Liked story') : (isHindi ? 'खबर पसंद करें' : 'Like this story')}
+            aria-label={liked ? 'Liked story' : 'Like this story'}
+          >
+            <Heart className={`w-3.5 h-3.5 ${liked ? 'fill-current text-rose-600' : ''}`} />
+            {likeCount > 0 && <span className="text-[11px] font-bold">{likeCount}</span>}
+          </button>
+
           <button
             onClick={() => setBookmarked(!bookmarked)}
             className={`p-1.5 rounded border transition-colors ${

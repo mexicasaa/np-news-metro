@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import { R2MediaRepository } from '../repositories/r2/R2MediaRepository';
 
 export interface MediaAsset {
   id: string;
@@ -11,6 +12,16 @@ export interface MediaAsset {
   mediaType: string;
   fileSize?: number;
   createdAt?: string;
+  contentHash?: string;
+  r2Key?: string;
+  isDeduplicated?: boolean;
+  referenceCount?: number;
+  variantUrls?: {
+    w320: string;
+    w640: string;
+    w960: string;
+    w1280: string;
+  };
 }
 
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/gif'];
@@ -24,10 +35,31 @@ export const sanitizeFileName = (fileName: string): string => {
   return `${base}-${unique}.${ext}`;
 };
 
+/**
+ * Generate responsive srcset string for high-scale edge caching
+ */
+export const generateSrcSet = (url: string, contentHash?: string): string => {
+  if (!url) return '';
+  if (!contentHash) return `${url} 1x`;
+
+  const baseUrl = url.split('?')[0];
+  const domain = baseUrl.substring(0, baseUrl.lastIndexOf('/'));
+  return `
+    ${domain}/320.webp 320w,
+    ${domain}/640.webp 640w,
+    ${domain}/960.webp 960w,
+    ${domain}/1280.webp 1280w
+  `.trim();
+};
+
+/**
+ * Upload an image with SHA-256 deduplication and relationship linking.
+ * Never stores duplicate image files or duplicate media records.
+ */
 export const uploadArticleImage = async (
   file: File,
   articleId?: string
-): Promise<{ url: string; path: string; error?: string }> => {
+): Promise<{ url: string; path: string; mediaId?: string; isDuplicate?: boolean; error?: string }> => {
   if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
     return {
       url: '',
@@ -44,47 +76,54 @@ export const uploadArticleImage = async (
     };
   }
 
-  const cleanName = sanitizeFileName(file.name);
-  const folder = articleId ? `articles/${articleId}` : 'articles/general';
-  const filePath = `${folder}/${cleanName}`;
+  const r2Repo = R2MediaRepository.getInstance();
 
   try {
-    const { error: uploadError } = await supabase.storage
-      .from('article-images')
-      .upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: false,
+    // 1. Calculate SHA-256 content hash
+    const contentHash = await r2Repo.computeContentHash(file);
+
+    // 2. Deduplicate or upload
+    const { media, isDuplicate } = await r2Repo.upload(file, contentHash, {
+      fileName: file.name,
+      mimeType: file.type,
+      fileSize: file.size,
+      altText: file.name.replace(/\.[^/.]+$/, ''),
+      caption: 'NP News Metro Media Desk',
+    });
+
+    // 3. Link relationship to article if articleId is provided
+    if (articleId) {
+      await r2Repo.linkArticleMedia({
+        articleId,
+        mediaId: media.id,
+        usageType: 'featured',
+        sortOrder: 0,
       });
 
-    if (uploadError) {
-      console.error('Storage upload error:', uploadError);
-      return { url: '', path: '', error: uploadError.message };
+      // Update article.featured_media_id in articles table if article exists
+      try {
+        await supabase
+          .from('articles')
+          .update({ featured_media_id: media.id })
+          .eq('id', articleId);
+      } catch {}
     }
 
-    const { data } = supabase.storage.from('article-images').getPublicUrl(filePath);
-
-    // Also register in media table for cataloging
-    try {
-      await supabase.from('media').insert({
-        file_name: cleanName,
-        storage_path: filePath,
-        public_url: data.publicUrl,
-        mime_type: file.type,
-        file_size: file.size,
-        media_type: 'image',
-        alt_text: file.name.replace(/\.[^/.]+$/, ''),
-      });
-    } catch (dbErr) {
-      console.warn('Could not record media metadata in database:', dbErr);
-    }
-
-    return { url: data.publicUrl, path: filePath };
+    return {
+      url: media.publicUrl,
+      path: media.storagePath,
+      mediaId: media.id,
+      isDuplicate,
+    };
   } catch (err: any) {
     console.error('Unexpected error in uploadArticleImage:', err);
     return { url: '', path: '', error: err?.message || 'Upload failed' };
   }
 };
 
+/**
+ * General media uploader for editorial desk with deduplication
+ */
 export const uploadMedia = async (
   file: File,
   altText?: string,
@@ -95,65 +134,34 @@ export const uploadMedia = async (
   }
 
   const isImage = file.type.startsWith('image/');
-  const cleanName = sanitizeFileName(file.name);
-  const filePath = `uploads/${new Date().getFullYear()}/${cleanName}`;
+  const r2Repo = R2MediaRepository.getInstance();
 
   try {
-    const { error: uploadError } = await supabase.storage
-      .from('media')
-      .upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: false,
-      });
-
-    if (uploadError) {
-      return { error: uploadError.message };
-    }
-
-    const { data } = supabase.storage.from('media').getPublicUrl(filePath);
-
-    const { data: dbData, error: dbError } = await supabase
-      .from('media')
-      .insert({
-        file_name: cleanName,
-        storage_path: filePath,
-        public_url: data.publicUrl,
-        mime_type: file.type,
-        file_size: file.size,
-        media_type: isImage ? 'image' : 'document',
-        alt_text: altText || file.name.replace(/\.[^/.]+$/, ''),
-        caption: credit || 'NP News Metro Media Desk',
-      })
-      .select()
-      .single();
-
-    if (dbError) {
-      return {
-        asset: {
-          id: `med-${Date.now()}`,
-          title: cleanName,
-          url: data.publicUrl,
-          dimensions: '1920 � 1080',
-          credit: credit || 'NP News Metro',
-          alt: altText || cleanName,
-          focal: 'Center (50%, 50%)',
-          mediaType: isImage ? 'image' : 'document',
-        },
-      };
-    }
+    const contentHash = await r2Repo.computeContentHash(file);
+    const { media, isDuplicate } = await r2Repo.upload(file, contentHash, {
+      fileName: file.name,
+      mimeType: file.type,
+      fileSize: file.size,
+      altText: altText || file.name.replace(/\.[^/.]+$/, ''),
+      caption: credit || 'NP News Metro Media Desk',
+    });
 
     return {
       asset: {
-        id: dbData.id,
-        title: dbData.file_name,
-        url: dbData.public_url,
-        dimensions: `${dbData.width || 1920} � ${dbData.height || 1080}`,
-        credit: dbData.caption || 'NP News Metro',
-        alt: dbData.alt_text || dbData.file_name,
+        id: media.id,
+        title: media.fileName,
+        url: media.publicUrl,
+        dimensions: `${media.width || 1920} × ${media.height || 1080}`,
+        credit: media.caption || credit || 'NP News Metro',
+        alt: media.altText || altText || media.fileName,
         focal: 'Center (50%, 50%)',
-        mediaType: dbData.media_type,
-        fileSize: dbData.file_size || undefined,
-        createdAt: dbData.created_at || undefined,
+        mediaType: isImage ? 'image' : 'document',
+        fileSize: media.fileSize || undefined,
+        createdAt: media.createdAt || undefined,
+        contentHash: media.contentHash || undefined,
+        r2Key: media.r2Key || undefined,
+        isDeduplicated: isDuplicate,
+        variantUrls: media.variantUrls,
       },
     };
   } catch (err: any) {
@@ -161,11 +169,18 @@ export const uploadMedia = async (
   }
 };
 
+/**
+ * Fetch media library with reference counts and deduplication metadata
+ */
 export const getMediaLibrary = async (): Promise<MediaAsset[]> => {
   try {
     const { data, error } = await supabase
       .from('media')
-      .select('*')
+      .select(`
+        id, file_name, storage_path, public_url, mime_type, file_size, width, height,
+        alt_text, caption, media_type, created_at, content_hash, r2_key,
+        article_media (count)
+      `)
       .order('created_at', { ascending: false });
 
     if (error || !data || data.length === 0) {
@@ -174,47 +189,56 @@ export const getMediaLibrary = async (): Promise<MediaAsset[]> => {
           id: 'med-1',
           title: 'Parliament House New Delhi Session',
           url: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&q=80&w=600',
-          dimensions: '1920 � 1080',
+          dimensions: '1920 × 1080',
           credit: 'PTI / Vijay Verma',
           alt: 'Parliament building exterior during winter session',
           focal: 'Center (50%, 50%)',
           mediaType: 'image',
+          referenceCount: 1,
         },
         {
           id: 'med-2',
           title: 'Western Port Maritime Corridor Freight Yard',
           url: 'https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&q=80&w=600',
-          dimensions: '2400 � 1350',
+          dimensions: '2400 × 1350',
           credit: 'Reuters / Amit Dave',
           alt: 'Container logistics and ship freight loading',
           focal: 'Top-Right (65%, 35%)',
           mediaType: 'image',
-        },
-        {
-          id: 'med-3',
-          title: 'Dal Lake Srinagar Ecological Drone Panorama',
-          url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=600',
-          dimensions: '1920 � 1080',
-          credit: 'Meera Iyer / NP News',
-          alt: 'Aerial perspective of Dal Lake and houseboats',
-          focal: 'Center (50%, 50%)',
-          mediaType: 'image',
+          referenceCount: 1,
         },
       ];
     }
 
-    return data.map((m) => ({
-      id: m.id,
-      title: m.file_name,
-      url: m.public_url,
-      dimensions: m.width && m.height ? `${m.width} � ${m.height}` : '1920 � 1080',
-      credit: m.caption || 'NP News Desk',
-      alt: m.alt_text || m.file_name,
-      focal: 'Center (50%, 50%)',
-      mediaType: m.media_type,
-      fileSize: m.file_size || undefined,
-      createdAt: m.created_at || undefined,
-    }));
+    const r2Repo = R2MediaRepository.getInstance();
+
+    return data.map((m: any) => {
+      const refCount = Array.isArray(m.article_media) && m.article_media[0]?.count
+        ? Number(m.article_media[0].count)
+        : 0;
+
+      return {
+        id: m.id,
+        title: m.file_name,
+        url: m.public_url,
+        dimensions: m.width && m.height ? `${m.width} × ${m.height}` : '1920 × 1080',
+        credit: m.caption || 'NP News Desk',
+        alt: m.alt_text || m.file_name,
+        focal: 'Center (50%, 50%)',
+        mediaType: m.media_type || 'image',
+        fileSize: m.file_size || undefined,
+        createdAt: m.created_at || undefined,
+        contentHash: m.content_hash || undefined,
+        r2Key: m.r2_key || undefined,
+        referenceCount: refCount,
+        variantUrls: {
+          w320: r2Repo.getUrl(`media/${m.content_hash || m.id}/320.webp`),
+          w640: r2Repo.getUrl(`media/${m.content_hash || m.id}/640.webp`),
+          w960: r2Repo.getUrl(`media/${m.content_hash || m.id}/960.webp`),
+          w1280: r2Repo.getUrl(`media/${m.content_hash || m.id}/1280.webp`),
+        },
+      };
+    });
   } catch (err) {
     console.error('Error fetching media library:', err);
     return [];

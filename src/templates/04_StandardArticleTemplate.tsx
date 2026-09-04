@@ -6,6 +6,7 @@ import { handleImageError, getOptimizedImageUrl } from '../utils/imageFallback';
 import { ArticleHeader } from '../components/article/ArticleHeader';
 import { ArticleBody } from '../components/article/ArticleBody';
 import { ArticleShareBar } from '../components/article/ArticleShareBar';
+import { ArticleComments } from '../components/article/ArticleComments';
 import { AuthorBioBox } from '../components/article/AuthorBioBox';
 import { CorrectionNotice } from '../components/article/CorrectionNotice';
 import { RelatedStoriesBlock } from '../components/article/RelatedStoriesBlock';
@@ -183,55 +184,12 @@ export const StandardArticleTemplate: React.FC<StandardArticleTemplateProps> = (
               />
             )}
 
-            {/* Comments Section (Optional/Moderated) */}
-            <section className="my-8 pt-6 border-t border-border-subtle">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <MessageSquare className="w-5 h-5 text-primary" />
-                  <h3 className="font-serif text-xl font-bold text-ink">
-                    {isHindi ? `पाठक चर्चा (${post.commentCount})` : `Reader Discussion (${post.commentCount})`}
-                  </h3>
-                </div>
-                <button
-                  onClick={() => setCommentsOpen(!commentsOpen)}
-                  className="text-xs font-semibold text-primary hover:underline"
-                >
-                  {commentsOpen ? (isHindi ? 'चर्चा समेटें' : 'Collapse Discussion') : (isHindi ? 'चर्चा में भाग लें' : 'Join the Conversation')}
-                </button>
-              </div>
-
-              {commentsOpen ? (
-                <div className="bg-surface-lowest border border-border-subtle p-5 rounded-sm space-y-4">
-                  <div className="p-3 bg-surface-container rounded text-xs text-ink-secondary">
-                    <p className="font-bold text-ink mb-1">
-                      {isHindi ? 'न्यूज़रूम टिप्पणी दिशानिर्देश:' : 'Newsroom Commenting Guidelines:'}
-                    </p>
-                    <p>
-                      {isHindi
-                        ? 'एनपी न्यूज़ मेट्रो सभ्य और तर्कसंगत बहस को प्रोत्साहित करता है। सभी टिप्पणियों की आचार संहिता के अनुसार समीक्षा की जाती है।'
-                        : 'NP News Metro encourages reasoned civil debate. All comments are moderated in accordance with our Code of Conduct.'}
-                    </p>
-                  </div>
-                  <textarea
-                    rows={3}
-                    placeholder={isHindi ? 'बहस में अपना दृष्टिकोण जोड़ें...' : 'Add your civil perspective to the debate...'}
-                    className="w-full p-3 bg-canvas border border-border-subtle rounded text-xs focus:outline-hidden focus:border-primary"
-                  />
-                  <button
-                    onClick={() => alert(isHindi ? 'टिप्पणी संपादकीय समीक्षा के लिए भेज दी गई है।' : 'Comment submitted for editorial moderation queue.')}
-                    className="bg-primary text-white px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm"
-                  >
-                    {isHindi ? 'समीक्षा हेतु प्रस्तुत करें' : 'Submit for Moderation'}
-                  </button>
-                </div>
-              ) : (
-                <p className="text-xs text-ink-muted">
-                  {isHindi
-                    ? 'सभ्य और सार्थक संवाद बनाए रखने के लिए टिप्पणियों की हमारे संपादकीय सत्यनिष्ठा डेस्क द्वारा समीक्षा की जाती है।'
-                    : 'Comments are moderated by our editorial integrity desk to maintain constructive civil discourse.'}
-                </p>
-              )}
-            </section>
+            {/* Reader Perspectives & Comments */}
+            <ArticleComments
+              articleId={post.id}
+              isOpen={commentsOpen}
+              onToggleOpen={() => setCommentsOpen(!commentsOpen)}
+            />
 
             {/* Related Coverage Block */}
             <RelatedStoriesBlock

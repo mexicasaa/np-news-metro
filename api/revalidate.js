@@ -14,7 +14,7 @@ export default async function handler(req, res) {
     const type = req.query?.type || req.body?.type;
     const action = req.query?.action || req.body?.action || 'update';
 
-    // Invalidate specific cache keys or all public feeds
+    // 1. Invalidate Vercel container in-memory cache
     if (slug) {
       invalidateWarmCache(`article:${slug}`);
       invalidateVideosWarmCache(`video:${slug}`);
@@ -27,9 +27,46 @@ export default async function handler(req, res) {
       invalidateVideosWarmCache('videos:list');
     }
     
-    // Always bust homepage and latest news feeds upon editorial updates
     invalidateWarmCache('view:homepage');
     invalidateWarmCache('view:latest');
+
+    // 2. Targeted Cloudflare edge cache purge (Rule 47)
+    let cloudflarePurgeResult = null;
+    const zoneId = process.env.CLOUDFLARE_ZONE_ID;
+    const cfToken = process.env.CLOUDFLARE_API_TOKEN;
+
+    if (zoneId && cfToken) {
+      const siteOrigin = 'https://www.npnewsmetro.com';
+      const filesToPurge = [
+        `${siteOrigin}/`,
+        `${siteOrigin}/api/articles?view=homepage`,
+        `${siteOrigin}/api/trending`,
+      ];
+
+      if (category) {
+        filesToPurge.push(`${siteOrigin}/category/${category}`);
+        filesToPurge.push(`${siteOrigin}/api/articles?category=${category}`);
+      }
+
+      if (slug && category) {
+        filesToPurge.push(`${siteOrigin}/${category}/${slug}`);
+        filesToPurge.push(`${siteOrigin}/api/articles?slug=${slug}`);
+      }
+
+      try {
+        const cfRes = await fetch(`https://api.cloudflare.com/client/v4/zones/${zoneId}/purge_cache`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${cfToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ files: filesToPurge }),
+        });
+        cloudflarePurgeResult = await cfRes.json();
+      } catch (cfErr) {
+        console.warn('Cloudflare edge cache purge notice:', cfErr.message);
+      }
+    }
 
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
     return res.status(200).json({
@@ -37,7 +74,8 @@ export default async function handler(req, res) {
       action,
       slug: slug || null,
       category: category || null,
-      timestamp: Date.now()
+      cloudflarePurged: cloudflarePurgeResult?.success || false,
+      timestamp: Date.now(),
     });
   } catch (err) {
     return res.status(500).json({ error: err.message || 'Revalidation failed' });

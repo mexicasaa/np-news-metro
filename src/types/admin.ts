@@ -7,7 +7,14 @@ export type UserRole =
   | 'editor' 
   | 'seo_manager' 
   | 'ad_manager' 
-  | 'admin';
+  | 'admin'
+  | 'SUPER_ADMIN'
+  | 'ADMIN'
+  | 'EDITOR'
+  | 'AUTHOR'
+  | 'MODERATOR'
+  | 'AD_MANAGER'
+  | 'ANALYST';
 
 export interface UserProfile {
   id: string;
@@ -35,6 +42,9 @@ export interface RolePermission {
   canManageUsers: boolean;
   canManageSystem: boolean;
   canCorrect: boolean;
+  canModerateComments?: boolean;
+  canManageSubscribers?: boolean;
+  canViewAnalytics?: boolean;
 }
 
 export const ROLE_PERMISSIONS: Record<UserRole, RolePermission> = {
@@ -53,6 +63,9 @@ export const ROLE_PERMISSIONS: Record<UserRole, RolePermission> = {
     canManageUsers: false,
     canManageSystem: false,
     canCorrect: false,
+    canModerateComments: false,
+    canManageSubscribers: false,
+    canViewAnalytics: false,
   },
   author: {
     canCreate: true,
@@ -69,6 +82,9 @@ export const ROLE_PERMISSIONS: Record<UserRole, RolePermission> = {
     canManageUsers: false,
     canManageSystem: false,
     canCorrect: false,
+    canModerateComments: false,
+    canManageSubscribers: false,
+    canViewAnalytics: false,
   },
   copy_editor: {
     canCreate: true,
@@ -85,6 +101,9 @@ export const ROLE_PERMISSIONS: Record<UserRole, RolePermission> = {
     canManageUsers: false,
     canManageSystem: false,
     canCorrect: true,
+    canModerateComments: true,
+    canManageSubscribers: false,
+    canViewAnalytics: false,
   },
   editor: {
     canCreate: true,
@@ -101,6 +120,9 @@ export const ROLE_PERMISSIONS: Record<UserRole, RolePermission> = {
     canManageUsers: false,
     canManageSystem: false,
     canCorrect: true,
+    canModerateComments: true,
+    canManageSubscribers: true,
+    canViewAnalytics: true,
   },
   seo_manager: {
     canCreate: false,
@@ -117,6 +139,9 @@ export const ROLE_PERMISSIONS: Record<UserRole, RolePermission> = {
     canManageUsers: false,
     canManageSystem: false,
     canCorrect: false,
+    canModerateComments: false,
+    canManageSubscribers: false,
+    canViewAnalytics: true,
   },
   ad_manager: {
     canCreate: false,
@@ -133,6 +158,9 @@ export const ROLE_PERMISSIONS: Record<UserRole, RolePermission> = {
     canManageUsers: false,
     canManageSystem: false,
     canCorrect: false,
+    canModerateComments: false,
+    canManageSubscribers: false,
+    canViewAnalytics: true,
   },
   admin: {
     canCreate: true,
@@ -149,6 +177,142 @@ export const ROLE_PERMISSIONS: Record<UserRole, RolePermission> = {
     canManageUsers: true,
     canManageSystem: true,
     canCorrect: true,
+    canModerateComments: true,
+    canManageSubscribers: true,
+    canViewAnalytics: true,
+  },
+  SUPER_ADMIN: {
+    canCreate: true,
+    canEditOwn: true,
+    canEditAny: true,
+    canReview: true,
+    canApprove: true,
+    canPublish: true,
+    canSchedule: true,
+    canPublishBreaking: true,
+    canManageHomepage: true,
+    canEditSeo: true,
+    canManageAds: true,
+    canManageUsers: true,
+    canManageSystem: true,
+    canCorrect: true,
+    canModerateComments: true,
+    canManageSubscribers: true,
+    canViewAnalytics: true,
+  },
+  ADMIN: {
+    canCreate: true,
+    canEditOwn: true,
+    canEditAny: true,
+    canReview: true,
+    canApprove: true,
+    canPublish: true,
+    canSchedule: true,
+    canPublishBreaking: true,
+    canManageHomepage: true,
+    canEditSeo: true,
+    canManageAds: true,
+    canManageUsers: true,
+    canManageSystem: true,
+    canCorrect: true,
+    canModerateComments: true,
+    canManageSubscribers: true,
+    canViewAnalytics: true,
+  },
+  EDITOR: {
+    canCreate: true,
+    canEditOwn: true,
+    canEditAny: true,
+    canReview: true,
+    canApprove: true,
+    canPublish: true,
+    canSchedule: true,
+    canPublishBreaking: true,
+    canManageHomepage: true,
+    canEditSeo: true,
+    canManageAds: true,
+    canManageUsers: false,
+    canManageSystem: false,
+    canCorrect: true,
+    canModerateComments: true,
+    canManageSubscribers: true,
+    canViewAnalytics: true,
+  },
+  AUTHOR: {
+    canCreate: true,
+    canEditOwn: true,
+    canEditAny: false,
+    canReview: false,
+    canApprove: false,
+    canPublish: false,
+    canSchedule: false,
+    canPublishBreaking: false,
+    canManageHomepage: false,
+    canEditSeo: false,
+    canManageAds: false,
+    canManageUsers: false,
+    canManageSystem: false,
+    canCorrect: false,
+    canModerateComments: false,
+    canManageSubscribers: false,
+    canViewAnalytics: false,
+  },
+  MODERATOR: {
+    canCreate: false,
+    canEditOwn: false,
+    canEditAny: false,
+    canReview: true,
+    canApprove: false,
+    canPublish: false,
+    canSchedule: false,
+    canPublishBreaking: false,
+    canManageHomepage: false,
+    canEditSeo: false,
+    canManageAds: false,
+    canManageUsers: false,
+    canManageSystem: false,
+    canCorrect: false,
+    canModerateComments: true,
+    canManageSubscribers: false,
+    canViewAnalytics: false,
+  },
+  AD_MANAGER: {
+    canCreate: false,
+    canEditOwn: false,
+    canEditAny: false,
+    canReview: false,
+    canApprove: false,
+    canPublish: false,
+    canSchedule: false,
+    canPublishBreaking: false,
+    canManageHomepage: false,
+    canEditSeo: false,
+    canManageAds: true,
+    canManageUsers: false,
+    canManageSystem: false,
+    canCorrect: false,
+    canModerateComments: false,
+    canManageSubscribers: false,
+    canViewAnalytics: true,
+  },
+  ANALYST: {
+    canCreate: false,
+    canEditOwn: false,
+    canEditAny: false,
+    canReview: false,
+    canApprove: false,
+    canPublish: false,
+    canSchedule: false,
+    canPublishBreaking: false,
+    canManageHomepage: false,
+    canEditSeo: false,
+    canManageAds: false,
+    canManageUsers: false,
+    canManageSystem: false,
+    canCorrect: false,
+    canModerateComments: false,
+    canManageSubscribers: false,
+    canViewAnalytics: true,
   },
 };
 

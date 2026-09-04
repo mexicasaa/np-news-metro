@@ -54,7 +54,8 @@ import { PublishOrchestratorModal } from './components/admin/PublishOrchestrator
 import { EmergencyBreakingModal } from './components/admin/EmergencyBreakingModal';
 import { RevisionHistoryModal } from './components/admin/RevisionHistoryModal';
 import { 
-  MediaLibraryView, MonetizationView, SeoHealthView, UsersView, SystemView 
+  MediaLibraryView, MonetizationView, SeoHealthView, UsersView, SystemView,
+  AudienceView, AnalyticsDashboardView
 } from './components/admin/AdminSecondaryViews';
 import { YouTubeManagerModal } from './components/admin/YouTubeManagerModal';
 import { SeoHead } from './components/common/SeoHead';
@@ -1862,8 +1863,8 @@ function AppContent() {
           {adminSection === 'media' && <MediaLibraryView />}
           {adminSection === 'monetization' && <MonetizationView />}
           {adminSection === 'seo' && <SeoHealthView />}
-          {adminSection === 'audience' && <DashboardHome onOpenPublishingCenter={() => setAdminSection('publishing')} onNewArticle={handleStartNewArticle} userRole={currentUserRole} />}
-          {adminSection === 'analytics' && <SeoHealthView />}
+          {adminSection === 'audience' && <AudienceView />}
+          {adminSection === 'analytics' && <AnalyticsDashboardView />}
           {adminSection === 'users' && <UsersView />}
           {adminSection === 'system' && <SystemView />}
         </AdminLayout>

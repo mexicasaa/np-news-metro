@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Mail, CheckCircle2, Sparkles, Shield, X } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import { subscribeNewsletter } from '../../services/subscriberService';
 
 interface NewsletterModuleProps {
   isOpen?: boolean;
@@ -22,6 +23,7 @@ export const NewsletterModule: React.FC<NewsletterModuleProps> = ({
     e.preventDefault();
     if (email) {
       setSubscribed(true);
+      subscribeNewsletter(email, [frequency]).catch(() => {});
     }
   };
 
