@@ -181,7 +181,8 @@ export const getMediaLibrary = async (): Promise<MediaAsset[]> => {
         alt_text, caption, media_type, created_at, content_hash, r2_key,
         article_media (count)
       `)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(100);
 
     if (error || !data || data.length === 0) {
       return [

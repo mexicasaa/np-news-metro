@@ -226,7 +226,8 @@ export const getPublishedVideos = async (): Promise<WpVideo[]> => {
       .from('videos')
       .select(VIDEO_FIELDS)
       .eq('status', 'published')
-      .order('published_at', { ascending: false });
+      .order('published_at', { ascending: false })
+      .limit(50);
 
     const stored = getStoredVideos();
     if (error || !data || data.length === 0) {
