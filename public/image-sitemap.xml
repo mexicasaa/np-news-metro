@@ -2,9 +2,17 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
+    <loc>https://www.npnewsmetro.com/india/story</loc>
+    <image:image>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/media/beba21f2539a5833aa287f123991d235ba04d390daf2c44651f5de0bc1345673/WhatsApp_Image_2026-08-21_at_1.53.31_PM.jpeg</image:loc>
+      <image:caption>नंद घर आनंद भयो यह केवल जन्म नहीं, चेतना का स्पंदन है</image:caption>
+      <image:title>नंद घर आनंद भयो यह केवल जन्म नहीं, चेतना का स्पंदन है</image:title>
+    </image:image>
+  </url>
+  <url>
     <loc>https://www.npnewsmetro.com/politics/mukhyamantree-shree-pushkara-sinha-dhaamee-se-mukhyamantree-aavaa</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/251ff8b8-297c-4375-b413-c009277130a3/1005602337-mtke1u2g.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/251ff8b8-297c-4375-b413-c009277130a3/1005602337-mtke1u2g.jpg</image:loc>
       <image:caption>मुख्यमंत्री श्री पुष्कर सिंह धामी से मुख्यमंत्री आवास में बाबा रामदेव ने की भेंट</image:caption>
       <image:title>मुख्यमंत्री श्री पुष्कर सिंह धामी से मुख्यमंत्री आवास में बाबा रामदेव ने की भेंट</image:title>
     </image:image>
@@ -12,7 +20,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/politics/sadakon-para-najara-naheen-aaegaa-besahaaraa-gauvansha-hara-pashu</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/24ef3d1f-2f65-4bcf-915f-c71306775dbf/1005602305-mtkdt57m.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/24ef3d1f-2f65-4bcf-915f-c71306775dbf/1005602305-mtkdt57m.jpg</image:loc>
       <image:caption>सड़कों पर नजर नहीं आएगा बेसहारा गौवंश, हर पशु की होगी टैगिंग</image:caption>
       <image:title>सड़कों पर नजर नहीं आएगा बेसहारा गौवंश, हर पशु की होगी टैगिंग</image:title>
     </image:image>
@@ -20,7 +28,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/politics/karanaala-medikala-koleja-men-badhenge-505-beda-emabeebeeesa-seet</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/72cab1f0-fa51-4abb-a9cf-80781cd8d11b/1005600955-mtkdm0rn.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/72cab1f0-fa51-4abb-a9cf-80781cd8d11b/1005600955-mtkdm0rn.jpg</image:loc>
       <image:caption>करनाल मेडिकल कॉलेज में बढ़ेंगे 505 बेड, एमबीबीएस सीटें होंगी 250</image:caption>
       <image:title>करनाल मेडिकल कॉलेज में बढ़ेंगे 505 बेड, एमबीबीएस सीटें होंगी 250</image:title>
     </image:image>
@@ -28,7 +36,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/religion/dhruva-charitra-suna-mantramugdha-hue-shraddhaalu-shreemad-bhaaga</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/5d6f0c86-cec8-42b1-a981-ec4e0651558b/featured-mtld3wxr-xuyu.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/5d6f0c86-cec8-42b1-a981-ec4e0651558b/featured-mtld3wxr-xuyu.jpg</image:loc>
       <image:caption>ध्रुव चरित्र सुन मंत्रमुग्ध हुए श्रद्धालु, श्रीमद् भागवत कथा में शुकदेव आगमन का प्रसंग</image:caption>
       <image:title>ध्रुव चरित्र सुन मंत्रमुग्ध हुए श्रद्धालु, श्रीमद् भागवत कथा में शुकदेव आगमन का प्रसंग</image:title>
     </image:image>
@@ -36,7 +44,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/lifestyle/jnyaanavatee-kee-punyatithi-para-do-darjana-brahmaakumaaree-brahm</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/5def417d-34d7-4660-951a-ac93540109d5/1005602158-mtkd4lva.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/5def417d-34d7-4660-951a-ac93540109d5/1005602158-mtkd4lva.jpg</image:loc>
       <image:caption>ज्ञानवती की पुण्यतिथि पर दो दर्जन ब्रह्माकुमारी-ब्रह्माकुमार सम्मानित</image:caption>
       <image:title>ज्ञानवती की पुण्यतिथि पर दो दर्जन ब्रह्माकुमारी-ब्रह्माकुमार सम्मानित</image:title>
     </image:image>
@@ -44,7 +52,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/politics/mukhyamantree-yogee-ne-aautasorsa-karmiyon-ko-diyaa-badaa-upahaar</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/88c5c828-b763-47db-9dff-e7a3054d6787/1005600751-mtkcwdmh.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/88c5c828-b763-47db-9dff-e7a3054d6787/1005600751-mtkcwdmh.jpg</image:loc>
       <image:caption>मुख्यमंत्री योगी ने आउटसोर्स कर्मियों को दिया बड़ा उपहार</image:caption>
       <image:title>मुख्यमंत्री योगी ने आउटसोर्स कर्मियों को दिया बड़ा उपहार</image:title>
     </image:image>
@@ -52,7 +60,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/social/tenta-kaitararsa-esosieshana-kaa-teena-divaseeya-mahaaadhiveshana</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/dc5eab2a-3971-4d63-8059-177d1cf1ece2/1005598109-mtkcjfew.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/dc5eab2a-3971-4d63-8059-177d1cf1ece2/1005598109-mtkcjfew.jpg</image:loc>
       <image:caption>टेंट-कैटरर्स एसोसिएशन का तीन दिवसीय महाअधिवेशन संपन्न</image:caption>
       <image:title>टेंट-कैटरर्स एसोसिएशन का तीन दिवसीय महाअधिवेशन संपन्न</image:title>
     </image:image>
@@ -60,7 +68,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/business/aaeeemaesa-noedaa-men-deekshaaranbha-kaaryakrama-vidyaarthiyon-ko</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/03557d80-8d97-4335-8291-d1430968b995/1005601916-mtkc9sfc.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/03557d80-8d97-4335-8291-d1430968b995/1005601916-mtkc9sfc.jpg</image:loc>
       <image:caption>आईएमएस नोएडा में दीक्षारंभ कार्यक्रम, विद्यार्थियों को सफलता के मंत्र</image:caption>
       <image:title>आईएमएस नोएडा में दीक्षारंभ कार्यक्रम, विद्यार्थियों को सफलता के मंत्र</image:title>
     </image:image>
@@ -68,7 +76,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/entertainment/prema-aura-bhakti-se-taiyaara-ho-rahe-shreekrishna-ke-vishesha-va</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/7b71ee4d-5214-456d-bb92-f3c90d7361e6/1005600997-mtkbof1i.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/7b71ee4d-5214-456d-bb92-f3c90d7361e6/1005600997-mtkbof1i.jpg</image:loc>
       <image:caption>प्रेम और भक्ति से तैयार हो रहे श्रीकृष्ण के विशेष वस्त्र</image:caption>
       <image:title>प्रेम और भक्ति से तैयार हो रहे श्रीकृष्ण के विशेष वस्त्र</image:title>
     </image:image>
@@ -76,7 +84,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/entertainment/patela-nagara-men-nikalee-bhavya-shreekrishna-janmaashtamee-shobh</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/7e9eca9b-35fd-413f-a1e2-1f47cd8fd8ba/1005596113-mtkbcsm1.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/7e9eca9b-35fd-413f-a1e2-1f47cd8fd8ba/1005596113-mtkbcsm1.jpg</image:loc>
       <image:caption>पटेल नगर में निकली भव्य श्रीकृष्ण जन्माष्टमी शोभायात्रा</image:caption>
       <image:title>पटेल नगर में निकली भव्य श्रीकृष्ण जन्माष्टमी शोभायात्रा</image:title>
     </image:image>
@@ -84,7 +92,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/astrology/3-sitanbara-kaa-dainika-raashiphala-jaanie-12-raashiyon-ke-lie-ka</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/a3d453ba-b3ba-4e96-8c3d-5a4155a4dd4d/featured-mtld3fv7-d2q8.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/a3d453ba-b3ba-4e96-8c3d-5a4155a4dd4d/featured-mtld3fv7-d2q8.jpg</image:loc>
       <image:caption>3 सितंबर का दैनिक राशिफल: जानिए 12 राशियों के लिए कैसा रहेगा गुरुवार</image:caption>
       <image:title>3 सितंबर का दैनिक राशिफल: जानिए 12 राशियों के लिए कैसा रहेगा गुरुवार</image:title>
     </image:image>
@@ -92,7 +100,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/politics/mahangaaee-aama-aadamee-ko-dheemaa-jahara-de-rahee-hai-pandita-ra</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/0853bb6a-9efb-4d1a-8b72-1a5a2a52ff8c/featured-mtld3uir-9j7m.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/0853bb6a-9efb-4d1a-8b72-1a5a2a52ff8c/featured-mtld3uir-9j7m.jpg</image:loc>
       <image:caption>महंगाई आम आदमी को धीमा जहर दे रही है : पंडित रवि शर्मा</image:caption>
       <image:title>महंगाई आम आदमी को धीमा जहर दे रही है : पंडित रवि शर्मा</image:title>
     </image:image>
@@ -100,7 +108,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/opinion/sanyukta-parivaara-aura-vyaayaamashaalaa-bhaarateeya-jeevana-dris</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/dceba0a4-531f-458f-b532-74035a23ecec/featured-mtld3r69-mmlb.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/dceba0a4-531f-458f-b532-74035a23ecec/featured-mtld3r69-mmlb.jpg</image:loc>
       <image:caption>संयुक्त परिवार और व्यायामशाला: भारतीय जीवन-दृष्टि की सनातन धरोहर की पुनर्प्रतिष्ठा</image:caption>
       <image:title>संयुक्त परिवार और व्यायामशाला: भारतीय जीवन-दृष्टि की सनातन धरोहर की पुनर्प्रतिष्ठा</image:title>
     </image:image>
@@ -108,7 +116,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/opinion/nainana-kee-tirachhee-chhuree-sautana-sanga-bataraava-rasika-piya</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/a1cc84ae-020d-4095-b0e1-dbf8f6df06b1/1005515420-mtjg5u2v.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/a1cc84ae-020d-4095-b0e1-dbf8f6df06b1/1005515420-mtjg5u2v.jpg</image:loc>
       <image:caption>नैनन की तिरछी छुरी — सौतन संग बतराव, रसिक पिया रँगरेजिया, मन मेरो हर्षात</image:caption>
       <image:title>नैनन की तिरछी छुरी — सौतन संग बतराव, रसिक पिया रँगरेजिया, मन मेरो हर्षात</image:title>
     </image:image>
@@ -116,7 +124,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/entertainment/rohinee-men-521-mahilaaon-ne-nikaalee-bhavya-kalasha-yaatraa-kris</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/bbae799a-3d27-4725-b5d0-6d93bbc85733/1005589841-mtiz36t6.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/bbae799a-3d27-4725-b5d0-6d93bbc85733/1005589841-mtiz36t6.jpg</image:loc>
       <image:caption>रोहिणी में 521 महिलाओं ने निकाली भव्य कलश यात्रा, कृष्ण दरबार रहा आकर्षण</image:caption>
       <image:title>रोहिणी में 521 महिलाओं ने निकाली भव्य कलश यात्रा, कृष्ण दरबार रहा आकर्षण</image:title>
     </image:image>
@@ -124,7 +132,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/politics/seeema-dhaamee-kee-pahala-se-8-varsheeya-deva-kaa-hogaa-muphta-il</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/fa058afc-544b-41a9-89ff-3968a06e083b/1005585753-mtiyxumy.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/fa058afc-544b-41a9-89ff-3968a06e083b/1005585753-mtiyxumy.jpg</image:loc>
       <image:caption>सीएम धामी की पहल से 8 वर्षीय देव का होगा मुफ्त इलाज, प्रशासन ने शुरू की तैयारी</image:caption>
       <image:title>सीएम धामी की पहल से 8 वर्षीय देव का होगा मुफ्त इलाज, प्रशासन ने शुरू की तैयारी</image:title>
     </image:image>
@@ -132,7 +140,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/politics/khateemaa-men-nagara-vana-okseejana-paarka-kaa-lokaarpana-seeema</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/9b847e12-3576-402c-bed9-db8f038bb809/1005585768-mtiyrkcp.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/9b847e12-3576-402c-bed9-db8f038bb809/1005585768-mtiyrkcp.jpg</image:loc>
       <image:caption>खटीमा में नगर वन ऑक्सीजन पार्क का लोकार्पण, सीएम धामी ने की 6 बड़ी घोषणाएं</image:caption>
       <image:title>खटीमा में नगर वन ऑक्सीजन पार्क का लोकार्पण, सीएम धामी ने की 6 बड़ी घोषणाएं</image:title>
     </image:image>
@@ -140,7 +148,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/politics/banabasaa-seemaa-para-shaheeda-smaaraka-aura-vishaala-tirange-kaa</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/d624532d-07ae-4fdb-97d1-2ccfef817382/1005588112-mtiyklhn.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/d624532d-07ae-4fdb-97d1-2ccfef817382/1005588112-mtiyklhn.jpg</image:loc>
       <image:caption>बनबसा सीमा पर शहीद स्मारक और विशाल तिरंगे का लोकार्पण, सीएम धामी ने किया नमन</image:caption>
       <image:title>बनबसा सीमा पर शहीद स्मारक और विशाल तिरंगे का लोकार्पण, सीएम धामी ने किया नमन</image:title>
     </image:image>
@@ -148,7 +156,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/religion/noedaa-men-dhoomadhaama-se-manaayaa-gayaa-adhishthaapana-divasa-k</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/acc6f1b8-d264-4725-a03b-89cf9edbcf4c/1005586791-mtiyc44n.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/acc6f1b8-d264-4725-a03b-89cf9edbcf4c/1005586791-mtiyc44n.jpg</image:loc>
       <image:caption>नोएडा में धूमधाम से मनाया गया अधिष्ठापन दिवस, कान्हा संग सजी हरियाली तीज</image:caption>
       <image:title>नोएडा में धूमधाम से मनाया गया अधिष्ठापन दिवस, कान्हा संग सजी हरियाली तीज</image:title>
     </image:image>
@@ -156,7 +164,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/astrology/2-sitanbara-2026-kaa-raashiphala</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/57a495c6-7aa2-4b40-a00b-22b17a4aa8fc/featured-mtld3s1s-gb6o.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/57a495c6-7aa2-4b40-a00b-22b17a4aa8fc/featured-mtld3s1s-gb6o.jpg</image:loc>
       <image:caption>2 सितंबर 2026 का  जानिए राशिफल</image:caption>
       <image:title>2 सितंबर 2026 का  जानिए राशिफल</image:title>
     </image:image>
@@ -164,7 +172,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/crime/noedaa-men-chora-samajhakara-yuvaka-se-maarapeeta-mauta-paancha-a</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/57e0a0cf-ca7c-4900-ba65-e58653c4f7fa/featured-mtld3p54-5t74.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/57e0a0cf-ca7c-4900-ba65-e58653c4f7fa/featured-mtld3p54-5t74.jpg</image:loc>
       <image:caption>नोएडा में चोर समझकर युवक से मारपीट, मौत; पांच आरोपी गिरफ्तार</image:caption>
       <image:title>नोएडा में चोर समझकर युवक से मारपीट, मौत; पांच आरोपी गिरफ्तार</image:title>
     </image:image>
@@ -172,7 +180,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/entertainment/shreekrishna-janmaashtamee-para-iskona-noedaa-men-surakshaa-ke-pu</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/8b70bbd3-afaa-42ed-97b3-85008d03a2e3/featured-mtld3vf5-93ua.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/8b70bbd3-afaa-42ed-97b3-85008d03a2e3/featured-mtld3vf5-93ua.jpg</image:loc>
       <image:caption>श्रीकृष्ण जन्माष्टमी पर इस्कॉन नोएडा में सुरक्षा के पुख्ता इंतजाम, भक्तों को मिलेगी सुविधा</image:caption>
       <image:title>श्रीकृष्ण जन्माष्टमी पर इस्कॉन नोएडा में सुरक्षा के पुख्ता इंतजाम, भक्तों को मिलेगी सुविधा</image:title>
     </image:image>
@@ -180,7 +188,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/social/melaaghaata-roda-para-paidala-chale-seeema-dhaamee-sthaaneeya-der</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/67bfe1aa-6a0c-4911-b09b-9c024f98d559/1005578753-mthl513o.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/67bfe1aa-6a0c-4911-b09b-9c024f98d559/1005578753-mthl513o.jpg</image:loc>
       <image:caption>मेलाघाट रोड पर पैदल चले सीएम धामी, स्थानीय डेरी में पी चाय</image:caption>
       <image:title>मेलाघाट रोड पर पैदल चले सीएम धामी, स्थानीय डेरी में पी चाय</image:title>
     </image:image>
@@ -188,7 +196,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/business/coindcx-ne-shuroo-kiyaa-dainika-sip-100-se-kripto-nivesha-kee-suv</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/f912ccef-97a5-48fd-8233-4963380e4819/1005579464-mthky47k.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/f912ccef-97a5-48fd-8233-4963380e4819/1005579464-mthky47k.jpg</image:loc>
       <image:caption>CoinDCX ने शुरू किया दैनिक SIP, ₹100 से क्रिप्टो निवेश की सुविधा</image:caption>
       <image:title>CoinDCX ने शुरू किया दैनिक SIP, ₹100 से क्रिप्टो निवेश की सुविधा</image:title>
     </image:image>
@@ -196,7 +204,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/business/bota-kaa-shuddha-laabha-38-badhakara-845-karoda-rupaye-bota-20-pa</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/d3626c1a-0168-4fd5-bfb0-2cc0f8b30118/1005579430-mthkof6l.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/d3626c1a-0168-4fd5-bfb0-2cc0f8b30118/1005579430-mthkof6l.jpg</image:loc>
       <image:caption>बोट का शुद्ध लाभ 38% बढ़कर 84.5 करोड़ रुपये, ‘बोट 2.0’ पर जोर</image:caption>
       <image:title>बोट का शुद्ध लाभ 38% बढ़कर 84.5 करोड़ रुपये, ‘बोट 2.0’ पर जोर</image:title>
     </image:image>
@@ -204,7 +212,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/social/naee-dillee-men-4-5-sitanbara-ko-hogaa-northa-eesta-stoodentsa-ph</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/c8ee6628-8f6e-475a-80d2-e603c6f94d09/featured-mtld3qco-g9v3.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/c8ee6628-8f6e-475a-80d2-e603c6f94d09/featured-mtld3qco-g9v3.jpg</image:loc>
       <image:caption>नई दिल्ली में 4-5 सितंबर को होगा नॉर्थ ईस्ट स्टूडेंट्स फेस्टिवल</image:caption>
       <image:title>नई दिल्ली में 4-5 सितंबर को होगा नॉर्थ ईस्ट स्टूडेंट्स फेस्टिवल</image:title>
     </image:image>
@@ -212,7 +220,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/politics/hkrn-ko-lekara-vipaksha-para-barase-mukhyamantree-sainee-bole-vip</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/a624d7dd-6ed0-4380-bda8-cdac1924f0bb/1005579404-mthkcife.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/a624d7dd-6ed0-4380-bda8-cdac1924f0bb/1005579404-mthkcife.jpg</image:loc>
       <image:caption>HKRN को लेकर विपक्ष पर बरसे मुख्यमंत्री सैनी, बोले- विपक्ष को हो गया ‘फोबिया’</image:caption>
       <image:title>HKRN को लेकर विपक्ष पर बरसे मुख्यमंत्री सैनी, बोले- विपक्ष को हो गया ‘फोबिया’</image:title>
     </image:image>
@@ -220,7 +228,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/crime/sektara-58-pulisa-ne-teena-vaahana-chora-va-mobaaila-snaichara-da</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/49c7c782-4c7a-4a66-b069-05f9c45ddefd/1005579285-mthk2w9o.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/49c7c782-4c7a-4a66-b069-05f9c45ddefd/1005579285-mthk2w9o.jpg</image:loc>
       <image:caption>सेक्टर-58 पुलिस ने तीन वाहन चोर व मोबाइल स्नैचर दबोचे</image:caption>
       <image:title>सेक्टर-58 पुलिस ने तीन वाहन चोर व मोबाइल स्नैचर दबोचे</image:title>
     </image:image>
@@ -228,7 +236,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/politics/baharaaicha-ko-pichhadepana-se-nikaalakara-vikaasa-kee-naee-raaha</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/9ae5b43c-8ddb-4338-9e6b-b3b34e0dcca8/1005577882-mthjvdc5.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/9ae5b43c-8ddb-4338-9e6b-b3b34e0dcca8/1005577882-mthjvdc5.jpg</image:loc>
       <image:caption>बहराइच को पिछड़ेपन से निकालकर विकास की नई राह पर ले जा रही सरकार: योगी</image:caption>
       <image:title>बहराइच को पिछड़ेपन से निकालकर विकास की नई राह पर ले जा रही सरकार: योगी</image:title>
     </image:image>
@@ -236,7 +244,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/social/12-sitanbara-ko-raashtreeya-loka-adaalata-maamalon-ke-tvarita-nis</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/69ab12ac-ea02-44e2-848b-76122af99e8b/1005579161-mthjo20p.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/69ab12ac-ea02-44e2-848b-76122af99e8b/1005579161-mthjo20p.jpg</image:loc>
       <image:caption>12 सितंबर को राष्ट्रीय लोक अदालत, मामलों के त्वरित निस्तारण की तैयारी तेज</image:caption>
       <image:title>12 सितंबर को राष्ट्रीय लोक अदालत, मामलों के त्वरित निस्तारण की तैयारी तेज</image:title>
     </image:image>
@@ -244,7 +252,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/social/gaushaalaaon-men-govansha-ke-sanrakshana-aura-suvidhaaon-ko-sudri</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/633466f8-1854-464c-b8e6-55cce21d1e37/1005576693-mthjezhm.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/633466f8-1854-464c-b8e6-55cce21d1e37/1005576693-mthjezhm.jpg</image:loc>
       <image:caption>गौशालाओं में गोवंश के संरक्षण और सुविधाओं को सुदृढ़ करने के निर्देश</image:caption>
       <image:title>गौशालाओं में गोवंश के संरक्षण और सुविधाओं को सुदृढ़ करने के निर्देश</image:title>
     </image:image>
@@ -252,7 +260,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/astrology/1-sitanbara-kaa-raashiphala-mangalavaara-ko-ina-raashiyon-ko-mile</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/25a6d9bf-e56b-487c-a43b-1c15ae971455/1005537142-mthj8lq1.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/25a6d9bf-e56b-487c-a43b-1c15ae971455/1005537142-mthj8lq1.jpg</image:loc>
       <image:caption>1 सितंबर का राशिफल: मंगलवार को इन राशियों को मिलेंगे सफलता के अवसर</image:caption>
       <image:title>1 सितंबर का राशिफल: मंगलवार को इन राशियों को मिलेंगे सफलता के अवसर</image:title>
     </image:image>
@@ -260,7 +268,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/politics/madhu-vihaara-kee-badahaalee-para-phootaa-janataa-kaa-gussaa-aand</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/8bc20d50-3118-4d6f-96c5-414b86810d55/1005579047-mthiw78w.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/8bc20d50-3118-4d6f-96c5-414b86810d55/1005579047-mthiw78w.jpg</image:loc>
       <image:caption>मधु विहार की बदहाली पर फूटा जनता का गुस्सा, आंदोलन की चेतावनी</image:caption>
       <image:title>मधु विहार की बदहाली पर फूटा जनता का गुस्सा, आंदोलन की चेतावनी</image:title>
     </image:image>
@@ -268,7 +276,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/social/veedeeo-banane-para-aaratee-gauda-kaa-kiyaa-gayaa-abhinandana</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/74968fa9-1686-4c23-865e-caeb9857a85f/1005577566-mthindtu.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/74968fa9-1686-4c23-865e-caeb9857a85f/1005577566-mthindtu.jpg</image:loc>
       <image:caption>वीडीओ बनने पर आरती गौड़ का किया गया अभिनंदन</image:caption>
       <image:title>वीडीओ बनने पर आरती गौड़ का किया गया अभिनंदन</image:title>
     </image:image>
@@ -276,7 +284,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/crime/kanpanee-se-mobaaila-choree-kara-bechane-vaale-giroha-kaa-pardaap</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/c0a4539a-7d29-47bf-9149-73c571f9375e/1005577664-mthierb5.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/c0a4539a-7d29-47bf-9149-73c571f9375e/1005577664-mthierb5.jpg</image:loc>
       <image:caption>कंपनी से मोबाइल चोरी कर बेचने वाले गिरोह का पर्दाफाश, छह गिरफ्तार</image:caption>
       <image:title>कंपनी से मोबाइल चोरी कर बेचने वाले गिरोह का पर्दाफाश, छह गिरफ्तार</image:title>
     </image:image>
@@ -284,7 +292,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/business/karoora-vaishya-bainka-ne-eka-dina-men-kholeen-16-naee-shaakhaaen</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/e770974b-1865-4f42-b78a-83d5b8e03450/1005577728-mthi54by.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/e770974b-1865-4f42-b78a-83d5b8e03450/1005577728-mthi54by.jpg</image:loc>
       <image:caption>करूर वैश्य बैंक ने एक दिन में खोलीं 16 नई शाखाएं, नेटवर्क पहुंचा 919 पर</image:caption>
       <image:title>करूर वैश्य बैंक ने एक दिन में खोलीं 16 नई शाखाएं, नेटवर्क पहुंचा 919 पर</image:title>
     </image:image>
@@ -292,7 +300,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/entertainment/shree-bhairava-baabaa-gaudhaama-kaa-bhavya-udghaatana-gausevaa-ko-2</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/41f8869d-ddc4-4270-a9d3-4c2d7f5e0a67/1005573146-mthhx2k5.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/41f8869d-ddc4-4270-a9d3-4c2d7f5e0a67/1005573146-mthhx2k5.jpg</image:loc>
       <image:caption>श्री भैरव बाबा गौधाम का भव्य उद्घाटन, गौसेवा को मिलेगी नई दिशा</image:caption>
       <image:title>श्री भैरव बाबा गौधाम का भव्य उद्घाटन, गौसेवा को मिलेगी नई दिशा</image:title>
     </image:image>
@@ -300,7 +308,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/politics/videshon-men-rojagaara-ke-lie-yuvaaon-ko-kaushala-aura-bhaashaa-p-2</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/625f089c-f3b0-4b12-8b69-4cdb919f1451/1005577599-mthhoitp.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/625f089c-f3b0-4b12-8b69-4cdb919f1451/1005577599-mthhoitp.jpg</image:loc>
       <image:caption>विदेशों में रोजगार के लिए युवाओं को कौशल और भाषा प्रशिक्षण देगी सरकार</image:caption>
       <image:title>विदेशों में रोजगार के लिए युवाओं को कौशल और भाषा प्रशिक्षण देगी सरकार</image:title>
     </image:image>
@@ -308,7 +316,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/entertainment/aaeeemaesa-deeaaeee-men-praaranbha-2026-kaa-aayojana-visheshajnyo</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/70d772e3-4233-43b8-a2ee-d4a66f68e512/1005578516-mthha4ap.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/70d772e3-4233-43b8-a2ee-d4a66f68e512/1005578516-mthha4ap.jpg</image:loc>
       <image:caption>आईएमएस-डीआईए में ‘प्रारंभ-2026’ का हुआ आयोजन</image:caption>
       <image:title>आईएमएस-डीआईए में ‘प्रारंभ-2026’ का हुआ आयोजन</image:title>
     </image:image>
@@ -316,7 +324,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/lephtinenta-shevataa-sajavaana-ko-gadhavaala-bhavana-men-kiyaa-sa</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/4a466eab-af88-4fa4-9386-c951974d81ff/1005578323-mthgvivl.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/4a466eab-af88-4fa4-9386-c951974d81ff/1005578323-mthgvivl.jpg</image:loc>
       <image:caption>लेफ्टिनेंट शेवता सजवाण को गढ़वाल भवन में किया सम्मानित, उपलब्धि पर समाज ने जताया गर्व</image:caption>
       <image:title>लेफ्टिनेंट शेवता सजवाण को गढ़वाल भवन में किया सम्मानित, उपलब्धि पर समाज ने जताया गर्व</image:title>
     </image:image>
@@ -324,7 +332,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/yauvana-ke-bhramajaala-men-prema-kaa-tirohana-vaasanaa-kaa-mahaam</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/47f930e0-8fb9-4ee2-b011-6141d8837966/WhatsApp-Image-2026-08-31-at-8-57-11-PM-mtheg41y.jpeg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/47f930e0-8fb9-4ee2-b011-6141d8837966/WhatsApp-Image-2026-08-31-at-8-57-11-PM-mtheg41y.jpeg</image:loc>
       <image:caption>यौवन के भ्रमजाल में प्रेम का तिरोहण — वासना का महामार्ग</image:caption>
       <image:title>यौवन के भ्रमजाल में प्रेम का तिरोहण — वासना का महामार्ग</image:title>
     </image:image>
@@ -332,7 +340,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/akhila-bhaarateeya-agravaala-vaishya-mitra-mandala-ke-chunaava-sa</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/4bb71642-2aed-443e-aa3c-9d503a401faa/WhatsApp-Image-2026-08-31-at-8-39-15-PM-mthe7mu8.jpeg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/4bb71642-2aed-443e-aa3c-9d503a401faa/WhatsApp-Image-2026-08-31-at-8-39-15-PM-mthe7mu8.jpeg</image:loc>
       <image:caption>अखिल भारतीय अग्रवाल वैश्य मित्र मंडल के चुनाव संपन्न, राधा कृष्ण गर्ग बने तीसरी बार अध्यक्ष</image:caption>
       <image:title>अखिल भारतीय अग्रवाल वैश्य मित्र मंडल के चुनाव संपन्न, राधा कृष्ण गर्ग बने तीसरी बार अध्यक्ष</image:title>
     </image:image>
@@ -340,7 +348,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/entertainment/siddha-saadhvee-gopeevaalaa-kaa-tirobhaava-mahotsava-shraddhaa-bh</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/7ab361a3-e969-4335-b5c4-bf8fea05ee9f/1005566298-mtg27rog.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/7ab361a3-e969-4335-b5c4-bf8fea05ee9f/1005566298-mtg27rog.jpg</image:loc>
       <image:caption>सिद्ध साध्वी गोपीवाला का तिरोभाव महोत्सव श्रद्धा-भक्ति से मनाया, संतों का हुआ सम्मान</image:caption>
       <image:title>सिद्ध साध्वी गोपीवाला का तिरोभाव महोत्सव श्रद्धा-भक्ति से मनाया, संतों का हुआ सम्मान</image:title>
     </image:image>
@@ -348,7 +356,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/world/baadha-peediton-kee-madada-ko-aage-aayaa-hangara-phree-bhaarata-b</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/8ef4be02-394a-4d32-adfc-0edd3db31c6a/1005565769-mtg3gzad.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/8ef4be02-394a-4d32-adfc-0edd3db31c6a/1005565769-mtg3gzad.jpg</image:loc>
       <image:caption>बाढ़ पीड़ितों की मदद को आगे आया हंगर फ्री भारत, बलिया भेजे 5 हजार फूड पैकेट</image:caption>
       <image:title>बाढ़ पीड़ितों की मदद को आगे आया हंगर फ्री भारत, बलिया भेजे 5 हजार फूड पैकेट</image:title>
     </image:image>
@@ -356,7 +364,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/entertainment/31-agasta-kaa-raashiphala-somavaara-ko-ina-raashiyon-ko-milegaa-b</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/761b63d7-c0c5-45b1-a850-947df5c4b216/1005537142-mtg36r98.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/761b63d7-c0c5-45b1-a850-947df5c4b216/1005537142-mtg36r98.jpg</image:loc>
       <image:caption>31 अगस्त का राशिफल: सोमवार को इन राशियों को मिलेगा भाग्य का साथ, जानें 12 राशियों का हाल</image:caption>
       <image:title>31 अगस्त का राशिफल: सोमवार को इन राशियों को मिलेगा भाग्य का साथ, जानें 12 राशियों का हाल</image:title>
     </image:image>
@@ -364,7 +372,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/entertainment/aksa-e-ghazala-para-sajee-saahityika-shaama-shaayara-shivadatta-a</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/519516a8-0179-4ac1-871e-bb4d0e81b398/featured-mtld3t2b-u6cl.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/519516a8-0179-4ac1-871e-bb4d0e81b398/featured-mtld3t2b-u6cl.jpg</image:loc>
       <image:caption>अक्स-ए-ग़ज़ल’ पर सजी साहित्यिक शाम, शायर शिवदत्त ‘अक्स’ की रचनाओं पर हुई सार्थक चर्चा</image:caption>
       <image:title>अक्स-ए-ग़ज़ल’ पर सजी साहित्यिक शाम, शायर शिवदत्त ‘अक्स’ की रचनाओं पर हुई सार्थक चर्चा</image:title>
     </image:image>
@@ -372,7 +380,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/opinion/samaya-kee-pratikoolataa-men-aatmanirmaana-kaa-mauna-sankalpa</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/0d6c4663-118a-4889-955d-596779076efb/1005515420-mtg2fqli.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/0d6c4663-118a-4889-955d-596779076efb/1005515420-mtg2fqli.jpg</image:loc>
       <image:caption>समय की प्रतिकूलता में आत्मनिर्माण का मौन संकल्प</image:caption>
       <image:title>समय की प्रतिकूलता में आत्मनिर्माण का मौन संकल्प</image:title>
     </image:image>
@@ -380,7 +388,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/politics/kisaana-ekataa-mahaasangha-ne-kisaanon-kee-samasyaaon-para-kiyaa</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/32a6bfbb-009b-4d34-8845-a4dc7c8dd866/1005566330-mtg1x7kc.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/32a6bfbb-009b-4d34-8845-a4dc7c8dd866/1005566330-mtg1x7kc.jpg</image:loc>
       <image:caption>किसान एकता महासंघ ने किसानों की समस्याओं पर किया मंथन, यमुना प्राधिकरण को ज्ञापन देने का निर्णय</image:caption>
       <image:title>किसान एकता महासंघ ने किसानों की समस्याओं पर किया मंथन, यमुना प्राधिकरण को ज्ञापन देने का निर्णय</image:title>
     </image:image>
@@ -388,7 +396,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/politics/hara-garbhavatee-mahilaa-kee-samriddhi-portala-se-hogee-dijitala</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/2bed66a9-304b-4a16-9750-0b77f01b3833/1005567110-mtg1qi4h.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/2bed66a9-304b-4a16-9750-0b77f01b3833/1005567110-mtg1qi4h.jpg</image:loc>
       <image:caption>हर गर्भवती महिला की ‘समृद्धि’ पोर्टल से होगी डिजिटल निगरानी: नायब सिंह सैनी</image:caption>
       <image:title>हर गर्भवती महिला की ‘समृद्धि’ पोर्टल से होगी डिजिटल निगरानी: नायब सिंह सैनी</image:title>
     </image:image>
@@ -396,7 +404,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/politics/vimukta-evan-ghumantoo-samaaja-kaa-itihaasa-svaabhimaana-aura-vee</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/f62c1c20-9684-46e6-ab9a-75ae85653f22/1005566649-mtg1b2n6.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/f62c1c20-9684-46e6-ab9a-75ae85653f22/1005566649-mtg1b2n6.jpg</image:loc>
       <image:caption>विमुक्त एवं घुमंतू समाज का इतिहास स्वाभिमान और वीरता की गाथा : नायब सिंह सैनी8</image:caption>
       <image:title>विमुक्त एवं घुमंतू समाज का इतिहास स्वाभिमान और वीरता की गाथा : नायब सिंह सैनी8</image:title>
     </image:image>
@@ -404,7 +412,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/kareeba-eka-saala-se-pharaara-vaanchhita-abhiyukta-aasipha-haapud</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/5aea2a7a-2b84-4c0a-9b08-9e71c67a7111/1005566520-mtg0hti1.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/5aea2a7a-2b84-4c0a-9b08-9e71c67a7111/1005566520-mtg0hti1.jpg</image:loc>
       <image:caption>करीब एक साल से फरार वांछित अभियुक्त आसिफ हापुड़ से गिरफ्तार, दनकौर पुलिस की कार्रवाई</image:caption>
       <image:title>करीब एक साल से फरार वांछित अभियुक्त आसिफ हापुड़ से गिरफ्तार, दनकौर पुलिस की कार्रवाई</image:title>
     </image:image>
@@ -412,7 +420,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/lifestyle/poorvee-dillee-men-ghutanon-ke-ilaaja-ke-lie-robotika-takaneeka-k</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/4b98daed-4328-434e-af77-ded1fa9e09fa/1005566290-mtfz7dsz.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/4b98daed-4328-434e-af77-ded1fa9e09fa/1005566290-mtfz7dsz.jpg</image:loc>
       <image:caption>पूर्वी दिल्ली में घुटनों के इलाज के लिए रोबोटिक तकनीक की शुरुआत</image:caption>
       <image:title>पूर्वी दिल्ली में घुटनों के इलाज के लिए रोबोटिक तकनीक की शुरुआत</image:title>
     </image:image>
@@ -420,7 +428,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/gleshiyara-jheelon-kee-nigaraanee-men-atyaadhunika-takaneeka-kaa</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/278d34ab-8697-4378-85a5-c6732b4753a2/1005566247-mtfyrakb.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/278d34ab-8697-4378-85a5-c6732b4753a2/1005566247-mtfyrakb.jpg</image:loc>
       <image:caption>ग्लेशियर झीलों की निगरानी में अत्याधुनिक तकनीक का होगा इस्तेमाल : मदन कौशिक</image:caption>
       <image:title>ग्लेशियर झीलों की निगरानी में अत्याधुनिक तकनीक का होगा इस्तेमाल : मदन कौशिक</image:title>
     </image:image>
@@ -428,7 +436,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/rishikesha-ke-suniyojita-vikaasa-ko-antima-roopa-dene-kee-kavaaya-2</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/4fa3adf0-ce2b-494a-838c-32d5074b568b/1005566102-mtfyd2d5.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/4fa3adf0-ce2b-494a-838c-32d5074b568b/1005566102-mtfyd2d5.jpg</image:loc>
       <image:caption>ऋषिकेश के सुनियोजित विकास को अंतिम रूप देने की कवायद तेज, महायोजना पर सरकार का फोकस</image:caption>
       <image:title>ऋषिकेश के सुनियोजित विकास को अंतिम रूप देने की कवायद तेज, महायोजना पर सरकार का फोकस</image:title>
     </image:image>
@@ -436,7 +444,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/politics/mana-kee-baata-raashtra-nirmaana-men-bhaageedaaree-ke-lie-karatee</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/81433ed7-3832-4e72-9c54-49d01ab30ab1/featured-mtld3h6s-ogna.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/81433ed7-3832-4e72-9c54-49d01ab30ab1/featured-mtld3h6s-ogna.jpg</image:loc>
       <image:caption>मन की बात राष्ट्र निर्माण में भागीदारी के लिए करती है प्रेरित : मुख्यमंत्री धामी</image:caption>
       <image:title>मन की बात राष्ट्र निर्माण में भागीदारी के लिए करती है प्रेरित : मुख्यमंत्री धामी</image:title>
     </image:image>
@@ -444,7 +452,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/politics/story-10</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/de35bd55-b2e9-4c77-ba38-05aa64f1ccd9/WhatsApp-Image-2026-08-29-at-9-47-18-PM-mtettdvz.jpeg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/de35bd55-b2e9-4c77-ba38-05aa64f1ccd9/WhatsApp-Image-2026-08-29-at-9-47-18-PM-mtettdvz.jpeg</image:loc>
       <image:caption>भाजपा का कांग्रेस पर बड़ा हमला, गुरु प्रकाश पासवान और सुधांशु त्रिवेदी ने राहुल गांधी को घेरा</image:caption>
       <image:title>भाजपा का कांग्रेस पर बड़ा हमला, गुरु प्रकाश पासवान और सुधांशु त्रिवेदी ने राहुल गांधी को घेरा</image:title>
     </image:image>
@@ -452,7 +460,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/sports/story-9-2</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/38c85066-25dc-41aa-81d1-d3fb25889787/WhatsApp-Image-2026-08-29-at-4-40-24-PM-mtet36sq.jpeg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/38c85066-25dc-41aa-81d1-d3fb25889787/WhatsApp-Image-2026-08-29-at-4-40-24-PM-mtet36sq.jpeg</image:loc>
       <image:caption>उत्तराखंड क्रीड़ा विश्वविद्यालय का पहला चरण शुरू, धामी ने 43.50 करोड़  का  किया  शिलान्यास</image:caption>
       <image:title>उत्तराखंड क्रीड़ा विश्वविद्यालय का पहला चरण शुरू, धामी ने 43.50 करोड़  का  किया  शिलान्यास</image:title>
     </image:image>
@@ -460,7 +468,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/politics/story-8-2</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/33c6a7c0-9714-4ab3-8260-9ce77ceee4ff/WhatsApp-Image-2026-08-29-at-5-40-14-PM-mtesbiio.jpeg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/33c6a7c0-9714-4ab3-8260-9ce77ceee4ff/WhatsApp-Image-2026-08-29-at-5-40-14-PM-mtesbiio.jpeg</image:loc>
       <image:caption>रक्षाबंधन पर भाई-बहनों ने रोपे 1.09 लाख पौधे, यूपी में बनीं 59 रक्षाबंधन वाटिकाएं</image:caption>
       <image:title>रक्षाबंधन पर भाई-बहनों ने रोपे 1.09 लाख पौधे, यूपी में बनीं 59 रक्षाबंधन वाटिकाएं</image:title>
     </image:image>
@@ -468,7 +476,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/politics/story-7-2</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/b9ed58b8-e419-4db4-b163-5d3d76c01413/WhatsApp-Image-2026-08-29-at-3-22-47-PM-mteryqny.jpeg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/b9ed58b8-e419-4db4-b163-5d3d76c01413/WhatsApp-Image-2026-08-29-at-3-22-47-PM-mteryqny.jpeg</image:loc>
       <image:caption>सीएम योगी का अखिलेश पर हमला, बोले- पत्रकारों के सवाल पर गाली-गलौच करते हैं</image:caption>
       <image:title>सीएम योगी का अखिलेश पर हमला, बोले- पत्रकारों के सवाल पर गाली-गलौच करते हैं</image:title>
     </image:image>
@@ -476,7 +484,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/entertainment/story-6-2</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/cf0a5401-c972-48bc-88da-d6a6a8c641d5/featured-mtld3ikk-ejdn.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/cf0a5401-c972-48bc-88da-d6a6a8c641d5/featured-mtld3ikk-ejdn.jpg</image:loc>
       <image:caption>हरियाणा में फिल्म शूटिंग का न्योता, लोकेशन के साथ सहयोग का CM सैनी ने दिया भरोसा</image:caption>
       <image:title>हरियाणा में फिल्म शूटिंग का न्योता, लोकेशन के साथ सहयोग का CM सैनी ने दिया भरोसा</image:title>
     </image:image>
@@ -484,7 +492,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/politics/story-5-2</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/c24d475b-e1bf-47c7-945f-d54144f75e8e/featured-mtld3kc3-7zr1.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/c24d475b-e1bf-47c7-945f-d54144f75e8e/featured-mtld3kc3-7zr1.jpg</image:loc>
       <image:caption>नूंह में रोजगार और विकास पर जोर, मुफ्त कोचिंग को मुख्यमंत्री ने दी मंजूरी</image:caption>
       <image:title>नूंह में रोजगार और विकास पर जोर, मुफ्त कोचिंग को मुख्यमंत्री ने दी मंजूरी</image:title>
     </image:image>
@@ -492,7 +500,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/story-4-2</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/2e2981ca-b767-4d65-8be7-a553d9bde108/WhatsApp-Image-2026-08-29-at-6-11-12-PM-mteq8x2k.jpeg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/2e2981ca-b767-4d65-8be7-a553d9bde108/WhatsApp-Image-2026-08-29-at-6-11-12-PM-mteq8x2k.jpeg</image:loc>
       <image:caption>हरियाणा में कचरे से बनेगी 50 मेगावाट बिजली, चार वेस्ट-टू-एनर्जी प्लांट के लिए एमओयू</image:caption>
       <image:title>हरियाणा में कचरे से बनेगी 50 मेगावाट बिजली, चार वेस्ट-टू-एनर्जी प्लांट के लिए एमओयू</image:title>
     </image:image>
@@ -500,7 +508,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/opinion/badhataa-taapamaana-aura-bikharataa-jeevana-2</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/7f4b2769-7ad6-480a-8d23-0ae1bf6a4517/featured-mtld3m2c-dmt8.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/7f4b2769-7ad6-480a-8d23-0ae1bf6a4517/featured-mtld3m2c-dmt8.jpg</image:loc>
       <image:caption>बढ़ता तापमान और बिखरता जीवन</image:caption>
       <image:title>बढ़ता तापमान और बिखरता जीवन</image:title>
     </image:image>
@@ -508,7 +516,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/story-3-2</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/8a22d852-74ac-4d41-8033-8707d0218226/featured-mtld3o2n-09f0.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/8a22d852-74ac-4d41-8033-8707d0218226/featured-mtld3o2n-09f0.jpg</image:loc>
       <image:caption>बच्ची की हत्या के आरोपी से पुलिस की मुठभेड़, गोली लगने से आरोपी की मौत; हेड कांस्टेबल घायल</image:caption>
       <image:title>बच्ची की हत्या के आरोपी से पुलिस की मुठभेड़, गोली लगने से आरोपी की मौत; हेड कांस्टेबल घायल</image:title>
     </image:image>
@@ -516,7 +524,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/story-2-2</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/0b0b147d-2dec-4342-a79b-7314af56dd05/featured-mtld3mw4-nguu.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/0b0b147d-2dec-4342-a79b-7314af56dd05/featured-mtld3mw4-nguu.jpg</image:loc>
       <image:caption>30 मिनट में पुलिस ने तलाश की 3 साल की गुमशुदा बच्ची, सकुशल परिजनों को सौंपा</image:caption>
       <image:title>30 मिनट में पुलिस ने तलाश की 3 साल की गुमशुदा बच्ची, सकुशल परिजनों को सौंपा</image:title>
     </image:image>
@@ -524,7 +532,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/story-11</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/25604ec7-bc40-4f31-8d60-bd631afc0e48/WhatsApp-Image-2026-08-29-at-1-59-10-PM-mteo1b5g.jpeg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/25604ec7-bc40-4f31-8d60-bd631afc0e48/WhatsApp-Image-2026-08-29-at-1-59-10-PM-mteo1b5g.jpeg</image:loc>
       <image:caption>सेवानिवृत्त पुलिसकर्मियों के अनुभवों का होगा बेहतर उपयोग</image:caption>
       <image:title>सेवानिवृत्त पुलिसकर्मियों के अनुभवों का होगा बेहतर उपयोग</image:title>
     </image:image>
@@ -532,7 +540,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/entertainment/khushiyon-kaa-paavarahaausa-hotee-hain-bahanen</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/1005548297-mtd8p8ud.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/1005548297-mtd8p8ud.jpg</image:loc>
       <image:caption>खुशियों का पावरहाउस होती हैं बहनें.....</image:caption>
       <image:title>खुशियों का पावरहाउस होती हैं बहनें.....</image:title>
     </image:image>
@@ -540,7 +548,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/politics/lohiyaaheda-men-paidala-pahunche-dhaamee-sthaaneeya-stola-para-ch</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/1005546724-mtd8ck3y.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/1005546724-mtd8ck3y.jpg</image:loc>
       <image:caption>लोहियाहेड में पैदल पहुंचे धामी, स्थानीय स्टॉल पर चखा टिकी का स्वाद</image:caption>
       <image:title>लोहियाहेड में पैदल पहुंचे धामी, स्थानीय स्टॉल पर चखा टिकी का स्वाद</image:title>
     </image:image>
@@ -548,7 +556,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/rakshaabandhana-para-dhaamee-sarakaara-kee-mahilaaon-ko-badee-sau</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/1005546718-mtd80b0y.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/1005546718-mtd80b0y.jpg</image:loc>
       <image:caption>रक्षाबंधन पर धामी सरकार की महिलाओं को बड़ी सौगात, 60 वर्ष से मुफ्त रोडवेज सफर</image:caption>
       <image:title>रक्षाबंधन पर धामी सरकार की महिलाओं को बड़ी सौगात, 60 वर्ष से मुफ्त रोडवेज सफर</image:title>
     </image:image>
@@ -556,7 +564,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/rakshaabandhana-ke-paavana-avasara-phalon-phoolon-se-khelee-gaee</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/1005548018-mtd7blhx.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/1005548018-mtd7blhx.jpg</image:loc>
       <image:caption>रक्षाबंधन के पावन अवसर फलों-फूलों से खेली गई ऐतिहासिक बग्वाल</image:caption>
       <image:title>रक्षाबंधन के पावन अवसर फलों-फूलों से खेली गई ऐतिहासिक बग्वाल</image:title>
     </image:image>
@@ -564,7 +572,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/politics/panjaaba-men-bhaajapaa-kee-sarakaara-banaane-kaa-mana-banaa-chuke</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/1005547301-mtd6wymt.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/1005547301-mtd6wymt.jpg</image:loc>
       <image:caption>पंजाब में भाजपा की सरकार बनाने का मन बना चुकी जनता : सैनी</image:caption>
       <image:title>पंजाब में भाजपा की सरकार बनाने का मन बना चुकी जनता : सैनी</image:title>
     </image:image>
@@ -572,7 +580,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/santa-kabeera-kuteera-men-seeema-sainee-ne-manaayaa-rakshaabandha</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/1005547847-mtd6hkvg.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/1005547847-mtd6hkvg.jpg</image:loc>
       <image:caption>संत कबीर कुटीर में सीएम सैनी ने मनाया रक्षाबंधन</image:caption>
       <image:title>संत कबीर कुटीर में सीएम सैनी ने मनाया रक्षाबंधन</image:title>
     </image:image>
@@ -580,7 +588,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/politics/yuvaaon-ke-lie-avasaron-kaa-majaboota-eeko-sistama-taiyaara-yogae</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/1005547672-mtd5zwad.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/1005547672-mtd5zwad.jpg</image:loc>
       <image:caption>युवाओं के लिए अवसरों का मजबूत ईको सिस्टम तैयार: योगी</image:caption>
       <image:title>युवाओं के लिए अवसरों का मजबूत ईको सिस्टम तैयार: योगी</image:title>
     </image:image>
@@ -588,7 +596,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/60-varsha-se-adhika-umra-kee-mahilaaon-ke-lie-yoopee-rodaveja-men</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/1005535865-mtd5oj7k.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/1005535865-mtd5oj7k.jpg</image:loc>
       <image:caption>60 वर्ष से अधिक उम्र की महिलाओं के लिए यूपी रोडवेज में मुफ्त सफर की सौगात</image:caption>
       <image:title>60 वर्ष से अधिक उम्र की महिलाओं के लिए यूपी रोडवेज में मुफ्त सफर की सौगात</image:title>
     </image:image>
@@ -596,7 +604,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/betiyon-ko-milaa-mancha-to-khulakara-bole-sapane-mukhyamantree-yo</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/1005547084-mtd58lnx.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/1005547084-mtd58lnx.jpg</image:loc>
       <image:caption>बेटियों को मिला मंच तो खुलकर बोले सपने, मुख्यमंत्री योगी से छात्राओं ने पूछे बेझिझक सवाल</image:caption>
       <image:title>बेटियों को मिला मंच तो खुलकर बोले सपने, मुख्यमंत्री योगी से छात्राओं ने पूछे बेझिझक सवाल</image:title>
     </image:image>
@@ -604,7 +612,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/betiyon-kee-muskaana-se-khila-uthaa-mukhyamantree-aavaasa-yogee-k</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/1005547112-mtd4xume.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/1005547112-mtd4xume.jpg</image:loc>
       <image:caption>बेटियों की मुस्कान से खिल उठा मुख्यमंत्री आवास, योगी की कलाई पर बंधी स्नेह की डोर</image:caption>
       <image:title>बेटियों की मुस्कान से खिल उठा मुख्यमंत्री आवास, योगी की कलाई पर बंधी स्नेह की डोर</image:title>
     </image:image>
@@ -612,7 +620,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/entertainment/sanjaya-jheela-sthita-paandava-shaakhaa-men-harshollaasa-se-manaa</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/1005546981-mtd39qe0.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/1005546981-mtd39qe0.jpg</image:loc>
       <image:caption>संजय झील स्थित पांडव शाखा में हर्षोल्लास से मनाया गया रक्षाबंधन पर्व, स्वयंसेवकों ने बांधा रक्षा सूत्र</image:caption>
       <image:title>संजय झील स्थित पांडव शाखा में हर्षोल्लास से मनाया गया रक्षाबंधन पर्व, स्वयंसेवकों ने बांधा रक्षा सूत्र</image:title>
     </image:image>
@@ -620,7 +628,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/entertainment/29-agasta-kaa-raashiphala-shanivaara-ko-ina-raashiyon-ko-mila-sak</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/1005537142-mtd04gl9.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/1005537142-mtd04gl9.jpg</image:loc>
       <image:caption>29 अगस्त का राशिफल: शनिवार को इन राशियों को मिल सकता है लाभ, जानें सभी 12 राशियों का हाल</image:caption>
       <image:title>29 अगस्त का राशिफल: शनिवार को इन राशियों को मिल सकता है लाभ, जानें सभी 12 राशियों का हाल</image:title>
     </image:image>
@@ -628,7 +636,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/entertainment/dharatee-se-antariksha-taka-betiyon-kee-udaana-rakshaabandhana-pa</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/1005545472-mtczn99f.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/1005545472-mtczn99f.jpg</image:loc>
       <image:caption>धरती से अंतरिक्ष तक बेटियों की उड़ान, रक्षाबंधन पर मिला वैश्विक संदेश</image:caption>
       <image:title>धरती से अंतरिक्ष तक बेटियों की उड़ान, रक्षाबंधन पर मिला वैश्विक संदेश</image:title>
     </image:image>
@@ -636,7 +644,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/lifestyle/kama-amh-ke-baavajooda-praakritika-garbhadhaarana-kee-ummeeda-pri</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/1005545447-mtcz4kqq.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/1005545447-mtcz4kqq.jpg</image:loc>
       <image:caption>कम AMH के बावजूद प्राकृतिक गर्भधारण की उम्मीद, प्रियंका की कहानी बनी प्रेरणा</image:caption>
       <image:title>कम AMH के बावजूद प्राकृतिक गर्भधारण की उम्मीद, प्रियंका की कहानी बनी प्रेरणा</image:title>
     </image:image>
@@ -644,7 +652,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/phedareshana-opha-panjaabee-esosieshana-kaa-sevaa-sankalpa-30-jar</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/1005544737-mtcy6hz2.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/1005544737-mtcy6hz2.jpg</image:loc>
       <image:caption>फेडरेशन ऑफ पंजाबी एसोसिएशन का सेवा संकल्प, 30 जरूरतमंदों के होंगे निःशुल्क नेत्र ऑपरेशन</image:caption>
       <image:title>फेडरेशन ऑफ पंजाबी एसोसिएशन का सेवा संकल्प, 30 जरूरतमंदों के होंगे निःशुल्क नेत्र ऑपरेशन</image:title>
     </image:image>
@@ -652,7 +660,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/iskona-noedaa-men-dhoomadhaama-se-manaaee-gaee-balaraama-poornima</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/1005544128-mtct2uyl.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/1005544128-mtct2uyl.jpg</image:loc>
       <image:caption>इस्कॉन नोएडा में धूमधाम से मनाई गई बलराम पूर्णिमा, 1500 भक्तों ने लिया उत्सव में भाग</image:caption>
       <image:title>इस्कॉन नोएडा में धूमधाम से मनाई गई बलराम पूर्णिमा, 1500 भक्तों ने लिया उत्सव में भाग</image:title>
     </image:image>
@@ -660,7 +668,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/mukhyamantree-sashakta-bahanaa-utsava-men-champaavata-ko-6297-kar</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/1005534298-mtbvuax5.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/1005534298-mtbvuax5.jpg</image:loc>
       <image:caption>मुख्यमंत्री सशक्त बहना उत्सव में चम्पावत को 62.97 करोड़ की 50 विकास योजनाओं की सौगात</image:caption>
       <image:title>मुख्यमंत्री सशक्त बहना उत्सव में चम्पावत को 62.97 करोड़ की 50 विकास योजनाओं की सौगात</image:title>
     </image:image>
@@ -668,7 +676,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/himaalaya-royaa-to-janajeevana-maidaana-doobaaa</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/4524b399-18ca-4e9e-8c00-40055f45d5b4/1005537397-mtbu880l-mtbvs0et.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/4524b399-18ca-4e9e-8c00-40055f45d5b4/1005537397-mtbu880l-mtbvs0et.jpg</image:loc>
       <image:caption>हिमालय रोया तो जनजीवन मैदान डूबा</image:caption>
       <image:title>हिमालय रोया तो जनजीवन मैदान डूबा</image:title>
     </image:image>
@@ -676,7 +684,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/ananta-bandhana-akhanda-rakshaa-rakshaa-bandhana-para-vishesha</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/1005537465-mtbur5bp.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/1005537465-mtbur5bp.jpg</image:loc>
       <image:caption>अनन्त बंधन, अखंड रक्षा (रक्षा बंधन पर विशेष)</image:caption>
       <image:title>अनन्त बंधन, अखंड रक्षा (रक्षा बंधन पर विशेष)</image:title>
     </image:image>
@@ -684,7 +692,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/sabhee-mahaashaktiyon-kee-aashrayadaataa-hain-maan-bhagavatee-gur</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/1005534124-mtbvddv3.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/1005534124-mtbvddv3.jpg</image:loc>
       <image:caption>सभी महाशक्तियों की आश्रयदाता हैं मां भगवती-गुरुचरण</image:caption>
       <image:title>सभी महाशक्तियों की आश्रयदाता हैं मां भगवती-गुरुचरण</image:title>
     </image:image>
@@ -692,7 +700,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/rakshaabandhana-se-pahale-khaadya-surakshaa-vibhaaga-kee-badee-ka</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/1005533424-mtbv4dr1.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/1005533424-mtbv4dr1.jpg</image:loc>
       <image:caption>रक्षाबंधन से पहले खाद्य सुरक्षा विभाग की बड़ी कार्रवाई, 40 नमूने जांच को भेजे</image:caption>
       <image:title>रक्षाबंधन से पहले खाद्य सुरक्षा विभाग की बड़ी कार्रवाई, 40 नमूने जांच को भेजे</image:title>
     </image:image>
@@ -700,7 +708,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/rakshaabandhana-para-jaanen-shubha-muhoorta-poojaa-vidhi-aura-12</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/1005537142-mtbtdwa5.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/1005537142-mtbtdwa5.jpg</image:loc>
       <image:caption>रक्षाबंधन पर जानें शुभ मुहूर्त, पूजा विधि और 12 राशियों का राशिफल</image:caption>
       <image:title>रक्षाबंधन पर जानें शुभ मुहूर्त, पूजा विधि और 12 राशियों का राशिफल</image:title>
     </image:image>
@@ -708,7 +716,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/vipaksha-kaanoona-vyavasthaa-kaa-paatha-padhaane-se-pahale-apanaa</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/1005536970-mtbt1tlc.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/1005536970-mtbt1tlc.jpg</image:loc>
       <image:caption>विपक्ष कानून-व्यवस्था का पाठ पढ़ाने से पहले अपना शासनकाल देखे: मुख्यमंत्री नायब सिंह सैनी</image:caption>
       <image:title>विपक्ष कानून-व्यवस्था का पाठ पढ़ाने से पहले अपना शासनकाल देखे: मुख्यमंत्री नायब सिंह सैनी</image:title>
     </image:image>
@@ -716,7 +724,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/medikala-koleja-baharaaicha-men-pahalee-baara-doorabeena-se-kandh</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/8d204a21-3351-4584-b694-8b548134d281/1005524558-mtaeik28.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/8d204a21-3351-4584-b694-8b548134d281/1005524558-mtaeik28.jpg</image:loc>
       <image:caption>मेडिकल कॉलेज बहराइच में पहली बार दूरबीन से कंधे की सर्जरी सफल</image:caption>
       <image:title>मेडिकल कॉलेज बहराइच में पहली बार दूरबीन से कंधे की सर्जरी सफल</image:title>
     </image:image>
@@ -724,7 +732,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/rakshaabandhana-para-mahilaaon-ko-muphta-basa-yaatraa-kaa-tohapha</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/WhatsApp-Image-2026-08-26-at-3-51-09-PM-mtadp49w.jpeg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/WhatsApp-Image-2026-08-26-at-3-51-09-PM-mtadp49w.jpeg</image:loc>
       <image:caption>रक्षाबंधन पर महिलाओं को मुफ्त बस यात्रा का तोहफा</image:caption>
       <image:title>रक्षाबंधन पर महिलाओं को मुफ्त बस यात्रा का तोहफा</image:title>
     </image:image>
@@ -732,7 +740,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/navavarsha-melaa-samiti-ke-shivira-51-nara-naariyon-ne-daana-kiya</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/WhatsApp-Image-2026-08-26-at-8-12-19-PM-mtabz49w.jpeg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/WhatsApp-Image-2026-08-26-at-8-12-19-PM-mtabz49w.jpeg</image:loc>
       <image:caption>नववर्ष मेला समिति के शिविर 51 नर-नारियों ने दान किया लहू</image:caption>
       <image:title>नववर्ष मेला समिति के शिविर 51 नर-नारियों ने दान किया लहू</image:title>
     </image:image>
@@ -740,7 +748,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/krishnajanmabhoomi-kee-mukti-aandolana-kee-mashaala-jena-jee-ne-t</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/04d13655-5285-4877-a865-fe118fb2690f/WhatsApp-Image-2026-08-26-at-7-52-30-PM-mtabt6hd.jpeg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/04d13655-5285-4877-a865-fe118fb2690f/WhatsApp-Image-2026-08-26-at-7-52-30-PM-mtabt6hd.jpeg</image:loc>
       <image:caption>कृष्णजन्मभूमि की मुक्ति आंदोलन की मशाल जेन-जी ने थामी</image:caption>
       <image:title>कृष्णजन्मभूमि की मुक्ति आंदोलन की मशाल जेन-जी ने थामी</image:title>
     </image:image>
@@ -748,7 +756,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/aatha-dashaka-kee-prateekshaa-ke-baada-vaishvika-shikhara-para-st</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/WhatsApp-Image-2026-08-21-at-1-53-31-PM-mt9x9kie.jpeg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/WhatsApp-Image-2026-08-21-at-1-53-31-PM-mt9x9kie.jpeg</image:loc>
       <image:caption>आठ दशक की प्रतीक्षा के बाद वैश्विक शिखर पर स्त्री-शक्ति की दस्तक</image:caption>
       <image:title>आठ दशक की प्रतीक्षा के बाद वैश्विक शिखर पर स्त्री-शक्ति की दस्तक</image:title>
     </image:image>
@@ -756,7 +764,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/politics/chhaha-maheene-men-eka-laakha-yuvaaon-ko-sarakaaree-naukaree-deng</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/9fb7875a-925e-4f27-8edd-3c204a255c88/1005512003-mt8z5ld1-mt9qyo4b.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/9fb7875a-925e-4f27-8edd-3c204a255c88/1005512003-mt8z5ld1-mt9qyo4b.jpg</image:loc>
       <image:caption>छह महीने में एक लाख युवाओं को सरकारी नौकरी देंगे: सीएम योगी</image:caption>
       <image:title>छह महीने में एक लाख युवाओं को सरकारी नौकरी देंगे: सीएम योगी</image:title>
     </image:image>
@@ -764,7 +772,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/khare-the-sikke-jo-khote-nikala-gae</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/dc128f24-ebee-4886-998d-57bafa84ee4f/WhatsApp-Image-2026-08-26-at-11-54-49-AM-mt9qwr52.jpeg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/dc128f24-ebee-4886-998d-57bafa84ee4f/WhatsApp-Image-2026-08-26-at-11-54-49-AM-mt9qwr52.jpeg</image:loc>
       <image:caption>खरे थे सिक्के जो खोटे निकल गए...</image:caption>
       <image:title>खरे थे सिक्के जो खोटे निकल गए...</image:title>
     </image:image>
@@ -772,7 +780,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/pavitra-chhadee-yaatraa-men-shaamila-honge-dhaamee-santon-ne-diya</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/1005517100-mt9humc7.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/1005517100-mt9humc7.jpg</image:loc>
       <image:caption>पवित्र छड़ी यात्रा में शामिल होंगे धामी, संतों ने दिया न्योता</image:caption>
       <image:title>पवित्र छड़ी यात्रा में शामिल होंगे धामी, संतों ने दिया न्योता</image:title>
     </image:image>
@@ -780,7 +788,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/cheenee-kee-jamaakhoree-para-dee-ema-kee-sakhtee-4000-kuntala-se</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/1005513599-mt9hkyt0.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/1005513599-mt9hkyt0.jpg</image:loc>
       <image:caption>चीनी की जमाखोरी पर डी एम की सख्ती, 4000 कुंतल से ज्यादा स्टॉक पर कार्रवाई</image:caption>
       <image:title>चीनी की जमाखोरी पर डी एम की सख्ती, 4000 कुंतल से ज्यादा स्टॉक पर कार्रवाई</image:title>
     </image:image>
@@ -788,7 +796,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/aaee-phona-badaa-yaa-jeevana-badaa</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/0cc4d9cc-65f7-48e3-ac04-24d6493bed78/1005515420-mt91b80u.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/0cc4d9cc-65f7-48e3-ac04-24d6493bed78/1005515420-mt91b80u.jpg</image:loc>
       <image:caption>आई फोन बड़ा या जीवन बड़ा?</image:caption>
       <image:title>आई फोन बड़ा या जीवन बड़ा?</image:title>
     </image:image>
@@ -796,7 +804,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/kanpanee-se-363-tee-sharta-choree-do-surakshaa-gaarda-sameta-teen</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/1005511756-mt8zwkdd.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/1005511756-mt8zwkdd.jpg</image:loc>
       <image:caption>कंपनी से 363 टी-शर्ट चोरी, दो सुरक्षा गार्ड समेत तीन गिरफ्तार</image:caption>
       <image:title>कंपनी से 363 टी-शर्ट चोरी, दो सुरक्षा गार्ड समेत तीन गिरफ्तार</image:title>
     </image:image>
@@ -804,7 +812,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/466-puraane-vaatara-varksa-honge-aaraseesee-aadhaarita-shuddha-pe</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/1005513400-mt8yx952.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/1005513400-mt8yx952.jpg</image:loc>
       <image:caption>466 पुराने वाटर वर्क्स होंगे आरसीसी आधारित, शुद्ध पेयजल पर सरकार का जोर</image:caption>
       <image:title>466 पुराने वाटर वर्क्स होंगे आरसीसी आधारित, शुद्ध पेयजल पर सरकार का जोर</image:title>
     </image:image>
@@ -812,7 +820,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/politics/320-taalaabon-kaa-jalda-hogaa-saundaryeekarana-naayaba-sainaee</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/1005513379-mt8ypbwy.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/1005513379-mt8ypbwy.jpg</image:loc>
       <image:caption>320 तालाबों का जल्द होगा सौंदर्यीकरण: नायब सैनी</image:caption>
       <image:title>320 तालाबों का जल्द होगा सौंदर्यीकरण: नायब सैनी</image:title>
     </image:image>
@@ -820,7 +828,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/84-varsheeya-haarta-pheliyara-mareeja-kaa-binaa-opana-haarta-sarj</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/1005510607-mt8xul2w.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/1005510607-mt8xul2w.jpg</image:loc>
       <image:caption>84 वर्षीय हार्ट फेलियर मरीज का बिना ओपन-हार्ट सर्जरी सफल इलाज</image:caption>
       <image:title>84 वर्षीय हार्ट फेलियर मरीज का बिना ओपन-हार्ट सर्जरी सफल इलाज</image:title>
     </image:image>
@@ -828,7 +836,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/sportsa-ritela-para-naee-pustaka-kaa-lokaarpana-bhaarata-ke-khela</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/1005512111-mt8xedlh.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/1005512111-mt8xedlh.jpg</image:loc>
       <image:caption>स्पोर्ट्स रिटेल पर नई पुस्तक का लोकार्पण, भारत के खेल बाजार की संभावनाओं पर बढ़ी चर्चा</image:caption>
       <image:title>स्पोर्ट्स रिटेल पर नई पुस्तक का लोकार्पण, भारत के खेल बाजार की संभावनाओं पर बढ़ी चर्चा</image:title>
     </image:image>
@@ -836,7 +844,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/bhaarata-100-nae-jahaajon-se-ghataaegaa-videshee-shipinga-para-ni</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/1005513211-mt8x34xp.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/1005513211-mt8x34xp.jpg</image:loc>
       <image:caption>भारत 100 नए जहाजों से घटाएगा विदेशी शिपिंग पर निर्भरता, हर साल बचेंगे 75 अरब डॉलर</image:caption>
       <image:title>भारत 100 नए जहाजों से घटाएगा विदेशी शिपिंग पर निर्भरता, हर साल बचेंगे 75 अरब डॉलर</image:title>
     </image:image>
@@ -844,7 +852,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/nishaanebaajee-men-bhaaooraava-devarasa-vidyaa-mandira-kee-betiyo</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/1005505353-mt88eczu.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/1005505353-mt88eczu.jpg</image:loc>
       <image:caption>निशानेबाजी में भाऊराव देवरस विद्या मंदिर की बेटियों का शानदार प्रदर्शन, राष्ट्रीय चैंपियनशिप में बनाएंगी जगह</image:caption>
       <image:title>निशानेबाजी में भाऊराव देवरस विद्या मंदिर की बेटियों का शानदार प्रदर्शन, राष्ट्रीय चैंपियनशिप में बनाएंगी जगह</image:title>
     </image:image>
@@ -852,7 +860,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/sports/sunrise-shuttlers-badminton-record-noida</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/e2b79a83-1456-4cf8-a901-447551061992/1005477865-mt7ic8co.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/e2b79a83-1456-4cf8-a901-447551061992/1005477865-mt7ic8co.jpg</image:loc>
       <image:caption>जमीनी स्तर पर बैडमिंटन के विकास में सनराइज़ शटलर्स ने रचा नया कीर्तिमान</image:caption>
       <image:title>जमीनी स्तर पर बैडमिंटन के विकास में सनराइज़ शटलर्स ने रचा नया कीर्तिमान</image:title>
     </image:image>
@@ -860,7 +868,7 @@
   <url>
     <loc>https://www.npnewsmetro.com/india/sawan-somwar-jhandewala-devi-mandir-rudrabhishek</loc>
     <image:image>
-      <image:loc>https://bogjmdyolhazzvicjrjl.supabase.co/storage/v1/object/public/article-images/articles/general/1005496780-mt7hhhel.jpg</image:loc>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/articles/general/1005496780-mt7hhhel.jpg</image:loc>
       <image:caption>सावन के अंतिम सोमवार पर झण्डेवाला देवी मंदिर में गूंजा हर-हर महादेव, श्रद्धालुओं ने किया जलाभिषेक</image:caption>
       <image:title>सावन के अंतिम सोमवार पर झण्डेवाला देवी मंदिर में गूंजा हर-हर महादेव, श्रद्धालुओं ने किया जलाभिषेक</image:title>
     </image:image>

@@ -2,6 +2,17 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
   <url>
+    <loc>https://www.npnewsmetro.com/india/story</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-04T17:34:26.999Z</news:publication_date>
+      <news:title>नंद घर आनंद भयो यह केवल जन्म नहीं, चेतना का स्पंदन है</news:title>
+    </news:news>
+  </url>
+  <url>
     <loc>https://www.npnewsmetro.com/politics/mukhyamantree-shree-pushkara-sinha-dhaamee-se-mukhyamantree-aavaa</loc>
     <news:news>
       <news:publication>

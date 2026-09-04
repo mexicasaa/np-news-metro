@@ -110,7 +110,40 @@ export class R2MediaRepository {
     const storagePath = `media/${contentHash}/${cleanName}`;
     let publicUrl = this.getUrl(r2Key);
 
-    // 2. Upload file binary (Supabase storage fallback if R2 not directly mounted)
+    // 2. Primary: Upload directly to Cloudflare R2 via Serverless S3 API
+    try {
+      const reader = new FileReader();
+      const base64Promise = new Promise<string>((resolve, reject) => {
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+      const base64Data = await base64Promise;
+
+      const r2Resp = await fetch('/api/r2-upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          base64Data,
+          fileName: meta.fileName,
+          mimeType: meta.mimeType,
+          contentHash,
+          altText: meta.altText,
+          caption: meta.caption,
+        }),
+      });
+
+      if (r2Resp.ok) {
+        const result = await r2Resp.json();
+        if (result.media) {
+          return { media: this.mapToRecord(result.media), isDuplicate: !!result.isDuplicate };
+        }
+      }
+    } catch (r2Err) {
+      console.warn('Direct R2 serverless upload error, attempting fallback:', r2Err);
+    }
+
+    // 3. Fallback: Upload to Supabase storage if direct R2 upload fails
     try {
       const { error: uploadError } = await supabase.storage
         .from('article-images')
