@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Play, Eye, Clock, User, ShieldCheck, Flame, Share2, FileText, ArrowRight } from 'lucide-react';
 import { WpVideo, WpPost } from '../types/wordpress';
-import { mockVideos, mockPosts, mockAuthors, getLocalizedVideo } from '../data/mockWpData';
+import { mockVideos, mockAuthors, getLocalizedVideo } from '../data/mockWpData';
+import { getStoredPosts } from '../utils/newsStorage';
 import { VideoPlayer } from '../components/media/VideoPlayer';
 import { ArticleShareBar } from '../components/article/ArticleShareBar';
 import { VideoCard } from '../components/cards/VideoCard';
@@ -28,12 +29,14 @@ export const VideoDetailTemplate: React.FC<VideoDetailTemplateProps> = ({
   onNavigateVideos,
   showAds = false,
 }) => {
+  if (!video) return null;
   const { language, t, isHindi } = useLanguage();
   const localized = getLocalizedVideo(video, language);
   const author = mockAuthors[video.authorId];
   const relatedVideos = mockVideos.filter((v) => v.id !== video.id);
-  const relatedPosts = mockPosts.slice(0, 3);
-  const trendingRanking = [...mockPosts].sort((a, b) => b.viewsCount - a.viewsCount).slice(0, 5);
+  const storedPosts = getStoredPosts();
+  const relatedPosts = storedPosts.slice(0, 3);
+  const trendingRanking = [...storedPosts].sort((a, b) => (b.viewsCount || 0) - (a.viewsCount || 0)).slice(0, 5);
 
   return (
     <div className="bg-canvas min-h-screen">

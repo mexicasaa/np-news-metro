@@ -1,5 +1,5 @@
 import { WpPost, WpVideo } from '../types/wordpress';
-import { mockPosts as defaultMockPosts, mockVideos } from '../data/mockWpData';
+import { mockVideos } from '../data/mockWpData';
 
 const STORAGE_KEY = 'np_news_published_posts';
 const BROADCAST_CHANNEL_NAME = 'np_news_feed_channel';
@@ -46,24 +46,32 @@ export const isPostPublished = (post: Partial<WpPost> | null | undefined): boole
 };
 
 export const getStoredPosts = (): WpPost[] => {
-  if (typeof window === 'undefined') return defaultMockPosts.filter(isPostPublished);
+  if (typeof window === 'undefined') return [];
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      const initial = defaultMockPosts.filter(isPostPublished);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
-      return initial;
-    }
+    if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed) && parsed.length > 0) {
-      // Strictly enforce that only published posts are returned
-      return parsed.filter(isPostPublished);
+      // Strictly enforce that only real published posts (never mock posts starting with 'wp-') are returned
+      return parsed.filter(p => isPostPublished(p) && !p.id?.startsWith('wp-'));
     }
-    return defaultMockPosts.filter(isPostPublished);
+    return [];
   } catch (err) {
-    console.error('Error reading stored posts from localStorage:', err);
-    return defaultMockPosts.filter(isPostPublished);
+    return [];
   }
+};
+
+/**
+ * Persist current live articles in localStorage for instant retrieval on page reload
+ */
+export const saveLiveArticlesCache = (posts: WpPost[]): void => {
+  if (typeof window === 'undefined' || !Array.isArray(posts)) return;
+  try {
+    const realPosts = posts.filter(p => isPostPublished(p) && !p.id?.startsWith('wp-'));
+    if (realPosts.length > 0) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(realPosts));
+    }
+  } catch (e) {}
 };
 
 export interface AutoSaveSession {
@@ -221,7 +229,7 @@ export const removeStoredDraft = (postId: string, title?: string): void => {
 };
 
 export const savePublishedPost = (post: WpPost): WpPost[] => {
-  if (typeof window === 'undefined') return [post, ...defaultMockPosts].filter(isPostPublished);
+  if (typeof window === 'undefined') return [post].filter(isPostPublished);
   try {
     const currentPosts = getStoredPosts();
     const isPublished = isPostPublished(post);
@@ -299,29 +307,29 @@ export const savePublishedPost = (post: WpPost): WpPost[] => {
     return updated;
   } catch (err) {
     console.error('Error saving post to cache:', err);
-    return [post, ...defaultMockPosts].filter(isPostPublished);
+    return [post].filter(isPostPublished);
   }
 };
 
 export const deleteStoredPost = (postId: string): WpPost[] => {
-  if (typeof window === 'undefined') return defaultMockPosts;
+  if (typeof window === 'undefined') return [];
   try {
     const currentPosts = getStoredPosts();
     const updated = currentPosts.filter(p => p.id !== postId && p.slug !== postId);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
     return updated;
   } catch (err) {
-    return defaultMockPosts;
+    return [];
   }
 };
 
 export const resetStoredPostsToDefault = (): WpPost[] => {
-  if (typeof window === 'undefined') return defaultMockPosts;
+  if (typeof window === 'undefined') return [];
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultMockPosts));
-    return defaultMockPosts;
+    localStorage.removeItem(STORAGE_KEY);
+    return [];
   } catch (err) {
-    return defaultMockPosts;
+    return [];
   }
 };
 

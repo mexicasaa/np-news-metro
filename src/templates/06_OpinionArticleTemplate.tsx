@@ -1,7 +1,8 @@
 import React from 'react';
 import { Quote, Feather, ShieldCheck, Flame, BookOpen, ArrowRight } from 'lucide-react';
 import { WpPost } from '../types/wordpress';
-import { mockPosts, mockAuthors, getLocalizedPost } from '../data/mockWpData';
+import { mockAuthors, getLocalizedPost } from '../data/mockWpData';
+import { getStoredPosts } from '../utils/newsStorage';
 import { ArticleBody } from '../components/article/ArticleBody';
 import { ArticleShareBar } from '../components/article/ArticleShareBar';
 import { AuthorBioBox } from '../components/article/AuthorBioBox';
@@ -27,6 +28,7 @@ export const OpinionArticleTemplate: React.FC<OpinionArticleTemplateProps> = ({
   onSelectCategory,
   onSelectAuthor,
 }) => {
+  if (!post) return null;
   const { language, t, isHindi } = useLanguage();
   const localized = getLocalizedPost(post, language);
   const author = post.customAuthor?.name ? {
@@ -58,8 +60,9 @@ export const OpinionArticleTemplate: React.FC<OpinionArticleTemplateProps> = ({
     beats: ['Opinion & Analysis'],
     social: {}
   }));
-  const otherOpinions = mockPosts.filter((p) => p.id !== post.id && (p.isOpinion || p.category === 'opinion'));
-  const trendingRanking = [...mockPosts].sort((a, b) => b.viewsCount - a.viewsCount).slice(0, 5);
+  const storedPosts = getStoredPosts();
+  const otherOpinions = storedPosts.filter((p) => p.id !== post.id && (p.isOpinion || p.category === 'opinion'));
+  const trendingRanking = [...storedPosts].sort((a, b) => (b.viewsCount || 0) - (a.viewsCount || 0)).slice(0, 5);
 
   return (
     <div className="bg-canvas min-h-screen">
@@ -150,7 +153,7 @@ export const OpinionArticleTemplate: React.FC<OpinionArticleTemplateProps> = ({
 
             {/* Related Opinion Stories */}
             <RelatedStoriesBlock
-              relatedPosts={otherOpinions.length > 0 ? otherOpinions : mockPosts.slice(2, 5)}
+              relatedPosts={otherOpinions.length > 0 ? otherOpinions : storedPosts.slice(2, 5)}
               onSelectPost={onSelectPost}
               onSelectCategory={onSelectCategory}
               title={isHindi ? 'अन्य संपादकीय विचार एवं विश्लेषण' : 'More Thought & Editorial Analysis'}

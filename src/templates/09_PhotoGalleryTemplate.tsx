@@ -1,7 +1,8 @@
 import React from 'react';
 import { Camera, Eye, Share2, Flame, ArrowRight, User } from 'lucide-react';
 import { WpGallery, WpPost } from '../types/wordpress';
-import { mockGalleries, mockPosts, mockAuthors } from '../data/mockWpData';
+import { mockGalleries, mockAuthors } from '../data/mockWpData';
+import { getStoredPosts } from '../utils/newsStorage';
 import { GalleryViewer } from '../components/media/GalleryViewer';
 import { ArticleShareBar } from '../components/article/ArticleShareBar';
 import { MediumStoryCard } from '../components/cards/MediumStoryCard';
@@ -27,8 +28,9 @@ export const PhotoGalleryTemplate: React.FC<PhotoGalleryTemplateProps> = ({
 }) => {
   const { language, t, isHindi } = useLanguage();
   const author = mockAuthors[gallery.authorId];
-  const relatedPosts = mockPosts.slice(0, 3);
-  const trendingRanking = [...mockPosts].sort((a, b) => b.viewsCount - a.viewsCount).slice(0, 5);
+  const storedPosts = getStoredPosts();
+  const relatedPosts = storedPosts.slice(0, 3);
+  const trendingRanking = [...storedPosts].sort((a, b) => (b.viewsCount || 0) - (a.viewsCount || 0)).slice(0, 5);
 
   const galleryTitle = isHindi ? 'वाराणसी: शाश्वत घाट, आस्था और जीर्णोद्धार' : gallery.title;
   const galleryDesc = isHindi

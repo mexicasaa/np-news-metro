@@ -20,7 +20,7 @@ interface SearchResultsTemplateProps {
 
 export const SearchResultsTemplate: React.FC<SearchResultsTemplateProps> = ({
   posts: externalPosts,
-  initialQuery = 'Corridor',
+  initialQuery = '',
   onSelectPost,
   onNavigateHome,
   onSelectCategory,
@@ -29,6 +29,7 @@ export const SearchResultsTemplate: React.FC<SearchResultsTemplateProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'relevance' | 'date'>('relevance');
   const [serverResults, setServerResults] = useState<WpPost[] | null>(null);
+  const [isSearching, setIsSearching] = useState<boolean>(false);
   const { language, t, isHindi } = useLanguage();
 
   // Server-side edge search effect (debounced)
@@ -37,15 +38,22 @@ export const SearchResultsTemplate: React.FC<SearchResultsTemplateProps> = ({
     const trimmed = query.trim();
     if (!trimmed) {
       setServerResults(null);
+      setIsSearching(false);
       return;
     }
 
+    setIsSearching(true);
     const timer = setTimeout(() => {
       searchArticles(trimmed, 25).then((res) => {
-        if (isMounted && res) {
-          setServerResults(res);
+        if (isMounted) {
+          setServerResults(res || []);
+          setIsSearching(false);
         }
-      }).catch(() => {});
+      }).catch(() => {
+        if (isMounted) {
+          setIsSearching(false);
+        }
+      });
     }, 250);
 
     return () => {
@@ -215,7 +223,20 @@ export const SearchResultsTemplate: React.FC<SearchResultsTemplateProps> = ({
 
         {/* Results Feed or Empty State */}
         <div className="max-w-4xl mx-auto space-y-4">
-          {filteredPosts.length > 0 ? (
+          {isSearching ? (
+            <div className="space-y-4">
+              {[1, 2, 3].map((n) => (
+                <div key={n} className="bg-surface-lowest border border-border-subtle p-4 rounded-sm animate-pulse flex flex-col sm:flex-row gap-4">
+                  <div className="w-full sm:w-44 h-28 bg-surface-container rounded-sm flex-shrink-0"></div>
+                  <div className="flex-1 space-y-2.5 py-1">
+                    <div className="h-4 bg-surface-container rounded-sm w-3/4"></div>
+                    <div className="h-3 bg-surface-container rounded-sm w-full"></div>
+                    <div className="h-3 bg-surface-container rounded-sm w-1/2"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : filteredPosts.length > 0 ? (
             filteredPosts.map((post) => (
               <HorizontalStoryCard
                 key={post.id}

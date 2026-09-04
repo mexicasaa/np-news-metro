@@ -15,7 +15,7 @@ import { SkeletonCard } from './components/common/SkeletonCard';
 import { AdminLoginModal } from './components/admin/AdminLoginModal';
 
 import { WpPost, WpVideo, WpGallery } from './types/wordpress';
-import { mockPosts as initialMockPosts, mockVideos, mockGalleries } from './data/mockWpData';
+import { mockVideos, mockGalleries } from './data/mockWpData';
 import { getStoredPosts, savePublishedPost, popRefreshSession, clearAutoSaveSession, getStoredVideos, isPostPublished, removeStoredDraft } from './utils/newsStorage';
 import { getPublishedArticles, getEditorialArticles, getArticleBySlug, saveArticle, deleteArticle, getDeletedArticles, restoreDeletedArticle, permanentDeleteArticle, DeletedArticle } from './services/articleService';
 import { getCurrentUserProfile, ensureAuthenticatedSession, signOut as authSignOut } from './services/authService';
@@ -141,7 +141,7 @@ const parseUrlRoute = (currentPosts: WpPost[], currentVideos: WpVideo[], isIniti
       viewMode: 'public',
       template: 'article-standard',
       category: 'india',
-      post: draftPost || currentPosts[0] || initialMockPosts[0],
+      post: draftPost || currentPosts[0],
       authorId: 'author-1',
       staticPage: 'about',
       searchQuery: '',
@@ -354,7 +354,7 @@ const parseUrlRoute = (currentPosts: WpPost[], currentVideos: WpVideo[], isIniti
   // 10. Article: /:category/:slug OR /:slug
   const segments = cleanPath.split('/');
   const candidateSlug = segments[segments.length - 1];
-  const allPosts = [...currentPosts, ...initialMockPosts];
+  const allPosts = currentPosts;
   const foundPost = allPosts.find(p => p.slug?.toLowerCase() === candidateSlug.toLowerCase() || p.id === candidateSlug);
 
   const isAuthAdmin = typeof window !== 'undefined' && (localStorage.getItem('np_news_admin_auth') === 'true' || sessionStorage.getItem('np_news_admin_auth') === 'true');
@@ -441,12 +441,12 @@ function AppContent() {
   const [viewMode, setViewMode] = useState<'public' | 'admin'>(initialRoute.viewMode);
   const [currentTemplate, setCurrentTemplate] = useState<string>(initialRoute.template);
   const [selectedCategory, setSelectedCategory] = useState<string>(initialRoute.category);
-  const [selectedPost, setSelectedPost] = useState<WpPost>(initialRoute.post || posts[0] || initialMockPosts[0]);
+  const [selectedPost, setSelectedPost] = useState<WpPost>(initialRoute.post || posts[0]);
   const [selectedVideo, setSelectedVideo] = useState<WpVideo>(initialRoute.video || videos[0] || mockVideos[0]);
   const [selectedGallery, setSelectedGallery] = useState<WpGallery>(mockGalleries[0]);
   const [selectedAuthorId, setSelectedAuthorId] = useState<string>(initialRoute.authorId);
   const [staticPage, setStaticPage] = useState<StaticPageType>(initialRoute.staticPage);
-  const [searchQuery, setSearchQuery] = useState<string>(initialRoute.searchQuery || 'Infrastructure Corridor');
+  const [searchQuery, setSearchQuery] = useState<string>(initialRoute.searchQuery || '');
 
   // Immediate targeted fetching for single article / video if directly loaded via shared permalink
   React.useEffect(() => {
@@ -1432,6 +1432,16 @@ function AppContent() {
     }
 
     if (currentTemplate === 'article-standard' || currentTemplate === 'article-breaking' || currentTemplate === 'article-opinion') {
+      if (!selectedPost) {
+        return {
+          metadata: {
+            title: 'NP NEWS METRO — Real News. Real Impact.',
+            description: 'Fast, verified, and in-depth national news coverage from NP News Metro.',
+            canonicalUrl: 'https://www.npnewsmetro.com/',
+          },
+          structuredData: undefined,
+        };
+      }
       return {
         metadata: {
           title: selectedPost.seoTitle || selectedPost.title,
@@ -1959,7 +1969,7 @@ function AppContent() {
           )}
 
           {/* MAIN TEMPLATE CONTENT RENDERER */}
-          {isLoadingSkeleton || (isContentLoading && publishedPosts.length === 0 && currentTemplate === 'homepage') ? (
+          {isLoadingSkeleton || (isContentLoading && publishedPosts.length === 0 && ['homepage', 'latest', 'trending', 'category'].includes(currentTemplate)) ? (
             <FrontendLoadingScreen />
           ) : (
             <>

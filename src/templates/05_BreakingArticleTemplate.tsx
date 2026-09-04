@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Radio, Clock, AlertTriangle, Flame, Share2, RefreshCw, Pin } from 'lucide-react';
 import { WpPost } from '../types/wordpress';
-import { mockPosts, mockAuthors, mockLiveBlog, getLocalizedPost } from '../data/mockWpData';
+import { mockAuthors, mockLiveBlog, getLocalizedPost } from '../data/mockWpData';
+import { getStoredPosts } from '../utils/newsStorage';
 import { handleImageError, getOptimizedImageUrl } from '../utils/imageFallback';
 import { ArticleBody } from '../components/article/ArticleBody';
 import { ArticleShareBar } from '../components/article/ArticleShareBar';
@@ -29,6 +30,7 @@ export const BreakingArticleTemplate: React.FC<BreakingArticleTemplateProps> = (
   onSelectCategory,
   onSelectAuthor,
 }) => {
+  if (!post) return null;
   const { language, t, isHindi } = useLanguage();
   const localized = getLocalizedPost(post, language);
   const author = post.customAuthor?.name ? {
@@ -57,8 +59,9 @@ export const BreakingArticleTemplate: React.FC<BreakingArticleTemplateProps> = (
     beats: ['National News'],
     social: {}
   });
-  const relatedBreaking = mockPosts.filter((p) => p.id !== post.id && p.isBreaking);
-  const trendingRanking = [...mockPosts].sort((a, b) => b.viewsCount - a.viewsCount).slice(0, 5);
+  const storedPosts = getStoredPosts();
+  const relatedBreaking = storedPosts.filter((p) => p.id !== post.id && p.isBreaking);
+  const trendingRanking = [...storedPosts].sort((a, b) => (b.viewsCount || 0) - (a.viewsCount || 0)).slice(0, 5);
 
   const formatDateTime = (dateStr: string) => {
     try {
@@ -187,7 +190,7 @@ export const BreakingArticleTemplate: React.FC<BreakingArticleTemplateProps> = (
 
             {/* Related Breaking Coverage */}
             <RelatedStoriesBlock
-              relatedPosts={mockPosts.slice(1, 4)}
+              relatedPosts={relatedBreaking.length > 0 ? relatedBreaking : storedPosts.slice(1, 4)}
               onSelectPost={onSelectPost}
               onSelectCategory={onSelectCategory}
               title={isHindi ? 'संबंधित निरंतर कवरेज' : 'Related Ongoing Coverage'}

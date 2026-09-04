@@ -1,11 +1,10 @@
 import { supabase } from '../lib/supabase';
 import { WpPost, GutenbergBlock, EditorialCategorySlug } from '../types/wordpress';
 import { EditorialStatus } from '../types/admin';
-import { mockPosts as defaultMockPosts } from '../data/mockWpData';
 import { ensureAuthenticatedSession } from './authService';
 import { slugifyText } from '../utils/slugify';
 import { getAuthorAvatarUrl, DEFAULT_AUTHOR_AVATAR } from '../utils/imageFallback';
-import { isPostPublished, removeStoredDraft } from '../utils/newsStorage';
+import { isPostPublished, removeStoredDraft, getStoredPosts, saveLiveArticlesCache } from '../utils/newsStorage';
 
 // Category mapping helper
 const CATEGORY_SLUG_TO_ID: Record<string, string> = {
@@ -229,7 +228,7 @@ export const getPublishedArticles = async (): Promise<WpPost[]> => {
     return cachedHomepageArticles.data;
   }
 
-  // 1. First attempt to fetch from Vercel Edge-cached public API
+  // 1. Fetch from Edge-cached public API (Zero direct DB connection from browser)
   try {
     if (typeof window !== 'undefined') {
       const res = await fetch('/api/articles?view=homepage');
@@ -237,54 +236,26 @@ export const getPublishedArticles = async (): Promise<WpPost[]> => {
         const json = await res.json();
         if (json?.posts && Array.isArray(json.posts) && json.posts.length > 0) {
           const livePosts = json.posts.map((row: any) => mapDbToWpPost(row)).filter(isPostPublished);
-          const liveSlugs = new Set(livePosts.map((p: any) => p.slug));
-          const supplementalMock = defaultMockPosts
-            .filter(isPostPublished)
-            .filter(m => !liveSlugs.has(m.slug));
-          const combined = [...livePosts, ...supplementalMock];
-          cachedHomepageArticles = { data: combined, timestamp: Date.now() };
-          return combined;
+          if (livePosts.length > 0) {
+            cachedHomepageArticles = { data: livePosts, timestamp: Date.now() };
+            // Save real live posts to localStorage for instant hydration on page reload
+            saveLiveArticlesCache(livePosts);
+            return livePosts;
+          }
         }
       }
     }
   } catch (apiErr) {
-    // Fallback to direct Supabase client if /api is unreachable
+    console.warn('Edge API fetch note:', apiErr);
   }
 
-  // 2. Direct Supabase query with LEAN column projection (NO full content/blocks)
-  try {
-    const { data, error } = await supabase
-      .from('articles')
-      .select(CARD_PROJECTION_SELECT)
-      .eq('status', 'published')
-      .order('is_lead', { ascending: false })
-      .order('published_at', { ascending: false })
-      .limit(40);
-
-    if (error) {
-      console.warn('Error fetching published articles from Supabase:', error.message);
-      return defaultMockPosts;
-    }
-
-    if (!data || data.length === 0) {
-      const fallback = defaultMockPosts.filter(isPostPublished);
-      cachedHomepageArticles = { data: fallback, timestamp: Date.now() };
-      return fallback;
-    }
-
-    const livePosts = data.map(row => mapDbToWpPost(row)).filter(isPostPublished);
-    const liveSlugs = new Set(livePosts.map(p => p.slug));
-    const supplementalMock = defaultMockPosts
-      .filter(isPostPublished)
-      .filter(m => !liveSlugs.has(m.slug));
-    
-    const combined = [...livePosts, ...supplementalMock];
-    cachedHomepageArticles = { data: combined, timestamp: Date.now() };
-    return combined;
-  } catch (err) {
-    console.error('Unexpected error fetching published articles:', err);
-    return defaultMockPosts.filter(isPostPublished);
+  // Return existing memory cache or stored live cache (Never call Supabase DB directly from public browser)
+  const stored = getStoredPosts();
+  if (stored && stored.length > 0) {
+    return stored;
   }
+
+  return [];
 };
 
 export const getCategoryArticles = async (
@@ -298,7 +269,7 @@ export const getCategoryArticles = async (
     return cached.data;
   }
 
-  // 1. First attempt to fetch from Vercel Edge-cached public API
+  // Fetch from Edge-cached public API (Zero direct DB connection from browser)
   try {
     if (typeof window !== 'undefined') {
       const res = await fetch(`/api/articles?category=${encodeURIComponent(categorySlug)}&page=${page}&limit=${limit}`);
@@ -313,35 +284,7 @@ export const getCategoryArticles = async (
     }
   } catch (apiErr) {}
 
-  // 2. Direct Supabase fallback
-  try {
-    const offset = (page - 1) * limit;
-    let query = supabase
-      .from('articles')
-      .select(CARD_PROJECTION_SELECT)
-      .eq('status', 'published');
-
-    const { data: catRow } = await supabase
-      .from('categories')
-      .select('id')
-      .eq('slug', categorySlug.toLowerCase())
-      .maybeSingle();
-
-    if (catRow?.id) {
-      query = query.eq('category_id', catRow.id);
-    }
-
-    const { data, error } = await query
-      .order('published_at', { ascending: false })
-      .range(offset, offset + limit - 1);
-
-    if (error || !data) return [];
-    const mapped = data.map(row => mapDbToWpPost(row)).filter(isPostPublished);
-    cachedCategoryArticles.set(cacheKey, { data: mapped, timestamp: Date.now() });
-    return mapped;
-  } catch (err) {
-    return [];
-  }
+  return cachedCategoryArticles.get(cacheKey)?.data || [];
 };
 
 export const getLatestArticles = async (
@@ -354,7 +297,7 @@ export const getLatestArticles = async (
     return cached.data;
   }
 
-  // 1. First attempt to fetch from Vercel Edge-cached public API
+  // Fetch from Edge-cached public API (Zero direct DB connection from browser)
   try {
     if (typeof window !== 'undefined') {
       const res = await fetch(`/api/articles?view=latest&page=${page}&limit=${limit}`);
@@ -369,23 +312,7 @@ export const getLatestArticles = async (
     }
   } catch (apiErr) {}
 
-  // 2. Direct Supabase fallback
-  try {
-    const offset = (page - 1) * limit;
-    const { data, error } = await supabase
-      .from('articles')
-      .select(CARD_PROJECTION_SELECT)
-      .eq('status', 'published')
-      .order('published_at', { ascending: false })
-      .range(offset, offset + limit - 1);
-
-    if (error || !data) return [];
-    const mapped = data.map(row => mapDbToWpPost(row)).filter(isPostPublished);
-    cachedLatestArticles.set(cacheKey, { data: mapped, timestamp: Date.now() });
-    return mapped;
-  } catch (err) {
-    return [];
-  }
+  return cachedLatestArticles.get(cacheKey)?.data || [];
 };
 
 export const searchArticles = async (
@@ -394,7 +321,7 @@ export const searchArticles = async (
 ): Promise<WpPost[]> => {
   if (!queryText.trim()) return [];
 
-  // 1. First attempt to fetch from Vercel Edge-cached public API
+  // 1. Fetch from Edge-cached public API (Zero direct DB connection from browser)
   try {
     if (typeof window !== 'undefined') {
       const res = await fetch(`/api/articles?search=${encodeURIComponent(queryText)}&limit=${limit}`);
@@ -407,22 +334,18 @@ export const searchArticles = async (
     }
   } catch (apiErr) {}
 
-  // 2. Direct Supabase fallback
-  try {
-    const safeQ = queryText.replace(/[%_]/g, '');
-    const { data, error } = await supabase
-      .from('articles')
-      .select(CARD_PROJECTION_SELECT)
-      .eq('status', 'published')
-      .or(`title.ilike.%${safeQ}%,excerpt.ilike.%${safeQ}%,title_hi.ilike.%${safeQ}%`)
-      .order('published_at', { ascending: false })
-      .limit(limit);
-
-    if (error || !data) return [];
-    return data.map(row => mapDbToWpPost(row)).filter(isPostPublished);
-  } catch (err) {
-    return [];
+  // 2. Offline / local fallback using cached stored articles (Zero direct DB connection)
+  const stored = getStoredPosts();
+  if (stored && stored.length > 0) {
+    const q = queryText.toLowerCase().trim();
+    return stored.filter(p => 
+      p.title.toLowerCase().includes(q) ||
+      (p.dek && p.dek.toLowerCase().includes(q)) ||
+      (p.titleHi && p.titleHi.toLowerCase().includes(q))
+    ).slice(0, limit);
   }
+
+  return [];
 };
 
 export const getArticleBySlug = async (
@@ -437,7 +360,7 @@ export const getArticleBySlug = async (
     }
   }
 
-  // 1. For public visitors (not in draft preview), try edge-cached API first
+  // 1. For public visitors (not in draft preview), fetch strictly via Edge-cached API (Zero direct DB connection)
   if (!allowDraft) {
     try {
       if (typeof window !== 'undefined') {
@@ -454,37 +377,30 @@ export const getArticleBySlug = async (
         }
       }
     } catch (apiErr) {}
+
+    // Fallback to client stored posts if offline or edge cache warming
+    const stored = getStoredPosts();
+    const foundInStored = stored.find(p => p.slug === slug);
+    if (foundInStored) {
+      return foundInStored;
+    }
+
+    return null;
   }
 
-  // 2. Fallback to Supabase query with exact fields
+  // 2. Draft preview for authenticated editors ONLY (from /admin preview)
   try {
-    let query = supabase
+    const { data, error } = await supabase
       .from('articles')
       .select(ARTICLE_DETAIL_SELECT)
-      .eq('slug', slug);
-
-    if (!allowDraft) {
-      query = query.eq('status', 'published');
-    }
-
-    const { data, error } = await query.maybeSingle();
+      .eq('slug', slug)
+      .maybeSingle();
 
     if (error || !data) {
-      const mock = defaultMockPosts.find(p => p.slug === slug);
-      if (mock && (allowDraft || isPostPublished(mock))) {
-        return mock;
-      }
       return null;
     }
 
-    const mapped = mapDbToWpPost(data);
-    if (!allowDraft && !isPostPublished(mapped)) {
-      return null;
-    }
-    if (!allowDraft) {
-      cachedArticleBySlug.set(slug, { data: mapped, timestamp: Date.now() });
-    }
-    return mapped;
+    return mapDbToWpPost(data);
   } catch (err) {
     return null;
   }
@@ -509,12 +425,7 @@ export const getEditorialArticles = async (
     const { data, error } = await query;
 
     if (error || !data || data.length === 0) {
-      return defaultMockPosts.map(p => ({
-        ...p,
-        rawId: p.id,
-        editorialStatus: 'published' as EditorialStatus,
-        status: 'published',
-      }));
+      return [];
     }
 
     const liveEditorial = (data as any[]).map((row: any) => {
@@ -528,21 +439,10 @@ export const getEditorialArticles = async (
       };
     });
 
-    // Merge with default mock posts to preserve coverage if few articles exist
-    const liveSlugs = new Set(liveEditorial.map((p: any) => p.slug));
-    const supplementalMock = defaultMockPosts
-      .filter(m => !liveSlugs.has(m.slug))
-      .map(p => ({
-        ...p,
-        rawId: p.id,
-        editorialStatus: 'published' as EditorialStatus,
-        status: 'published',
-      }));
-
-    return [...liveEditorial, ...supplementalMock];
+    return liveEditorial;
   } catch (err) {
     console.error('Error fetching editorial articles:', err);
-    return defaultMockPosts.map(p => ({ ...p, rawId: p.id, editorialStatus: 'published' as EditorialStatus, status: 'published' }));
+    return [];
   }
 };
 

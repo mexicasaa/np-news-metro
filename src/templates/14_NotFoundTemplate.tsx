@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Search, Home, Newspaper, TrendingUp, ArrowRight, AlertOctagon } from 'lucide-react';
 import { WpPost } from '../types/wordpress';
-import { mockPosts, mockCategories } from '../data/mockWpData';
+import { mockCategories } from '../data/mockWpData';
+import { getStoredPosts } from '../utils/newsStorage';
 import { MediumStoryCard } from '../components/cards/MediumStoryCard';
 import { Breadcrumbs } from '../components/layout/Breadcrumbs';
 import { useLanguage } from '../context/LanguageContext';
@@ -26,7 +27,7 @@ export const NotFoundTemplate: React.FC<NotFoundTemplateProps> = ({
   const [query, setQuery] = useState('');
   const { t, isHindi } = useLanguage();
 
-  const recommendedStories = mockPosts.slice(0, 3);
+  const recommendedStories = getStoredPosts().slice(0, 3);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();

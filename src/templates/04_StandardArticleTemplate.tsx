@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Clock, User, ShieldCheck, Flame, MessageSquare, AlertCircle, Share2, ExternalLink } from 'lucide-react';
 import { WpPost } from '../types/wordpress';
-import { mockPosts, mockAuthors, getLocalizedPost } from '../data/mockWpData';
+import { mockAuthors, getLocalizedPost } from '../data/mockWpData';
+import { getStoredPosts } from '../utils/newsStorage';
 import { handleImageError, getOptimizedImageUrl } from '../utils/imageFallback';
 import { ArticleHeader } from '../components/article/ArticleHeader';
 import { ArticleBody } from '../components/article/ArticleBody';
@@ -36,6 +37,7 @@ export const StandardArticleTemplate: React.FC<StandardArticleTemplateProps> = (
   showCorrections = true,
   showAds = false,
 }) => {
+  if (!post) return null;
   const [commentsOpen, setCommentsOpen] = useState(false);
   const { language, t, isHindi } = useLanguage();
   const localized = getLocalizedPost(post, language);
@@ -63,8 +65,9 @@ export const StandardArticleTemplate: React.FC<StandardArticleTemplateProps> = (
     beats: ['National News'],
     social: {}
   });
-  const relatedPosts = mockPosts.filter((p) => p.id !== post.id && (p.category === post.category || p.tags.some(t => post.tags.includes(t))));
-  const trendingRanking = [...mockPosts].sort((a, b) => b.viewsCount - a.viewsCount).slice(0, 5);
+  const storedPosts = getStoredPosts();
+  const relatedPosts = storedPosts.filter((p) => p.id !== post.id && (p.category === post.category || p.tags?.some(t => post.tags?.includes(t))));
+  const trendingRanking = [...storedPosts].sort((a, b) => (b.viewsCount || 0) - (a.viewsCount || 0)).slice(0, 5);
 
   return (
     <div className="bg-canvas min-h-screen">

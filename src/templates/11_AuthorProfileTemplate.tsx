@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { ShieldCheck, Twitter, Linkedin, Mail, ArrowRight, BookOpen, Flame, Newspaper } from 'lucide-react';
 import { WpAuthor, WpPost } from '../types/wordpress';
-import { mockAuthors, mockPosts } from '../data/mockWpData';
+import { mockAuthors } from '../data/mockWpData';
+import { getStoredPosts } from '../utils/newsStorage';
 import { HorizontalStoryCard } from '../components/cards/HorizontalStoryCard';
 import { RankingItem } from '../components/cards/RankingItem';
 import { AdSlot } from '../components/commercial/AdSlot';
@@ -29,10 +30,11 @@ export const AuthorProfileTemplate: React.FC<AuthorProfileTemplateProps> = ({
   const displayName = isHindi && author.nameHi ? author.nameHi : author.name;
   const displayRole = isHindi && author.roleHi ? author.roleHi : author.role;
   const displayBio = isHindi && author.bioHi ? author.bioHi : author.bio;
-  const authorPosts = mockPosts.filter((p) => p.authorId === author.id);
-  const displayPosts = authorPosts.length > 0 ? authorPosts : mockPosts.slice(0, 3);
-  const popularPosts = [...displayPosts].sort((a, b) => b.viewsCount - a.viewsCount);
-  const trendingRanking = [...mockPosts].sort((a, b) => b.viewsCount - a.viewsCount).slice(0, 5);
+  const storedPosts = getStoredPosts();
+  const authorPosts = storedPosts.filter((p) => p.authorId === author.id);
+  const displayPosts = authorPosts.length > 0 ? authorPosts : storedPosts.slice(0, 3);
+  const popularPosts = [...displayPosts].sort((a, b) => (b.viewsCount || 0) - (a.viewsCount || 0));
+  const trendingRanking = [...storedPosts].sort((a, b) => (b.viewsCount || 0) - (a.viewsCount || 0)).slice(0, 5);
 
   return (
     <div className="bg-canvas min-h-screen">
