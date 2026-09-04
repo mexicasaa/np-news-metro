@@ -1,36 +1,5 @@
 // @ts-nocheck
-import url from 'node:url';
-
-// 1. Permanently silence DEP0169 url.parse deprecation warnings across all runtimes
-if (typeof process !== 'undefined' && process.emitWarning) {
-  const _origEmitWarning = process.emitWarning;
-  process.emitWarning = function (warning: any, ...args: any[]) {
-    if (
-      (typeof warning === 'string' && (warning.includes('url.parse') || warning.includes('DEP0169'))) ||
-      (args[0] === 'DEP0169' || args[1] === 'DEP0169') ||
-      (warning && typeof warning === 'object' && (warning.code === 'DEP0169' || warning.name === 'DEP0169' || (warning.message && warning.message.includes('url.parse'))))
-    ) {
-      return;
-    }
-    return _origEmitWarning.apply(process, [warning, ...args]);
-  };
-}
-
-if (url && typeof url.parse === 'function') {
-  const _origParse = url.parse;
-  url.parse = function (...args: any[]) {
-    if (typeof process !== 'undefined' && process.emitWarning) {
-      const savedEmit = process.emitWarning;
-      process.emitWarning = () => {};
-      try {
-        return _origParse.apply(this, args);
-      } finally {
-        process.emitWarning = savedEmit;
-      }
-    }
-    return _origParse.apply(this, args);
-  };
-}
+import './_suppressWarnings.js';
 
 import { createClient } from '@supabase/supabase-js';
 // @ts-ignore
