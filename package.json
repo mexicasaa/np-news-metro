@@ -4,11 +4,11 @@
   "version": "1.0.1",
   "type": "module",
   "scripts": {
-    "dev": "cross-env NODE_OPTIONS=--no-deprecation vite",
-    "build": "cross-env NODE_OPTIONS=--no-deprecation node scripts/generate-sitemaps.js && tsc && cross-env NODE_OPTIONS=--no-deprecation vite build",
+    "dev": "vite",
+    "build": "node scripts/generate-sitemaps.js && tsc && vite build",
     "backup": "node scripts/backup-supabase.js",
     "indexnow": "node scripts/submit-indexnow.js",
-    "preview": "cross-env NODE_OPTIONS=--no-deprecation vite preview"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.4",
@@ -19,7 +19,7 @@
     "tailwind-merge": "^2.6.0"
   },
   "devDependencies": {
-    "@types/node": "^26.2.0",
+    "@types/node": "^20.17.0",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@vercel/node": "^12.0.0",
@@ -35,6 +35,6 @@
     "esbuild": true
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": "20.x"
   }
 }

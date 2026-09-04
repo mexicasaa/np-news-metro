@@ -2,14 +2,6 @@
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "build": {
-    "env": {
-      "NODE_OPTIONS": "--no-deprecation"
-    }
-  },
-  "env": {
-    "NODE_OPTIONS": "--no-deprecation"
-  },
   "functions": {
     "api/**/*.js": {
       "memory": 1024,
