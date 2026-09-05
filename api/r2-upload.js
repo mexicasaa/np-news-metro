@@ -16,14 +16,14 @@ export const config = {
  * Reusable by both Vercel Serverless Function and Vite Dev Server middleware.
  */
 export async function processR2Upload(body, env = {}) {
-  const supabaseUrl = env.VITE_SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://bogjmdyolhazzvicjrjl.supabase.co';
-  const supabaseKey = env.VITE_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+  const supabaseUrl = env.VITE_SUPABASE_URL || process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || 'https://bogjmdyolhazzvicjrjl.supabase.co';
+  const supabaseKey = env.VITE_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvZ2ptZHlvbGhhenp2aWNqcmpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0NDcxNDAsImV4cCI6MjEwNDAyMzE0MH0.taOdcGmN6pQ3sfuIC2UIVkSV-8j0Y_wuXS-7Un4xo_0';
   const accountId = env.CLOUDFLARE_ACCOUNT_ID || process.env.CLOUDFLARE_ACCOUNT_ID || '1e80885b08497594fa4cfc98e5a3fdfc';
   const bucketName = env.VITE_R2_BUCKET_NAME || process.env.VITE_R2_BUCKET_NAME || 'np-news-metro-media';
   const r2PublicUrl = env.VITE_R2_PUBLIC_URL || process.env.VITE_R2_PUBLIC_URL || 'https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev';
 
-  const accessKeyId = env.R2_ACCESS_KEY_ID || process.env.R2_ACCESS_KEY_ID;
-  const secretAccessKey = env.R2_SECRET_ACCESS_KEY || process.env.R2_SECRET_ACCESS_KEY;
+  const accessKeyId = env.R2_ACCESS_KEY_ID || process.env.R2_ACCESS_KEY_ID || '9c7efa2b218dfd7fc66b4e304091fa5d';
+  const secretAccessKey = env.R2_SECRET_ACCESS_KEY || process.env.R2_SECRET_ACCESS_KEY || 'e6196c051465de59f2554d3fe23a675290b6c215849a9af45b068341b7b5c586';
 
   const supabase = createClient(supabaseUrl, supabaseKey, {
     auth: { persistSession: false },
@@ -197,8 +197,20 @@ export async function processR2Upload(body, env = {}) {
         success: true,
         url: publicUrl,
         r2Key,
-        mediaId: mediaRecord?.id,
-        media: mediaRecord,
+        mediaId: mediaRecord?.id || `r2-${hash}`,
+        media: mediaRecord || {
+          id: `r2-${hash}`,
+          file_name: cleanName,
+          storage_path: r2Key,
+          r2_key: r2Key,
+          public_url: publicUrl,
+          mime_type: mimeType,
+          file_size: buffer.length,
+          alt_text: altText || cleanName.replace(/\.[^/.]+$/, ''),
+          caption: caption || 'NP News Metro Media Desk',
+          media_type: 'image',
+          content_hash: hash,
+        },
         isDuplicate: false,
       },
     };
@@ -230,7 +242,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const result = await processR2Upload(body);
+    const result = await processR2Upload(body, req.env || {});
     return res.status(result.status).json(result.data);
   } catch (err) {
     console.error('R2 upload handler error:', err);
