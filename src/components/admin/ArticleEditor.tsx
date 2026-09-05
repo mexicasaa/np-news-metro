@@ -33,7 +33,7 @@ interface ArticleEditorProps {
   initialPost?: WpPost;
   userRole: UserRole;
   currentAuthorId: string;
-  onSaveDraft: (postData: Partial<WpPost>, options?: { silent?: boolean }) => Promise<WpPost | undefined> | void;
+  onSaveDraft: (postData: Partial<WpPost>, options?: { silent?: boolean; isAutoSave?: boolean }) => Promise<WpPost | undefined> | void;
   onSubmitForReview?: (postData: Partial<WpPost>) => void;
   onApproveCopy?: (postData: Partial<WpPost>) => void;
   onSchedulePost?: (postData: Partial<WpPost>, scheduleTime: string) => void;
@@ -614,7 +614,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     };
   };
 
-  const performSaveDraft = async (options: { silent?: boolean } = { silent: true }): Promise<WpPost | undefined> => {
+  const performSaveDraft = async (options: { silent?: boolean; isAutoSave?: boolean } = { silent: true }): Promise<WpPost | undefined> => {
     // NEVER auto-save or revert a published story into a draft
     if (
       status === 'published' || 
@@ -759,8 +759,8 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     if (!isDirty() || status === 'published' || isPostPublished(initialPost)) return;
 
     const timer = setTimeout(() => {
-      performSaveDraft({ silent: true });
-    }, 2000);
+      performSaveDraft({ silent: true, isAutoSave: true });
+    }, 30000);
 
     return () => clearTimeout(timer);
   }, [

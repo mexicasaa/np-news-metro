@@ -259,13 +259,22 @@ export default async function handler(req, res) {
         updated_at: new Date().toISOString(),
       };
 
+      const SAVE_RETURN_FIELDS = `
+        id, slug, title, title_hi, excerpt, dek_hi, category_id,
+        categories (id, name, slug),
+        status, updated_at, published_at, featured_image_url,
+        article_tags (
+          tags (id, name, slug)
+        )
+      `;
+
       let resultArticle = null;
       if (existingId) {
         const { data, error } = await supabase
           .from('articles')
           .update(dbPayload)
           .eq('id', existingId)
-          .select(ARTICLE_DETAIL_FIELDS)
+          .select(SAVE_RETURN_FIELDS)
           .single();
         if (error) return res.status(500).json({ error: `Update error: ${error.message}` });
         resultArticle = data;
@@ -273,20 +282,22 @@ export default async function handler(req, res) {
         const { data, error } = await supabase
           .from('articles')
           .insert(dbPayload)
-          .select(ARTICLE_DETAIL_FIELDS)
+          .select(SAVE_RETURN_FIELDS)
           .single();
         if (error) return res.status(500).json({ error: `Insert error: ${error.message}` });
         resultArticle = data;
       }
 
-      // Record revision
-      if (resultArticle?.id) {
+      // Record revision ONLY when published or manual edit, never on background auto-save
+      const isAutoSave = Boolean(body.isAutoSave || postData.isAutoSave);
+      const shouldRecordRevision = !isAutoSave && (targetStatus === 'published' || !existingId);
+      if (resultArticle?.id && shouldRecordRevision) {
         try {
           await supabase.from('article_revisions').insert({
             article_id: resultArticle.id,
-            title: resultArticle.title,
-            excerpt: resultArticle.excerpt,
-            content: resultArticle.content,
+            title: resultArticle.title || title,
+            excerpt: resultArticle.excerpt || postData.dek,
+            content: contentText,
             status: targetStatus,
           });
         } catch (e) {}
@@ -303,7 +314,13 @@ export default async function handler(req, res) {
       invalidateWarmCache();
       purgeCloudflareEdge(resultArticle.slug, postData.category);
 
-      return res.status(200).json({ post: resultArticle, success: true });
+      const fullPostResult = {
+        ...dbPayload,
+        ...resultArticle,
+        blocks: postData.blocks || [],
+      };
+
+      return res.status(200).json({ post: fullPostResult, success: true });
     } catch (err) {
       return res.status(500).json({ error: err.message || 'Error processing article' });
     }

@@ -193,8 +193,8 @@ export const ARTICLE_DETAIL_SELECT = `
   )
 `;
 
-export const EDITORIAL_SELECT = `
-  id, slug, title, title_hi, excerpt, dek_hi, content, blocks, key_takeaways,
+export const EDITORIAL_LIST_SELECT = `
+  id, slug, title, title_hi, excerpt, dek_hi,
   author_id, author_name, author_role, author_avatar, author_bio,
   category_id, categories (id, name, slug),
   published_at, updated_at, status, created_at,
@@ -206,6 +206,8 @@ export const EDITORIAL_SELECT = `
     tags (id, name, slug)
   )
 `;
+
+export const EDITORIAL_SELECT = EDITORIAL_LIST_SELECT;
 
 // Client-side in-memory cache to strictly protect Supabase DB and Egress limits
 let cachedHomepageArticles: { data: WpPost[]; timestamp: number } | null = null;
@@ -447,7 +449,7 @@ export const getEditorialArticles = async (
 };
 
 export const saveArticle = async (
-  postData: Partial<WpPost> & { isEdit?: boolean },
+  postData: Partial<WpPost> & { isEdit?: boolean; isAutoSave?: boolean },
   targetStatus: EditorialStatus = 'draft'
 ): Promise<{ post?: WpPost; error?: string }> => {
   // 1. Serverless Edge API first (Zero direct DB connection from browser, automatic warm cache & Cloudflare purge)
@@ -580,18 +582,23 @@ export const saveArticle = async (
 
     let resultArticle: any = null;
 
+    // Egress optimization: Do NOT return content, blocks, and key_takeaways back down the wire
+    const SAVE_CONFIRMATION_SELECT = `
+      id, slug, title, title_hi, excerpt, dek_hi, category_id,
+      categories (id, name, slug),
+      author_id, author_name, author_role, author_avatar,
+      status, updated_at, published_at, featured_image_url,
+      article_tags (
+        tags (id, name, slug)
+      )
+    `;
+
     if (existingId) {
       const { data, error } = await supabase
         .from('articles')
         .update(dbPayload)
         .eq('id', existingId)
-        .select(`
-          *,
-          categories (id, name, slug),
-          article_tags (
-            tags (id, name, slug)
-          )
-        `)
+        .select(SAVE_CONFIRMATION_SELECT)
         .single();
 
       if (error) {
@@ -605,13 +612,7 @@ export const saveArticle = async (
       const { data, error } = await supabase
         .from('articles')
         .insert(dbPayload)
-        .select(`
-          *,
-          categories (id, name, slug),
-          article_tags (
-            tags (id, name, slug)
-          )
-        `)
+        .select(SAVE_CONFIRMATION_SELECT)
         .single();
 
       if (error) {
@@ -623,14 +624,15 @@ export const saveArticle = async (
       resultArticle = data;
     }
 
-    // Record revision in history
-    if (resultArticle?.id) {
+    // Record revision in history ONLY on explicit publish or manual save, never on silent auto-saves
+    const shouldRecordRevision = !postData.isAutoSave && (targetStatus === 'published' || !postData.isEdit);
+    if (resultArticle?.id && shouldRecordRevision) {
       try {
         await supabase.from('article_revisions').insert({
           article_id: resultArticle.id,
-          title: resultArticle.title,
-          excerpt: resultArticle.excerpt,
-          content: resultArticle.content,
+          title: resultArticle.title || title,
+          excerpt: resultArticle.excerpt || postData.dek,
+          content: contentText,
           status: targetStatus,
         });
       } catch (revErr) {}
@@ -689,9 +691,13 @@ export const saveArticle = async (
       }
     } catch (e) {}
 
-    const mapped = mapDbToWpPost(resultArticle, postData.tags);
+    const mapped = mapDbToWpPost({
+      ...dbPayload,
+      ...resultArticle,
+    }, postData.tags);
     const finalPost: WpPost = {
       ...mapped,
+      blocks: postData.blocks && postData.blocks.length > 0 ? postData.blocks : mapped.blocks,
       editorialStatus: (resultArticle.status || targetStatus) as EditorialStatus,
       status: resultArticle.status || targetStatus,
     };

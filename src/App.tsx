@@ -17,7 +17,7 @@ import { AdminLoginModal } from './components/admin/AdminLoginModal';
 import { WpPost, WpVideo, WpGallery } from './types/wordpress';
 import { mockVideos, mockGalleries } from './data/mockWpData';
 import { getStoredPosts, savePublishedPost, popRefreshSession, clearAutoSaveSession, getStoredVideos, isPostPublished, removeStoredDraft } from './utils/newsStorage';
-import { getPublishedArticles, getEditorialArticles, getArticleBySlug, saveArticle, deleteArticle, getDeletedArticles, restoreDeletedArticle, permanentDeleteArticle, DeletedArticle } from './services/articleService';
+import { getPublishedArticles, getEditorialArticles, getArticleBySlug, saveArticle, deleteArticle, getDeletedArticles, restoreDeletedArticle, permanentDeleteArticle, DeletedArticle, mapDbToWpPost } from './services/articleService';
 import { getCurrentUserProfile, ensureAuthenticatedSession, signOut as authSignOut } from './services/authService';
 import { getVideos } from './services/taxonomyService';
 import { getVideoBySlug, getPublishedVideos } from './services/videoService';
@@ -650,13 +650,16 @@ function AppContent() {
         feedChannel = new BroadcastChannel('np_news_feed_channel');
         feedChannel.onmessage = async (event) => {
           if (event.data?.type === 'NEWS_PUBLISHED') {
-            const fresh = isAdmin ? await getEditorialArticles('all') : await getPublishedArticles();
-            setPosts(fresh);
-          } else if (event.data?.type === 'ARTICLE_DRAFT_SAVED') {
-            if (isAdmin) {
-              const fresh = await getEditorialArticles('all');
-              setPosts(fresh);
-            }
+            const targetId = event.data?.articleId;
+            setPosts(prev => {
+              if (targetId && prev.some(p => p.id === targetId && p.status === 'published')) {
+                return prev;
+              }
+              (isAdmin ? getEditorialArticles('all') : getPublishedArticles()).then(fresh => {
+                if (fresh && fresh.length > 0) setPosts(fresh);
+              });
+              return prev;
+            });
           } else if (event.data?.type === 'VIDEOS_UPDATED') {
             const freshVideos = await getPublishedVideos();
             setVideos(freshVideos);
@@ -676,10 +679,29 @@ function AppContent() {
         .on(
           'postgres_changes',
           { event: '*', schema: 'public', table: 'articles' },
-          async (payload) => {
-            console.log('[Realtime Admin] Database change detected:', payload.eventType);
-            const freshPosts = await getEditorialArticles('all');
-            setPosts(freshPosts);
+          (payload) => {
+            console.log('[Realtime Admin] Incremental database event:', payload.eventType);
+            if (payload.eventType === 'DELETE' && payload.old?.id) {
+              setPosts(prev => prev.filter(p => p.id !== payload.old.id));
+            } else if (payload.eventType === 'INSERT' && payload.new) {
+              const mapped = mapDbToWpPost(payload.new);
+              setPosts(prev => [mapped, ...prev.filter(p => p.id !== mapped.id)]);
+            } else if (payload.eventType === 'UPDATE' && payload.new) {
+              setPosts(prev => prev.map(p => {
+                if (p.id === payload.new.id) {
+                  const mapped = mapDbToWpPost(payload.new);
+                  return {
+                    ...p,
+                    ...mapped,
+                    // Retain previously loaded blocks if Realtime update payload did not contain them
+                    blocks: (mapped.blocks && mapped.blocks.length > 0 && mapped.blocks[0].id !== 'b-default-1')
+                      ? mapped.blocks
+                      : p.blocks,
+                  };
+                }
+                return p;
+              }));
+            }
           }
         )
         .subscribe();
@@ -689,10 +711,15 @@ function AppContent() {
         .on(
           'postgres_changes',
           { event: '*', schema: 'public', table: 'videos' },
-          async (payload) => {
-            console.log('[Realtime Admin] Video change detected:', payload.eventType);
-            const freshVids = await getPublishedVideos();
-            setVideos(freshVids);
+          (payload) => {
+            console.log('[Realtime Admin] Incremental video event:', payload.eventType);
+            if (payload.eventType === 'DELETE' && payload.old?.id) {
+              setVideos(prev => prev.filter(v => v.id !== payload.old.id));
+            } else if (payload.eventType === 'INSERT' && payload.new) {
+              setVideos(prev => [payload.new as any, ...prev.filter(v => v.id !== payload.new.id)]);
+            } else if (payload.eventType === 'UPDATE' && payload.new) {
+              setVideos(prev => prev.map(v => v.id === payload.new.id ? { ...v, ...payload.new } : v));
+            }
           }
         )
         .subscribe();
@@ -1054,14 +1081,28 @@ function AppContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleStartEditArticle = (post: WpPost) => {
+  const handleStartEditArticle = async (post: WpPost) => {
     if (!isAdminAuthenticated) {
       setPendingAdminSection('edit-article');
       setAdminLoginModalOpen(true);
       return;
     }
     clearAutoSaveSession();
-    setActiveEditingPost(post);
+
+    let fullPost = post;
+    const hasOnlyPlaceholderBlocks = !post.blocks || post.blocks.length === 0 || (post.blocks.length === 1 && post.blocks[0].id === 'b-default-1');
+    if (post.slug && hasOnlyPlaceholderBlocks) {
+      try {
+        const detail = await getArticleBySlug(post.slug, true);
+        if (detail && detail.blocks && detail.blocks.length > 0) {
+          fullPost = detail;
+        }
+      } catch (err) {
+        console.warn('Could not fetch full article detail on edit, using listing data:', err);
+      }
+    }
+
+    setActiveEditingPost(fullPost);
     setAdminSection('edit-article');
     try {
       if (typeof window !== 'undefined' && window.location.pathname !== '/admin') {
@@ -1759,7 +1800,12 @@ function AppContent() {
                   ],
                 };
 
-                const { post, error } = await saveArticle({ ...fullPost, isEdit: isEditingExisting }, 'draft');
+                const isAuto = Boolean(options?.isAutoSave ?? options?.silent);
+                const { post, error } = await saveArticle({
+                  ...fullPost,
+                  isEdit: isEditingExisting,
+                  isAutoSave: isAuto,
+                }, 'draft');
                 const finalDraftPost = post || { ...fullPost, editorialStatus: 'draft' as EditorialStatus, status: 'draft' };
 
                 setActiveEditingPost(finalDraftPost);
