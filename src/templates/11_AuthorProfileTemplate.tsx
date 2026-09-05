@@ -26,7 +26,7 @@ export const AuthorProfileTemplate: React.FC<AuthorProfileTemplateProps> = ({
   const [activeTab, setActiveTab] = useState<'latest' | 'popular'>('latest');
   const { t, isHindi } = useLanguage();
 
-  const author = mockAuthors[authorId] || mockAuthors['author-1'];
+  const author = mockAuthors[authorId] || Object.values(mockAuthors).find(a => a.slug === authorId || a.id === authorId) || mockAuthors['author-1'];
   const displayName = isHindi && author.nameHi ? author.nameHi : author.name;
   const displayRole = isHindi && author.roleHi ? author.roleHi : author.role;
   const displayBio = isHindi && author.bioHi ? author.bioHi : author.bio;

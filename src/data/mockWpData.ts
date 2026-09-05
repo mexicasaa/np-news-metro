@@ -65,6 +65,22 @@ export const mockAuthors: Record<string, WpAuthor> = {
       email: 'rk.agarwal@npnewsmetro.com',
     },
   },
+  'author-krishna-nand-shastri': {
+    id: 'author-krishna-nand-shastri',
+    name: 'Pt. Krishna Nand Shastri (Advocate)',
+    nameHi: 'पं. कृष्ण नंद शास्त्री (अधिवक्ता)',
+    slug: 'krishna-nand-shastri',
+    role: 'Financial and Law Advisory Board Member',
+    roleHi: 'वित्तीय एवं विधि सलाहकार मंडल सदस्य',
+    avatar: '/uploads/krishna-nand-shastri.jpg',
+    bio: 'Financial and Law Advisory Board Member at NP News Metro, providing strategic legal guidance, regulatory compliance, financial governance, and statutory oversight.',
+    bioHi: 'एनपी न्यूज़ मेट्रो के वित्तीय एवं विधि सलाहकार मंडल सदस्य, विधिक मामलों, विनियामक अनुपालन, वित्तीय अनुशासन और संस्थागत सुशासन पर विशेषज्ञ मार्गदर्शन प्रदान करते हैं।',
+    verified: true,
+    beats: ['Financial Advisory', 'Legal Affairs & Law', 'Institutional Compliance', 'Ethics & Governance'],
+    social: {
+      email: 'krishnanand.shastri@npnewsmetro.com',
+    },
+  },
   'author-bholeshwar-upmanyu': {
     id: 'author-bholeshwar-upmanyu',
     name: 'Bholeshwar Upmanyu',
