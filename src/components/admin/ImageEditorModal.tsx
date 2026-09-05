@@ -4,6 +4,7 @@ import {
   ZoomIn, ZoomOut, Sun, Contrast, Droplet, Sparkles, RefreshCw, 
   Crop, Sliders, Wand2, Eye, ShieldCheck, AlertCircle
 } from 'lucide-react';
+import { uploadArticleImage } from '../../services/mediaService';
 
 interface ImageEditorModalProps {
   isOpen: boolean;
@@ -95,7 +96,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
 
         // Try fetching as blob to create local object URL (bypasses canvas taint)
         try {
-          const resp = await fetch(imageUrl, { mode: 'cors' });
+          const resp = await fetch(imageUrl, { mode: 'cors', cache: 'no-cache' });
           if (resp.ok) {
             const blob = await resp.blob();
             const objectUrl = URL.createObjectURL(blob);
@@ -106,8 +107,23 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
             }
           }
         } catch (fetchErr) {
-          // If fetch fails (CORS), fallback to direct URL
+          // If direct fetch fails (CORS), try same-origin proxy
         }
+
+        // Try same-origin image proxy: /api/image
+        try {
+          const proxyUrl = `/api/image?url=${encodeURIComponent(imageUrl)}&width=1920&quality=95`;
+          const resp = await fetch(proxyUrl);
+          if (resp.ok) {
+            const blob = await resp.blob();
+            const objectUrl = URL.createObjectURL(blob);
+            if (isMounted) {
+              originalBlobUrlRef.current = objectUrl;
+              setIsLoading(false);
+              return;
+            }
+          }
+        } catch (proxyErr) {}
 
         if (isMounted) {
           originalBlobUrlRef.current = imageUrl;
@@ -308,14 +324,41 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
     try {
       const sourceImg = imageRef.current;
       
-      // Load into full-res image element with crossOrigin anonymous
-      const fullImg = new Image();
-      fullImg.crossOrigin = 'anonymous';
-      await new Promise<void>((resolve, reject) => {
-        fullImg.onload = () => resolve();
-        fullImg.onerror = () => reject(new Error('Image failed to load in export canvas.'));
-        fullImg.src = originalBlobUrlRef.current || imageUrl;
-      });
+      // Load into full-res image element safely with proxy fallback
+      const loadImageElement = async (src: string): Promise<HTMLImageElement> => {
+        const isBlobOrData = src.startsWith('blob:') || src.startsWith('data:');
+        return new Promise<HTMLImageElement>((resolve, reject) => {
+          const img = new Image();
+          if (!isBlobOrData) {
+            img.crossOrigin = 'anonymous';
+          }
+          img.onload = () => resolve(img);
+          img.onerror = () => reject(new Error('Failed to load image element'));
+          img.src = src;
+        });
+      };
+
+      let fullImg: HTMLImageElement;
+      const targetSrc = originalBlobUrlRef.current || imageUrl;
+
+      try {
+        fullImg = await loadImageElement(targetSrc);
+      } catch (loadErr) {
+        // Fallback: fetch via same-origin proxy
+        try {
+          const proxyUrl = `/api/image?url=${encodeURIComponent(imageUrl)}&width=1920&quality=95`;
+          const pResp = await fetch(proxyUrl);
+          if (pResp.ok) {
+            const pBlob = await pResp.blob();
+            const pObjUrl = URL.createObjectURL(pBlob);
+            fullImg = await loadImageElement(pObjUrl);
+          } else {
+            throw new Error('Proxy load failed');
+          }
+        } catch (proxyErr) {
+          throw new Error('Image failed to load in export canvas.');
+        }
+      }
 
       const naturalW = fullImg.naturalWidth || 1920;
       const naturalH = fullImg.naturalHeight || 1080;
@@ -380,10 +423,29 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
         finalCanvas.height
       );
 
-      // Export as high quality JPEG data URL
-      const editedDataUrl = finalCanvas.toDataURL('image/jpeg', 0.92);
-      onSave(editedDataUrl);
-      onClose();
+      // Export as Blob and upload directly to Cloudflare R2 with SHA-256 deduplication
+      await new Promise<void>((resolve, reject) => {
+        finalCanvas.toBlob(async (blob) => {
+          if (!blob) {
+            reject(new Error('Canvas export failed to produce image.'));
+            return;
+          }
+
+          try {
+            // Deduplicate: if identical crop already exists in R2, discard duplicate and reuse URL
+            const uploadRes = await uploadArticleImage(blob, undefined, 'featured-crop.jpg');
+            if (uploadRes.url) {
+              onSave(uploadRes.url);
+              onClose();
+              resolve();
+            } else {
+              reject(new Error(uploadRes.error || 'Failed to save cropped image to Cloudflare R2'));
+            }
+          } catch (uploadErr) {
+            reject(uploadErr);
+          }
+        }, 'image/jpeg', 0.92);
+      });
     } catch (err: any) {
       console.error('Error exporting edited image:', err);
       alert(`Could not process image: ${err?.message || 'Please try again.'}`);

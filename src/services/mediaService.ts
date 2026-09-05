@@ -57,14 +57,16 @@ export const generateSrcSet = (url: string, contentHash?: string): string => {
  * Never stores duplicate image files or duplicate media records.
  */
 export const uploadArticleImage = async (
-  file: File,
-  articleId?: string
+  file: File | Blob,
+  articleId?: string,
+  customFileName?: string
 ): Promise<{ url: string; path: string; mediaId?: string; isDuplicate?: boolean; error?: string }> => {
-  if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+  const fileType = file.type || 'image/jpeg';
+  if (!ALLOWED_IMAGE_TYPES.includes(fileType)) {
     return {
       url: '',
       path: '',
-      error: `Invalid file type "${file.type}". Allowed: JPG, PNG, WEBP, AVIF, GIF.`,
+      error: `Invalid file type "${fileType}". Allowed: JPG, PNG, WEBP, AVIF, GIF.`,
     };
   }
 
@@ -76,6 +78,7 @@ export const uploadArticleImage = async (
     };
   }
 
+  const fileName = customFileName || (file instanceof File ? file.name : `cropped-${Date.now()}.jpg`);
   const r2Repo = R2MediaRepository.getInstance();
 
   try {
@@ -84,15 +87,15 @@ export const uploadArticleImage = async (
 
     // 2. Deduplicate or upload
     const { media, isDuplicate } = await r2Repo.upload(file, contentHash, {
-      fileName: file.name,
-      mimeType: file.type,
+      fileName,
+      mimeType: fileType,
       fileSize: file.size,
-      altText: file.name.replace(/\.[^/.]+$/, ''),
+      altText: fileName.replace(/\.[^/.]+$/, ''),
       caption: 'NP News Metro Media Desk',
     });
 
     // 3. Link relationship to article if articleId is provided
-    if (articleId) {
+    if (articleId && articleId !== 'avatars') {
       await r2Repo.linkArticleMedia({
         articleId,
         mediaId: media.id,

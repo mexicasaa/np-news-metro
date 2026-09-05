@@ -3,6 +3,7 @@ import {
   X, Check, RotateCw, RotateCcw, ZoomIn, ZoomOut, Crop, 
   User, RefreshCw, AlertCircle
 } from 'lucide-react';
+import { uploadArticleImage } from '../../services/mediaService';
 
 interface AvatarCropModalProps {
   isOpen: boolean;
@@ -57,7 +58,22 @@ export const AvatarCropModal: React.FC<AvatarCropModalProps> = ({
         }
 
         try {
-          const resp = await fetch(imageUrl, { mode: 'cors' });
+          const resp = await fetch(imageUrl, { mode: 'cors', cache: 'no-cache' });
+          if (resp.ok) {
+            const blob = await resp.blob();
+            const objectUrl = URL.createObjectURL(blob);
+            if (isMounted) {
+              blobUrlRef.current = objectUrl;
+              setIsLoading(false);
+              return;
+            }
+          }
+        } catch (e) {}
+
+        // Fallback to same-origin image proxy
+        try {
+          const proxyUrl = `/api/image?url=${encodeURIComponent(imageUrl)}&width=1000&quality=95`;
+          const resp = await fetch(proxyUrl);
           if (resp.ok) {
             const blob = await resp.blob();
             const objectUrl = URL.createObjectURL(blob);
@@ -188,13 +204,41 @@ export const AvatarCropModal: React.FC<AvatarCropModalProps> = ({
 
     setIsProcessing(true);
     try {
-      const fullImg = new Image();
-      fullImg.crossOrigin = 'anonymous';
-      await new Promise<void>((resolve, reject) => {
-        fullImg.onload = () => resolve();
-        fullImg.onerror = () => reject(new Error('Image failed to load in avatar canvas.'));
-        fullImg.src = blobUrlRef.current || imageUrl;
-      });
+      // Load into full-res image element safely with proxy fallback
+      const loadImageElement = async (src: string): Promise<HTMLImageElement> => {
+        const isBlobOrData = src.startsWith('blob:') || src.startsWith('data:');
+        return new Promise<HTMLImageElement>((resolve, reject) => {
+          const img = new Image();
+          if (!isBlobOrData) {
+            img.crossOrigin = 'anonymous';
+          }
+          img.onload = () => resolve(img);
+          img.onerror = () => reject(new Error('Failed to load image element'));
+          img.src = src;
+        });
+      };
+
+      let fullImg: HTMLImageElement;
+      const targetSrc = blobUrlRef.current || imageUrl;
+
+      try {
+        fullImg = await loadImageElement(targetSrc);
+      } catch (loadErr) {
+        // Fallback: fetch via same-origin proxy
+        try {
+          const proxyUrl = `/api/image?url=${encodeURIComponent(imageUrl)}&width=1000&quality=95`;
+          const pResp = await fetch(proxyUrl);
+          if (pResp.ok) {
+            const pBlob = await pResp.blob();
+            const pObjUrl = URL.createObjectURL(pBlob);
+            fullImg = await loadImageElement(pObjUrl);
+          } else {
+            throw new Error('Proxy load failed');
+          }
+        } catch (proxyErr) {
+          throw new Error('Image failed to load in avatar canvas.');
+        }
+      }
 
       const naturalW = fullImg.naturalWidth || 800;
       const naturalH = fullImg.naturalHeight || 800;
@@ -242,9 +286,29 @@ export const AvatarCropModal: React.FC<AvatarCropModalProps> = ({
         outputSize
       );
 
-      const editedDataUrl = finalCanvas.toDataURL('image/jpeg', 0.92);
-      onSave(editedDataUrl);
-      onClose();
+      // Export as Blob and upload directly to Cloudflare R2 with SHA-256 deduplication
+      await new Promise<void>((resolve, reject) => {
+        finalCanvas.toBlob(async (blob) => {
+          if (!blob) {
+            reject(new Error('Canvas export failed to produce avatar image.'));
+            return;
+          }
+
+          try {
+            // Deduplicate: if identical avatar already exists in R2, reuse URL
+            const uploadRes = await uploadArticleImage(blob, 'avatars', 'avatar-crop.jpg');
+            if (uploadRes.url) {
+              onSave(uploadRes.url);
+              onClose();
+              resolve();
+            } else {
+              reject(new Error(uploadRes.error || 'Failed to save cropped avatar to Cloudflare R2'));
+            }
+          } catch (uploadErr) {
+            reject(uploadErr);
+          }
+        }, 'image/jpeg', 0.92);
+      });
     } catch (err: any) {
       console.error('Error cropping avatar:', err);
       alert(`Could not crop avatar: ${err?.message || 'Please try again.'}`);
