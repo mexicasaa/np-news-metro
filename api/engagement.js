@@ -9,6 +9,9 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: { persistSession: false },
 });
 
+const adWarmCache = new Map();
+const AD_CACHE_TTL = 15 * 60 * 1000; // 15 minutes
+
 export default async function handler(req, res) {
   const action = req.query?.action || 'likes';
   const method = req.method;
@@ -239,6 +242,12 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'zone required' });
       }
 
+      const cached = adWarmCache.get(zone);
+      if (cached && Date.now() - cached.timestamp < AD_CACHE_TTL) {
+        res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=1800, stale-while-revalidate=86400');
+        return res.status(200).json({ placement: cached.data });
+      }
+
       try {
         const now = new Date().toISOString();
         const { data, error } = await supabase
@@ -257,13 +266,15 @@ export default async function handler(req, res) {
           .maybeSingle();
 
         if (error || !data || !data.campaigns) {
-          res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=120');
+          adWarmCache.set(zone, { data: null, timestamp: Date.now() });
+          res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=1800, stale-while-revalidate=86400');
           return res.status(200).json({ placement: null });
         }
 
         const campaign = data.campaigns;
         if (campaign.status !== 'active' || (campaign.start_at && campaign.start_at > now) || (campaign.end_at && campaign.end_at < now)) {
-          res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=120');
+          adWarmCache.set(zone, { data: null, timestamp: Date.now() });
+          res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=1800, stale-while-revalidate=86400');
           return res.status(200).json({ placement: null });
         }
 
@@ -272,7 +283,8 @@ export default async function handler(req, res) {
           : null;
 
         if (!creative) {
-          res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=120');
+          adWarmCache.set(zone, { data: null, timestamp: Date.now() });
+          res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=1800, stale-while-revalidate=86400');
           return res.status(200).json({ placement: null });
         }
 
@@ -290,7 +302,8 @@ export default async function handler(req, res) {
           }
         };
 
-        res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=120, stale-while-revalidate=300');
+        adWarmCache.set(zone, { data: payload, timestamp: Date.now() });
+        res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=1800, stale-while-revalidate=86400');
         return res.status(200).json({ placement: payload });
       } catch (err) {
         return res.status(500).json({ error: err.message });

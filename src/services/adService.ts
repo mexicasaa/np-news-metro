@@ -11,9 +11,9 @@ export interface ActiveAdPlacement {
   altText?: string;
 }
 
-// In-memory cache for ad placements (60s TTL)
+// In-memory cache for ad placements (10m TTL)
 const adPlacementCache = new Map<string, { data: ActiveAdPlacement | null; timestamp: number }>();
-const AD_CACHE_TTL = 60 * 1000;
+const AD_CACHE_TTL = 10 * 60 * 1000;
 
 export const getAdPlacement = async (zone: string): Promise<ActiveAdPlacement | null> => {
   const cached = adPlacementCache.get(zone);

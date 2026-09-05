@@ -205,7 +205,7 @@ export const FALLBACK_VIDEOS = [
 
 let cachedLiveArticles = null;
 let cachedLiveArticlesTime = 0;
-const SITEMAP_CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+const SITEMAP_CACHE_TTL = 30 * 60 * 1000; // 30 minutes in-memory
 
 export async function fetchLiveArticles() {
   if (cachedLiveArticles && (Date.now() - cachedLiveArticlesTime < SITEMAP_CACHE_TTL)) {
@@ -216,13 +216,13 @@ export async function fetchLiveArticles() {
     const { data, error } = await supabase
       .from('articles')
       .select(`
-        id, slug, title, title_hi, excerpt, status, published_at, 
+        slug, title, title_hi, published_at, 
         featured_image_url, featured_image_caption, 
-        categories(slug, name),
-        article_tags(tags(name))
+        categories(slug)
       `)
       .eq('status', 'published')
-      .order('published_at', { ascending: false });
+      .order('published_at', { ascending: false })
+      .limit(500);
 
     if (error || !data || data.length === 0) {
       return cachedLiveArticles || FALLBACK_ARTICLES;
@@ -231,19 +231,16 @@ export async function fetchLiveArticles() {
     const liveArticles = data
       .filter(item => item.slug && item.slug !== 'auto-draft' && !item.slug.startsWith('auto-draft') && item.slug !== 'draft')
       .map(item => {
-        const tagsList = Array.isArray(item.article_tags)
-          ? item.article_tags.map(at => at.tags?.name).filter(Boolean)
-          : ['News', 'National'];
-
+        const catSlug = (Array.isArray(item.categories) ? item.categories[0]?.slug : item.categories?.slug) || 'india';
         return {
           slug: item.slug,
-          category: item.categories?.slug || 'india',
+          category: catSlug,
           title: item.title,
           titleHi: item.title_hi,
           publishedAt: item.published_at || new Date().toISOString(),
           featuredImage: item.featured_image_url,
           caption: item.featured_image_caption || item.title,
-          tags: tagsList
+          tags: ['News', 'India']
         };
       });
 
@@ -362,10 +359,14 @@ export function buildNewsSitemapXml(articles) {
         xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
 `;
 
-  const sorted = [...articles].sort((a, b) => new Date(b.publishedAt || 0) - new Date(a.publishedAt || 0));
+  const sorted = [...articles].sort((a, b) => new Date(b.publishedAt || 0).getTime() - new Date(a.publishedAt || 0).getTime());
+  // Google News guidelines: only articles published in the last 48 hours
+  const twoDaysAgo = Date.now() - 48 * 60 * 60 * 1000;
+  const recentArticles = sorted.filter(a => new Date(a.publishedAt || 0).getTime() >= twoDaysAgo);
+  const newsSelection = recentArticles.length >= 5 ? recentArticles : sorted.slice(0, 30);
   const seen = new Set();
 
-  for (const article of sorted) {
+  for (const article of newsSelection) {
     const loc = `${BASE_URL}/${article.category}/${article.slug}`;
     if (!seen.has(loc)) {
       seen.add(loc);
@@ -545,7 +546,7 @@ export function sendXmlResponse(res, xmlBody) {
   res.statusCode = 200;
   if (typeof res.setHeader === 'function') {
     res.setHeader('Content-Type', 'application/xml; charset=utf-8');
-    res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400');
+    res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800');
   }
   if (typeof res.status === 'function' && typeof res.send === 'function') {
     return res.status(200).send(xmlBody);

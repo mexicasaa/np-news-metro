@@ -194,17 +194,13 @@ export const ARTICLE_DETAIL_SELECT = `
 `;
 
 export const EDITORIAL_LIST_SELECT = `
-  id, slug, title, title_hi, excerpt, dek_hi,
-  author_id, author_name, author_role, author_avatar, author_bio,
-  category_id, categories (id, name, slug),
+  id, slug, title, title_hi, excerpt, category_id,
+  categories (id, name, slug),
+  author_id, author_name, author_role, author_avatar,
   published_at, updated_at, status, created_at,
-  is_breaking_news, is_lead, is_featured, is_opinion, is_sponsored, sponsor_name,
-  reading_time_minutes, view_count, location, image_credit,
-  seo_title, meta_description, canonical_url, robots_index, robots_follow,
-  featured_image_url, featured_image_alt, featured_image_caption, custom_author,
-  article_tags (
-    tags (id, name, slug)
-  )
+  is_breaking_news, is_lead, is_featured,
+  reading_time_minutes, view_count,
+  featured_image_url, featured_image_alt, custom_author
 `;
 
 export const EDITORIAL_SELECT = EDITORIAL_LIST_SELECT;
@@ -414,7 +410,8 @@ export const getEditorialArticles = async (
   try {
     let query = (supabase.from('articles') as any)
       .select(EDITORIAL_SELECT)
-      .order('updated_at', { ascending: false });
+      .order('updated_at', { ascending: false })
+      .limit(100);
 
     if (statusFilter && statusFilter !== 'all') {
       if (statusFilter === 'breaking') {

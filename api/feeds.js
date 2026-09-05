@@ -15,6 +15,9 @@ import {
   BASE_URL
 } from './_sitemapHelper.js';
 
+const xmlWarmCache = new Map();
+const XML_CACHE_TTL = 30 * 60 * 1000; // 30 minutes
+
 export default async function handler(req, res) {
   const type = req.query?.type || 'index';
 
@@ -34,14 +37,24 @@ export default async function handler(req, res) {
     return sendTextResponse(res, buildRobotsTxt());
   }
 
+  // Check warm cache for XML responses
+  const cachedXml = xmlWarmCache.get(type);
+  if (cachedXml && Date.now() - cachedXml.timestamp < XML_CACHE_TTL) {
+    return sendXmlResponse(res, cachedXml.xml);
+  }
+
   // 2. Video Sitemap (Doesn't require article list)
   if (type === 'video') {
-    return sendXmlResponse(res, buildVideoSitemapXml());
+    const xml = buildVideoSitemapXml();
+    xmlWarmCache.set(type, { xml, timestamp: Date.now() });
+    return sendXmlResponse(res, xml);
   }
 
   // 3. Sitemap Index
   if (type === 'index') {
-    return sendXmlResponse(res, buildSitemapIndexXml());
+    const xml = buildSitemapIndexXml();
+    xmlWarmCache.set(type, { xml, timestamp: Date.now() });
+    return sendXmlResponse(res, xml);
   }
 
   // 4. IndexNow Submission Webhook/Trigger
@@ -81,18 +94,21 @@ export default async function handler(req, res) {
   // 5. Article-based Sitemaps & Feeds
   try {
     const articles = await fetchLiveArticles();
+    let xml = '';
 
     if (type === 'news') {
-      return sendXmlResponse(res, buildNewsSitemapXml(articles));
+      xml = buildNewsSitemapXml(articles);
+    } else if (type === 'image') {
+      xml = buildImageSitemapXml(articles);
+    } else if (type === 'rss') {
+      xml = buildRssXml(articles);
+    } else {
+      // Default: Main sitemap
+      xml = buildMainSitemapXml(articles);
     }
-    if (type === 'image') {
-      return sendXmlResponse(res, buildImageSitemapXml(articles));
-    }
-    if (type === 'rss') {
-      return sendXmlResponse(res, buildRssXml(articles));
-    }
-    // Default: Main sitemap
-    return sendXmlResponse(res, buildMainSitemapXml(articles));
+
+    xmlWarmCache.set(type, { xml, timestamp: Date.now() });
+    return sendXmlResponse(res, xml);
   } catch (err) {
     console.error(`Error generating feed [${type}]:`, err);
     return res.status(500).send('Internal Server Error generating feed: ' + (err?.message || err));

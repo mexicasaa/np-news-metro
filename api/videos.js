@@ -45,7 +45,7 @@ export default async function handler(req, res) {
         const cached = warmCache.get(cacheKey);
         if (cached && Date.now() - cached.timestamp < CACHE_TTL_VIDEOS * 5) {
           res.setHeader('Content-Type', 'application/json; charset=utf-8');
-          res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600');
+          res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=900, stale-while-revalidate=1800');
           return res.status(200).json(cached.data);
         }
       }
@@ -69,7 +69,7 @@ export default async function handler(req, res) {
       warmCache.set(cacheKey, { data: responsePayload, timestamp: Date.now() });
 
       res.setHeader('Content-Type', 'application/json; charset=utf-8');
-      res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600');
+      res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=900, stale-while-revalidate=1800');
       return res.status(200).json(responsePayload);
     }
 
@@ -78,7 +78,7 @@ export default async function handler(req, res) {
       const cached = warmCache.get(cacheKey);
       if (cached && Date.now() - cached.timestamp < CACHE_TTL_VIDEOS) {
         res.setHeader('Content-Type', 'application/json; charset=utf-8');
-        res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600');
+        res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=900, stale-while-revalidate=1800');
         return res.status(200).json(cached.data);
       }
     }
@@ -98,7 +98,7 @@ export default async function handler(req, res) {
     warmCache.set(cacheKey, { data: responsePayload, timestamp: Date.now() });
 
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
-    res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600');
+    res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=900, stale-while-revalidate=1800');
     return res.status(200).json(responsePayload);
 
   } catch (err) {

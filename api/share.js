@@ -59,7 +59,7 @@ function sendResponse(res, statusCode, contentType, body) {
   res.statusCode = statusCode;
   if (typeof res.setHeader === "function") {
     res.setHeader("Content-Type", contentType);
-    res.setHeader("Cache-Control", "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400");
+    res.setHeader("Cache-Control", "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800");
   }
   if (typeof res.status === "function" && typeof res.send === "function") {
     return res.status(statusCode).send(body);
@@ -187,7 +187,7 @@ async function handler(req, res) {
       const canonicalCatUrl = `${SITE_ORIGIN}/category/${targetCat}`;
       let catArticles = [];
       try {
-        const { data: catData } = await supabase.from("articles").select("title, slug, excerpt, featured_image_url, published_at, categories(slug)").eq("status", "published").order("published_at", { ascending: false }).limit(15);
+        const { data: catData } = await supabase.from("articles").select("title, slug, featured_image_url, published_at, categories(slug)").eq("status", "published").order("published_at", { ascending: false }).limit(6);
         if (catData && catData.length > 0) {
           catArticles = catData.filter((a) => {
             const cSlug = (Array.isArray(a.categories) ? a.categories[0]?.slug : a.categories?.slug) || "india";
@@ -197,7 +197,7 @@ async function handler(req, res) {
       } catch (e) {
       }
       if (catArticles.length === 0) {
-        catArticles = FALLBACK_ARTICLES.filter((a) => a.category.toLowerCase() === targetCat || targetCat === "latest").slice(0, 15).map((a) => ({
+        catArticles = FALLBACK_ARTICLES.filter((a) => a.category.toLowerCase() === targetCat || targetCat === "latest").slice(0, 6).map((a) => ({
           title: a.title,
           slug: a.slug,
           excerpt: a.caption || a.title,
@@ -330,16 +330,12 @@ async function handler(req, res) {
             seo_title, 
             excerpt, 
             meta_description, 
-            category_id, 
             featured_image_url, 
-            featured_image_caption,
             author_name,
-            author_role,
-            custom_author,
             published_at, 
             updated_at,
             slug,
-            categories (slug, name)
+            categories (slug)
           `).eq("slug", cleanSlug).eq("status", "published").maybeSingle();
         if (!data && rawSlugParam && rawSlugParam !== cleanSlug) {
           const { data: rawData } = await supabase.from("articles").select(`
@@ -347,16 +343,12 @@ async function handler(req, res) {
               seo_title, 
               excerpt, 
               meta_description, 
-              category_id, 
               featured_image_url, 
-              featured_image_caption,
               author_name,
-              author_role,
-              custom_author,
               published_at, 
               updated_at,
               slug,
-              categories (slug, name)
+              categories (slug)
             `).eq("slug", rawSlugParam).eq("status", "published").maybeSingle();
           if (rawData) data = rawData;
         }

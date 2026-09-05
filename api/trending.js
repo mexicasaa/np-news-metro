@@ -9,12 +9,23 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: { persistSession: false },
 });
 
+const trendingWarmCache = new Map();
+const TRENDING_CACHE_TTL = 15 * 60 * 1000; // 15 minutes
+
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   const limit = Math.min(20, Math.max(1, parseInt(req.query?.limit || '10', 10)));
+  const cacheKey = `trending:${limit}`;
+
+  const cached = trendingWarmCache.get(cacheKey);
+  if (cached && Date.now() - cached.timestamp < TRENDING_CACHE_TTL) {
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=900, stale-while-revalidate=1800');
+    return res.status(200).json(cached.data);
+  }
 
   try {
     // 1. Fetch top metrics from daily aggregate
@@ -57,9 +68,12 @@ export default async function handler(req, res) {
         .sort((a, b) => b.score - a.score)
         .slice(0, limit);
 
+      const payload = { trending };
+      trendingWarmCache.set(cacheKey, { data: payload, timestamp: Date.now() });
+
       res.setHeader('Content-Type', 'application/json; charset=utf-8');
-      res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600');
-      return res.status(200).json({ trending });
+      res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=900, stale-while-revalidate=1800');
+      return res.status(200).json(payload);
     }
 
     // 2. Fallback to articles view_count
@@ -89,9 +103,12 @@ export default async function handler(req, res) {
       publishedAt: art.published_at,
     }));
 
+    const fallbackPayload = { trending: fallbackTrending };
+    trendingWarmCache.set(cacheKey, { data: fallbackPayload, timestamp: Date.now() });
+
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
-    res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600');
-    return res.status(200).json({ trending: fallbackTrending });
+    res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=900, stale-while-revalidate=1800');
+    return res.status(200).json(fallbackPayload);
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }

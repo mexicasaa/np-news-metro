@@ -124,6 +124,9 @@ async function purgeCloudflareEdge(slug, category) {
     `${siteOrigin}/`,
     `${siteOrigin}/api/articles?view=homepage`,
     `${siteOrigin}/api/trending`,
+    `${siteOrigin}/sitemap.xml`,
+    `${siteOrigin}/news-sitemap.xml`,
+    `${siteOrigin}/rss.xml`,
   ];
   if (category) {
     filesToPurge.push(`${siteOrigin}/category/${category}`);
@@ -396,7 +399,7 @@ export default async function handler(req, res) {
         const cached = getFromWarmCache(cacheKey, CACHE_TTL.article);
         if (cached) {
           res.setHeader('Content-Type', 'application/json; charset=utf-8');
-          res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=900, stale-while-revalidate=3600');
+          res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=3600, stale-while-revalidate=86400');
           res.setHeader('X-Cache', 'WARM-HIT');
           return res.status(200).json(cached);
         }
@@ -421,7 +424,7 @@ export default async function handler(req, res) {
       setInWarmCache(cacheKey, responsePayload);
 
       res.setHeader('Content-Type', 'application/json; charset=utf-8');
-      res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=900, stale-while-revalidate=3600');
+      res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=3600, stale-while-revalidate=86400');
       res.setHeader('X-Cache', 'MISS');
       return res.status(200).json(responsePayload);
     }
@@ -472,7 +475,7 @@ export default async function handler(req, res) {
         const cached = getFromWarmCache(cacheKey, CACHE_TTL.category);
         if (cached) {
           res.setHeader('Content-Type', 'application/json; charset=utf-8');
-          res.setHeader('Cache-Control', 'public, max-age=30, s-maxage=180, stale-while-revalidate=600');
+          res.setHeader('Cache-Control', 'public, max-age=30, s-maxage=600, stale-while-revalidate=86400');
           res.setHeader('X-Cache', 'WARM-HIT');
           return res.status(200).json(cached);
         }
@@ -505,7 +508,7 @@ export default async function handler(req, res) {
       setInWarmCache(cacheKey, responsePayload);
 
       res.setHeader('Content-Type', 'application/json; charset=utf-8');
-      res.setHeader('Cache-Control', 'public, max-age=30, s-maxage=180, stale-while-revalidate=600');
+      res.setHeader('Cache-Control', 'public, max-age=30, s-maxage=600, stale-while-revalidate=86400');
       res.setHeader('X-Cache', 'MISS');
       return res.status(200).json(responsePayload);
     }
@@ -519,7 +522,7 @@ export default async function handler(req, res) {
         const cached = getFromWarmCache(cacheKey, CACHE_TTL.homepage);
         if (cached) {
           res.setHeader('Content-Type', 'application/json; charset=utf-8');
-          res.setHeader('Cache-Control', 'public, max-age=15, s-maxage=60, stale-while-revalidate=300');
+          res.setHeader('Cache-Control', 'public, max-age=30, s-maxage=300, stale-while-revalidate=86400');
           res.setHeader('X-Cache', 'WARM-HIT');
           return res.status(200).json(cached);
         }
@@ -541,7 +544,7 @@ export default async function handler(req, res) {
       setInWarmCache(cacheKey, responsePayload);
 
       res.setHeader('Content-Type', 'application/json; charset=utf-8');
-      res.setHeader('Cache-Control', 'public, max-age=15, s-maxage=60, stale-while-revalidate=300');
+      res.setHeader('Cache-Control', 'public, max-age=30, s-maxage=300, stale-while-revalidate=86400');
       res.setHeader('X-Cache', 'MISS');
       return res.status(200).json(responsePayload);
     }
@@ -554,7 +557,7 @@ export default async function handler(req, res) {
       const cached = getFromWarmCache(cacheKey, CACHE_TTL.latest);
       if (cached) {
         res.setHeader('Content-Type', 'application/json; charset=utf-8');
-        res.setHeader('Cache-Control', 'public, max-age=15, s-maxage=60, stale-while-revalidate=300');
+        res.setHeader('Cache-Control', 'public, max-age=30, s-maxage=300, stale-while-revalidate=86400');
         res.setHeader('X-Cache', 'WARM-HIT');
         return res.status(200).json(cached);
       }
@@ -575,7 +578,7 @@ export default async function handler(req, res) {
     setInWarmCache(cacheKey, responsePayload);
 
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
-    res.setHeader('Cache-Control', 'public, max-age=15, s-maxage=60, stale-while-revalidate=300');
+    res.setHeader('Cache-Control', 'public, max-age=30, s-maxage=300, stale-while-revalidate=86400');
     res.setHeader('X-Cache', 'MISS');
     return res.status(200).json(responsePayload);
 

@@ -2,6 +2,30 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
   <url>
+    <loc>https://www.npnewsmetro.com/religion/jhandevaalaa-devee-mandira-men-dhoomadhaama-se-manaayaa-gayaa-kri</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-05T17:09:14.361Z</news:publication_date>
+      <news:title>झण्डेवाला देवी मंदिर में धूमधाम से मनाया गया कृष्ण जन्मोत्सव</news:title>
+      <news:keywords>News, India</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/opinion/jeevana-ko-jeenaa-sikhaane-vaale-sabase-bade-guru-shreekrishna</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-05T16:47:15.877Z</news:publication_date>
+      <news:title>जीवन को जीना सिखाने वाले सबसे बड़े गुरु श्रीकृष्ण</news:title>
+      <news:keywords>News, India</news:keywords>
+    </news:news>
+  </url>
+  <url>
     <loc>https://www.npnewsmetro.com/india/story-2</loc>
     <news:news>
       <news:publication>
@@ -10,6 +34,7 @@
       </news:publication>
       <news:publication_date>2026-09-05T08:35:02.339Z</news:publication_date>
       <news:title>वैश्य एकता परिषद ने नोएडा महानगर कार्यकारिणी का किया गठन</news:title>
+      <news:keywords>News, India</news:keywords>
     </news:news>
   </url>
   <url>
@@ -21,6 +46,7 @@
       </news:publication>
       <news:publication_date>2026-09-04T17:34:26.999Z</news:publication_date>
       <news:title>नंद घर आनंद भयो यह केवल जन्म नहीं, चेतना का स्पंदन है</news:title>
+      <news:keywords>News, India</news:keywords>
     </news:news>
   </url>
   <url>
@@ -32,6 +58,7 @@
       </news:publication>
       <news:publication_date>2026-09-02T17:47:25.316Z</news:publication_date>
       <news:title>मुख्यमंत्री श्री पुष्कर सिंह धामी से मुख्यमंत्री आवास में बाबा रामदेव ने की भेंट</news:title>
+      <news:keywords>News, India</news:keywords>
     </news:news>
   </url>
   <url>
@@ -43,6 +70,7 @@
       </news:publication>
       <news:publication_date>2026-09-02T17:40:51.865Z</news:publication_date>
       <news:title>सड़कों पर नजर नहीं आएगा बेसहारा गौवंश, हर पशु की होगी टैगिंग</news:title>
+      <news:keywords>News, India</news:keywords>
     </news:news>
   </url>
   <url>
@@ -54,6 +82,7 @@
       </news:publication>
       <news:publication_date>2026-09-02T17:35:16.429Z</news:publication_date>
       <news:title>करनाल मेडिकल कॉलेज में बढ़ेंगे 505 बेड, एमबीबीएस सीटें होंगी 250</news:title>
+      <news:keywords>News, India</news:keywords>
     </news:news>
   </url>
   <url>
@@ -65,6 +94,7 @@
       </news:publication>
       <news:publication_date>2026-09-02T17:29:13.130Z</news:publication_date>
       <news:title>ध्रुव चरित्र सुन मंत्रमुग्ध हुए श्रद्धालु, श्रीमद् भागवत कथा में शुकदेव आगमन का प्रसंग</news:title>
+      <news:keywords>News, India</news:keywords>
     </news:news>
   </url>
   <url>
@@ -76,6 +106,7 @@
       </news:publication>
       <news:publication_date>2026-09-02T17:21:49.531Z</news:publication_date>
       <news:title>ज्ञानवती की पुण्यतिथि पर दो दर्जन ब्रह्माकुमारी-ब्रह्माकुमार सम्मानित</news:title>
+      <news:keywords>News, India</news:keywords>
     </news:news>
   </url>
   <url>
@@ -87,6 +118,7 @@
       </news:publication>
       <news:publication_date>2026-09-02T17:15:21.852Z</news:publication_date>
       <news:title>मुख्यमंत्री योगी ने आउटसोर्स कर्मियों को दिया बड़ा उपहार</news:title>
+      <news:keywords>News, India</news:keywords>
     </news:news>
   </url>
   <url>
@@ -98,6 +130,7 @@
       </news:publication>
       <news:publication_date>2026-09-02T17:05:54.542Z</news:publication_date>
       <news:title>टेंट-कैटरर्स एसोसिएशन का तीन दिवसीय महाअधिवेशन संपन्न</news:title>
+      <news:keywords>News, India</news:keywords>
     </news:news>
   </url>
   <url>
@@ -109,6 +142,7 @@
       </news:publication>
       <news:publication_date>2026-09-02T16:57:33.899Z</news:publication_date>
       <news:title>आईएमएस नोएडा में दीक्षारंभ कार्यक्रम, विद्यार्थियों को सफलता के मंत्र</news:title>
+      <news:keywords>News, India</news:keywords>
     </news:news>
   </url>
   <url>
@@ -120,6 +154,7 @@
       </news:publication>
       <news:publication_date>2026-09-02T16:40:58.810Z</news:publication_date>
       <news:title>प्रेम और भक्ति से तैयार हो रहे श्रीकृष्ण के विशेष वस्त्र</news:title>
+      <news:keywords>News, India</news:keywords>
     </news:news>
   </url>
   <url>
@@ -131,6 +166,7 @@
       </news:publication>
       <news:publication_date>2026-09-02T16:32:02.824Z</news:publication_date>
       <news:title>पटेल नगर में निकली भव्य श्रीकृष्ण जन्माष्टमी शोभायात्रा</news:title>
+      <news:keywords>News, India</news:keywords>
     </news:news>
   </url>
   <url>
@@ -142,6 +178,7 @@
       </news:publication>
       <news:publication_date>2026-09-02T16:22:27.108Z</news:publication_date>
       <news:title>3 सितंबर का दैनिक राशिफल: जानिए 12 राशियों के लिए कैसा रहेगा गुरुवार</news:title>
+      <news:keywords>News, India</news:keywords>
     </news:news>
   </url>
   <url>
@@ -153,6 +190,7 @@
       </news:publication>
       <news:publication_date>2026-09-02T16:09:12.118Z</news:publication_date>
       <news:title>महंगाई आम आदमी को धीमा जहर दे रही है : पंडित रवि शर्मा</news:title>
+      <news:keywords>News, India</news:keywords>
     </news:news>
   </url>
   <url>
@@ -164,6 +202,7 @@
       </news:publication>
       <news:publication_date>2026-09-02T12:14:41.406Z</news:publication_date>
       <news:title>संयुक्त परिवार और व्यायामशाला: भारतीय जीवन-दृष्टि की सनातन धरोहर की पुनर्प्रतिष्ठा</news:title>
+      <news:keywords>News, India</news:keywords>
     </news:news>
   </url>
   <url>
@@ -175,6 +214,7 @@
       </news:publication>
       <news:publication_date>2026-09-02T01:58:59.626Z</news:publication_date>
       <news:title>नैनन की तिरछी छुरी — सौतन संग बतराव, रसिक पिया रँगरेजिया, मन मेरो हर्षात</news:title>
+      <news:keywords>News, India</news:keywords>
     </news:news>
   </url>
   <url>
@@ -186,6 +226,7 @@
       </news:publication>
       <news:publication_date>2026-09-01T18:00:49.487Z</news:publication_date>
       <news:title>रोहिणी में 521 महिलाओं ने निकाली भव्य कलश यात्रा, कृष्ण दरबार रहा आकर्षण</news:title>
+      <news:keywords>News, India</news:keywords>
     </news:news>
   </url>
   <url>
@@ -197,6 +238,7 @@
       </news:publication>
       <news:publication_date>2026-09-01T17:56:30.159Z</news:publication_date>
       <news:title>सीएम धामी की पहल से 8 वर्षीय देव का होगा मुफ्त इलाज, प्रशासन ने शुरू की तैयारी</news:title>
+      <news:keywords>News, India</news:keywords>
     </news:news>
   </url>
   <url>
@@ -208,6 +250,7 @@
       </news:publication>
       <news:publication_date>2026-09-01T17:51:48.762Z</news:publication_date>
       <news:title>खटीमा में नगर वन ऑक्सीजन पार्क का लोकार्पण, सीएम धामी ने की 6 बड़ी घोषणाएं</news:title>
+      <news:keywords>News, India</news:keywords>
     </news:news>
   </url>
   <url>
@@ -219,6 +262,7 @@
       </news:publication>
       <news:publication_date>2026-09-01T17:46:45.287Z</news:publication_date>
       <news:title>बनबसा सीमा पर शहीद स्मारक और विशाल तिरंगे का लोकार्पण, सीएम धामी ने किया नमन</news:title>
+      <news:keywords>News, India</news:keywords>
     </news:news>
   </url>
   <url>
@@ -230,6 +274,7 @@
       </news:publication>
       <news:publication_date>2026-09-01T17:39:43.141Z</news:publication_date>
       <news:title>नोएडा में धूमधाम से मनाया गया अधिष्ठापन दिवस, कान्हा संग सजी हरियाली तीज</news:title>
+      <news:keywords>News, India</news:keywords>
     </news:news>
   </url>
   <url>
@@ -241,6 +286,7 @@
       </news:publication>
       <news:publication_date>2026-09-01T17:32:40.129Z</news:publication_date>
       <news:title>2 सितंबर 2026 का  जानिए राशिफल</news:title>
+      <news:keywords>News, India</news:keywords>
     </news:news>
   </url>
   <url>
@@ -252,6 +298,7 @@
       </news:publication>
       <news:publication_date>2026-09-01T17:21:22.714Z</news:publication_date>
       <news:title>नोएडा में चोर समझकर युवक से मारपीट, मौत; पांच आरोपी गिरफ्तार</news:title>
+      <news:keywords>News, India</news:keywords>
     </news:news>
   </url>
   <url>
@@ -263,6 +310,7 @@
       </news:publication>
       <news:publication_date>2026-09-01T17:12:45.025Z</news:publication_date>
       <news:title>श्रीकृष्ण जन्माष्टमी पर इस्कॉन नोएडा में सुरक्षा के पुख्ता इंतजाम, भक्तों को मिलेगी सुविधा</news:title>
+      <news:keywords>News, India</news:keywords>
     </news:news>
   </url>
   <url>
@@ -274,6 +322,7 @@
       </news:publication>
       <news:publication_date>2026-08-31T18:42:40.902Z</news:publication_date>
       <news:title>मेलाघाट रोड पर पैदल चले सीएम धामी, स्थानीय डेरी में पी चाय</news:title>
+      <news:keywords>News, India</news:keywords>
     </news:news>
   </url>
   <url>
@@ -285,6 +334,7 @@
       </news:publication>
       <news:publication_date>2026-08-31T18:37:16.639Z</news:publication_date>
       <news:title>CoinDCX ने शुरू किया दैनिक SIP, ₹100 से क्रिप्टो निवेश की सुविधा</news:title>
+      <news:keywords>News, India</news:keywords>
     </news:news>
   </url>
   <url>
@@ -296,6 +346,7 @@
       </news:publication>
       <news:publication_date>2026-08-31T18:29:35.547Z</news:publication_date>
       <news:title>बोट का शुद्ध लाभ 38% बढ़कर 84.5 करोड़ रुपये, ‘बोट 2.0’ पर जोर</news:title>
+      <news:keywords>News, India</news:keywords>
     </news:news>
   </url>
   <url>
@@ -307,1124 +358,7 @@
       </news:publication>
       <news:publication_date>2026-08-31T18:24:43.710Z</news:publication_date>
       <news:title>नई दिल्ली में 4-5 सितंबर को होगा नॉर्थ ईस्ट स्टूडेंट्स फेस्टिवल</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/politics/hkrn-ko-lekara-vipaksha-para-barase-mukhyamantree-sainee-bole-vip</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-31T18:20:24.700Z</news:publication_date>
-      <news:title>HKRN को लेकर विपक्ष पर बरसे मुख्यमंत्री सैनी, बोले- विपक्ष को हो गया ‘फोबिया’</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/crime/sektara-58-pulisa-ne-teena-vaahana-chora-va-mobaaila-snaichara-da</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-31T18:13:19.277Z</news:publication_date>
-      <news:title>सेक्टर-58 पुलिस ने तीन वाहन चोर व मोबाइल स्नैचर दबोचे</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/politics/baharaaicha-ko-pichhadepana-se-nikaalakara-vikaasa-kee-naee-raaha</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-31T18:07:11.013Z</news:publication_date>
-      <news:title>बहराइच को पिछड़ेपन से निकालकर विकास की नई राह पर ले जा रही सरकार: योगी</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/social/12-sitanbara-ko-raashtreeya-loka-adaalata-maamalon-ke-tvarita-nis</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-31T18:01:30.186Z</news:publication_date>
-      <news:title>12 सितंबर को राष्ट्रीय लोक अदालत, मामलों के त्वरित निस्तारण की तैयारी तेज</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/social/gaushaalaaon-men-govansha-ke-sanrakshana-aura-suvidhaaon-ko-sudri</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-31T17:54:33.804Z</news:publication_date>
-      <news:title>गौशालाओं में गोवंश के संरक्षण और सुविधाओं को सुदृढ़ करने के निर्देश</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/astrology/1-sitanbara-kaa-raashiphala-mangalavaara-ko-ina-raashiyon-ko-mile</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-31T17:49:23.628Z</news:publication_date>
-      <news:title>1 सितंबर का राशिफल: मंगलवार को इन राशियों को मिलेंगे सफलता के अवसर</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/politics/madhu-vihaara-kee-badahaalee-para-phootaa-janataa-kaa-gussaa-aand</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-31T17:40:41.693Z</news:publication_date>
-      <news:title>मधु विहार की बदहाली पर फूटा जनता का गुस्सा, आंदोलन की चेतावनी</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/social/veedeeo-banane-para-aaratee-gauda-kaa-kiyaa-gayaa-abhinandana</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-31T17:33:08.532Z</news:publication_date>
-      <news:title>वीडीओ बनने पर आरती गौड़ का किया गया अभिनंदन</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/crime/kanpanee-se-mobaaila-choree-kara-bechane-vaale-giroha-kaa-pardaap</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-31T17:26:23.814Z</news:publication_date>
-      <news:title>कंपनी से मोबाइल चोरी कर बेचने वाले गिरोह का पर्दाफाश, छह गिरफ्तार</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/business/karoora-vaishya-bainka-ne-eka-dina-men-kholeen-16-naee-shaakhaaen</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-31T17:19:38.393Z</news:publication_date>
-      <news:title>करूर वैश्य बैंक ने एक दिन में खोलीं 16 नई शाखाएं, नेटवर्क पहुंचा 919 पर</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/entertainment/shree-bhairava-baabaa-gaudhaama-kaa-bhavya-udghaatana-gausevaa-ko-2</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-31T17:12:34.074Z</news:publication_date>
-      <news:title>श्री भैरव बाबा गौधाम का भव्य उद्घाटन, गौसेवा को मिलेगी नई दिशा</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/politics/videshon-men-rojagaara-ke-lie-yuvaaon-ko-kaushala-aura-bhaashaa-p-2</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-31T17:06:22.915Z</news:publication_date>
-      <news:title>विदेशों में रोजगार के लिए युवाओं को कौशल और भाषा प्रशिक्षण देगी सरकार</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/entertainment/aaeeemaesa-deeaaeee-men-praaranbha-2026-kaa-aayojana-visheshajnyo</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-31T16:55:09.163Z</news:publication_date>
-      <news:title>आईएमएस-डीआईए में ‘प्रारंभ-2026’ का हुआ आयोजन</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/lephtinenta-shevataa-sajavaana-ko-gadhavaala-bhavana-men-kiyaa-sa</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-31T16:45:21.820Z</news:publication_date>
-      <news:title>लेफ्टिनेंट शेवता सजवाण को गढ़वाल भवन में किया सम्मानित, उपलब्धि पर समाज ने जताया गर्व</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/yauvana-ke-bhramajaala-men-prema-kaa-tirohana-vaasanaa-kaa-mahaam</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-31T15:36:41.451Z</news:publication_date>
-      <news:title>यौवन के भ्रमजाल में प्रेम का तिरोहण — वासना का महामार्ग</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/akhila-bhaarateeya-agravaala-vaishya-mitra-mandala-ke-chunaava-sa</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-31T15:30:30.738Z</news:publication_date>
-      <news:title>अखिल भारतीय अग्रवाल वैश्य मित्र मंडल के चुनाव संपन्न, राधा कृष्ण गर्ग बने तीसरी बार अध्यक्ष</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/entertainment/siddha-saadhvee-gopeevaalaa-kaa-tirobhaava-mahotsava-shraddhaa-bh</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-31T07:16:50.707Z</news:publication_date>
-      <news:title>सिद्ध साध्वी गोपीवाला का तिरोभाव महोत्सव श्रद्धा-भक्ति से मनाया, संतों का हुआ सम्मान</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/world/baadha-peediton-kee-madada-ko-aage-aayaa-hangara-phree-bhaarata-b</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-30T17:40:21.846Z</news:publication_date>
-      <news:title>बाढ़ पीड़ितों की मदद को आगे आया हंगर फ्री भारत, बलिया भेजे 5 हजार फूड पैकेट</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/entertainment/31-agasta-kaa-raashiphala-somavaara-ko-ina-raashiyon-ko-milegaa-b</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-30T17:32:51.690Z</news:publication_date>
-      <news:title>31 अगस्त का राशिफल: सोमवार को इन राशियों को मिलेगा भाग्य का साथ, जानें 12 राशियों का हाल</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/entertainment/aksa-e-ghazala-para-sajee-saahityika-shaama-shaayara-shivadatta-a</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-30T17:23:20.237Z</news:publication_date>
-      <news:title>अक्स-ए-ग़ज़ल’ पर सजी साहित्यिक शाम, शायर शिवदत्त ‘अक्स’ की रचनाओं पर हुई सार्थक चर्चा</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/opinion/samaya-kee-pratikoolataa-men-aatmanirmaana-kaa-mauna-sankalpa</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-30T17:12:28.501Z</news:publication_date>
-      <news:title>समय की प्रतिकूलता में आत्मनिर्माण का मौन संकल्प</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/politics/kisaana-ekataa-mahaasangha-ne-kisaanon-kee-samasyaaon-para-kiyaa</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-30T16:56:53.668Z</news:publication_date>
-      <news:title>किसान एकता महासंघ ने किसानों की समस्याओं पर किया मंथन, यमुना प्राधिकरण को ज्ञापन देने का निर्णय</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/politics/hara-garbhavatee-mahilaa-kee-samriddhi-portala-se-hogee-dijitala</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-30T16:51:34.684Z</news:publication_date>
-      <news:title>हर गर्भवती महिला की ‘समृद्धि’ पोर्टल से होगी डिजिटल निगरानी: नायब सिंह सैनी</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/politics/vimukta-evan-ghumantoo-samaaja-kaa-itihaasa-svaabhimaana-aura-vee</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-30T16:39:37.627Z</news:publication_date>
-      <news:title>विमुक्त एवं घुमंतू समाज का इतिहास स्वाभिमान और वीरता की गाथा : नायब सिंह सैनी8</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/kareeba-eka-saala-se-pharaara-vaanchhita-abhiyukta-aasipha-haapud</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-30T16:17:51.552Z</news:publication_date>
-      <news:title>करीब एक साल से फरार वांछित अभियुक्त आसिफ हापुड़ से गिरफ्तार, दनकौर पुलिस की कार्रवाई</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/lifestyle/poorvee-dillee-men-ghutanon-ke-ilaaja-ke-lie-robotika-takaneeka-k</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-30T15:42:03.103Z</news:publication_date>
-      <news:title>पूर्वी दिल्ली में घुटनों के इलाज के लिए रोबोटिक तकनीक की शुरुआत</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/gleshiyara-jheelon-kee-nigaraanee-men-atyaadhunika-takaneeka-kaa</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-30T15:28:24.629Z</news:publication_date>
-      <news:title>ग्लेशियर झीलों की निगरानी में अत्याधुनिक तकनीक का होगा इस्तेमाल : मदन कौशिक</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/rishikesha-ke-suniyojita-vikaasa-ko-antima-roopa-dene-kee-kavaaya-2</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-30T15:18:03.618Z</news:publication_date>
-      <news:title>ऋषिकेश के सुनियोजित विकास को अंतिम रूप देने की कवायद तेज, महायोजना पर सरकार का फोकस</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/politics/mana-kee-baata-raashtra-nirmaana-men-bhaageedaaree-ke-lie-karatee</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-30T15:04:36.576Z</news:publication_date>
-      <news:title>मन की बात राष्ट्र निर्माण में भागीदारी के लिए करती है प्रेरित : मुख्यमंत्री धामी</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/politics/story-10</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-29T20:22:21.423Z</news:publication_date>
-      <news:title>भाजपा का कांग्रेस पर बड़ा हमला, गुरु प्रकाश पासवान और सुधांशु त्रिवेदी ने राहुल गांधी को घेरा</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/sports/story-9-2</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-29T20:12:41.123Z</news:publication_date>
-      <news:title>उत्तराखंड क्रीड़ा विश्वविद्यालय का पहला चरण शुरू, धामी ने 43.50 करोड़  का  किया  शिलान्यास</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/politics/story-8-2</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-29T19:51:20.011Z</news:publication_date>
-      <news:title>रक्षाबंधन पर भाई-बहनों ने रोपे 1.09 लाख पौधे, यूपी में बनीं 59 रक्षाबंधन वाटिकाएं</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/politics/story-7-2</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-29T19:35:04.936Z</news:publication_date>
-      <news:title>सीएम योगी का अखिलेश पर हमला, बोले- पत्रकारों के सवाल पर गाली-गलौच करते हैं</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/entertainment/story-6-2</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-29T19:22:39.333Z</news:publication_date>
-      <news:title>हरियाणा में फिल्म शूटिंग का न्योता, लोकेशन के साथ सहयोग का CM सैनी ने दिया भरोसा</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/politics/story-5-2</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-29T19:10:45.540Z</news:publication_date>
-      <news:title>नूंह में रोजगार और विकास पर जोर, मुफ्त कोचिंग को मुख्यमंत्री ने दी मंजूरी</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/story-4-2</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-29T18:50:34.469Z</news:publication_date>
-      <news:title>हरियाणा में कचरे से बनेगी 50 मेगावाट बिजली, चार वेस्ट-टू-एनर्जी प्लांट के लिए एमओयू</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/opinion/badhataa-taapamaana-aura-bikharataa-jeevana-2</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-29T18:38:33.674Z</news:publication_date>
-      <news:title>बढ़ता तापमान और बिखरता जीवन</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/story-3-2</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-29T18:16:22.699Z</news:publication_date>
-      <news:title>बच्ची की हत्या के आरोपी से पुलिस की मुठभेड़, गोली लगने से आरोपी की मौत; हेड कांस्टेबल घायल</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/story-2-2</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-29T18:00:32.202Z</news:publication_date>
-      <news:title>30 मिनट में पुलिस ने तलाश की 3 साल की गुमशुदा बच्ची, सकुशल परिजनों को सौंपा</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/story-11</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-29T17:47:37.839Z</news:publication_date>
-      <news:title>सेवानिवृत्त पुलिसकर्मियों के अनुभवों का होगा बेहतर उपयोग</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/entertainment/khushiyon-kaa-paavarahaausa-hotee-hain-bahanen</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-28T17:43:24.602Z</news:publication_date>
-      <news:title>खुशियों का पावरहाउस होती हैं बहनें.....</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/politics/lohiyaaheda-men-paidala-pahunche-dhaamee-sthaaneeya-stola-para-ch</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-28T17:33:20.670Z</news:publication_date>
-      <news:title>लोहियाहेड में पैदल पहुंचे धामी, स्थानीय स्टॉल पर चखा टिकी का स्वाद</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/rakshaabandhana-para-dhaamee-sarakaara-kee-mahilaaon-ko-badee-sau</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-28T17:23:59.672Z</news:publication_date>
-      <news:title>रक्षाबंधन पर धामी सरकार की महिलाओं को बड़ी सौगात, 60 वर्ष से मुफ्त रोडवेज सफर</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/rakshaabandhana-ke-paavana-avasara-phalon-phoolon-se-khelee-gaee</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-28T17:05:20.341Z</news:publication_date>
-      <news:title>रक्षाबंधन के पावन अवसर फलों-फूलों से खेली गई ऐतिहासिक बग्वाल</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/politics/panjaaba-men-bhaajapaa-kee-sarakaara-banaane-kaa-mana-banaa-chuke</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-28T16:53:44.481Z</news:publication_date>
-      <news:title>पंजाब में भाजपा की सरकार बनाने का मन बना चुकी जनता : सैनी</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/santa-kabeera-kuteera-men-seeema-sainee-ne-manaayaa-rakshaabandha</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-28T16:41:56.345Z</news:publication_date>
-      <news:title>संत कबीर कुटीर में सीएम सैनी ने मनाया रक्षाबंधन</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/politics/yuvaaon-ke-lie-avasaron-kaa-majaboota-eeko-sistama-taiyaara-yogae</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-28T16:28:11.791Z</news:publication_date>
-      <news:title>युवाओं के लिए अवसरों का मजबूत ईको सिस्टम तैयार: योगी</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/60-varsha-se-adhika-umra-kee-mahilaaon-ke-lie-yoopee-rodaveja-men</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-28T16:19:15.653Z</news:publication_date>
-      <news:title>60 वर्ष से अधिक उम्र की महिलाओं के लिए यूपी रोडवेज में मुफ्त सफर की सौगात</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/betiyon-ko-milaa-mancha-to-khulakara-bole-sapane-mukhyamantree-yo</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-28T16:07:02.735Z</news:publication_date>
-      <news:title>बेटियों को मिला मंच तो खुलकर बोले सपने, मुख्यमंत्री योगी से छात्राओं ने पूछे बेझिझक सवाल</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/betiyon-kee-muskaana-se-khila-uthaa-mukhyamantree-aavaasa-yogee-k</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-28T15:58:31.586Z</news:publication_date>
-      <news:title>बेटियों की मुस्कान से खिल उठा मुख्यमंत्री आवास, योगी की कलाई पर बंधी स्नेह की डोर</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/entertainment/sanjaya-jheela-sthita-paandava-shaakhaa-men-harshollaasa-se-manaa</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-28T15:12:44.738Z</news:publication_date>
-      <news:title>संजय झील स्थित पांडव शाखा में हर्षोल्लास से मनाया गया रक्षाबंधन पर्व, स्वयंसेवकों ने बांधा रक्षा सूत्र</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/entertainment/29-agasta-kaa-raashiphala-shanivaara-ko-ina-raashiyon-ko-mila-sak</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-28T13:47:29.085Z</news:publication_date>
-      <news:title>29 अगस्त का राशिफल: शनिवार को इन राशियों को मिल सकता है लाभ, जानें सभी 12 राशियों का हाल</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/entertainment/dharatee-se-antariksha-taka-betiyon-kee-udaana-rakshaabandhana-pa</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-28T13:31:12.635Z</news:publication_date>
-      <news:title>धरती से अंतरिक्ष तक बेटियों की उड़ान, रक्षाबंधन पर मिला वैश्विक संदेश</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/lifestyle/kama-amh-ke-baavajooda-praakritika-garbhadhaarana-kee-ummeeda-pri</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-28T13:15:40.985Z</news:publication_date>
-      <news:title>कम AMH के बावजूद प्राकृतिक गर्भधारण की उम्मीद, प्रियंका की कहानी बनी प्रेरणा</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/phedareshana-opha-panjaabee-esosieshana-kaa-sevaa-sankalpa-30-jar</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-28T12:48:50.360Z</news:publication_date>
-      <news:title>फेडरेशन ऑफ पंजाबी एसोसिएशन का सेवा संकल्प, 30 जरूरतमंदों के होंगे निःशुल्क नेत्र ऑपरेशन</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/iskona-noedaa-men-dhoomadhaama-se-manaaee-gaee-balaraama-poornima</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-28T10:25:57.162Z</news:publication_date>
-      <news:title>इस्कॉन नोएडा में धूमधाम से मनाई गई बलराम पूर्णिमा, 1500 भक्तों ने लिया उत्सव में भाग</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/mukhyamantree-sashakta-bahanaa-utsava-men-champaavata-ko-6297-kar</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-27T18:57:01.099Z</news:publication_date>
-      <news:title>मुख्यमंत्री सशक्त बहना उत्सव में चम्पावत को 62.97 करोड़ की 50 विकास योजनाओं की सौगात</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/himaalaya-royaa-to-janajeevana-maidaana-doobaaa</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-27T18:53:25.867Z</news:publication_date>
-      <news:title>हिमालय रोया तो जनजीवन मैदान डूबा</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/ananta-bandhana-akhanda-rakshaa-rakshaa-bandhana-para-vishesha</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-27T18:46:35.253Z</news:publication_date>
-      <news:title>अनन्त बंधन, अखंड रक्षा (रक्षा बंधन पर विशेष)</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/sabhee-mahaashaktiyon-kee-aashrayadaataa-hain-maan-bhagavatee-gur</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-27T18:43:01.368Z</news:publication_date>
-      <news:title>सभी महाशक्तियों की आश्रयदाता हैं मां भगवती-गुरुचरण</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/rakshaabandhana-se-pahale-khaadya-surakshaa-vibhaaga-kee-badee-ka</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-27T18:35:32.107Z</news:publication_date>
-      <news:title>रक्षाबंधन से पहले खाद्य सुरक्षा विभाग की बड़ी कार्रवाई, 40 नमूने जांच को भेजे</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/rakshaabandhana-para-jaanen-shubha-muhoorta-poojaa-vidhi-aura-12</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-27T17:48:47.967Z</news:publication_date>
-      <news:title>रक्षाबंधन पर जानें शुभ मुहूर्त, पूजा विधि और 12 राशियों का राशिफल</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/vipaksha-kaanoona-vyavasthaa-kaa-paatha-padhaane-se-pahale-apanaa</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-27T17:37:14.481Z</news:publication_date>
-      <news:title>विपक्ष कानून-व्यवस्था का पाठ पढ़ाने से पहले अपना शासनकाल देखे: मुख्यमंत्री नायब सिंह सैनी</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/medikala-koleja-baharaaicha-men-pahalee-baara-doorabeena-se-kandh</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-26T18:02:57.236Z</news:publication_date>
-      <news:title>मेडिकल कॉलेज बहराइच में पहली बार दूरबीन से कंधे की सर्जरी सफल</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/rakshaabandhana-para-mahilaaon-ko-muphta-basa-yaatraa-kaa-tohapha</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-26T17:40:11.777Z</news:publication_date>
-      <news:title>रक्षाबंधन पर महिलाओं को मुफ्त बस यात्रा का तोहफा</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/navavarsha-melaa-samiti-ke-shivira-51-nara-naariyon-ne-daana-kiya</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-26T16:51:46.422Z</news:publication_date>
-      <news:title>नववर्ष मेला समिति के शिविर 51 नर-नारियों ने दान किया लहू</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/krishnajanmabhoomi-kee-mukti-aandolana-kee-mashaala-jena-jee-ne-t</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-26T16:46:47.084Z</news:publication_date>
-      <news:title>कृष्णजन्मभूमि की मुक्ति आंदोलन की मशाल जेन-जी ने थामी</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/aatha-dashaka-kee-prateekshaa-ke-baada-vaishvika-shikhara-para-st</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-26T09:59:37.599Z</news:publication_date>
-      <news:title>आठ दशक की प्रतीक्षा के बाद वैश्विक शिखर पर स्त्री-शक्ति की दस्तक</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/politics/chhaha-maheene-men-eka-laakha-yuvaaon-ko-sarakaaree-naukaree-deng</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-26T07:03:11.699Z</news:publication_date>
-      <news:title>छह महीने में एक लाख युवाओं को सरकारी नौकरी देंगे: सीएम योगी</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/khare-the-sikke-jo-khote-nikala-gae</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-26T07:01:40.969Z</news:publication_date>
-      <news:title>खरे थे सिक्के जो खोटे निकल गए...</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/pavitra-chhadee-yaatraa-men-shaamila-honge-dhaamee-santon-ne-diya</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-26T02:48:21.283Z</news:publication_date>
-      <news:title>पवित्र छड़ी यात्रा में शामिल होंगे धामी, संतों ने दिया न्योता</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/cheenee-kee-jamaakhoree-para-dee-ema-kee-sakhtee-4000-kuntala-se</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-26T02:40:51.763Z</news:publication_date>
-      <news:title>चीनी की जमाखोरी पर डी एम की सख्ती, 4000 कुंतल से ज्यादा स्टॉक पर कार्रवाई</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/aaee-phona-badaa-yaa-jeevana-badaa</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-25T19:05:51.928Z</news:publication_date>
-      <news:title>आई फोन बड़ा या जीवन बड़ा?</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/kanpanee-se-363-tee-sharta-choree-do-surakshaa-gaarda-sameta-teen</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-25T18:25:45.815Z</news:publication_date>
-      <news:title>कंपनी से 363 टी-शर्ट चोरी, दो सुरक्षा गार्ड समेत तीन गिरफ्तार</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/466-puraane-vaatara-varksa-honge-aaraseesee-aadhaarita-shuddha-pe</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-25T17:58:32.037Z</news:publication_date>
-      <news:title>466 पुराने वाटर वर्क्स होंगे आरसीसी आधारित, शुद्ध पेयजल पर सरकार का जोर</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/politics/320-taalaabon-kaa-jalda-hogaa-saundaryeekarana-naayaba-sainaee</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-25T17:53:10.933Z</news:publication_date>
-      <news:title>320 तालाबों का जल्द होगा सौंदर्यीकरण: नायब सैनी</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/84-varsheeya-haarta-pheliyara-mareeja-kaa-binaa-opana-haarta-sarj</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-25T17:38:00.207Z</news:publication_date>
-      <news:title>84 वर्षीय हार्ट फेलियर मरीज का बिना ओपन-हार्ट सर्जरी सफल इलाज</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/sportsa-ritela-para-naee-pustaka-kaa-lokaarpana-bhaarata-ke-khela</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-25T17:16:22.477Z</news:publication_date>
-      <news:title>स्पोर्ट्स रिटेल पर नई पुस्तक का लोकार्पण, भारत के खेल बाजार की संभावनाओं पर बढ़ी चर्चा</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/bhaarata-100-nae-jahaajon-se-ghataaegaa-videshee-shipinga-para-ni</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-25T17:07:21.753Z</news:publication_date>
-      <news:title>भारत 100 नए जहाजों से घटाएगा विदेशी शिपिंग पर निर्भरता, हर साल बचेंगे 75 अरब डॉलर</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/nishaanebaajee-men-bhaaooraava-devarasa-vidyaa-mandira-kee-betiyo</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-25T05:35:46.913Z</news:publication_date>
-      <news:title>निशानेबाजी में भाऊराव देवरस विद्या मंदिर की बेटियों का शानदार प्रदर्शन, राष्ट्रीय चैंपियनशिप में बनाएंगी जगह</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/sports/sunrise-shuttlers-badminton-record-noida</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-24T17:26:14.631Z</news:publication_date>
-      <news:title>जमीनी स्तर पर बैडमिंटन के विकास में सनराइज़ शटलर्स ने रचा नया कीर्तिमान</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/sawan-somwar-jhandewala-devi-mandir-rudrabhishek</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-24T17:02:36.530Z</news:publication_date>
-      <news:title>सावन के अंतिम सोमवार पर झण्डेवाला देवी मंदिर में गूंजा हर-हर महादेव, श्रद्धालुओं ने किया जलाभिषेक</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/technology/india-strategic-ai-infrastructure-corridor</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-24T06:00:44.556Z</news:publication_date>
-      <news:title>India Announces Strategic AI Infrastructure Corridor With \$12B Clean Energy Backing</news:title>
-      <news:keywords>Technology &amp; AI, Infrastructure</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/politics/nayab-saini-ka-bhagwant-mann-par-hamla-sirf-chutkule-sunakar-time-pass</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>en</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-22T16:00:00.000Z</news:publication_date>
-      <news:title>Haryana CM Nayab Saini Attacks Bhagwant Mann: &quot;Punjab CM is Just Killing Time by Cracking Jokes&quot;</news:title>
-      <news:keywords>नायब सिंह सैनी, भगवंत मान, पंजाब राजनीति</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/iskcon-noida-me-bhavya-janmashtami-mahotsav-5-lakh-shradhalu</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>en</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-22T15:30:00.000Z</news:publication_date>
-      <news:title>Grand Sri Krishna Janmashtami Mahotsav at ISKCON Noida: Over 5 Lakh Devotees Expected</news:title>
-      <news:keywords>इस्कॉन नोएडा, श्रीकृष्ण जन्माष्टमी, शोभायात्रा</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/economy/ganne-ke-ras-ki-ek-boond-me-uljha-desh-ka-bhavishya</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>en</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-22T02:30:00.000Z</news:publication_date>
-      <news:title>Tangled in a Single Drop of Sugarcane Juice: The Future of the Nation</news:title>
-      <news:keywords>गन्ना किसान, एथेनॉल, ऊर्जा नीति</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/business/upi-cross-border-remittances-monthly-record-transactions</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>en</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-19T10:30:00.000Z</news:publication_date>
-      <news:title>Digital Payments Ecosystem Logs Record 16.5 Billion Monthly UPI Transactions as Cross-Border Remittances Expand</news:title>
-      <news:keywords>UPI, Fintech, Banking, Digital Payments</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/politics/parliament-clears-digital-public-infrastructure-bill-monsoon-session</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>en</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-19T09:00:00.000Z</news:publication_date>
-      <news:title>Parliament Clears Landmark Digital Public Infrastructure &amp; Data Protection Amendment Bill in Monsoon Session</news:title>
-      <news:keywords>Parliament, Data Protection, Digital India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/business/sensex-nifty-all-time-high-fii-inflows-corporate-earnings</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>en</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-19T06:00:00.000Z</news:publication_date>
-      <news:title>Sensex Scales Historic 85,000 Mark on Strong Foreign Institutional Inflows and Robust Q1 Corporate Earnings</news:title>
-      <news:keywords>Sensex, Nifty, Stock Markets</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/politics/election-commission-announces-assembly-poll-dates-schedule</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>en</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-19T04:30:00.000Z</news:publication_date>
-      <news:title>Election Commission Announces Schedule for Five Key State Assembly Polls; Voting Across Three Phases Starting November 12</news:title>
-      <news:keywords>Election Commission, State Polls, Assembly Elections</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/world/indo-pacific-trade-corridor-tokyo-summit-critical-minerals</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>en</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-19T02:45:00.000Z</news:publication_date>
-      <news:title>Indo-Pacific Trade Corridor Summit Concludes in Tokyo with Trilateral Critical Minerals Pact</news:title>
-      <news:keywords>Geopolitics, Indo-Pacific, Critical Minerals</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/cabinet-approves-infrastructure-corridor-western-ports</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>en</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-19T02:00:00.000Z</news:publication_date>
-      <news:title>Union Cabinet Approves ₹1.2 Lakh Crore Infrastructure Corridor Linking Major Western Ports to Industrial Nodes</news:title>
-      <news:keywords>Infrastructure, Logistics, Cabinet Decision</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/economy/retail-inflation-moderates-july-cpi-food-supply-rbi</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>en</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-19T00:45:00.000Z</news:publication_date>
-      <news:title>Retail Inflation Moderates to 3.8% in July as Food Supply Chains Stabilize; RBI Stance Unchanged</news:title>
-      <news:keywords>Inflation, CPI, RBI, Monetary Policy</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/sports/india-england-lords-test-match-pace-bowling-series-win</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>en</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-18T18:15:00.000Z</news:publication_date>
-      <news:title>Indian Cricket Team Clinches Historic Test Series Victory at Lord’s with Fierce Day 5 Pace Bowling Masterclass</news:title>
-      <news:keywords>Cricket, Test Match, Lords, Team India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/world/global-maritime-trade-alliance-red-sea-security-protocol</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>en</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-18T16:45:00.000Z</news:publication_date>
-      <news:title>Global Maritime Trade Alliance Finalizes New Red Sea Security Escort Protocol Ahead of UN Assembly</news:title>
-      <news:keywords>Global Trade, Maritime Security, United Nations</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/technology/national-cyber-coordination-centre-ai-defense-grid</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>en</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-18T13:15:00.000Z</news:publication_date>
-      <news:title>National Cyber Coordination Centre Deploys AI Defense Shield Across Critical Energy &amp; Railway Grids</news:title>
-      <news:keywords>Cybersecurity, AI, National Security</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/opinion/rethinking-urban-density-india-megacities-polycentric-transit</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>en</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-18T12:30:00.000Z</news:publication_date>
-      <news:title>Rethinking Urban Density: Why India’s Megacities Need Polycentric Transit, Not Just Taller Towers</news:title>
-      <news:keywords>Urban Planning, Sustainability, Climate</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/technology/india-first-commercial-semiconductor-fab-dholera-gujarat</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>en</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-18T08:50:00.000Z</news:publication_date>
-      <news:title>India’s First Commercial 28nm Fabrication Facility Begins Tool Installation at Dholera Special Investment Region</news:title>
-      <news:keywords>Semiconductors, Dholera, Make In India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/entertainment/71st-national-film-awards-regional-cinema-triumph-winners</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>en</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-17T11:00:00.000Z</news:publication_date>
-      <news:title>71st National Film Awards: Regional Cinema Triumphs with Groundbreaking Narrative Storytelling and Audiovisual Craft</news:title>
-      <news:keywords>National Film Awards, Cinema, Culture</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/lifestyle/restoring-western-ghats-sacred-groves-community-forestry</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>en</news:language>
-      </news:publication>
-      <news:publication_date>2026-08-17T05:30:00.000Z</news:publication_date>
-      <news:title>Restoring the Western Ghats: How Community-Led Sacred Grove Forestry is Reviving Ancient Water Tables</news:title>
-      <news:keywords>Western Ghats, Environment, Forestry</news:keywords>
+      <news:keywords>News, India</news:keywords>
     </news:news>
   </url>
 </urlset>
