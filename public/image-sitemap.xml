@@ -2,6 +2,14 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
+    <loc>https://www.npnewsmetro.com/india/story-2</loc>
+    <image:image>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/media/0d0038244be31d920a6554c10bdc0f33dcb6ea8568d0d68d532143e50a4bb0dc/IMG-20260905-WA0001.jpg</image:loc>
+      <image:caption>वैश्य एकता परिषद ने नोएडा महानगर कार्यकारिणी का किया गठन</image:caption>
+      <image:title>वैश्य एकता परिषद ने नोएडा महानगर कार्यकारिणी का किया गठन</image:title>
+    </image:image>
+  </url>
+  <url>
     <loc>https://www.npnewsmetro.com/india/story</loc>
     <image:image>
       <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/media/beba21f2539a5833aa287f123991d235ba04d390daf2c44651f5de0bc1345673/WhatsApp_Image_2026-08-21_at_1.53.31_PM.jpeg</image:loc>

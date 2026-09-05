@@ -325,10 +325,12 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
           setFeaturedImage(uploadRes.url);
           return;
         }
-        const compressed = await compressImageFile(file, { maxWidth: 1400, quality: 0.84 });
-        setFeaturedImage(compressed);
-      } catch (err) {
+        if (uploadRes.error) {
+          alert(`Featured image upload failed: ${uploadRes.error}`);
+        }
+      } catch (err: any) {
         console.error('Error uploading featured image:', err);
+        alert(`Featured image upload error: ${err?.message || 'Upload failed'}`);
       }
     }
   };
@@ -343,11 +345,12 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
           setIsAvatarCropOpen(true);
           return;
         }
-        const compressed = await compressAvatarFile(file);
-        setCustomAuthorAvatar(compressed);
-        setIsAvatarCropOpen(true);
-      } catch (err) {
+        if (uploadRes.error) {
+          alert(`Avatar upload failed: ${uploadRes.error}`);
+        }
+      } catch (err: any) {
         console.error('Error uploading author avatar:', err);
+        alert(`Avatar upload error: ${err?.message || 'Upload failed'}`);
       }
     }
   };
@@ -364,20 +367,21 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       const file = e.target.files[0];
       const cleanCaption = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
       try {
-        let finalUrl = '';
         const uploadRes = await uploadArticleImage(file, initialPost?.id);
-        if (uploadRes.url) {
-          finalUrl = uploadRes.url;
-        } else {
-          finalUrl = await compressImageFile(file, { maxWidth: 1200, quality: 0.82 });
+        if (!uploadRes.url) {
+          alert(`Inline image upload failed: ${uploadRes.error || 'Upload failed'}`);
+          e.target.value = '';
+          return;
         }
+        const finalUrl = uploadRes.url;
         const imageTag = `\n\n![${cleanCaption}](${finalUrl})\n\n`;
         const pos = cursorPos !== null ? cursorPos : (textareaRef.current?.selectionStart ?? content.length);
         const newContent = content.substring(0, pos) + imageTag + content.substring(pos);
         setContent(newContent);
         setCursorPos(null);
-      } catch (err) {
+      } catch (err: any) {
         console.error('Error uploading inline image:', err);
+        alert(`Inline image upload error: ${err?.message || 'Upload failed'}`);
       }
       e.target.value = '';
     }

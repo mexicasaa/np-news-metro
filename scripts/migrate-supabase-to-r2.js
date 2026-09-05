@@ -120,19 +120,62 @@ async function migrate() {
         })
         .eq('id', item.id);
 
+      // Update featured_image_url
       const { data: affectedArticles } = await supabase
         .from('articles')
-        .select('id, title, featured_image_url')
-        .eq('featured_image_url', currentUrl);
+        .select('id, title, featured_image_url, blocks, content')
+        .or(`featured_image_url.eq.${currentUrl},content.like.%${currentUrl}%`);
 
       if (affectedArticles && affectedArticles.length > 0) {
         console.log(`Updating ${affectedArticles.length} articles referencing this image...`);
         for (const art of affectedArticles) {
-          await supabase
-            .from('articles')
-            .update({ featured_image_url: newPublicUrl })
-            .eq('id', art.id);
-          console.log(`Updated article: ${art.title} -> ${newPublicUrl}`);
+          const updates = {};
+          if (art.featured_image_url === currentUrl) {
+            updates.featured_image_url = newPublicUrl;
+          }
+          if (art.content && art.content.includes(currentUrl)) {
+            updates.content = art.content.split(currentUrl).join(newPublicUrl);
+          }
+          if (Array.isArray(art.blocks)) {
+            let blocksModified = false;
+            const updatedBlocks = art.blocks.map(b => {
+              if (b && b.imageUrl === currentUrl) {
+                blocksModified = true;
+                return { ...b, imageUrl: newPublicUrl };
+              }
+              return b;
+            });
+            if (blocksModified) {
+              updates.blocks = updatedBlocks;
+            }
+          }
+          if (Object.keys(updates).length > 0) {
+            await supabase.from('articles').update(updates).eq('id', art.id);
+            console.log(`Updated article ${art.id} (${art.title}) with new R2 URL.`);
+          }
+        }
+      }
+
+      // Also check articles where blocks JSON contains the URL
+      const { data: allArticles } = await supabase
+        .from('articles')
+        .select('id, title, blocks');
+      if (allArticles) {
+        for (const art of allArticles) {
+          if (Array.isArray(art.blocks)) {
+            let blocksModified = false;
+            const updatedBlocks = art.blocks.map(b => {
+              if (b && b.imageUrl === currentUrl) {
+                blocksModified = true;
+                return { ...b, imageUrl: newPublicUrl };
+              }
+              return b;
+            });
+            if (blocksModified) {
+              await supabase.from('articles').update({ blocks: updatedBlocks }).eq('id', art.id);
+              console.log(`Updated blocks in article ${art.id} (${art.title}) with new R2 URL.`);
+            }
+          }
         }
       }
 

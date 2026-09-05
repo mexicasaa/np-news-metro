@@ -110,101 +110,59 @@ export class R2MediaRepository {
     const storagePath = `media/${contentHash}/${cleanName}`;
     let publicUrl = this.getUrl(r2Key);
 
-    // 2. Primary: Upload directly to Cloudflare R2 via Serverless S3 API
-    try {
-      const reader = new FileReader();
-      const base64Promise = new Promise<string>((resolve, reject) => {
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-      const base64Data = await base64Promise;
+    // 2. Direct upload exclusively to Cloudflare R2 via Serverless / Dev S3 API
+    const reader = new FileReader();
+    const base64Promise = new Promise<string>((resolve, reject) => {
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+    const base64Data = await base64Promise;
 
-      const r2Resp = await fetch('/api/r2-upload', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          base64Data,
-          fileName: meta.fileName,
-          mimeType: meta.mimeType,
-          contentHash,
-          altText: meta.altText,
-          caption: meta.caption,
-        }),
-      });
+    const r2Resp = await fetch('/api/r2-upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        base64Data,
+        fileName: meta.fileName,
+        mimeType: meta.mimeType,
+        contentHash,
+        altText: meta.altText,
+        caption: meta.caption,
+      }),
+    });
 
-      if (r2Resp.ok) {
-        const result = await r2Resp.json();
-        if (result.media) {
-          return { media: this.mapToRecord(result.media), isDuplicate: !!result.isDuplicate };
-        }
+    if (r2Resp.ok) {
+      const result = await r2Resp.json();
+      if (result.media) {
+        return { media: this.mapToRecord(result.media), isDuplicate: !!result.isDuplicate };
       }
-    } catch (r2Err) {
-      console.warn('Direct R2 serverless upload error, attempting fallback:', r2Err);
+      if (result.url) {
+        return {
+          media: {
+            id: result.mediaId || result.media?.id || `r2-${contentHash}`,
+            fileName: meta.fileName,
+            storagePath: result.r2Key || r2Key,
+            r2Key: result.r2Key || r2Key,
+            publicUrl: result.url,
+            mimeType: meta.mimeType,
+            fileSize: meta.fileSize || (file instanceof File ? file.size : undefined),
+            altText: meta.altText,
+            caption: meta.caption,
+            mediaType: 'image',
+            contentHash,
+          },
+          isDuplicate: !!result.isDuplicate,
+        };
+      }
     }
 
-    // 3. Fallback: Upload to Supabase storage if direct R2 upload fails
+    let errMessage = 'Cloudflare R2 direct upload failed';
     try {
-      const { error: uploadError } = await supabase.storage
-        .from('article-images')
-        .upload(storagePath, file, {
-          cacheControl: '31536000', // 1 year immutable edge cache
-          upsert: true,
-          contentType: meta.mimeType || 'image/webp',
-        });
-
-      if (!uploadError) {
-        const { data } = supabase.storage.from('article-images').getPublicUrl(storagePath);
-        if (data?.publicUrl) {
-          publicUrl = data.publicUrl;
-        }
-      }
-    } catch (storageErr) {
-      console.warn('Storage upload note (fallback in effect):', storageErr);
-    }
-
-    // 3. Insert single media record in Supabase with UNIQUE(content_hash)
-    try {
-      const { data, error } = await supabase
-        .from('media')
-        .insert({
-          file_name: cleanName,
-          storage_path: storagePath,
-          r2_key: r2Key,
-          content_hash: contentHash,
-          public_url: publicUrl,
-          mime_type: meta.mimeType,
-          file_size: meta.fileSize,
-          width: meta.width || 1280,
-          height: meta.height || 720,
-          alt_text: meta.altText || cleanName.replace(/\.[^/.]+$/, ''),
-          caption: meta.caption || meta.credit || 'NP News Metro Media Desk',
-          media_type: meta.mimeType.startsWith('image/') ? 'image' : 'document',
-          uploaded_by: meta.uploadedBy || null,
-        })
-        .select()
-        .single();
-
-      if (error) {
-        // If conflict on content_hash occurs due to concurrent upload race
-        if (error.code === '23505') {
-          const concurrent = await this.findByHash(contentHash);
-          if (concurrent) {
-            return { media: concurrent, isDuplicate: true };
-          }
-        }
-        throw error;
-      }
-
-      return { media: this.mapToRecord(data), isDuplicate: false };
-    } catch (err: any) {
-      // Re-query in case of concurrent insert
-      const fallbackRecord = await this.findByHash(contentHash);
-      if (fallbackRecord) {
-        return { media: fallbackRecord, isDuplicate: true };
-      }
-      throw err;
-    }
+      const errJson = await r2Resp.json();
+      if (errJson?.error) errMessage = `Cloudflare R2 upload failed: ${errJson.error}`;
+    } catch {}
+    throw new Error(errMessage);
   }
 
   /**
@@ -251,10 +209,7 @@ export class R2MediaRepository {
         return false;
       }
 
-      if (r2Key) {
-        await supabase.storage.from('article-images').remove([r2Key]);
-      }
-
+      // Record removed from media table
       const { error } = await supabase.from('media').delete().eq('id', mediaId);
       return !error;
     } catch {
