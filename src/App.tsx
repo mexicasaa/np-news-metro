@@ -495,9 +495,15 @@ function AppContent() {
           setCurrentTemplate(tpl);
           if (directPost.category) setSelectedCategory(directPost.category);
           setPosts((prev) => {
-            if (prev.some((p) => p.id === directPost.id || p.slug === directPost.slug)) return prev;
+            const exists = prev.some((p) => p.id === directPost.id || p.slug === directPost.slug);
+            if (exists) {
+              return prev.map((p) => (p.id === directPost.id || p.slug === directPost.slug) ? directPost : p);
+            }
             return [directPost, ...prev];
           });
+          if (isPostPublished(directPost)) {
+            savePublishedPost(directPost);
+          }
         } else {
           setCurrentTemplate((prev) => prev === 'article-loading' ? 'not-found' : prev);
         }
@@ -861,11 +867,15 @@ function AppContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     // If clicked from a lightweight card without full content blocks, load full article on-demand from CDN cache
-    if (!post.blocks || post.blocks.length === 0 || !(post as any).content) {
+    const hasOnlyPlaceholder = !post.blocks || post.blocks.length === 0 || (post.blocks.length === 1 && post.blocks[0].id === 'b-default-1') || !(post as any).content;
+    if (hasOnlyPlaceholder) {
       getArticleBySlug(post.slug).then((fullPost) => {
         if (fullPost) {
           setSelectedPost(fullPost);
           setPosts(prev => prev.map(p => p.id === fullPost.id ? fullPost : p));
+          if (isPostPublished(fullPost)) {
+            savePublishedPost(fullPost);
+          }
         }
       }).catch(() => {});
     }

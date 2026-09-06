@@ -80,9 +80,41 @@ export const ArticleBody: React.FC<ArticleBodyProps> = ({
   const { language } = useLanguage();
   const localized = getLocalizedPost(post, language);
 
+  // Compute active blocks with robust fallback to post.content if blocks are missing or only contains excerpt placeholder
+  const rawBlocks = (localized.blocks && localized.blocks.length > 0)
+    ? localized.blocks
+    : (post.blocks && post.blocks.length > 0)
+      ? post.blocks
+      : [];
+
+  const isOnlyPlaceholder = rawBlocks.length === 1 && rawBlocks[0].id === 'b-default-1';
+  const hasFullContent = typeof post.content === 'string' && post.content.trim().length > (post.dek || '').trim().length;
+
+  let activeBlocks: GutenbergBlock[] = rawBlocks;
+  if ((rawBlocks.length === 0 || isOnlyPlaceholder) && hasFullContent && post.content) {
+    const paragraphs = post.content.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+    if (paragraphs.length > 0) {
+      activeBlocks = paragraphs.map((p, idx) => ({
+        id: `content-p-${idx}`,
+        type: 'paragraph' as const,
+        content: p,
+      }));
+    }
+  }
+
+  if (activeBlocks.length === 0) {
+    activeBlocks = [
+      {
+        id: 'fallback-p-0',
+        type: 'paragraph' as const,
+        content: localized.dek || post.dek || '',
+      },
+    ];
+  }
+
   return (
     <div className="gutenberg-content font-body text-ink leading-relaxed">
-      {(localized.blocks || post.blocks).map((block, index) => {
+      {activeBlocks.map((block, index) => {
         switch (block.type) {
           case 'paragraph': {
             const isFirstParagraph = index === 0;

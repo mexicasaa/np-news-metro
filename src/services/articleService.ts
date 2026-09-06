@@ -54,21 +54,35 @@ export const mapDbToWpPost = (row: any, joinedTags?: string[]): WpPost => {
         : (Array.isArray(row.tags) ? row.tags : ['National', 'Policy']));
 
   let parsedBlocks: GutenbergBlock[] = [];
-  if (Array.isArray(row.blocks) && row.blocks.length > 0) {
-    parsedBlocks = row.blocks;
+  let rawBlocks = row.blocks;
+  if (typeof rawBlocks === 'string') {
+    try { rawBlocks = JSON.parse(rawBlocks); } catch (e) {}
+  }
+
+  if (Array.isArray(rawBlocks) && rawBlocks.length > 0) {
+    parsedBlocks = rawBlocks;
   } else if (typeof row.content === 'string' && row.content.trim()) {
-    parsedBlocks = [
-      {
-        id: 'b-content-1',
-        type: 'paragraph',
-        content: row.content,
-      },
-    ];
+    const paragraphs = row.content.split(/\n\s*\n/).map((p: string) => p.trim()).filter(Boolean);
+    if (paragraphs.length > 0) {
+      parsedBlocks = paragraphs.map((p: string, idx: number) => ({
+        id: `b-content-${idx}`,
+        type: 'paragraph' as const,
+        content: p,
+      }));
+    } else {
+      parsedBlocks = [
+        {
+          id: 'b-content-1',
+          type: 'paragraph' as const,
+          content: row.content,
+        },
+      ];
+    }
   } else {
     parsedBlocks = [
       {
         id: 'b-default-1',
-        type: 'paragraph',
+        type: 'paragraph' as const,
         content: row.excerpt || 'News dispatch from editorial desk.',
       },
     ];
@@ -121,6 +135,7 @@ export const mapDbToWpPost = (row: any, joinedTags?: string[]): WpPost => {
     sponsorName: row.sponsor_name || undefined,
     keyTakeaways: Array.isArray(row.key_takeaways) ? row.key_takeaways : undefined,
     blocks: parsedBlocks,
+    content: typeof row.content === 'string' ? row.content : undefined,
     viewsCount: Number(row.view_count) || 140,
     sharesCount: 14,
     commentCount: 0,
@@ -348,10 +363,21 @@ export const searchArticles = async (
 
 export const getArticleBySlug = async (
   slug: string, 
-  allowDraft: boolean = false
+  allowDraft: boolean = false,
+  forceFresh: boolean = false
 ): Promise<WpPost | null> => {
-  // Check client cache if not in draft mode
-  if (!allowDraft) {
+  // Check if browser URL has cache-busting version parameter
+  let urlVersion = '';
+  if (typeof window !== 'undefined') {
+    try {
+      const sp = new URLSearchParams(window.location.search);
+      urlVersion = sp.get('v') || '';
+      if (sp.get('fresh') === 'true') forceFresh = true;
+    } catch (e) {}
+  }
+
+  // Check client cache if not in draft mode and not forced fresh
+  if (!allowDraft && !forceFresh && !urlVersion) {
     const cached = cachedArticleBySlug.get(slug);
     if (cached && Date.now() - cached.timestamp < CLIENT_SLUG_TTL) {
       return cached.data;
@@ -362,7 +388,12 @@ export const getArticleBySlug = async (
   if (!allowDraft) {
     try {
       if (typeof window !== 'undefined') {
-        const res = await fetch(`/api/articles?slug=${encodeURIComponent(slug)}`);
+        const queryParams = new URLSearchParams();
+        queryParams.set('slug', slug);
+        if (urlVersion) queryParams.set('v', urlVersion);
+        if (forceFresh) queryParams.set('fresh', 'true');
+
+        const res = await fetch(`/api/articles?${queryParams.toString()}`);
         if (res.ok) {
           const json = await res.json();
           if (json?.post) {

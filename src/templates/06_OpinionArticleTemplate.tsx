@@ -3,6 +3,7 @@ import { Quote, Feather, ShieldCheck, Flame, BookOpen, ArrowRight } from 'lucide
 import { WpPost } from '../types/wordpress';
 import { mockAuthors, getLocalizedPost } from '../data/mockWpData';
 import { getStoredPosts } from '../utils/newsStorage';
+import { getArticleBySlug } from '../services/articleService';
 import { ArticleBody } from '../components/article/ArticleBody';
 import { ArticleShareBar } from '../components/article/ArticleShareBar';
 import { AuthorBioBox } from '../components/article/AuthorBioBox';
@@ -31,6 +32,19 @@ export const OpinionArticleTemplate: React.FC<OpinionArticleTemplateProps> = ({
   if (!post) return null;
   const { language, t, isHindi } = useLanguage();
   const localized = getLocalizedPost(post, language);
+
+  // Self-healing: if the active post only has a single placeholder block, fetch full article on-demand
+  React.useEffect(() => {
+    if (!post?.slug) return;
+    const isPlaceholder = !post.blocks || post.blocks.length === 0 || (post.blocks.length === 1 && post.blocks[0].id === 'b-default-1');
+    if (isPlaceholder) {
+      getArticleBySlug(post.slug, false, true).then((fullPost) => {
+        if (fullPost && fullPost.blocks && fullPost.blocks.length > 0 && fullPost.blocks[0].id !== 'b-default-1') {
+          onSelectPost(fullPost);
+        }
+      }).catch(() => {});
+    }
+  }, [post?.slug, post?.blocks?.length]);
   const author = post.customAuthor?.name ? {
     id: 'guest',
     name: post.customAuthor.name,

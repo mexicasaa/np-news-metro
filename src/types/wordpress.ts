@@ -107,6 +107,7 @@ export interface WpPost {
   keyTakeawaysHi?: string[];
   blocks: GutenbergBlock[];
   blocksHi?: GutenbergBlock[];
+  content?: string;
   viewsCount: number;
   sharesCount: number;
   commentCount: number;

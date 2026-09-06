@@ -55,11 +55,14 @@ function escapeHtml(str) {
   if (!str) return "";
   return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
-function sendResponse(res, statusCode, contentType, body) {
+function sendResponse(res, statusCode, contentType, body, isBypass = false) {
   res.statusCode = statusCode;
   if (typeof res.setHeader === "function") {
     res.setHeader("Content-Type", contentType);
-    res.setHeader("Cache-Control", "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800");
+    const cacheControl = isBypass
+      ? "public, max-age=60, s-maxage=300, stale-while-revalidate=600"
+      : "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800";
+    res.setHeader("Cache-Control", cacheControl);
   }
   if (typeof res.status === "function" && typeof res.send === "function") {
     return res.status(statusCode).send(body);
@@ -298,10 +301,13 @@ async function handler(req, res) {
       return sendResponse(res, 200, "text/html; charset=utf-8", catHtml);
     }
     let mediaItem = null;
-    const articleCacheKey = `item:${cleanCategory}:${cleanSlug || rawSlugParam}`;
-    const cachedItem = shareWarmCache.get(articleCacheKey);
-    if (cachedItem && Date.now() - cachedItem.timestamp < SHARE_CACHE_TTL) {
-      return sendResponse(res, 200, "text/html; charset=utf-8", cachedItem.html);
+    const bypassCache = !!rawVersionParam || req.query?.fresh === "true" || url.searchParams.get("fresh") === "true";
+    const articleCacheKey = `item:${cleanCategory}:${cleanSlug || rawSlugParam}:${rawVersionParam || "default"}`;
+    if (!bypassCache) {
+      const cachedItem = shareWarmCache.get(articleCacheKey);
+      if (cachedItem && Date.now() - cachedItem.timestamp < SHARE_CACHE_TTL) {
+        return sendResponse(res, 200, "text/html; charset=utf-8", cachedItem.html);
+      }
     }
     if (cleanCategory === "videos" && cleanSlug) {
       try {
@@ -325,41 +331,57 @@ async function handler(req, res) {
     }
     if (!mediaItem && cleanSlug) {
       try {
-        let { data } = await supabase.from("articles").select(`
-            title, 
-            seo_title, 
-            excerpt, 
-            meta_description, 
-            featured_image_url, 
-            author_name,
-            published_at, 
-            updated_at,
-            slug,
-            categories (slug)
-          `).eq("slug", cleanSlug).eq("status", "published").maybeSingle();
+        const ARTICLE_FIELDS = `
+          title, 
+          title_hi,
+          seo_title, 
+          excerpt, 
+          dek_hi,
+          content,
+          blocks,
+          meta_description, 
+          featured_image_url, 
+          featured_image_caption,
+          author_name,
+          author_role,
+          author_avatar,
+          custom_author,
+          published_at, 
+          updated_at,
+          slug,
+          categories (slug)
+        `;
+        let { data } = await supabase.from("articles").select(ARTICLE_FIELDS).eq("slug", cleanSlug).eq("status", "published").maybeSingle();
         if (!data && rawSlugParam && rawSlugParam !== cleanSlug) {
-          const { data: rawData } = await supabase.from("articles").select(`
-              title, 
-              seo_title, 
-              excerpt, 
-              meta_description, 
-              featured_image_url, 
-              author_name,
-              published_at, 
-              updated_at,
-              slug,
-              categories (slug)
-            `).eq("slug", rawSlugParam).eq("status", "published").maybeSingle();
+          const { data: rawData } = await supabase.from("articles").select(ARTICLE_FIELDS).eq("slug", rawSlugParam).eq("status", "published").maybeSingle();
           if (rawData) data = rawData;
         }
         if (data) {
           const rawCat = data.categories;
           const resolvedCat = (Array.isArray(rawCat) ? rawCat[0]?.slug : rawCat?.slug) || cleanCategory;
-          const bodyParagraphs = [data.meta_description || data.excerpt || data.title];
+          
+          let bodyParagraphs = [];
+          let rawBlocks = data.blocks;
+          if (typeof rawBlocks === 'string') {
+            try { rawBlocks = JSON.parse(rawBlocks); } catch (e) {}
+          }
+          if (Array.isArray(rawBlocks) && rawBlocks.length > 0) {
+            bodyParagraphs = rawBlocks
+              .filter(b => b && (b.type === 'paragraph' || b.type === 'heading' || !b.type) && b.content)
+              .map(b => String(b.content).trim())
+              .filter(Boolean);
+          }
+          if (bodyParagraphs.length === 0 && typeof data.content === 'string' && data.content.trim()) {
+            bodyParagraphs = data.content.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+          }
+          if (bodyParagraphs.length === 0) {
+            bodyParagraphs = [data.meta_description || data.excerpt || data.dek_hi || data.title].filter(Boolean);
+          }
+
           const authorName2 = data.custom_author?.name || data.author_name || "NP News Metro Bureau";
           mediaItem = {
-            title: data.seo_title || data.title,
-            dek: data.meta_description || data.excerpt || data.title,
+            title: data.seo_title || data.title_hi || data.title,
+            dek: data.meta_description || data.dek_hi || data.excerpt || data.title,
             category: resolvedCat || "india",
             image: data.featured_image_url,
             caption: data.featured_image_caption || data.title,
@@ -575,6 +597,10 @@ async function handler(req, res) {
       <div class="article-body">
         ${paragraphs.map((p) => `<p>${escapeHtml(p)}</p>`).join("\n        ")}
       </div>
+
+      <div style="margin: 36px 0 20px 0; text-align: center;">
+        <a href="${SITE_ORIGIN}/${category}/${slug}" style="display: inline-block; background-color: #990000; color: #ffffff; padding: 12px 24px; font-size: 15px; font-weight: bold; text-decoration: none; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">ताज़ा ख़बरें और पूरा डिजिटल संस्करण पढ़ें &rarr;</a>
+      </div>
     </article>
   </main>
 
@@ -593,7 +619,7 @@ async function handler(req, res) {
 </body>
 </html>`;
     shareWarmCache.set(articleCacheKey, { html, timestamp: Date.now() });
-    return sendResponse(res, 200, "text/html; charset=utf-8", html);
+    return sendResponse(res, 200, "text/html; charset=utf-8", html, bypassCache);
   } catch (err) {
     return sendResponse(res, 500, "text/plain; charset=utf-8", "Server Error: " + (err?.message || String(err)));
   }

@@ -384,17 +384,18 @@ export default async function handler(req, res) {
   const category = (req.query?.category || url.searchParams.get('category') || '').trim();
   const view = (req.query?.view || url.searchParams.get('view') || '').trim();
   const search = (req.query?.search || url.searchParams.get('search') || '').trim();
+  const versionParam = (req.query?.v || url.searchParams.get('v') || '').trim();
   const page = Math.max(1, parseInt(req.query?.page || url.searchParams.get('page') || '1', 10));
   const limit = Math.min(50, Math.max(1, parseInt(req.query?.limit || url.searchParams.get('limit') || '20', 10)));
   const offset = (page - 1) * limit;
-  const bypassCache = req.query?.fresh === 'true' || url.searchParams.get('fresh') === 'true';
+  const bypassCache = !!versionParam || req.query?.fresh === 'true' || url.searchParams.get('fresh') === 'true';
 
   try {
     // -------------------------------------------------------------
     // 1. SINGLE ARTICLE DETAIL (by slug)
     // -------------------------------------------------------------
     if (slug) {
-      const cacheKey = `article:${slug}`;
+      const cacheKey = `article:${slug}:${versionParam || 'default'}`;
       if (!bypassCache) {
         const cached = getFromWarmCache(cacheKey, CACHE_TTL.article);
         if (cached) {
@@ -424,7 +425,10 @@ export default async function handler(req, res) {
       setInWarmCache(cacheKey, responsePayload);
 
       res.setHeader('Content-Type', 'application/json; charset=utf-8');
-      res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=3600, stale-while-revalidate=86400');
+      const cacheControl = bypassCache 
+        ? 'public, max-age=60, s-maxage=300, stale-while-revalidate=600'
+        : 'public, max-age=60, s-maxage=3600, stale-while-revalidate=86400';
+      res.setHeader('Cache-Control', cacheControl);
       res.setHeader('X-Cache', 'MISS');
       return res.status(200).json(responsePayload);
     }
