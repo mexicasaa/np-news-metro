@@ -370,9 +370,7 @@ async function runSuite() {
     'api/feeds.js',
     'api/articles.js',
     'api/trending.js',
-    'api/image.js',
     'api/videos.js',
-    'api/media-upload.js',
     'api/revalidate.js',
   ];
 

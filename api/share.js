@@ -16,23 +16,23 @@ function getAbsoluteUrl(img, slug) {
   const trimmed = img.trim();
   if (trimmed.startsWith("data:")) {
     if (slug) {
-      return `${SITE_ORIGIN}/api/image?slug=${encodeURIComponent(slug)}`;
+      return `https://cdn.npnewsmetro.com/articles/${encodeURIComponent(slug)}`;
     }
     return DEFAULT_OG_IMAGE;
   }
   if (trimmed.includes("supabase.co/storage/v1/object/public/")) {
     const pathAfter = trimmed.split("/storage/v1/object/public/")[1];
     if (pathAfter) {
-      return `${SITE_ORIGIN}/api/image/${pathAfter.replace(/^\/+/, "")}`;
+      return `https://cdn.npnewsmetro.com/${pathAfter.replace(/^\/+/, "")}`;
     }
-    return `${SITE_ORIGIN}/api/image?url=${encodeURIComponent(trimmed)}`;
+    return `https://cdn.npnewsmetro.com/proxy?url=${encodeURIComponent(trimmed)}`;
   }
   if (trimmed.includes("supabase.co/storage/v1/render/image/public/")) {
     const pathAfter = trimmed.split("/storage/v1/render/image/public/")[1]?.split("?")[0];
     if (pathAfter) {
-      return `${SITE_ORIGIN}/api/image/${pathAfter.replace(/^\/+/, "")}`;
+      return `https://cdn.npnewsmetro.com/${pathAfter.replace(/^\/+/, "")}`;
     }
-    return `${SITE_ORIGIN}/api/image?url=${encodeURIComponent(trimmed)}`;
+    return `https://cdn.npnewsmetro.com/proxy?url=${encodeURIComponent(trimmed)}`;
   }
   if (/^https?:\/\//i.test(trimmed)) {
     if (trimmed.includes("images.unsplash.com")) {
@@ -46,7 +46,7 @@ function getAbsoluteUrl(img, slug) {
         return trimmed;
       }
     }
-    return `${SITE_ORIGIN}/api/image?url=${encodeURIComponent(trimmed)}`;
+    return `https://cdn.npnewsmetro.com/proxy?url=${encodeURIComponent(trimmed)}`;
   }
   const cleanPath = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
   return `${SITE_ORIGIN}${cleanPath}`;

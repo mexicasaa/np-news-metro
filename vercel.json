@@ -81,10 +81,6 @@
   ],
   "rewrites": [
     {
-      "source": "/api/image/:path*",
-      "destination": "/api/image?path=:path*"
-    },
-    {
       "source": "/api/likes",
       "destination": "/api/engagement?action=likes"
     },

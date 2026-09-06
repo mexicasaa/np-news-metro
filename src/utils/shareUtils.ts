@@ -49,9 +49,9 @@ export const getAbsoluteImageUrl = (imageUrl?: string, customOrigin?: string, sl
   // Handle data URIs
   if (trimmed.startsWith('data:')) {
     if (slug) {
-      return `${cleanOrigin}/api/image?slug=${encodeURIComponent(slug)}`;
+      return `https://cdn.npnewsmetro.com/articles/${encodeURIComponent(slug)}.jpg`;
     }
-    return DEFAULT_OG_IMAGE;
+    return `${cleanOrigin}/uploads/dr-deepak-goswami.jpg`;
   }
 
   // Already a full absolute HTTP/HTTPS URL
