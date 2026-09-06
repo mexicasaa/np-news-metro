@@ -75,7 +75,7 @@ export const renderInlineMarkdown = (text?: string): React.ReactNode => {
 export const ArticleBody: React.FC<ArticleBodyProps> = ({
   post,
   onSelectRelatedStory,
-  showAds = false,
+  showAds = true,
 }) => {
   const { language } = useLanguage();
   const localized = getLocalizedPost(post, language);

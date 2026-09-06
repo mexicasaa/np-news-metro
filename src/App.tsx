@@ -819,7 +819,13 @@ function AppContent() {
 
   // Editorial Flags
   const [isEmergencyBreaking, setIsEmergencyBreaking] = useState(false);
-  const [showAds, setShowAds] = useState(false);
+  const [showAds, setShowAds] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('np_editorial_ads');
+      if (saved !== null) return saved === 'true';
+    }
+    return true;
+  });
   const [showCorrections, setShowCorrections] = useState(true);
   const [isLoadingSkeleton, setIsLoadingSkeleton] = useState(false);
 

@@ -59,8 +59,8 @@ export const AdSlot: React.FC<AdSlotProps> = ({ zone, className = '' }) => {
     return (
       <aside
         className={`my-4 bg-surface-lowest border border-border-subtle rounded-sm p-3.5 shadow-2xs hover:border-primary/40 transition-all ${className}`}
-        data-ad-zone={zone}
-        aria-label="Advertisement"
+        data-slot={zone}
+        aria-label="Sponsored Partner"
       >
         <div className="flex items-center justify-between text-[9px] uppercase font-bold text-ink-muted tracking-widest pb-2 border-b border-border-subtle mb-2.5">
           <span className="text-secondary-gold">{isHindi ? 'प्रायोजित साझेदार' : 'Sponsored Partner'}</span>
@@ -85,6 +85,12 @@ export const AdSlot: React.FC<AdSlotProps> = ({ zone, className = '' }) => {
                 alt={altText}
                 className="w-full h-auto max-h-[540px] object-contain block mx-auto transition-transform duration-300 group-hover:scale-[1.01]"
                 loading="lazy"
+                onError={(e) => {
+                  const target = e.currentTarget;
+                  if (!target.src.endsWith('/uploads/shastri-patanjali-chikitsalaya.jpg')) {
+                    target.src = '/uploads/shastri-patanjali-chikitsalaya.jpg';
+                  }
+                }}
               />
             </a>
           )}
@@ -131,7 +137,7 @@ export const AdSlot: React.FC<AdSlotProps> = ({ zone, className = '' }) => {
     return (
       <div
         className={`my-6 bg-surface-lowest border border-border-subtle rounded-sm p-3.5 sm:p-4 shadow-2xs hover:border-primary/40 transition-all max-w-[760px] mx-auto ${className}`}
-        data-ad-zone={zone}
+        data-slot={zone}
       >
         <div className="flex items-center justify-between text-[9px] uppercase font-bold text-ink-muted tracking-widest pb-2 border-b border-border-subtle mb-3">
           <span className="text-secondary-gold">{isHindi ? 'प्रायोजित विज्ञापन' : 'Sponsored Feature'}</span>
@@ -155,6 +161,12 @@ export const AdSlot: React.FC<AdSlotProps> = ({ zone, className = '' }) => {
               alt={altText}
               className="w-full h-auto max-h-[300px] object-contain block mx-auto transition-transform duration-300 group-hover:scale-[1.01]"
               loading="lazy"
+              onError={(e) => {
+                const target = e.currentTarget;
+                if (!target.src.endsWith('/uploads/shastri-patanjali-chikitsalaya.jpg')) {
+                  target.src = '/uploads/shastri-patanjali-chikitsalaya.jpg';
+                }
+              }}
             />
           </a>
 
@@ -199,7 +211,7 @@ export const AdSlot: React.FC<AdSlotProps> = ({ zone, className = '' }) => {
   return (
     <div
       className={`my-2 sm:my-2.5 flex flex-col items-center justify-center ${className}`}
-      data-ad-zone={zone}
+      data-slot={zone}
     >
       <div
         className="w-full bg-surface-lowest border border-border-subtle rounded-sm py-1.5 px-3 sm:py-2 sm:px-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left transition-all hover:border-primary/40 shadow-2xs max-w-[970px]"

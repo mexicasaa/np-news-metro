@@ -36,7 +36,7 @@ export const StandardArticleTemplate: React.FC<StandardArticleTemplateProps> = (
   onSelectCategory,
   onSelectAuthor,
   showCorrections = true,
-  showAds = false,
+  showAds = true,
 }) => {
   if (!post) return null;
   const [commentsOpen, setCommentsOpen] = useState(false);

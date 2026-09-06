@@ -34,7 +34,7 @@ export const CategoryTemplate: React.FC<CategoryTemplateProps> = ({
   onNavigateHome,
   onSelectCategory,
   onNavigateTrending,
-  showAds = false,
+  showAds = true,
 }) => {
   const [activeSubcategory, setActiveSubcategory] = useState<string>('All');
   const [currentPage, setCurrentPage] = useState(1);

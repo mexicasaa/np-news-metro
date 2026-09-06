@@ -27,7 +27,7 @@ export const VideoDetailTemplate: React.FC<VideoDetailTemplateProps> = ({
   onSelectPost,
   onNavigateHome,
   onNavigateVideos,
-  showAds = false,
+  showAds = true,
 }) => {
   if (!video) return null;
   const { language, t, isHindi } = useLanguage();

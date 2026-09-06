@@ -26,7 +26,7 @@ export const LatestNewsTemplate: React.FC<LatestNewsTemplateProps> = ({
   onSelectPost,
   onNavigateHome,
   onNavigateTrending,
-  showAds = false,
+  showAds = true,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);

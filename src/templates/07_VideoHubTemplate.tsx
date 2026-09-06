@@ -20,7 +20,7 @@ export const VideoHubTemplate: React.FC<VideoHubTemplateProps> = ({
   videos,
   onSelectVideo,
   onNavigateHome,
-  showAds = false,
+  showAds = true,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const { t, isHindi } = useLanguage();

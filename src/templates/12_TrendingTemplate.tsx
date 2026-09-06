@@ -22,7 +22,7 @@ export const TrendingTemplate: React.FC<TrendingTemplateProps> = ({
   onSelectPost,
   onNavigateHome,
   onSelectCategory,
-  showAds = false,
+  showAds = true,
 }) => {
   const [timeframe, setTimeframe] = useState<'today' | 'week' | 'shared'>('today');
   const { language, t, isHindi } = useLanguage();

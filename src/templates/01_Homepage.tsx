@@ -42,7 +42,7 @@ export const Homepage: React.FC<HomepageProps> = ({
   onNavigateTrending,
   onNavigateVideos,
   onOpenNewsletter,
-  showAds = false,
+  showAds = true,
 }) => {
   const { t, isHindi } = useLanguage();
   const allPosts = (externalPosts && externalPosts.length > 0 ? externalPosts : getStoredPosts()).filter(isPostPublished);

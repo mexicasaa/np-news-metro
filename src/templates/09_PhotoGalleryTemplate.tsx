@@ -24,7 +24,7 @@ export const PhotoGalleryTemplate: React.FC<PhotoGalleryTemplateProps> = ({
   onSelectPost,
   onNavigateHome,
   onSelectCategory,
-  showAds = false,
+  showAds = true,
 }) => {
   const { language, t, isHindi } = useLanguage();
   const author = mockAuthors[gallery.authorId];
