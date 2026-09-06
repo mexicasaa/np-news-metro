@@ -291,7 +291,12 @@ export default async function handler(req, res) {
         const payload = {
           campaignId: campaign.id,
           placementId: data.id,
+          advertiserName: campaign.advertisers?.name || 'Direct Advertiser',
           advertiser: campaign.advertisers?.name || 'Direct Advertiser',
+          creativeText: creative.headline || campaign.name,
+          destinationUrl: creative.destination_url,
+          mediaUrl: creative.media?.public_url || null,
+          altText: creative.alt_text,
           creative: {
             id: creative.id,
             type: creative.type,

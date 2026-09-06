@@ -126,6 +126,9 @@ export const Homepage: React.FC<HomepageProps> = ({
                 </div>
               ))}
             </div>
+
+            {/* Vertical Sidebar Ad Placement (A3) */}
+            {showAds && <AdSlot zone="A3" className="mt-2" />}
           </div>
         </div>
       </section>
