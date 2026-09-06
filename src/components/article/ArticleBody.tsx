@@ -3,7 +3,7 @@ import { WpPost, GutenbergBlock } from '../../types/wordpress';
 import { KeyPointsBlock } from './KeyPointsBlock';
 import { PullQuote } from './PullQuote';
 import { AdSlot } from '../commercial/AdSlot';
-import { handleImageError } from '../../utils/imageFallback';
+import { handleImageError, getOptimizedImageUrl } from '../../utils/imageFallback';
 import { useLanguage } from '../../context/LanguageContext';
 import { getLocalizedPost } from '../../data/mockWpData';
 
@@ -234,7 +234,7 @@ export const ArticleBody: React.FC<ArticleBodyProps> = ({
               <figure key={block.id} className="my-8">
                 <div className="aspect-[16/9] overflow-hidden rounded-sm bg-surface-container border border-border-subtle">
                   <img
-                    src={block.imageUrl}
+                    src={getOptimizedImageUrl(block.imageUrl, 800)}
                     alt={block.imageCaption || 'Article visual'}
                     onError={handleImageError}
                     className="w-full h-full object-cover"

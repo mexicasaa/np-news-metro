@@ -30,20 +30,20 @@ export const getAbsoluteImageUrl = (imageUrl?: string, customOrigin?: string, sl
   const origin = customOrigin || getSiteOrigin();
   const cleanOrigin = origin.replace(/\/+$/, '');
 
-  // If Supabase storage, route via first-party clean /api/image/path endpoint to avoid x-robots-tag: none and ensure 100% crawlability
+  // If Supabase storage, route via direct Cloudflare CDN domain to avoid Vercel proxy compute costs
+  const cdnDomain = typeof process !== 'undefined' && process.env.VITE_CDN_DOMAIN ? process.env.VITE_CDN_DOMAIN : 'https://cdn.npnews.com';
+
   if (trimmed.includes('supabase.co/storage/v1/object/public/')) {
     const pathAfter = trimmed.split('/storage/v1/object/public/')[1];
     if (pathAfter) {
-      return `${cleanOrigin}/api/image/${pathAfter.replace(/^\/+/, '')}`;
+      return `${cdnDomain}/${pathAfter.replace(/^\/+/, '')}`;
     }
-    return `${cleanOrigin}/api/image?url=${encodeURIComponent(trimmed)}`;
   }
   if (trimmed.includes('supabase.co/storage/v1/render/image/public/')) {
     const pathAfter = trimmed.split('/storage/v1/render/image/public/')[1]?.split('?')[0];
     if (pathAfter) {
-      return `${cleanOrigin}/api/image/${pathAfter.replace(/^\/+/, '')}`;
+      return `${cdnDomain}/${pathAfter.replace(/^\/+/, '')}`;
     }
-    return `${cleanOrigin}/api/image?url=${encodeURIComponent(trimmed)}`;
   }
 
   // Handle data URIs

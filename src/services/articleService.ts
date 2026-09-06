@@ -852,7 +852,8 @@ export const getDeletedArticles = async (): Promise<DeletedArticle[]> => {
     const { data, error } = await ((supabase as any)
       .from('deleted_articles') as any)
       .select('*')
-      .order('deleted_at', { ascending: false });
+      .order('deleted_at', { ascending: false })
+      .limit(25);
 
     if (error || !data) {
       console.error('Error fetching deleted articles:', error);

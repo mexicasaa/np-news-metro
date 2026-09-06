@@ -22,7 +22,8 @@ export async function handler(event, context) {
     const { data: revisions, error } = await supabase
       .from('article_revisions')
       .select('id, article_id, created_at')
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(500);
 
     if (error || !revisions) {
       throw error || new Error('Failed to query revisions');

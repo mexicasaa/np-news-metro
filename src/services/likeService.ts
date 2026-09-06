@@ -17,28 +17,39 @@ export interface LikeState {
   likeCount: number;
 }
 
+const LIKED_STORAGE_PREFIX = 'np_liked_article_';
+
 export const getArticleLikeState = async (articleId: string): Promise<LikeState> => {
   if (!articleId) return { hasLiked: false, likeCount: 0 };
-  const userId = getVisitorId();
+  
+  // Instant client-side state evaluation
+  let hasLiked = false;
+  if (typeof window !== 'undefined') {
+    hasLiked = localStorage.getItem(`${LIKED_STORAGE_PREFIX}${articleId}`) === 'true';
+  }
 
-  // 1. Try serverless edge API if in browser
+  // 1. Try public edge-cached likeCount API (No userId parameter = 100% CDN cache hits)
   try {
     if (typeof window !== 'undefined') {
-      const res = await fetch(`/api/likes?articleId=${encodeURIComponent(articleId)}&userId=${encodeURIComponent(userId)}`);
+      const res = await fetch(`/api/likes?articleId=${encodeURIComponent(articleId)}`);
       if (res.ok) {
-        return await res.json();
+        const data = await res.json();
+        return {
+          hasLiked,
+          likeCount: typeof data.likeCount === 'number' ? data.likeCount : 0,
+        };
       }
     }
   } catch {}
 
-  // 2. Direct repository fallback
-  const repo = LikeRepository.getInstance();
-  const [hasLiked, likeCount] = await Promise.all([
-    repo.hasLiked(articleId, userId),
-    repo.getLikesCount(articleId),
-  ]);
-
-  return { hasLiked, likeCount };
+  // 2. Direct repository fallback (count only)
+  try {
+    const repo = LikeRepository.getInstance();
+    const likeCount = await repo.getLikesCount(articleId);
+    return { hasLiked, likeCount };
+  } catch {
+    return { hasLiked, likeCount: 0 };
+  }
 };
 
 export const toggleArticleLike = async (articleId: string): Promise<LikeState> => {
@@ -54,7 +65,9 @@ export const toggleArticleLike = async (articleId: string): Promise<LikeState> =
         body: JSON.stringify({ articleId, userId }),
       });
       if (res.ok) {
-        return await res.json();
+        const json = await res.json();
+        localStorage.setItem(`${LIKED_STORAGE_PREFIX}${articleId}`, json.hasLiked ? 'true' : 'false');
+        return json;
       }
     }
   } catch {}
@@ -62,5 +75,8 @@ export const toggleArticleLike = async (articleId: string): Promise<LikeState> =
   // 2. Direct repository fallback
   const repo = LikeRepository.getInstance();
   const result = await repo.toggleLike(articleId, userId);
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(`${LIKED_STORAGE_PREFIX}${articleId}`, result.liked ? 'true' : 'false');
+  }
   return { hasLiked: result.liked, likeCount: result.count };
 };

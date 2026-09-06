@@ -39,6 +39,14 @@ async function downloadFile(url, destPath, retries = 3) {
     fs.mkdirSync(dir, { recursive: true });
   }
 
+  // Incremental safeguard: skip if already downloaded to eliminate storage egress
+  if (fs.existsSync(destPath)) {
+    const stat = fs.statSync(destPath);
+    if (stat.size > 0) {
+      return { success: true, size: stat.size, skipped: true };
+    }
+  }
+
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       const res = await fetch(url);

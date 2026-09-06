@@ -128,7 +128,7 @@ export default async function handler(req, res) {
     let imageRes = await fetch(targetUrl);
     
     // If optimized render endpoint failed or not found, try fallback raw object
-    if (!imageRes.ok && fallbackUrl) {
+    if (!imageRes.ok && fallbackUrl && fallbackUrl !== targetUrl) {
       imageRes = await fetch(fallbackUrl);
     }
 
@@ -150,7 +150,6 @@ export default async function handler(req, res) {
     let buffer = Buffer.from(await imageRes.arrayBuffer());
 
     // CRITICAL: WhatsApp strictly drops ANY image >= 300KB (307,200 bytes).
-    // Tier 1 compression (800px / q60) if buffer > 250KB
     if (buffer.length > 250 * 1024 && pathParam) {
       try {
         const cleanPath = decodeURIComponent(pathParam).replace(/^\/+/, '');
@@ -165,25 +164,10 @@ export default async function handler(req, res) {
       } catch (ce) {}
     }
 
-    // Tier 2 compression (600px / q50) if buffer still > 250KB
-    if (buffer.length > 250 * 1024 && pathParam) {
-      try {
-        const cleanPath = decodeURIComponent(pathParam).replace(/^\/+/, '');
-        const compressedUrl = `${SUPABASE_STORAGE_ORIGIN}/storage/v1/render/image/public/${cleanPath}?width=600&quality=50&resize=contain`;
-        const cRes = await fetch(compressedUrl);
-        if (cRes.ok) {
-          const cBuf = Buffer.from(await cRes.arrayBuffer());
-          if (cBuf.length > 0 && cBuf.length < buffer.length) {
-            buffer = cBuf;
-          }
-        }
-      } catch (ce) {}
-    }
-
     if (typeof res.setHeader === 'function') {
       res.setHeader('Content-Type', contentType);
       res.setHeader('Content-Length', buffer.length);
-      res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=604800, stale-while-revalidate=86400');
+      res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=2592000, stale-while-revalidate=604800, immutable');
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('X-Robots-Tag', 'all, index, follow');
       // Strips any upstream x-robots-tag: none to ensure full social/search crawler indexing

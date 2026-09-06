@@ -43,7 +43,12 @@ export default async function handler(req, res) {
           userId ? supabase.from('article_likes').select('id').eq('article_id', articleId).eq('user_id', userId).maybeSingle() : Promise.resolve({ data: null }),
         ]);
 
-        res.setHeader('Cache-Control', 'public, max-age=15, s-maxage=30, stale-while-revalidate=60');
+        if (userId) {
+          res.setHeader('Cache-Control', 'private, no-cache');
+        } else {
+          res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600');
+        }
+
         return res.status(200).json({
           hasLiked: !!likedRes?.data,
           likeCount: countRes?.count || 0,

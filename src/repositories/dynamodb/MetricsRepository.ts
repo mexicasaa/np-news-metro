@@ -1,4 +1,3 @@
-import { supabase } from '../../lib/supabase';
 import { DailyMetricsRecord } from '../types';
 
 export class MetricsRepository {
@@ -66,17 +65,26 @@ export class MetricsRepository {
 
     const today = new Date().toISOString().split('T')[0];
 
-    // Failure-isolated write to Supabase aggregate table
+    // Failure-isolated write to new Edge API
     for (const [articleId, stat] of Object.entries(counts)) {
       try {
-        await supabase.rpc('increment_article_metric', {
-          p_article_id: articleId,
-          p_date: today,
-          p_views: stat.views,
-          p_shares: stat.shares,
-          p_likes: 0,
-          p_comments: 0,
-        });
+        if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
+          const blob = new Blob([JSON.stringify({
+            articleId,
+            type: stat.views > 0 ? 'view' : 'share'
+          })], { type: 'application/json' });
+          navigator.sendBeacon('/api/telemetry', blob);
+        } else {
+          fetch('/api/telemetry', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              articleId,
+              type: stat.views > 0 ? 'view' : 'share'
+            }),
+            keepalive: true
+          }).catch(() => {});
+        }
       } catch (err) {
         // Never let metric recording fail or throw
         console.warn('Metric batch increment non-fatal warning:', err);
@@ -92,18 +100,13 @@ export class MetricsRepository {
     const targetDate = date || new Date().toISOString().split('T')[0];
 
     try {
-      const { data, error } = await supabase
-        .from('article_metrics_daily')
-        .select('article_id, date, views, likes, shares, comments')
-        .eq('article_id', articleId)
-        .eq('date', targetDate)
-        .maybeSingle();
-
-      if (error || !data) return null;
-
+      const response = await fetch(`/api/metrics?articleId=${articleId}&date=${targetDate}`);
+      if (!response.ok) return null;
+      
+      const data = await response.json();
       return {
-        articleId: data.article_id || articleId,
-        date: data.date,
+        articleId: data.articleId || articleId,
+        date: data.date || targetDate,
         views: Number(data.views) || 0,
         likes: Number(data.likes) || 0,
         shares: Number(data.shares) || 0,

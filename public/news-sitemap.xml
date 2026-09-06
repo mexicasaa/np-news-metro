@@ -277,16 +277,4 @@
       <news:keywords>News, India</news:keywords>
     </news:news>
   </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/story</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-04T17:34:26.999Z</news:publication_date>
-      <news:title>नंद घर आनंद भयो यह केवल जन्म नहीं, चेतना का स्पंदन है</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
 </urlset>

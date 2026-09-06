@@ -54,19 +54,24 @@ export const getOptimizedImageUrl = (
     return trimmed;
   }
 
-  // Supabase storage object URL -> route through /api/image/...
+  // Normalize width to discrete buckets to prevent Edge CDN cache fragmentation
+  const bucketWidth = width <= 450 ? 400 : width <= 850 ? 800 : 1200;
+
+  const cdnDomain = typeof process !== 'undefined' && process.env.VITE_CDN_DOMAIN ? process.env.VITE_CDN_DOMAIN : 'https://cdn.npnews.com';
+
+  // Supabase storage object URL -> route through direct CDN
   if (trimmed.includes('/storage/v1/object/public/')) {
     const pathAfter = trimmed.split('/storage/v1/object/public/')[1];
     if (pathAfter) {
-      return `/api/image/${pathAfter.replace(/^\/+/, '')}?w=${width}&q=${quality}`;
+      return `${cdnDomain}/${pathAfter.replace(/^\/+/, '')}?w=${bucketWidth}&q=${quality}`;
     }
   }
 
-  // Supabase render URL -> normalize to /api/image/...
+  // Supabase render URL -> normalize to direct CDN
   if (trimmed.includes('/storage/v1/render/image/public/')) {
     const pathAfter = trimmed.split('/storage/v1/render/image/public/')[1]?.split('?')[0];
     if (pathAfter) {
-      return `/api/image/${pathAfter.replace(/^\/+/, '')}?w=${width}&q=${quality}`;
+      return `${cdnDomain}/${pathAfter.replace(/^\/+/, '')}?w=${bucketWidth}&q=${quality}`;
     }
   }
 
@@ -74,7 +79,7 @@ export const getOptimizedImageUrl = (
   if (trimmed.includes('images.unsplash.com')) {
     try {
       const u = new URL(trimmed);
-      u.searchParams.set('w', String(width));
+      u.searchParams.set('w', String(bucketWidth));
       u.searchParams.set('q', String(quality));
       u.searchParams.set('auto', 'format');
       return u.toString();

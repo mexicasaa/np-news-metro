@@ -40,7 +40,7 @@ export const BreakingArticleTemplate: React.FC<BreakingArticleTemplateProps> = (
     if (!post?.slug) return;
     const isPlaceholder = !post.blocks || post.blocks.length === 0 || (post.blocks.length === 1 && post.blocks[0].id === 'b-default-1');
     if (isPlaceholder) {
-      getArticleBySlug(post.slug, false, true).then((fullPost) => {
+      getArticleBySlug(post.slug, false, false).then((fullPost) => {
         if (fullPost && fullPost.blocks && fullPost.blocks.length > 0 && fullPost.blocks[0].id !== 'b-default-1') {
           onSelectPost(fullPost);
         }

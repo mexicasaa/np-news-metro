@@ -112,7 +112,10 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
 
         // Try same-origin image proxy: /api/image
         try {
-          const proxyUrl = `/api/image?url=${encodeURIComponent(imageUrl)}&width=1920&quality=95`;
+          const cdnDomain = typeof process !== 'undefined' && process.env.VITE_CDN_DOMAIN ? process.env.VITE_CDN_DOMAIN : 'https://cdn.npnews.com';
+          const proxyUrl = imageUrl.includes('supabase.co/storage/v1/object/public/') 
+            ? `${cdnDomain}/${imageUrl.split('supabase.co/storage/v1/object/public/')[1]}?width=1920&quality=95` 
+            : imageUrl;
           const resp = await fetch(proxyUrl);
           if (resp.ok) {
             const blob = await resp.blob();
@@ -346,7 +349,10 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
       } catch (loadErr) {
         // Fallback: fetch via same-origin proxy
         try {
-          const proxyUrl = `/api/image?url=${encodeURIComponent(imageUrl)}&width=1920&quality=95`;
+          const cdnDomain = typeof process !== 'undefined' && process.env.VITE_CDN_DOMAIN ? process.env.VITE_CDN_DOMAIN : 'https://cdn.npnews.com';
+          const proxyUrl = imageUrl.includes('supabase.co/storage/v1/object/public/') 
+            ? `${cdnDomain}/${imageUrl.split('supabase.co/storage/v1/object/public/')[1]}?width=1920&quality=95` 
+            : imageUrl;
           const pResp = await fetch(proxyUrl);
           if (pResp.ok) {
             const pBlob = await pResp.blob();

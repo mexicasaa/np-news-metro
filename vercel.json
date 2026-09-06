@@ -101,10 +101,6 @@
       "destination": "/api/engagement?action=ads"
     },
     {
-      "source": "/api/metrics",
-      "destination": "/api/engagement?action=metrics"
-    },
-    {
       "source": "/sitemap_index.xml",
       "destination": "/api/feeds?type=index"
     },
@@ -301,6 +297,24 @@
     },
     {
       "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/uploads/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)\\.(jpg|jpeg|png|webp|avif|gif|svg|ico)",
       "headers": [
         {
           "key": "Cache-Control",

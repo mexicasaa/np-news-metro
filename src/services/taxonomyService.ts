@@ -136,7 +136,8 @@ export const getVideos = async (): Promise<WpVideo[]> => {
       .from('videos')
       .select('id, title, slug, youtube_url, youtube_video_id, thumbnail_url, description, channel_name, duration_seconds, published_at')
       .eq('status', 'published')
-      .order('published_at', { ascending: false });
+      .order('published_at', { ascending: false })
+      .limit(30);
 
     if (error || !data || data.length === 0) {
       return mockVideos;

@@ -62,6 +62,17 @@ const CARD_PROJECTION_FIELDS = `
   featured_image_url, featured_image_alt, featured_image_caption
 `;
 
+// Protects wire egress by stripping accidental base64 images from author avatar
+const sanitizeCardPosts = (posts) => {
+  if (!Array.isArray(posts)) return [];
+  return posts.map(p => {
+    if (p?.author_avatar && p.author_avatar.startsWith('data:image')) {
+      return { ...p, author_avatar: '/uploads/dr-deepak-goswami.jpg' };
+    }
+    return p;
+  });
+};
+
 // Full projection for single article detail
 const ARTICLE_DETAIL_FIELDS = `
   id, slug, title, title_hi, excerpt, dek_hi, content, blocks, key_takeaways,
@@ -461,7 +472,7 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: error.message });
       }
 
-      const responsePayload = { posts: data || [] };
+      const responsePayload = { posts: sanitizeCardPosts(data || []) };
       setInWarmCache(cacheKey, responsePayload);
 
       res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -508,7 +519,7 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: error.message });
       }
 
-      const responsePayload = { posts: data || [], page, limit };
+      const responsePayload = { posts: sanitizeCardPosts(data || []), page, limit };
       setInWarmCache(cacheKey, responsePayload);
 
       res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -544,7 +555,7 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: error.message });
       }
 
-      const responsePayload = { posts: data || [], timestamp: Date.now() };
+      const responsePayload = { posts: sanitizeCardPosts(data || []), timestamp: Date.now() };
       setInWarmCache(cacheKey, responsePayload);
 
       res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -578,7 +589,7 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: error.message });
     }
 
-    const responsePayload = { posts: data || [], page, limit };
+    const responsePayload = { posts: sanitizeCardPosts(data || []), page, limit };
     setInWarmCache(cacheKey, responsePayload);
 
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
