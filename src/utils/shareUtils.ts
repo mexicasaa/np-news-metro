@@ -31,7 +31,9 @@ export const getAbsoluteImageUrl = (imageUrl?: string, customOrigin?: string, sl
   const cleanOrigin = origin.replace(/\/+$/, '');
 
   // If Supabase storage, route via direct Cloudflare CDN domain to avoid Vercel proxy compute costs
-  const cdnDomain = typeof process !== 'undefined' && process.env.VITE_CDN_DOMAIN ? process.env.VITE_CDN_DOMAIN : 'https://cdn.npnews.com';
+  const cdnDomain = (typeof import.meta !== 'undefined' && (import.meta as any)?.env?.VITE_CDN_DOMAIN) ||
+    (typeof process !== 'undefined' && process?.env?.VITE_CDN_DOMAIN) ||
+    'https://cdn.npnewsmetro.com';
 
   if (trimmed.includes('supabase.co/storage/v1/object/public/')) {
     const pathAfter = trimmed.split('/storage/v1/object/public/')[1];

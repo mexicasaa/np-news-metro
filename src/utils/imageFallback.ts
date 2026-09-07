@@ -57,7 +57,9 @@ export const getOptimizedImageUrl = (
   // Normalize width to discrete buckets to prevent Edge CDN cache fragmentation
   const bucketWidth = width <= 450 ? 400 : width <= 850 ? 800 : 1200;
 
-  const cdnDomain = typeof process !== 'undefined' && process.env.VITE_CDN_DOMAIN ? process.env.VITE_CDN_DOMAIN : 'https://cdn.npnews.com';
+  const cdnDomain = (typeof import.meta !== 'undefined' && (import.meta as any)?.env?.VITE_CDN_DOMAIN) ||
+    (typeof process !== 'undefined' && process?.env?.VITE_CDN_DOMAIN) ||
+    'https://cdn.npnewsmetro.com';
 
   // Supabase storage object URL -> route through direct CDN
   if (trimmed.includes('/storage/v1/object/public/')) {

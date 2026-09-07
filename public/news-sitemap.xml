@@ -2,6 +2,18 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
   <url>
+    <loc>https://www.npnewsmetro.com/religion/shreekrishna-rukminee-vivaaha-prasanga-se-bhaktimaya-huaa-rohinae</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-07T01:52:25.227Z</news:publication_date>
+      <news:title>श्रीकृष्ण-रुक्मिणी विवाह प्रसंग से भक्तिमय हुआ रोहिणी</news:title>
+      <news:keywords>News, India</news:keywords>
+    </news:news>
+  </url>
+  <url>
     <loc>https://www.npnewsmetro.com/social/tenta-kaitararsa-esosieshana-kaa-teena-divaseeya-mahaaadhiveshana</loc>
     <news:news>
       <news:publication>
@@ -262,18 +274,6 @@
       </news:publication>
       <news:publication_date>2026-09-05T16:47:15.877Z</news:publication_date>
       <news:title>जीवन को जीना सिखाने वाले सबसे बड़े गुरु श्रीकृष्ण</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/story-2</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-05T08:35:02.339Z</news:publication_date>
-      <news:title>वैश्य एकता परिषद ने नोएडा महानगर कार्यकारिणी का किया गठन</news:title>
       <news:keywords>News, India</news:keywords>
     </news:news>
   </url>

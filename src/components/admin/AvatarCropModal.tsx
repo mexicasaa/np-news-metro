@@ -72,7 +72,9 @@ export const AvatarCropModal: React.FC<AvatarCropModalProps> = ({
 
         // Fallback to same-origin image proxy
         try {
-          const cdnDomain = typeof process !== 'undefined' && process.env.VITE_CDN_DOMAIN ? process.env.VITE_CDN_DOMAIN : 'https://cdn.npnews.com';
+          const cdnDomain = (typeof import.meta !== 'undefined' && (import.meta as any)?.env?.VITE_CDN_DOMAIN) ||
+            (typeof process !== 'undefined' && process?.env?.VITE_CDN_DOMAIN) ||
+            'https://cdn.npnewsmetro.com';
           const proxyUrl = imageUrl.includes('supabase.co/storage/v1/object/public/') 
             ? `${cdnDomain}/${imageUrl.split('supabase.co/storage/v1/object/public/')[1]}?width=1000&quality=95` 
             : imageUrl;
@@ -229,7 +231,9 @@ export const AvatarCropModal: React.FC<AvatarCropModalProps> = ({
       } catch (loadErr) {
         // Fallback: fetch via same-origin proxy
         try {
-          const cdnDomain = typeof process !== 'undefined' && process.env.VITE_CDN_DOMAIN ? process.env.VITE_CDN_DOMAIN : 'https://cdn.npnews.com';
+          const cdnDomain = (typeof import.meta !== 'undefined' && (import.meta as any)?.env?.VITE_CDN_DOMAIN) ||
+            (typeof process !== 'undefined' && process?.env?.VITE_CDN_DOMAIN) ||
+            'https://cdn.npnewsmetro.com';
           const proxyUrl = imageUrl.includes('supabase.co/storage/v1/object/public/') 
             ? `${cdnDomain}/${imageUrl.split('supabase.co/storage/v1/object/public/')[1]}?width=1000&quality=95` 
             : imageUrl;
