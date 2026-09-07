@@ -61,6 +61,14 @@ export const getOptimizedImageUrl = (
     (typeof process !== 'undefined' && process?.env?.VITE_CDN_DOMAIN) ||
     'https://cdn.npnewsmetro.com';
 
+  // Cloudflare R2 direct dev URL -> route through direct CDN
+  if (trimmed.includes('pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev')) {
+    return trimmed.replace('https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev', cdnDomain);
+  }
+  if (/^https?:\/\/pub-[a-zA-Z0-9]+\.r2\.dev/.test(trimmed)) {
+    return trimmed.replace(/^https?:\/\/pub-[a-zA-Z0-9]+\.r2\.dev/, cdnDomain);
+  }
+
   // Supabase storage object URL -> route through direct CDN
   if (trimmed.includes('/storage/v1/object/public/')) {
     const pathAfter = trimmed.split('/storage/v1/object/public/')[1];

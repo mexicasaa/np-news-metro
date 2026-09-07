@@ -16,23 +16,29 @@ function getAbsoluteUrl(img, slug) {
   const trimmed = img.trim();
   if (trimmed.startsWith("data:")) {
     if (slug) {
-      return `https://cdn.npnewsmetro.com/articles/${encodeURIComponent(slug)}`;
+      return `${SITE_ORIGIN}/api/image?slug=${encodeURIComponent(slug)}`;
     }
     return DEFAULT_OG_IMAGE;
+  }
+  if (trimmed.includes("pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev")) {
+    return trimmed.replace("https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev", "https://cdn.npnewsmetro.com");
+  }
+  if (/^https?:\/\/pub-[a-zA-Z0-9]+\.r2\.dev/.test(trimmed)) {
+    return trimmed.replace(/^https?:\/\/pub-[a-zA-Z0-9]+\.r2\.dev/, "https://cdn.npnewsmetro.com");
   }
   if (trimmed.includes("supabase.co/storage/v1/object/public/")) {
     const pathAfter = trimmed.split("/storage/v1/object/public/")[1];
     if (pathAfter) {
       return `https://cdn.npnewsmetro.com/${pathAfter.replace(/^\/+/, "")}`;
     }
-    return `https://cdn.npnewsmetro.com/proxy?url=${encodeURIComponent(trimmed)}`;
+    return DEFAULT_OG_IMAGE;
   }
   if (trimmed.includes("supabase.co/storage/v1/render/image/public/")) {
     const pathAfter = trimmed.split("/storage/v1/render/image/public/")[1]?.split("?")[0];
     if (pathAfter) {
       return `https://cdn.npnewsmetro.com/${pathAfter.replace(/^\/+/, "")}`;
     }
-    return `https://cdn.npnewsmetro.com/proxy?url=${encodeURIComponent(trimmed)}`;
+    return DEFAULT_OG_IMAGE;
   }
   if (/^https?:\/\//i.test(trimmed)) {
     if (trimmed.includes("images.unsplash.com")) {
@@ -46,7 +52,7 @@ function getAbsoluteUrl(img, slug) {
         return trimmed;
       }
     }
-    return `https://cdn.npnewsmetro.com/proxy?url=${encodeURIComponent(trimmed)}`;
+    return trimmed;
   }
   const cleanPath = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
   return `${SITE_ORIGIN}${cleanPath}`;
@@ -209,6 +215,10 @@ async function handler(req, res) {
           categories: { slug: a.category }
         }));
       }
+      const topCatImage = catArticles.find((a) => a.featured_image_url)?.featured_image_url;
+      const catImage = topCatImage ? getAbsoluteUrl(topCatImage) : DEFAULT_OG_IMAGE;
+      const catImageExt = catImage.split("?")[0].split(".").pop()?.toLowerCase();
+      const catImageMimeType = catImageExt === "png" ? "image/png" : catImageExt === "webp" ? "image/webp" : "image/jpeg";
       const catHtml = `<!DOCTYPE html>
 <html lang="hi">
 <head>
@@ -226,13 +236,22 @@ async function handler(req, res) {
   <meta property="og:title" content="${escapeHtml(catDisplayName)} News | NP News Metro" />
   <meta property="og:description" content="Latest breaking headlines and investigative reporting in ${escapeHtml(catDisplayName)}." />
   <meta property="og:url" content="${canonicalCatUrl}" />
-  <meta property="og:image" content="${DEFAULT_OG_IMAGE}" />
+  <meta property="og:image" content="${catImage}" />
+  <meta property="og:image:url" content="${catImage}" />
+  <meta property="og:image:secure_url" content="${catImage}" />
+  <meta property="og:image:type" content="${catImageMimeType}" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="${escapeHtml(catDisplayName)} News | NP News Metro" />
 
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:domain" content="www.npnewsmetro.com" />
   <meta name="twitter:site" content="@NPNewsMetro" />
   <meta name="twitter:title" content="${escapeHtml(catDisplayName)} News | NP News Metro" />
   <meta name="twitter:description" content="Latest breaking headlines and investigative reporting in ${escapeHtml(catDisplayName)}." />
-  <meta name="twitter:image" content="${DEFAULT_OG_IMAGE}" />
+  <meta name="twitter:image" content="${catImage}" />
+  <meta name="twitter:image:alt" content="${escapeHtml(catDisplayName)} News | NP News Metro" />
+  <link rel="image_src" href="${catImage}" />
 
   <script type="application/ld+json">
   {
@@ -456,6 +475,8 @@ async function handler(req, res) {
     const imageVersion = mediaItem?.modifiedAt ? `${new Date(mediaItem.modifiedAt).getTime()}_v3` : `${Date.now()}_v3`;
     let image = mediaItem ? getAbsoluteUrl(mediaItem.image, slug) : DEFAULT_OG_IMAGE;
     image = image.includes("?") ? `${image}&v=${imageVersion}` : `${image}?v=${imageVersion}`;
+    const imageExt = image.split("?")[0].split(".").pop()?.toLowerCase();
+    const imageMimeType = imageExt === "png" ? "image/png" : imageExt === "webp" ? "image/webp" : imageExt === "gif" ? "image/gif" : "image/jpeg";
     const isVideo = category === "videos";
     const canonicalUrl = slug ? isVideo ? `${SITE_ORIGIN}/videos/${slug}` : `${SITE_ORIGIN}/${category}/${slug}` : `${SITE_ORIGIN}/`;
     const shareUrl = rawVersionParam ? `${canonicalUrl}?v=${encodeURIComponent(rawVersionParam)}` : `${canonicalUrl}?v=${imageVersion}`;
@@ -514,7 +535,7 @@ async function handler(req, res) {
   <meta property="og:image" content="${image}" />
   <meta property="og:image:url" content="${image}" />
   <meta property="og:image:secure_url" content="${image}" />
-  <meta property="og:image:type" content="image/jpeg" />
+  <meta property="og:image:type" content="${imageMimeType}" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="${escapeHtml(title)}" />

@@ -2,6 +2,14 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
+    <loc>https://www.npnewsmetro.com/india/story-3</loc>
+    <image:image>
+      <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/media/e7a262b2cbc2cd103ccc2adfade1103100876bb41398f962464873d45e1d316c/featured-crop.jpg</image:loc>
+      <image:caption>संघर्षों की इस दुनिया में....</image:caption>
+      <image:title>संघर्षों की इस दुनिया में....</image:title>
+    </image:image>
+  </url>
+  <url>
     <loc>https://www.npnewsmetro.com/religion/shreekrishna-rukminee-vivaaha-prasanga-se-bhaktimaya-huaa-rohinae</loc>
     <image:image>
       <image:loc>https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev/media/5ec0581ded7a5cc9369c75ee9ac32b256df0a08503c7767b353e3a088cd609dc/1005646353.jpg</image:loc>

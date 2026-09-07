@@ -35,6 +35,14 @@ export const getAbsoluteImageUrl = (imageUrl?: string, customOrigin?: string, sl
     (typeof process !== 'undefined' && process?.env?.VITE_CDN_DOMAIN) ||
     'https://cdn.npnewsmetro.com';
 
+  // If Cloudflare R2 direct public dev URL, normalize to branded edge CDN domain
+  if (trimmed.includes('pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev')) {
+    return trimmed.replace('https://pub-a4495fe3c1c741f2a1c8d8cd43ce064f.r2.dev', cdnDomain);
+  }
+  if (/^https?:\/\/pub-[a-zA-Z0-9]+\.r2\.dev/.test(trimmed)) {
+    return trimmed.replace(/^https?:\/\/pub-[a-zA-Z0-9]+\.r2\.dev/, cdnDomain);
+  }
+
   if (trimmed.includes('supabase.co/storage/v1/object/public/')) {
     const pathAfter = trimmed.split('/storage/v1/object/public/')[1];
     if (pathAfter) {
@@ -51,7 +59,7 @@ export const getAbsoluteImageUrl = (imageUrl?: string, customOrigin?: string, sl
   // Handle data URIs
   if (trimmed.startsWith('data:')) {
     if (slug) {
-      return `https://cdn.npnewsmetro.com/articles/${encodeURIComponent(slug)}.jpg`;
+      return `${cleanOrigin}/api/image?slug=${encodeURIComponent(slug)}`;
     }
     return `${cleanOrigin}/uploads/dr-deepak-goswami.jpg`;
   }

@@ -2,6 +2,30 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
   <url>
+    <loc>https://www.npnewsmetro.com/india/unauthorized-article-attempt</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>en</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-07T16:26:43.293Z</news:publication_date>
+      <news:title>Unauthorized Article Attempt</news:title>
+      <news:keywords>News, India</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/india/story-3</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-07T16:01:11.148Z</news:publication_date>
+      <news:title>संघर्षों की इस दुनिया में....</news:title>
+      <news:keywords>News, India</news:keywords>
+    </news:news>
+  </url>
+  <url>
     <loc>https://www.npnewsmetro.com/religion/shreekrishna-rukminee-vivaaha-prasanga-se-bhaktimaya-huaa-rohinae</loc>
     <news:news>
       <news:publication>

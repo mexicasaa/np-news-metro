@@ -49,7 +49,8 @@ async function runCrawlerTests() {
   const ogUrl3 = r3.body.match(/<meta property="og:url" content="([^"]+)"/)?.[1];
   console.log('Article 1 og:image:', ogImg3);
   console.log('Article 1 og:url:', ogUrl3);
-  assert.ok(ogImg3 && ogImg3.includes('/api/image') && ogImg3.includes('1005537465-mtbur5bp.jpg'), 'Article 1 og:image must route through /api/image');
+  assert.ok(ogImg3 && (ogImg3.includes('/api/image') || ogImg3.includes('cdn.npnewsmetro.com')) && ogImg3.includes('1005537465-mtbur5bp.jpg'), 'Article 1 og:image must route through cdn or api/image');
+  assert.ok(!ogImg3.includes('/proxy?url='), 'Article 1 og:image must NOT contain broken /proxy?url=');
   assert.ok(ogUrl3 && ogUrl3.includes('v=1787856397874'), 'Article 1 og:url must include cache buster for social scrapers');
   console.log('✓ Test 3 Passed: Article 1 generates clean first-party image URL and cache-busted og:url');
 
@@ -64,7 +65,8 @@ async function runCrawlerTests() {
   const ogUrl4 = r4.body.match(/<meta property="og:url" content="([^"]+)"/)?.[1];
   console.log('Article 2 og:image:', ogImg4);
   console.log('Article 2 og:url:', ogUrl4);
-  assert.ok(ogImg4 && ogImg4.includes('/api/image') && ogImg4.includes('1005537397-mtbu880l-mtbvs0et.jpg'), 'Article 2 og:image must route through /api/image');
+  assert.ok(ogImg4 && (ogImg4.includes('/api/image') || ogImg4.includes('cdn.npnewsmetro.com')) && ogImg4.includes('1005537397-mtbu880l-mtbvs0et.jpg'), 'Article 2 og:image must route through cdn or api/image');
+  assert.ok(!ogImg4.includes('/proxy?url='), 'Article 2 og:image must NOT contain broken /proxy?url=');
   assert.ok(ogUrl4 && ogUrl4.includes('v=1787856835846'), 'Article 2 og:url must include cache buster for social scrapers');
   console.log('✓ Test 4 Passed: Article 2 generates clean first-party image URL and cache-busted og:url');
 

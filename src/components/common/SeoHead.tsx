@@ -19,6 +19,8 @@ export const SeoHead: React.FC<SeoHeadProps> = ({ metadata, structuredData }) =>
     const finalDesc = metadata?.description || 'Fast, verified, and in-depth national news coverage, policy analysis, investigative journalism, and live market updates.';
     const finalUrl = metadata?.canonicalUrl || (typeof window !== 'undefined' ? `${window.location.origin}${window.location.pathname}` : 'https://www.npnewsmetro.com/');
     const finalImage = getAbsoluteImageUrl(metadata?.ogImage, 'https://www.npnewsmetro.com');
+    const imageExt = finalImage.split('?')[0].split('.').pop()?.toLowerCase();
+    const imageMime = imageExt === 'png' ? 'image/png' : imageExt === 'webp' ? 'image/webp' : imageExt === 'gif' ? 'image/gif' : 'image/jpeg';
     const robotsContent = metadata?.noIndex ? 'noindex, nofollow' : 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1';
     const googleNewsContent = metadata?.noIndex ? 'noindex, nofollow' : 'index, follow';
 
@@ -50,7 +52,7 @@ export const SeoHead: React.FC<SeoHeadProps> = ({ metadata, structuredData }) =>
     setMetaTag('meta[property="og:image:secure_url"]', 'property', 'og:image:secure_url', finalImage);
     setMetaTag('meta[property="og:image:width"]', 'property', 'og:image:width', '1200');
     setMetaTag('meta[property="og:image:height"]', 'property', 'og:image:height', '630');
-    setMetaTag('meta[property="og:image:type"]', 'property', 'og:image:type', 'image/jpeg');
+    setMetaTag('meta[property="og:image:type"]', 'property', 'og:image:type', imageMime);
     setMetaTag('meta[property="og:image:alt"]', 'property', 'og:image:alt', metadata?.title || 'NP News Metro');
     setMetaTag('meta[property="og:type"]', 'property', 'og:type', metadata?.ogType || 'website');
     setMetaTag('meta[property="og:site_name"]', 'property', 'og:site_name', 'NP News Metro');
