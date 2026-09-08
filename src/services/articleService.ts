@@ -437,7 +437,7 @@ export const getArticleBySlug = async (
 
 export const getEditorialArticles = async (
   statusFilter?: string,
-  limit?: number
+  limit: number = 25
 ): Promise<(WpPost & { editorialStatus: EditorialStatus; rawId: string })[]> => {
   try {
     let query = (supabase.from('articles') as any)

@@ -60,20 +60,6 @@ export const ensureAuthenticatedSession = async (): Promise<string | null> => {
     if (session?.user && session?.access_token) {
       return session.user.id;
     }
-
-    // Auto-authenticate as newsroom staff if no active JWT session exists
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: 'admin@npnews.com',
-      password: 'umang1512',
-    });
-
-    if (!error && data?.user) {
-      try {
-        localStorage.setItem('np_news_admin_auth', 'true');
-        sessionStorage.setItem('np_news_admin_auth', 'true');
-      } catch (e) {}
-      return data.user.id;
-    }
     return null;
   } catch (err) {
     console.error('Error ensuring authenticated session:', err);
@@ -83,6 +69,10 @@ export const ensureAuthenticatedSession = async (): Promise<string | null> => {
 
 export const signOut = async (): Promise<{ error?: string }> => {
   try {
+    try {
+      localStorage.removeItem('np_news_admin_auth');
+      sessionStorage.removeItem('np_news_admin_auth');
+    } catch (e) {}
     const { error } = await supabase.auth.signOut();
     if (error) {
       console.warn('Supabase sign out error:', error.message);
