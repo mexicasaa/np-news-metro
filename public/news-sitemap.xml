@@ -2,14 +2,134 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
   <url>
-    <loc>https://www.npnewsmetro.com/india/unauthorized-article-attempt</loc>
+    <loc>https://www.npnewsmetro.com/india/aanganavaadee-kaaryakatriyon-kaa-maanadeya-12-hajaara-sahaayikaao</loc>
     <news:news>
       <news:publication>
         <news:name>NP News Metro</news:name>
-        <news:language>en</news:language>
+        <news:language>hi</news:language>
       </news:publication>
-      <news:publication_date>2026-09-07T16:26:43.293Z</news:publication_date>
-      <news:title>Unauthorized Article Attempt</news:title>
+      <news:publication_date>2026-09-08T16:00:17.198Z</news:publication_date>
+      <news:title>आंगनवाड़ी कार्यकत्रियों का मानदेय 12 हजार, सहायिकाओं को मिलेंगे छह हजार रुपये</news:title>
+      <news:keywords>News, India</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/lifestyle/vishva-phijiyotherepee-divasa-haarta-aura-stroka-se-bachaava-men</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-08T02:49:58.524Z</news:publication_date>
+      <news:title>विश्व फिजियोथेरेपी दिवस: हार्ट और स्ट्रोक से बचाव में भी अहम फिजियोथेरेपी</news:title>
+      <news:keywords>News, India</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/lifestyle/keshava-ke-bhakton-ne-gauree-gopaala-ghara-men-manaayaa-nandotsav</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-08T02:30:42.110Z</news:publication_date>
+      <news:title>केशव के भक्तों ने गौरी गोपाल घर में मनाया नन्दोत्सव भोलेश्वर उपमन्यु</news:title>
+      <news:keywords>News, India</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/opinion/peinga-gesta-kiraaye-kee-chaaradeevaaree-men-kaida-chhaatron-kaa</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-08T02:25:46.017Z</news:publication_date>
+      <news:title>पेइंग गेस्ट : किराये की चारदीवारी में कैद छात्रों का सच</news:title>
+      <news:keywords>News, India</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/entertainment/kaavya-srijana-kee-maasika-goshthee-men-19-shikshakon-kaa-bhavya</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-08T02:19:44.483Z</news:publication_date>
+      <news:title>काव्य-सृजन की मासिक गोष्ठी में 19 शिक्षकों का भव्य सम्मान</news:title>
+      <news:keywords>News, India</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/astrology/8-sitanbara-2026-mangalavaara-kaa-raashiphala-jaanen-12-raashiyon</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-08T02:12:17.060Z</news:publication_date>
+      <news:title>8 सितंबर 2026 मंगलवार का राशिफल: जानें 12 राशियों का हाल</news:title>
+      <news:keywords>News, India</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/technology/2026-odee-kyoo3-kee-bhaarata-men-pree-bukinga-shuroo-1-laakha-men</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-08T02:03:12.081Z</news:publication_date>
+      <news:title>2026 ऑडी क्यू3 की भारत में प्री-बुकिंग शुरू, 1 लाख में करें बुकिंग</news:title>
+      <news:keywords>News, India</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/business/taataa-ne-karva-seereeja-eksa-loncha-kee-keemata-999-laakha-rupay</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-08T01:58:16.150Z</news:publication_date>
+      <news:title>टाटा ने कर्व सीरीज एक्स लॉन्च की, कीमत 9.99 लाख रुपये से शुरू</news:title>
+      <news:keywords>News, India</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/religion/sudaamaa-charitra-suna-bhaava-vibhora-hue-shraddhaalau</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-08T01:46:19.460Z</news:publication_date>
+      <news:title>सुदामा चरित्र सुन भाव-विभोर हुए श्रद्धालु</news:title>
+      <news:keywords>News, India</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/social/dooba-kshetra-men-bijalee-kanekshana-kaatane-ke-virodha-men-sapaa</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-08T01:38:52.411Z</news:publication_date>
+      <news:title>डूब क्षेत्र में बिजली कनेक्शन काटने के विरोध में सपा ने दिया समर्थन</news:title>
+      <news:keywords>News, India</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/politics/jarjara-skoolon-ko-lekara-aapa-ne-beeesae-ko-saunpaa-10-sootreeya</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-08T01:32:52.050Z</news:publication_date>
+      <news:title>जर्जर स्कूलों को लेकर आप ने बीएसए को सौंपा 10 सूत्रीय ज्ञापन</news:title>
       <news:keywords>News, India</news:keywords>
     </news:news>
   </url>
@@ -34,270 +154,6 @@
       </news:publication>
       <news:publication_date>2026-09-07T01:52:25.227Z</news:publication_date>
       <news:title>श्रीकृष्ण-रुक्मिणी विवाह प्रसंग से भक्तिमय हुआ रोहिणी</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/social/tenta-kaitararsa-esosieshana-kaa-teena-divaseeya-mahaaadhiveshana</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-06T09:01:42.203Z</news:publication_date>
-      <news:title>टेंट-कैटरर्स एसोसिएशन का तीन दिवसीय महाअधिवेशन संपन्न</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/hariyaanaa-men-raha-rahe-poorvottara-ke-yuvaaon-ko-pradesha-sarak</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-05T20:42:37.025Z</news:publication_date>
-      <news:title>हरियाणा में रह रहे पूर्वोत्तर के युवाओं को प्रदेश सरकार दे रही पूर्ण सहयोग : सीएम सैनी</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/politics/shikshaka-divasa-para-79-shikshakon-ko-milaa-raajya-stareeya-samm</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-05T20:39:22.913Z</news:publication_date>
-      <news:title>शिक्षक दिवस पर 79 शिक्षकों को मिला राज्य स्तरीय सम्मान</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/yuvaa-shakti-hee-vikasita-bhaarata-kee-sabase-badee-parivartanaka</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-05T20:22:47.272Z</news:publication_date>
-      <news:title>युवा शक्ति ही विकसित भारत की सबसे बड़ी परिवर्तनकारी शक्ति : सीएम धामी</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/religion/shreekrishna-kee-baala-leelaaen-suna-bhaavavibhora-hue-shraddhaal</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-05T20:12:10.941Z</news:publication_date>
-      <news:title>श्रीकृष्ण की बाल लीलाएं सुन भावविभोर हुए श्रद्धालु, गोवर्धन पूजा का सुनाया अमृतमयी प्रसंग</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/religion/iskona-noedaa-eksapresave-men-dhoomadhaama-se-manaayaa-shreekrish</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-05T20:05:12.222Z</news:publication_date>
-      <news:title>इस्कॉन नोएडा एक्सप्रेसवे में धूमधाम से मनाया श्रीकृष्ण जन्माष्टमी महोत्सव</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/crime/sektara-63-men-mobaaila-chora-giroha-kaa-pardaaphaasha-chaara-aar</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-05T19:58:19.212Z</news:publication_date>
-      <news:title>सेक्टर-63 में मोबाइल चोर गिरोह का पर्दाफाश, चार आरोपित गिरफ्तार</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/crime/phesa-3-men-vaahana-chora-giroha-kaa-pardaaphaasha-10-dopahiyaa-v</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-05T19:50:30.211Z</news:publication_date>
-      <news:title>फेस-3 में वाहन चोर गिरोह का पर्दाफाश, 10 दोपहिया वाहन बरामद</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/crime/teenon-tahaseelon-men-aayojita-huaa-sanpoorna-samaadhaana-divasa</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-05T19:42:23.513Z</news:publication_date>
-      <news:title>तीनों तहसीलों में आयोजित हुआ संपूर्ण समाधान दिवस, 189 शिकायतें दर्ज</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/religion/iskona-sansthaapakaachaarya-shreela-prabhupaada-kaa-aavirbhaava-t</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-05T19:34:57.168Z</news:publication_date>
-      <news:title>इस्कॉन संस्थापकाचार्य श्रील प्रभुपाद का आविर्भाव तिथि महामहोत्सव श्रद्धा और भक्ति के साथ सम्पन्न</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/astrology/6-sitanbara-2026-ravivaara-kaa-raashiphala-jaanen-sabhee-12-raash</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-05T19:21:37.421Z</news:publication_date>
-      <news:title>6 सितंबर 2026 रविवार का राशिफल: जानें सभी 12 राशियों का हाल</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/sabhee-81-shikshakon-ko-seeema-yogee-ne-apane-haathon-se-diyaa-pu</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-05T19:08:27.550Z</news:publication_date>
-      <news:title>सभी 81 शिक्षकों को सीएम योगी ने अपने हाथों से दिया पुरस्कार</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/aadhunika-shikshaa-aura-navaachaara-se-naee-peedhee-kaa-bhavishya</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-05T19:05:06.290Z</news:publication_date>
-      <news:title>आधुनिक शिक्षा और नवाचार से नई पीढ़ी का भविष्य गढ़ रहे शिक्षक : योगी</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/social/satyabhaana-mohanalaala-roopakishora-va-sukhanandana-sammaanita</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-05T18:45:19.800Z</news:publication_date>
-      <news:title>सत्यभान, मोहनलाल, रूपकिशोर व सुखनन्दन सम्मानित</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/social/braahmana-mahaasabhaa-ne-shubhaa-brajaraanee-va-lakshmee-kaa-kiya</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-05T18:39:42.799Z</news:publication_date>
-      <news:title>ब्राह्मण महासभा ने शुभा, ब्रजरानी व लक्ष्मी का किया सम्मान</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/religion/shivaajee-purama-parva-aayojana-samiti-ne-harshollaasa-se-manaaya</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-05T18:31:00.814Z</news:publication_date>
-      <news:title>शिवाजी पुरम पर्व आयोजन समिति ने हर्षोल्लास से मनाया श्रीकृष्ण जन्मोत्सव</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/religion/shreekrishna-janmaashtamee-parva-harshollaasa-se-sampanna-buraaiy</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-05T18:18:03.093Z</news:publication_date>
-      <news:title>श्रीकृष्ण जन्माष्टमी पर्व हर्षोल्लास से सम्पन्न, बुराइयां छोड़ने का कराया संकल्प</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/entertainment/shikshaa-hai-zarooraee</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-05T18:07:44.330Z</news:publication_date>
-      <news:title>शिक्षा है ज़रूरी</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/business/yuvaaon-taka-naee-pahachaana-ke-saatha-pahunchegaa-safi-hamdard-n</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-05T17:56:07.183Z</news:publication_date>
-      <news:title>युवाओं तक नई पहचान के साथ पहुंचेगा Safi, Hamdard ने शुरू किया नया अभियान</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/business/dillee-men-nest-fest-2026-kaa-bhavya-shubhaaranbha-rekhaa-guptaa</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-05T17:23:49.178Z</news:publication_date>
-      <news:title>दिल्ली में NESt Fest 2026 का भव्य शुभारंभ, रेखा गुप्ता-सिंधिया रहे मौजूद</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/religion/jhandevaalaa-devee-mandira-men-dhoomadhaama-se-manaayaa-gayaa-kri</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-05T17:09:14.361Z</news:publication_date>
-      <news:title>झण्डेवाला देवी मंदिर में धूमधाम से मनाया गया कृष्ण जन्मोत्सव</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/opinion/jeevana-ko-jeenaa-sikhaane-vaale-sabase-bade-guru-shreekrishna</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-05T16:47:15.877Z</news:publication_date>
-      <news:title>जीवन को जीना सिखाने वाले सबसे बड़े गुरु श्रीकृष्ण</news:title>
       <news:keywords>News, India</news:keywords>
     </news:news>
   </url>

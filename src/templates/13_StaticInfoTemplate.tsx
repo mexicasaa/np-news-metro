@@ -1558,89 +1558,88 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                     </span>
                   </div>
                   <h1 className="font-serif text-3xl sm:text-4xl font-extrabold text-ink tracking-tight">
-                    {isHindi ? 'न्यूज़रूम संपर्क एवं गोपनीय सुझाव' : 'Contact Us & Confidential News Tips'}
+                    {isHindi ? 'संपर्क करें' : 'Contact Us'}
                   </h1>
                   <p className="text-xs text-ink-muted mt-1">
-                    {isHindi ? 'संपादकीय डेस्क, शिकायत निवारण, विज्ञापन एवं व्हिसलब्लोअर हेल्पलाइन' : 'Editorial desks, bureau offices, grievance redressal, and secure whistleblower communications'}
+                    {isHindi ? 'प्रधान कार्यालय संपर्क विवरण, आधिकारिक पत्राचार एवं संदेश प्रपत्र' : 'Head office contact details, official correspondence, and newsroom communications'}
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="p-4 bg-surface-container/60 rounded border border-border-subtle space-y-2">
-                    <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-wider">
-                      <Building className="w-4 h-4 text-editorial-red" />
-                      <span>{isHindi ? 'राष्ट्रीय मुख्यालय (New Delhi HQ)' : 'National Headquarters'}</span>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Head Office */}
+                  <div className="p-5 bg-surface-container/60 rounded border border-border-subtle space-y-3 flex flex-col justify-between">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-wider">
+                        <Building className="w-4 h-4 text-editorial-red" />
+                        <span>{isHindi ? 'प्रधान कार्यालय (Head Office)' : 'Head Office'}</span>
+                      </div>
+                      <p className="text-xs text-ink leading-relaxed font-medium">
+                        A-120 Shiv Mandir Marg Mandawali<br />
+                        Delhi -110092
+                      </p>
                     </div>
-                    <p className="text-xs text-ink-secondary leading-relaxed">
-                      <strong>NP News Metro Media Network Pvt. Ltd.</strong><br />
-                      4th Floor, Statesman House, Barakhamba Road, Connaught Place,<br />
-                      New Delhi – 110001, India.
-                    </p>
-                    <div className="text-[11px] text-ink-muted bg-white p-1.5 rounded border border-border-subtle font-mono">
-                      <strong>RNI No:</strong> DEL HIN/2010/31544 (by Metromat Delhi)
+                    <div className="text-[11px] text-ink-muted bg-white p-2 rounded border border-border-subtle font-mono">
+                      <strong>{isHindi ? 'आरएनआई सं.:' : 'RNI No:'}</strong> DEL HIN/2010/31544 (by Metromat Delhi)
                     </div>
-                    <p className="text-xs text-ink font-semibold">
-                      {isHindi ? 'फोन:' : 'Phone:'} +91 (11) 4982-3100
-                    </p>
                   </div>
 
-                  <div className="p-4 bg-surface-container/60 rounded border border-border-subtle space-y-2">
+                  {/* Phone No */}
+                  <div className="p-5 bg-surface-container/60 rounded border border-border-subtle space-y-3">
                     <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-wider">
-                      <Globe className="w-4 h-4 text-editorial-red" />
-                      <span>{isHindi ? 'प्रमुख क्षेत्रीय ब्यूरो' : 'Regional Bureaus'}</span>
+                      <Phone className="w-4 h-4 text-editorial-red" />
+                      <span>{isHindi ? 'फोन नंबर (Phone No.)' : 'Phone No.'}</span>
                     </div>
-                    <ul className="text-xs text-ink-secondary space-y-1">
-                      <li>• <strong>Mumbai:</strong> Express Towers, Nariman Point, Mumbai 400021</li>
-                      <li>• <strong>Bengaluru:</strong> Brigade Road, MG Road, Bengaluru 560001</li>
-                      <li>• <strong>Kolkata:</strong> BBD Bagh, Central Kolkata 700001</li>
-                    </ul>
+                    <p className="text-xs text-ink-muted">
+                      {isHindi ? 'सीधे संपर्क या सहायता के लिए:' : 'Direct helpline and phone contacts:'}
+                    </p>
+                    <div className="space-y-2 pt-1">
+                      <a 
+                        href="tel:9716125425" 
+                        className="flex items-center gap-2.5 text-xs font-semibold text-ink hover:text-primary transition-colors font-mono p-2.5 bg-white rounded border border-border-subtle hover:border-primary"
+                      >
+                        <Phone className="w-3.5 h-3.5 text-editorial-red" />
+                        <span>9716125425</span>
+                      </a>
+                      <a 
+                        href="tel:9968219486" 
+                        className="flex items-center gap-2.5 text-xs font-semibold text-ink hover:text-primary transition-colors font-mono p-2.5 bg-white rounded border border-border-subtle hover:border-primary"
+                      >
+                        <Phone className="w-3.5 h-3.5 text-editorial-red" />
+                        <span>9968219486</span>
+                      </a>
+                    </div>
                   </div>
-                </div>
 
-                {/* Desk Email Directory */}
-                <div className="space-y-3 pt-2">
-                  <h3 className="font-serif text-base font-bold text-ink">
-                    {isHindi ? 'विभागीय संपर्क सूत्र (Email Directory)' : 'Departmental Email Desks'}
-                  </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                    <div className="p-3 bg-white border border-border-subtle rounded flex items-center justify-between">
-                      <div>
-                        <span className="font-bold text-ink block">{isHindi ? 'संपादक एवं मुख्य डेस्क' : 'Editor-in-Chief & General Desk'}</span>
-                        <span className="text-ink-secondary font-mono text-[11px]">editor@npnewsmetro.com</span>
-                      </div>
-                      <button onClick={() => handleCopy('editor@npnewsmetro.com')} className="p-1.5 text-ink-muted hover:text-primary cursor-pointer">
-                        {copiedEmail === 'editor@npnewsmetro.com' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                      </button>
+                  {/* Email ID */}
+                  <div className="p-5 bg-surface-container/60 rounded border border-border-subtle space-y-3">
+                    <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-wider">
+                      <Mail className="w-4 h-4 text-editorial-red" />
+                      <span>{isHindi ? 'ईमेल आईडी (Email ID)' : 'Email ID'}</span>
                     </div>
-
-                    <div className="p-3 bg-white border border-border-subtle rounded flex items-center justify-between">
-                      <div>
-                        <span className="font-bold text-ink block">{isHindi ? 'ब्रेकिंग न्यूज़ एवं प्रेस विज्ञप्ति' : 'News Desk & Press Releases'}</span>
-                        <span className="text-ink-secondary font-mono text-[11px]">newsdesk@npnewsmetro.com</span>
+                    <p className="text-xs text-ink-muted">
+                      {isHindi ? 'संपादकीय एवं आधिकारिक पत्राचार के लिए:' : 'For editorial inquiries and correspondence:'}
+                    </p>
+                    <div className="pt-1">
+                      <div className="p-2.5 bg-white border border-border-subtle rounded flex items-center justify-between gap-2">
+                        <a 
+                          href="mailto:umangpandey@npnewsmetro.com" 
+                          className="text-xs font-semibold text-ink hover:text-primary transition-colors font-mono break-all"
+                        >
+                          umangpandey@npnewsmetro.com
+                        </a>
+                        <button 
+                          type="button"
+                          onClick={() => handleCopy('umangpandey@npnewsmetro.com')} 
+                          title={isHindi ? 'कॉपी करें' : 'Copy Email'}
+                          className="p-1.5 text-ink-muted hover:text-primary cursor-pointer shrink-0"
+                        >
+                          {copiedEmail === 'umangpandey@npnewsmetro.com' ? (
+                            <Check className="w-3.5 h-3.5 text-emerald-600" />
+                          ) : (
+                            <Copy className="w-3.5 h-3.5" />
+                          )}
+                        </button>
                       </div>
-                      <button onClick={() => handleCopy('newsdesk@npnewsmetro.com')} className="p-1.5 text-ink-muted hover:text-primary cursor-pointer">
-                        {copiedEmail === 'newsdesk@npnewsmetro.com' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                      </button>
-                    </div>
-
-                    <div className="p-3 bg-white border border-border-subtle rounded flex items-center justify-between">
-                      <div>
-                        <span className="font-bold text-ink block">{isHindi ? 'गोपनीय व्हिसलब्लोअर सुझाव' : 'Confidential Whistleblower Tips'}</span>
-                        <span className="text-ink-secondary font-mono text-[11px]">tips@npnewsmetro.com</span>
-                      </div>
-                      <button onClick={() => handleCopy('tips@npnewsmetro.com')} className="p-1.5 text-ink-muted hover:text-primary cursor-pointer">
-                        {copiedEmail === 'tips@npnewsmetro.com' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                      </button>
-                    </div>
-
-                    <div className="p-3 bg-white border border-border-subtle rounded flex items-center justify-between">
-                      <div>
-                        <span className="font-bold text-ink block">{isHindi ? 'विज्ञापन एवं व्यावसायिक' : 'Commercial & Advertising'}</span>
-                        <span className="text-ink-secondary font-mono text-[11px]">advertise@npnewsmetro.com</span>
-                      </div>
-                      <button onClick={() => handleCopy('advertise@npnewsmetro.com')} className="p-1.5 text-ink-muted hover:text-primary cursor-pointer">
-                        {copiedEmail === 'advertise@npnewsmetro.com' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                      </button>
                     </div>
                   </div>
                 </div>
