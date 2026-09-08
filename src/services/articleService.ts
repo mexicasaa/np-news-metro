@@ -436,13 +436,18 @@ export const getArticleBySlug = async (
 };
 
 export const getEditorialArticles = async (
-  statusFilter?: string
+  statusFilter?: string,
+  limit?: number
 ): Promise<(WpPost & { editorialStatus: EditorialStatus; rawId: string })[]> => {
   try {
     let query = (supabase.from('articles') as any)
       .select(EDITORIAL_SELECT)
-      .order('updated_at', { ascending: false })
-      .limit(100);
+      .order('updated_at', { ascending: false });
+
+    // Dynamic variable limit: if passed, apply limit; if omitted, load the whole list
+    if (typeof limit === 'number' && limit > 0) {
+      query = query.limit(limit);
+    }
 
     if (statusFilter && statusFilter !== 'all') {
       if (statusFilter === 'breaking') {
@@ -455,6 +460,29 @@ export const getEditorialArticles = async (
     const { data, error } = await query;
 
     if (error || !data || data.length === 0) {
+      // Resilient fallback: fetch via serverless API if direct browser Supabase query encounters errors
+      try {
+        if (typeof window !== 'undefined') {
+          const limitQuery = typeof limit === 'number' && limit > 0 ? `&limit=${limit}` : '';
+          const res = await fetch(`/api/articles?view=all${limitQuery}`);
+          if (res.ok) {
+            const json = await res.json();
+            if (json?.posts && Array.isArray(json.posts) && json.posts.length > 0) {
+              return json.posts.map((row: any) => {
+                const isPub = (row.status || '').toLowerCase() === 'published';
+                const statusVal = isPub ? 'published' : (row.status || 'draft');
+                return {
+                  ...mapDbToWpPost(row),
+                  rawId: row.id,
+                  editorialStatus: statusVal as EditorialStatus,
+                  status: statusVal,
+                };
+              });
+            }
+          }
+        }
+      } catch (fallbackErr) {}
+
       return [];
     }
 

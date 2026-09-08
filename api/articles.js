@@ -567,35 +567,79 @@ export default async function handler(req, res) {
     // -------------------------------------------------------------
     // 5. LATEST CHRONOLOGICAL STREAM (view === 'latest')
     // -------------------------------------------------------------
-    const cacheKey = `view:latest:${page}:${limit}`;
-    if (!bypassCache) {
-      const cached = getFromWarmCache(cacheKey, CACHE_TTL.latest);
-      if (cached) {
-        res.setHeader('Content-Type', 'application/json; charset=utf-8');
-        res.setHeader('Cache-Control', 'public, max-age=30, s-maxage=300, stale-while-revalidate=86400');
-        res.setHeader('X-Cache', 'WARM-HIT');
-        return res.status(200).json(cached);
+    if (view === 'latest') {
+      const cacheKey = `view:latest:${page}:${limit}`;
+      if (!bypassCache) {
+        const cached = getFromWarmCache(cacheKey, CACHE_TTL.latest);
+        if (cached) {
+          res.setHeader('Content-Type', 'application/json; charset=utf-8');
+          res.setHeader('Cache-Control', 'public, max-age=30, s-maxage=300, stale-while-revalidate=86400');
+          res.setHeader('X-Cache', 'WARM-HIT');
+          return res.status(200).json(cached);
+        }
       }
+
+      const { data, error } = await supabase
+        .from('articles')
+        .select(CARD_PROJECTION_FIELDS)
+        .eq('status', 'published')
+        .order('published_at', { ascending: false })
+        .range(offset, offset + limit - 1);
+
+      if (error) {
+        return res.status(500).json({ error: error.message });
+      }
+
+      const responsePayload = { posts: sanitizeCardPosts(data || []), page, limit };
+      setInWarmCache(cacheKey, responsePayload);
+
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      res.setHeader('Cache-Control', 'public, max-age=30, s-maxage=300, stale-while-revalidate=86400');
+      res.setHeader('X-Cache', 'MISS');
+      return res.status(200).json(responsePayload);
     }
 
-    const { data, error } = await supabase
-      .from('articles')
-      .select(CARD_PROJECTION_FIELDS)
-      .eq('status', 'published')
-      .order('published_at', { ascending: false })
-      .range(offset, offset + limit - 1);
+    // -------------------------------------------------------------
+    // 6. EDITORIAL / ALL ARTICLES (view === 'all' or view === 'editorial')
+    // -------------------------------------------------------------
+    if (view === 'all' || view === 'editorial') {
+      const parsedLimit = req.query?.limit ? parseInt(String(req.query.limit), 10) : null;
+      const cacheKey = `view:all:${parsedLimit || 'unlimited'}`;
 
-    if (error) {
-      return res.status(500).json({ error: error.message });
+      if (!bypassCache) {
+        const cached = getFromWarmCache(cacheKey, 15 * 1000);
+        if (cached) {
+          res.setHeader('Content-Type', 'application/json; charset=utf-8');
+          res.setHeader('Cache-Control', 'private, no-cache');
+          res.setHeader('X-Cache', 'WARM-HIT');
+          return res.status(200).json(cached);
+        }
+      }
+
+      let q = supabase
+        .from('articles')
+        .select(CARD_PROJECTION_FIELDS)
+        .order('updated_at', { ascending: false });
+
+      // Variable limit: apply only if explicitly provided and > 0, otherwise fetch whole list
+      if (parsedLimit && parsedLimit > 0) {
+        q = q.limit(parsedLimit);
+      }
+
+      const { data, error } = await q;
+
+      if (error) {
+        return res.status(500).json({ error: error.message });
+      }
+
+      const responsePayload = { posts: sanitizeCardPosts(data || []), count: data?.length || 0 };
+      setInWarmCache(cacheKey, responsePayload);
+
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      res.setHeader('Cache-Control', 'private, no-cache');
+      res.setHeader('X-Cache', 'MISS');
+      return res.status(200).json(responsePayload);
     }
-
-    const responsePayload = { posts: sanitizeCardPosts(data || []), page, limit };
-    setInWarmCache(cacheKey, responsePayload);
-
-    res.setHeader('Content-Type', 'application/json; charset=utf-8');
-    res.setHeader('Cache-Control', 'public, max-age=30, s-maxage=300, stale-while-revalidate=86400');
-    res.setHeader('X-Cache', 'MISS');
-    return res.status(200).json(responsePayload);
 
   } catch (err) {
     console.error('Unhandled error in /api/articles:', err);
