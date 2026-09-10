@@ -663,9 +663,8 @@ export const VideoStudioManager: React.FC<VideoStudioManagerProps> = ({
                 <button
                   type="submit"
                   disabled={isSubmitting || !title.trim() || !youtubeUrl.trim()}
-                  className="px-5 py-2 bg-red-600 hover:bg-red-700 disabled:bg-slate-300 text-white rounded-lg text-xs sm:text-sm font-bold shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+                  className="px-5 py-2 bg-red-600 hover:bg-red-700 disabled:bg-slate-300 text-white rounded-lg text-xs sm:text-sm font-bold shadow-xs transition-all flex items-center justify-center cursor-pointer"
                 >
-                  <Sparkles className="w-4 h-4" />
                   <span>{isSubmitting ? 'Publishing...' : (editingVideo ? 'Update Video' : 'Publish to Homepage & Videos Page')}</span>
                 </button>
               </div>

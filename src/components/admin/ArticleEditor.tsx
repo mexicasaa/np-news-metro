@@ -2,10 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   Camera, Link2, Quote, List, AlignLeft, AlignCenter, AlignRight, 
   Bold, Italic, Settings, X, ChevronDown, ChevronUp, Eye, FileText, Search,
-  ImagePlus, ExternalLink, RefreshCw, ArrowLeft, CheckCircle2, Sparkles,
+  ImagePlus, ExternalLink, RefreshCw, ArrowLeft, CheckCircle2,
   HelpCircle, Globe, Clock, ShieldCheck, Tag, Layout, Type, AlertCircle,
   UserCheck, Calendar, User, Image as ImageIcon, Trash2, ArrowUp, ArrowDown,
-  Plus, Check, MapPin, Newspaper, FileCheck, Award, Flame, Crop
+  Plus, Check, MapPin, Newspaper, FileCheck, Award, Flame, Crop, UploadCloud
 } from 'lucide-react';
 import { WpPost, EditorialCategorySlug, GutenbergBlock } from '../../types/wordpress';
 import { UserRole, EditorialStatus } from '../../types/admin';
@@ -144,9 +144,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
   const [tags, setTags] = useState<string[]>(initialPost?.tags || ['National News', 'Policy', 'Breaking']);
   const [tagInput, setTagInput] = useState('');
 
-  const [authorType, setAuthorType] = useState<'staff' | 'external'>(
-    initialPost?.customAuthor?.name ? 'external' : 'staff'
-  );
+  const [authorType, setAuthorType] = useState<'staff' | 'external'>('external');
   const [authorId, setAuthorId] = useState<string>(
     initialPost?.authorId || currentAuthorId || 'author-1'
   );
@@ -274,7 +272,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     tags: true
   });
 
-  const [openSidebarDropdown, setOpenSidebarDropdown] = useState<'status' | 'visibility' | null>(null);
+  const [openSidebarDropdown, setOpenSidebarDropdown] = useState<string | null>(null);
 
   useEffect(() => {
     const handleDocClick = (e: MouseEvent) => {
@@ -317,10 +315,10 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       }
       setCategory((initialPost.category as EditorialCategorySlug) || 'india');
       setTags(initialPost.tags || ['National News', 'Policy', 'Breaking']);
-      setAuthorType(initialPost.customAuthor?.name ? 'external' : 'staff');
+      setAuthorType('external');
       setAuthorId(initialPost.authorId || currentAuthorId || 'author-1');
       setCustomAuthorName(initialPost.customAuthor?.name || '');
-      setCustomAuthorRole(initialPost.customAuthor?.role || 'Guest Contributor');
+      setCustomAuthorRole(initialPost.customAuthor?.role || 'Newsroom');
       setCustomAuthorAvatar(initialPost.customAuthor?.avatar || '');
       setIsBreaking(initialPost.isBreaking || false);
       setFeaturedImage(initialPost.featuredImage || '');
@@ -612,15 +610,11 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       category,
       authorId: authorId,
       customAuthor: {
-        name: authorType === 'external' && customAuthorName.trim() 
-          ? customAuthorName.trim() 
-          : (customAuthorName.trim() || selectedAuthor.name),
-        role: authorType === 'external' && customAuthorRole.trim() 
-          ? customAuthorRole.trim() 
-          : (customAuthorRole.trim() ? customAuthorRole.trim() : (selectedAuthor.designation || selectedAuthor.role)),
-        avatar: authorType === 'external' ? DEFAULT_AUTHOR_AVATAR : getAuthorAvatarUrl(selectedAuthor.avatar),
+        name: customAuthorName.trim() || selectedAuthor.name,
+        role: customAuthorRole.trim() || 'Newsroom',
+        avatar: DEFAULT_AUTHOR_AVATAR,
         bio: (selectedAuthor as any)?.bio || '',
-        isGuest: authorType === 'external',
+        isGuest: true,
       },
       tags,
       featuredImage: featuredImage || '',
@@ -884,14 +878,72 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     { label: 'Subheadline (Dek) or Meta description ready', passed: (metaDescription || dek).length >= 40 },
     { label: 'Featured hero image set (16:9 ratio)', passed: !!featuredImage },
     { label: 'Photo Alt text configured for accessibility', passed: !!(imageAlt || imageCaption) },
-    { label: 'Author byline accreditation assigned', passed: authorType === 'external' ? !!customAuthorName.trim() : !!authorId },
+    { label: 'Author byline accreditation assigned', passed: !!customAuthorName.trim() },
     { label: 'Source accreditation established', passed: !!sourceAgency.trim() },
     { label: 'Desk category & subcategory mapped', passed: !!category && !!subcategory },
     { label: 'Canonical URL slug ready', passed: !!slug && slug.length >= 3 },
   ];
 
   const seoPassedCount = seoChecklist.filter(item => item.passed).length;
-  const seoPercentage = Math.round((seoPassedCount / seoChecklist.length) * 100);
+  const renderCustomDropdown = <T extends string>({
+    id,
+    value,
+    options,
+    onChange,
+    placeholder,
+    maxHeight = 'max-h-60',
+  }: {
+    id: string;
+    value: T;
+    options: Array<{ value: T; label: string }>;
+    onChange: (val: T) => void;
+    placeholder?: string;
+    maxHeight?: string;
+  }) => {
+    const isOpen = openSidebarDropdown === id;
+    const selectedOpt = options.find(o => o.value === value);
+
+    return (
+      <div data-editor-dropdown="true" className="relative w-full">
+        <button
+          type="button"
+          onClick={() => setOpenSidebarDropdown(isOpen ? null : id)}
+          className={`w-full bg-white border border-slate-200/80 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-slate-800 shadow-2xs hover:border-slate-300 flex items-center justify-between gap-2 cursor-pointer transition-all ${
+            isOpen ? 'ring-2 ring-slate-900/10 border-slate-400 bg-slate-50' : ''
+          }`}
+        >
+          <span className="truncate">{selectedOpt?.label || placeholder || value}</span>
+          <ChevronDown className={`w-3.5 h-3.5 text-slate-400 shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180 text-slate-700' : ''}`} />
+        </button>
+
+        {isOpen && (
+          <div className={`absolute left-0 right-0 top-full mt-1.5 bg-white/95 backdrop-blur-xl border border-slate-200/90 rounded-2xl shadow-xl p-1.5 z-50 text-xs animate-fadeIn space-y-0.5 overflow-y-auto ${maxHeight} hide-scrollbar`}>
+            {options.map((opt) => {
+              const isSelected = opt.value === value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => {
+                    onChange(opt.value);
+                    setOpenSidebarDropdown(null);
+                  }}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium cursor-pointer transition-colors text-left ${
+                    isSelected
+                      ? 'bg-slate-900 text-white font-semibold shadow-2xs'
+                      : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
+                  }`}
+                >
+                  <span className="truncate">{opt.label}</span>
+                  {isSelected && <Check className="w-3.5 h-3.5 text-white ml-2 shrink-0" />}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] font-sans text-slate-800 pb-24 antialiased selection:bg-[#162839] selection:text-white">
@@ -913,32 +965,33 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                 <ArrowLeft className="w-4 h-4" />
               </button>
             )}
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-slate-900 text-base sm:text-lg">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2.5">
+                <h1 className="font-bold text-slate-900 text-base sm:text-lg tracking-tight">
                   {initialPost ? 'Edit Article' : 'Article Creator'}
-                </span>
-                <span className="bg-white border border-slate-200/80 text-slate-600 text-xs font-semibold px-2.5 py-0.5 rounded-full shadow-2xs uppercase tracking-wider">
-                  Publishing Center
-                </span>
-                <span className="bg-amber-50 text-amber-700 border border-amber-200/70 text-xs font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1.5 shadow-2xs">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                </h1>
+                <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border shadow-2xs ${
+                  status === 'published' 
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200/80' 
+                    : 'bg-amber-50 text-amber-700 border-amber-200/70'
+                }`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${status === 'published' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
                   <span>{status === 'published' ? 'Published' : 'Draft'}</span>
                 </span>
               </div>
               <div className="flex items-center gap-2 text-xs text-slate-400 mt-0.5">
                 <span className="flex items-center gap-1.5">
-                  <span className={`w-2 h-2 rounded-full ${isSaving ? 'bg-amber-400 animate-ping' : 'bg-emerald-500'}`}></span>
-                  <span className={isSaving ? 'text-amber-600 font-semibold' : 'text-slate-500'}>
-                    {isSaving ? 'Saving draft to database...' : `Draft auto-saved at ${lastSavedTime}`}
+                  <span className={`w-1.5 h-1.5 rounded-full ${isSaving ? 'bg-amber-400 animate-ping' : 'bg-emerald-500'}`} />
+                  <span className={isSaving ? 'text-amber-600 font-medium' : 'text-slate-500'}>
+                    {isSaving ? 'Saving...' : `Saved ${lastSavedTime ? '• ' + lastSavedTime : ''}`}
                   </span>
                 </span>
-                <span>•</span>
-                <span>By: <strong className="text-slate-600">{authorType === 'external' && customAuthorName.trim() ? customAuthorName.trim() : selectedAuthor.name}</strong></span>
-                <span>•</span>
-                <span>{wordCount} words</span>
-                <span>•</span>
-                <span className="font-semibold text-emerald-600">SEO: {seoPassedCount}/{seoChecklist.length}</span>
+                <span className="text-slate-300">•</span>
+                <span className="text-slate-500 truncate">
+                  By <strong className="font-medium text-slate-700">{customAuthorName.trim() || selectedAuthor.name}</strong>
+                </span>
+                <span className="text-slate-300">•</span>
+                <span className="text-slate-500">{wordCount} words</span>
               </div>
             </div>
           </div>
@@ -966,9 +1019,8 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
             <button
               type="button"
               onClick={() => onPublishNow(getPostData('published'))}
-              className="h-9 px-4 bg-slate-900 hover:bg-slate-800 active:scale-[0.98] text-white rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
+              className="h-9 px-4 bg-slate-900 hover:bg-slate-800 active:scale-[0.98] text-white rounded-xl text-xs font-bold shadow-sm transition-all flex items-center justify-center cursor-pointer shrink-0"
             >
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
               <span>{initialPost ? 'Update Story' : 'Publish Story'}</span>
             </button>
           </div>
@@ -1018,189 +1070,171 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
           
           <div className={"flex-1 w-full space-y-6 " + (mobileTab === 'content' ? "block" : "hidden lg:block")}>
             
-            <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xs border border-white/80 overflow-hidden focus-within:border-slate-300 focus-within:ring-2 focus-within:ring-slate-900/5 transition-all">
+            <div className="bg-white/90 backdrop-blur-md rounded-3xl shadow-xs border border-white/80 overflow-hidden transition-all">
               
-              <div className="p-4 sm:p-8 pb-4 space-y-4">
-                
-                <div>
-                  <div className="flex items-center justify-between text-xs text-slate-400 mb-1.5 font-medium">
-                    <span className="font-bold text-slate-700 uppercase tracking-wider">Headline</span>
-                    <span className={title.length > 90 || title.length < 40 ? 'text-amber-600 font-bold' : 'text-emerald-600 font-bold'}>
-                      {title.length}/90 chars (Recommended 40-90)
-                    </span>
-                  </div>
-                  <input
-                    type="text"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Enter main article headline here..."
-                    className="w-full text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-slate-900 placeholder:text-slate-300 border-none focus:outline-hidden bg-transparent leading-snug tracking-tight"
-                  />
-                </div>
+              <div className="pt-6 sm:pt-8 px-6 sm:px-10 pb-4">
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Title"
+                  style={{ outline: 'none', border: 'none', boxShadow: 'none' }}
+                  className="w-full text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-slate-900 placeholder:text-slate-300/80 border-none outline-none focus:outline-none focus:ring-0 ring-0 focus-visible:outline-none bg-transparent leading-tight tracking-tight selection:bg-slate-200"
+                />
 
-                <div className="pt-2 border-t border-slate-100/80">
-                  <div className="flex items-center justify-between text-xs text-slate-400 mb-1.5 font-medium">
-                    <span className="font-bold text-slate-700 uppercase tracking-wider">Subheadline (Dek) / Lead Summary</span>
-                    <span>Optional</span>
-                  </div>
+                <div className="mt-3">
                   <textarea
-                    rows={2}
+                    rows={1}
                     value={dek}
                     onChange={(e) => setDek(e.target.value)}
-                    placeholder="Write a compelling 1-2 sentence executive summary (Dek)..."
-                    className="w-full text-base sm:text-lg text-slate-600 font-sans placeholder:text-slate-300 border-none focus:outline-hidden bg-transparent resize-none leading-relaxed"
+                    placeholder="Add a subtitle or lead summary..."
+                    style={{ outline: 'none', border: 'none', boxShadow: 'none' }}
+                    className="w-full text-lg sm:text-xl text-slate-500 font-serif italic placeholder:text-slate-300/80 border-none outline-none focus:outline-none focus:ring-0 ring-0 focus-visible:outline-none bg-transparent resize-none leading-relaxed selection:bg-slate-200"
                   />
                 </div>
 
                 {title && (
-                  <div className="pt-2 flex items-center gap-2 text-xs text-slate-500 font-mono bg-white/80 p-2.5 rounded-xl border border-slate-200/80 shadow-2xs">
-                    <Globe className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                    <span className="text-slate-400 truncate">https://www.npnewsmetro.com/{category}/</span>
-                    <span className="font-bold text-slate-800 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200 shrink-0">{slug}</span>
+                  <div className="mt-2 text-[11px] text-slate-400 font-mono flex items-center gap-2 select-none pt-1">
+                    <Globe className="w-3 h-3 text-slate-400 shrink-0" />
+                    <span className="truncate">npnewsmetro.com/{category}/<strong className="text-slate-600 font-semibold">{slug}</strong></span>
+                    <span className="text-slate-400 ml-auto font-sans text-[10px]">{title.length}/90 chars</span>
                   </div>
                 )}
               </div>
 
-              <div className="sticky top-14 sm:top-16 z-30 flex items-center justify-between gap-2 px-3 sm:px-6 py-2 border-y border-slate-100/80 bg-white/70 backdrop-blur-md overflow-x-auto whitespace-nowrap scrollbar-none">
-                <div className="flex flex-wrap items-center gap-1">
-                  
+              <div className="sticky top-14 sm:top-16 z-30 flex items-center justify-between px-6 sm:px-10 py-2 border-y border-slate-100 bg-white/90 backdrop-blur-md overflow-x-auto whitespace-nowrap scrollbar-none">
+                <div className="flex items-center gap-1 sm:gap-2">
                   <button
                     type="button"
                     onClick={handleStartInlineImage}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-800 bg-white border border-slate-200/80 rounded-xl hover:bg-slate-50 transition-all mr-1 cursor-pointer shadow-2xs"
-                    title="Insert photo at cursor position with instant visual preview"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 hover:text-slate-950 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                    title="Insert photo at cursor position"
                   >
-                    <ImagePlus className="w-3.5 h-3.5 text-slate-700" />
-                    <span>Insert Image at Cursor</span>
+                    <ImagePlus className="w-3.5 h-3.5 text-slate-600" />
+                    <span>Photo</span>
                   </button>
 
-                  <div className="w-px h-5 bg-slate-200 mx-1"></div>
+                  <div className="w-px h-4 bg-slate-200/80 mx-1"></div>
 
                   <button
                     type="button"
                     onClick={() => insertTextFormatting('## ', '')}
-                    className="px-2.5 py-1 text-xs font-bold font-serif text-slate-700 hover:text-blue-600 hover:bg-white rounded transition-colors border border-transparent hover:border-slate-200 cursor-pointer"
-                    title="Heading 2"
+                    className="px-2 py-1 text-xs font-serif font-bold text-slate-600 hover:text-slate-950 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
+                    title="Heading 2 (##)"
                   >
                     H2
                   </button>
                   <button
                     type="button"
                     onClick={() => insertTextFormatting('### ', '')}
-                    className="px-2.5 py-1 text-xs font-bold font-serif text-slate-700 hover:text-blue-600 hover:bg-white rounded transition-colors border border-transparent hover:border-slate-200 cursor-pointer"
-                    title="Heading 3"
+                    className="px-2 py-1 text-xs font-serif font-bold text-slate-600 hover:text-slate-950 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
+                    title="Heading 3 (###)"
                   >
                     H3
                   </button>
 
-                  <div className="w-px h-5 bg-slate-200 mx-1"></div>
+                  <div className="w-px h-4 bg-slate-200/80 mx-1"></div>
 
                   <button
                     type="button"
                     onClick={() => insertTextFormatting('**', '**')}
-                    className="p-1.5 text-slate-600 hover:text-blue-600 hover:bg-white rounded transition-colors border border-transparent hover:border-slate-200 cursor-pointer"
+                    className="p-1.5 text-slate-600 hover:text-slate-950 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
                     title="Bold (**text**)"
                   >
-                    <Bold className="w-4 h-4" />
+                    <Bold className="w-3.5 h-3.5" />
                   </button>
                   <button
                     type="button"
                     onClick={() => insertTextFormatting('*', '*')}
-                    className="p-1.5 text-slate-600 hover:text-blue-600 hover:bg-white rounded transition-colors border border-transparent hover:border-slate-200 cursor-pointer"
+                    className="p-1.5 text-slate-600 hover:text-slate-950 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
                     title="Italic (*text*)"
                   >
-                    <Italic className="w-4 h-4" />
+                    <Italic className="w-3.5 h-3.5" />
                   </button>
                   <button
                     type="button"
                     onClick={() => insertTextFormatting('> "', '"')}
-                    className="p-1.5 text-slate-600 hover:text-blue-600 hover:bg-white rounded transition-colors border border-transparent hover:border-slate-200 cursor-pointer"
-                    title="Pull Quote"
+                    className="p-1.5 text-slate-600 hover:text-slate-950 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
+                    title="Pull Quote (>)"
                   >
-                    <Quote className="w-4 h-4" />
+                    <Quote className="w-3.5 h-3.5" />
                   </button>
                   <button
                     type="button"
                     onClick={() => insertTextFormatting('\n- ', '', 'List item')}
-                    className="p-1.5 text-slate-600 hover:text-blue-600 hover:bg-white rounded transition-colors border border-transparent hover:border-slate-200 cursor-pointer"
-                    title="Bullet List (- item)"
+                    className="p-1.5 text-slate-600 hover:text-slate-950 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
+                    title="Bullet List (-)"
                   >
-                    <List className="w-4 h-4" />
+                    <List className="w-3.5 h-3.5" />
                   </button>
                   <button
                     type="button"
                     onClick={handleInsertLink}
-                    className="p-1.5 text-slate-600 hover:text-blue-600 hover:bg-white rounded transition-colors border border-transparent hover:border-slate-200 cursor-pointer"
-                    title="Add Hyperlink [Text](URL)"
+                    className="p-1.5 text-slate-600 hover:text-slate-950 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
+                    title="Add Link [Text](URL)"
                   >
-                    <Link2 className="w-4 h-4" />
+                    <Link2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
 
-                <div className="text-xs text-slate-400 font-medium">
+                <div className="text-xs text-slate-400 font-medium select-none">
                   {wordCount} words • {readTimeMin} min read
                 </div>
               </div>
 
-              <div className="p-6 sm:p-8">
+              <div className="px-6 sm:px-10 py-6">
                 <textarea
                   ref={textareaRef}
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
-                  placeholder="Start writing the full story body here...&#10;&#10;💡 Place cursor anywhere and click '+ Insert Image at Cursor' to add a photo!&#10;💡 Use 'H2' or 'H3' to divide your story into sections.&#10;💡 Use 'Bold' or 'Italic' to emphasize keywords."
-                  className="w-full text-base sm:text-lg leading-relaxed text-slate-800 font-serif border-none focus:outline-hidden resize-y min-h-[380px] bg-white placeholder:text-slate-300"
+                  placeholder="Tell your story..."
+                  style={{ outline: 'none', border: 'none', boxShadow: 'none' }}
+                  className="w-full text-base sm:text-lg leading-relaxed text-slate-800 font-serif border-none outline-none focus:outline-none focus:ring-0 ring-0 focus-visible:outline-none resize-none min-h-[460px] bg-transparent placeholder:text-slate-300 selection:bg-slate-200"
                 />
               </div>
 
               {inlineImages.length > 0 && (
-                <div className="p-6 bg-slate-50 border-t border-slate-200/80 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <ImageIcon className="w-4 h-4 text-blue-600" />
-                      <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                        Embedded Article Photos ({inlineImages.length})
-                      </h4>
-                    </div>
-                    <span className="text-[11px] text-slate-400">Live preview of photos in story paragraphs</span>
+                <div className="px-6 sm:px-10 py-6 border-t border-slate-100 bg-slate-50/40 space-y-4">
+                  <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
+                    <span>Embedded Photos ({inlineImages.length})</span>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {inlineImages.map((img, idx) => (
-                      <div key={idx} className="bg-white border border-slate-200 rounded-xl p-3 shadow-2xs space-y-2.5 relative group">
-                        <div className="relative aspect-video rounded-lg overflow-hidden border border-slate-200 bg-slate-900">
+                      <div key={idx} className="bg-white border border-slate-200/70 rounded-2xl p-3 shadow-2xs space-y-2 relative group">
+                        <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-100">
                           <img src={img.imageUrl} alt={img.imageCaption || 'Photo'} className="w-full h-full object-cover" />
                           <button
                             type="button"
                             onClick={() => handleRemoveInlineImage(img.imageUrl || '')}
-                            className="absolute top-2 right-2 p-1.5 bg-red-600 hover:bg-red-700 text-white rounded-md shadow-xs opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                            title="Delete photo from article"
+                            className="absolute top-2 right-2 p-1.5 bg-slate-900/80 hover:bg-red-600 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                            title="Delete photo"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </div>
                         
-                        <div>
-                          <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Caption:</label>
-                          <input
-                            type="text"
-                            value={img.imageCaption || ''}
-                            onChange={(e) => handleUpdateImageCaption(img.imageUrl || '', e.target.value)}
-                            placeholder="Enter image caption..."
-                            className="w-full text-xs bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 focus:bg-white focus:border-blue-500 focus:outline-hidden"
-                          />
-                        </div>
+                        <input
+                          type="text"
+                          value={img.imageCaption || ''}
+                          onChange={(e) => handleUpdateImageCaption(img.imageUrl || '', e.target.value)}
+                          placeholder="Caption (optional)..."
+                          className="w-full text-xs bg-slate-50/70 border border-slate-200/60 rounded-lg px-2.5 py-1.5 focus:bg-white focus:outline-hidden text-slate-700 placeholder:text-slate-400"
+                        />
                       </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              <div className="px-6 py-3 bg-slate-50/60 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
-                <span className="flex items-center gap-1.5">
-                  <FileText className="w-3.5 h-3.5 text-slate-400" />
-                  <span>Interactive Editor Active</span>
-                </span>
-                <span>Estimated reading time: {readTimeMin} min</span>
+              <div className="px-6 sm:px-10 py-3 border-t border-slate-100/80 flex items-center justify-between text-xs text-slate-400 select-none">
+                <div className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  <span>Markdown supported • Autosaved</span>
+                </div>
+                <div>
+                  {content.length} characters
+                </div>
               </div>
 
             </div>
@@ -1310,9 +1344,9 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
 
           <div className={"w-full lg:w-[360px] shrink-0 space-y-5 " + (mobileTab === "settings" ? "block" : "hidden lg:block")}>
             
-            <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xs border border-white/80 overflow-hidden transition-all">
+            <div className={`bg-white/80 backdrop-blur-md rounded-3xl shadow-xs border border-white/80 transition-all relative ${openSidebarDropdown === 'status' || openSidebarDropdown === 'visibility' ? 'z-40' : 'z-20'}`}>
               <div 
-                className="px-5 py-4 border-b border-slate-100/80 flex items-center justify-between cursor-pointer select-none bg-white/40 hover:bg-white/60 backdrop-blur-xs transition-colors"
+                className="px-5 py-4 border-b border-slate-100/80 flex items-center justify-between cursor-pointer select-none bg-white/40 hover:bg-white/60 backdrop-blur-xs transition-colors rounded-t-3xl"
                 onClick={() => toggleBox('publish')}
               >
                 <div className="flex items-center gap-2">
@@ -1375,14 +1409,14 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                       <span>Publishing Timing:</span>
                     </div>
 
-                    <div className="p-1 bg-slate-100/80 backdrop-blur-md rounded-full border border-slate-200/60 inline-flex w-full">
+                    <div className="grid grid-cols-2 p-1 bg-slate-100/90 backdrop-blur-md rounded-full border border-slate-200/80 w-full shadow-inner">
                       <button
                         type="button"
                         onClick={() => setPublishDateType('now')}
-                        className={`h-7.5 px-3 rounded-full font-semibold transition-all cursor-pointer text-center flex-1 text-xs flex items-center justify-center ${
+                        className={`h-8 px-3 rounded-full font-bold text-xs transition-all cursor-pointer text-center flex items-center justify-center ${
                           publishDateType === 'now'
-                            ? 'bg-slate-900 text-white font-bold shadow-2xs'
-                            : 'text-slate-500 hover:text-slate-800'
+                            ? 'bg-slate-900 text-white shadow-xs'
+                            : 'text-slate-500 hover:text-slate-800 font-semibold hover:bg-white/40'
                         }`}
                       >
                         Publish Immediately
@@ -1390,10 +1424,10 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                       <button
                         type="button"
                         onClick={() => setPublishDateType('custom')}
-                        className={`h-7.5 px-3 rounded-full font-semibold transition-all cursor-pointer text-center flex-1 text-xs flex items-center justify-center ${
+                        className={`h-8 px-3 rounded-full font-bold text-xs transition-all cursor-pointer text-center flex items-center justify-center ${
                           publishDateType === 'custom'
-                            ? 'bg-slate-900 text-white font-bold shadow-2xs'
-                            : 'text-slate-500 hover:text-slate-800'
+                            ? 'bg-slate-900 text-white shadow-xs'
+                            : 'text-slate-500 hover:text-slate-800 font-semibold hover:bg-white/40'
                         }`}
                       >
                         Schedule Date
@@ -1407,111 +1441,62 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                           type="datetime-local"
                           value={customPublishDate}
                           onChange={(e) => setCustomPublishDate(e.target.value)}
-                          className="w-full text-xs bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-slate-800 font-medium focus:ring-1 focus:ring-slate-300 focus:outline-hidden"
+                          className="w-full text-xs bg-white border border-slate-200/80 rounded-xl px-3 py-2 text-slate-800 font-medium focus:ring-1 focus:ring-slate-300 focus:outline-hidden shadow-2xs"
                         />
                       </div>
                     )}
                   </div>
 
-                  <div className="pt-3 border-t border-slate-100/80 space-y-3 text-xs text-slate-600">
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold text-slate-700">Editorial Status:</span>
-                      <div data-editor-dropdown="true" className="relative">
-                        <button
-                          type="button"
-                          onClick={() => setOpenSidebarDropdown(openSidebarDropdown === 'status' ? null : 'status')}
-                          className={`h-8.5 bg-white border border-slate-200/80 rounded-xl px-3 text-xs font-semibold text-slate-800 shadow-2xs hover:border-slate-300 flex items-center justify-between gap-2 cursor-pointer transition-all min-w-[125px] ${
-                            openSidebarDropdown === 'status' ? 'ring-2 ring-slate-900/10 border-slate-400 bg-slate-50' : ''
-                          }`}
-                        >
-                          <span className="capitalize">{status}</span>
-                          <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${openSidebarDropdown === 'status' ? 'rotate-180 text-slate-700' : ''}`} />
-                        </button>
-
-                        {openSidebarDropdown === 'status' && (
-                          <div className="absolute right-0 top-full mt-1.5 w-44 bg-white/95 backdrop-blur-xl border border-white/90 rounded-2xl shadow-xl p-1.5 z-50 text-xs animate-fadeIn space-y-0.5 hide-scrollbar">
-                            {[
-                              { value: 'draft', label: 'Draft' },
-                              { value: 'review', label: 'Review / Copyedit' },
-                              { value: 'scheduled', label: 'Scheduled' },
-                              { value: 'published', label: 'Published' },
-                            ].map((opt) => (
-                              <button
-                                key={opt.value}
-                                type="button"
-                                onClick={() => {
-                                  setStatus(opt.value as EditorialStatus);
-                                  setOpenSidebarDropdown(null);
-                                }}
-                                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium cursor-pointer transition-colors text-left ${
-                                  status === opt.value
-                                    ? 'bg-slate-900 text-white font-semibold shadow-2xs'
-                                    : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
-                                }`}
-                              >
-                                <span>{opt.label}</span>
-                                {status === opt.value && <Check className="w-3.5 h-3.5 text-white ml-2 shrink-0" />}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
+                  <div className="pt-3 border-t border-slate-100/80 space-y-3.5 text-xs text-slate-600">
+                    {/* Editorial Status */}
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1.5">Editorial Status:</label>
+                      {renderCustomDropdown({
+                        id: 'status',
+                        value: status,
+                        options: [
+                          { value: 'draft', label: 'Draft' },
+                          { value: 'review', label: 'Review / Copyedit' },
+                          { value: 'scheduled', label: 'Scheduled' },
+                          { value: 'published', label: 'Published' },
+                        ],
+                        onChange: (val) => setStatus(val as EditorialStatus),
+                      })}
                     </div>
 
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold text-slate-700">Visibility:</span>
-                      <div data-editor-dropdown="true" className="relative">
-                        <button
-                          type="button"
-                          onClick={() => setOpenSidebarDropdown(openSidebarDropdown === 'visibility' ? null : 'visibility')}
-                          className={`h-8.5 bg-white border border-slate-200/80 rounded-xl px-3 text-xs font-semibold text-slate-800 shadow-2xs hover:border-slate-300 flex items-center justify-between gap-2 cursor-pointer transition-all min-w-[155px] ${
-                            openSidebarDropdown === 'visibility' ? 'ring-2 ring-slate-900/10 border-slate-400 bg-slate-50' : ''
-                          }`}
-                        >
-                          <span className="truncate">{visibility === 'Public' ? 'Public (All Readers)' : visibility === 'Subscribers' ? 'Subscribers Only' : 'Private / Internal'}</span>
-                          <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${openSidebarDropdown === 'visibility' ? 'rotate-180 text-slate-700' : ''}`} />
-                        </button>
-
-                        {openSidebarDropdown === 'visibility' && (
-                          <div className="absolute right-0 top-full mt-1.5 w-48 bg-white/95 backdrop-blur-xl border border-white/90 rounded-2xl shadow-xl p-1.5 z-50 text-xs animate-fadeIn space-y-0.5 hide-scrollbar">
-                            {[
-                              { value: 'Public', label: 'Public (All Readers)' },
-                              { value: 'Subscribers', label: 'Subscribers Only' },
-                              { value: 'Private', label: 'Private / Internal' },
-                            ].map((opt) => (
-                              <button
-                                key={opt.value}
-                                type="button"
-                                onClick={() => {
-                                  setVisibility(opt.value);
-                                  setOpenSidebarDropdown(null);
-                                }}
-                                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium cursor-pointer transition-colors text-left ${
-                                  visibility === opt.value
-                                    ? 'bg-slate-900 text-white font-semibold shadow-2xs'
-                                    : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
-                                }`}
-                              >
-                                <span>{opt.label}</span>
-                                {visibility === opt.value && <Check className="w-3.5 h-3.5 text-white ml-2 shrink-0" />}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
+                    {/* Visibility */}
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1.5">Visibility:</label>
+                      {renderCustomDropdown({
+                        id: 'visibility',
+                        value: visibility,
+                        options: [
+                          { value: 'Public', label: 'Public (All Readers)' },
+                          { value: 'Subscribers', label: 'Subscribers Only' },
+                          { value: 'Private', label: 'Private / Internal' },
+                        ],
+                        onChange: (val) => setVisibility(val),
+                      })}
                     </div>
 
-                    <div className="flex items-center justify-between p-2.5 bg-red-50/60 rounded-2xl border border-red-100/80">
-                      <div className="flex items-center gap-2 text-red-800 font-semibold text-xs">
-                        <Flame className="w-3.5 h-3.5 text-red-600 animate-pulse" />
-                        <span>Mark as Breaking Story:</span>
+                    {/* Mark as Breaking Story Toggle */}
+                    <div 
+                      onClick={() => setIsBreaking(!isBreaking)}
+                      className={`flex items-center justify-between p-3 rounded-2xl border transition-all cursor-pointer select-none ${
+                        isBreaking 
+                          ? 'bg-red-50/90 border-red-200/90 shadow-2xs' 
+                          : 'bg-white border-slate-200/80 hover:bg-slate-50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <Flame className={`w-4 h-4 ${isBreaking ? 'text-red-600 animate-pulse' : 'text-slate-400'}`} />
+                        <span className={`text-xs font-bold ${isBreaking ? 'text-red-900' : 'text-slate-700'}`}>
+                          Mark as Breaking Story
+                        </span>
                       </div>
-                      <input
-                        type="checkbox"
-                        checked={isBreaking}
-                        onChange={(e) => setIsBreaking(e.target.checked)}
-                        className="w-4 h-4 text-red-600 rounded-md border-red-300 focus:ring-red-500 cursor-pointer accent-red-600"
-                      />
+                      <div className={`w-9 h-5 rounded-full p-0.5 transition-colors duration-200 ease-in-out ${isBreaking ? 'bg-red-600' : 'bg-slate-200'}`}>
+                        <div className={`w-4 h-4 rounded-full bg-white shadow-xs transform transition-transform duration-200 ease-in-out ${isBreaking ? 'translate-x-4' : 'translate-x-0'}`} />
+                      </div>
                     </div>
                   </div>
 
@@ -1519,9 +1504,8 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                     <button
                       type="button"
                       onClick={() => onPublishNow(getPostData('published'))}
-                      className="w-full h-11 bg-slate-900 hover:bg-slate-800 active:scale-[0.99] text-white rounded-2xl font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+                      className="w-full h-11 bg-slate-900 hover:bg-slate-800 active:scale-[0.99] text-white rounded-2xl font-bold text-xs shadow-md transition-all flex items-center justify-center cursor-pointer"
                     >
-                      <Sparkles className="w-4 h-4 text-amber-400" />
                       <span>{initialPost ? 'Update Story (संपादित करें)' : 'Publish Story'}</span>
                     </button>
                   </div>
@@ -1530,41 +1514,11 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
               )}
             </div>
 
-            <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xs border border-white/80 overflow-hidden transition-all">
-              <div 
-                className="px-5 py-4 border-b border-slate-100/80 flex items-center justify-between cursor-pointer select-none bg-white/40 hover:bg-white/60 backdrop-blur-xs transition-colors"
-                onClick={() => toggleBox('seoCheck')}
-              >
-                <div className="flex items-center gap-2">
-                  <FileCheck className="w-4 h-4 text-emerald-600" />
-                  <h3 className="font-bold text-sm text-slate-800 uppercase tracking-wider">
-                    SEO CHECK ({seoPassedCount}/{seoChecklist.length})
-                  </h3>
-                </div>
-                {boxesOpen.seoCheck ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
-              </div>
 
-              {boxesOpen.seoCheck && (
-                <div className="p-5 space-y-2.5 text-xs">
-                  {seoChecklist.map((item, idx) => (
-                    <div key={idx} className="flex items-center gap-2.5">
-                      <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold ${
-                        item.passed ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-400'
-                      }`}>
-                        {item.passed ? <Check className="w-3 h-3" /> : '•'}
-                      </span>
-                      <span className={item.passed ? 'text-slate-800 font-medium' : 'text-slate-400'}>
-                        {item.label}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
 
-            <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xs border border-white/80 overflow-hidden transition-all">
+            <div className={`bg-white/80 backdrop-blur-md rounded-3xl shadow-xs border border-white/80 transition-all relative ${openSidebarDropdown === 'designation' ? 'z-30' : 'z-10'}`}>
               <div 
-                className="px-5 py-4 border-b border-slate-100/80 flex items-center justify-between cursor-pointer select-none bg-white/40 hover:bg-white/60 backdrop-blur-xs transition-colors"
+                className="px-5 py-4 border-b border-slate-100/80 flex items-center justify-between cursor-pointer select-none bg-white/40 hover:bg-white/60 backdrop-blur-xs transition-colors rounded-t-3xl"
                 onClick={() => toggleBox('author')}
               >
                 <div className="flex items-center gap-2">
@@ -1576,136 +1530,62 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
 
               {boxesOpen.author && (
                 <div className="p-5 space-y-4 text-xs">
-                  <div className="p-1 bg-slate-100/80 backdrop-blur-md rounded-full border border-slate-200/60 inline-flex w-full">
-                    <button
-                      type="button"
-                      onClick={() => setAuthorType('staff')}
-                      className={`h-7.5 px-3 rounded-full font-semibold transition-all cursor-pointer text-center flex-1 text-xs flex items-center justify-center ${
-                        authorType === 'staff'
-                          ? 'bg-slate-900 text-white font-bold shadow-2xs'
-                          : 'text-slate-500 hover:text-slate-800'
-                      }`}
-                    >
-                      Company Staff
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setAuthorType('external')}
-                      className={`h-7.5 px-3 rounded-full font-semibold transition-all cursor-pointer text-center flex-1 text-xs flex items-center justify-center ${
-                        authorType === 'external'
-                          ? 'bg-slate-900 text-white font-bold shadow-2xs'
-                          : 'text-slate-500 hover:text-slate-800'
-                      }`}
-                    >
-                      Guest / Outside
-                    </button>
+                  {/* Author / Agency Full Name: text input */}
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1.5">Author / Agency Full Name:</label>
+                    <input
+                      type="text"
+                      value={customAuthorName}
+                      onChange={(e) => setCustomAuthorName(e.target.value)}
+                      placeholder="e.g. Dr. Rajesh Sharma / PTI / Reuters / Special Correspondent"
+                      className="w-full bg-white border border-slate-200/80 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-900 focus:ring-1 focus:ring-slate-300 focus:outline-hidden shadow-2xs"
+                    />
                   </div>
 
-                  {authorType === 'staff' ? (
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-3 p-3 bg-white/80 rounded-2xl border border-slate-200/80 shadow-2xs">
-                        <img 
-                          src={getAuthorAvatarUrl(selectedAuthor.avatar)} 
-                          alt={selectedAuthor.name} 
-                          className="w-10 h-10 rounded-full object-cover border border-slate-200 shrink-0" 
+                  {/* Designation / Wire Outlet (Optional): custom dropdown */}
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1.5">Designation / Wire Outlet (Optional):</label>
+                    {renderCustomDropdown({
+                      id: 'designation',
+                      value: customAuthorRole,
+                      options: [
+                        ...DESIGNATION_ROLES.map(role => ({ value: role, label: role })),
+                        ...(customAuthorRole && !DESIGNATION_ROLES.includes(customAuthorRole) ? [{ value: customAuthorRole, label: customAuthorRole }] : [])
+                      ],
+                      onChange: (val) => setCustomAuthorRole(val),
+                    })}
+                  </div>
+
+                  {/* Author Photo / Avatar: Fixed to current media logo */}
+                  <div className="pt-2 border-t border-slate-100">
+                    <label className="block text-xs font-bold text-slate-700 mb-1.5">Author Photo / Avatar:</label>
+                    <div className="flex items-center gap-3 p-3 bg-slate-50/60 rounded-2xl border border-slate-200/70 shadow-2xs">
+                      <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-slate-200 bg-white shrink-0 shadow-2xs">
+                        <img
+                          src={DEFAULT_AUTHOR_AVATAR}
+                          alt="NP News Metro Official Media Logo"
+                          className="w-full h-full object-cover"
                           onError={handleAvatarError}
                         />
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-1.5">
-                            <span className="font-bold text-xs text-slate-900 truncate">{selectedAuthor.name}</span>
-                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                          </div>
-                          <p className="text-[11px] text-slate-500 truncate">
-                            {selectedAuthor.designation || selectedAuthor.role}
-                          </p>
-                        </div>
                       </div>
-
-                      <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1.5">Select Newsroom Reporter:</label>
-                        <select
-                          value={authorId}
-                          onChange={(e) => setAuthorId(e.target.value)}
-                          className="w-full text-xs bg-white border border-slate-200/80 rounded-xl p-2.5 text-slate-800 font-semibold focus:ring-1 focus:ring-slate-300 focus:outline-hidden shadow-2xs cursor-pointer"
-                        >
-                          {authorsList.map((author) => (
-                            <option key={author.id} value={author.id}>
-                              {author.name} — ({author.designation || author.role})
-                            </option>
-                          ))}
-                        </select>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-bold text-xs text-slate-900">NP News Metro Media Logo</span>
+                          <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                        </div>
+                        <p className="text-[11px] text-slate-500 font-medium">
+                          Fixed official brand watermark
+                        </p>
                       </div>
                     </div>
-                  ) : (
-                    <div className="space-y-3 bg-amber-50/40 p-4 rounded-2xl border border-amber-200/80">
-                      <div className="flex items-center gap-2 text-amber-900 font-bold">
-                        <User className="w-4 h-4 text-amber-700" />
-                        <span>External / Guest Writer Byline</span>
-                      </div>
-                      
-                      {/* Author / Agency Full Name: text input */}
-                      <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1">Author / Agency Full Name:</label>
-                        <input
-                          type="text"
-                          value={customAuthorName}
-                          onChange={(e) => setCustomAuthorName(e.target.value)}
-                          placeholder="e.g. Dr. Rajesh Sharma / PTI / Reuters / Special Correspondent"
-                          className="w-full bg-white border border-slate-200/80 rounded-xl px-3 py-2 text-xs font-medium text-slate-900 focus:ring-1 focus:ring-slate-300 focus:outline-hidden shadow-2xs"
-                        />
-                      </div>
-
-                      {/* Designation / Wire Outlet (Optional): dropdown field */}
-                      <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1">Designation / Wire Outlet (Optional):</label>
-                        <select
-                          value={customAuthorRole}
-                          onChange={(e) => setCustomAuthorRole(e.target.value)}
-                          className="w-full bg-white border border-slate-200/80 rounded-xl px-3 py-2 text-xs font-medium text-slate-900 focus:ring-1 focus:ring-slate-300 focus:outline-hidden shadow-2xs cursor-pointer"
-                        >
-                          {DESIGNATION_ROLES.map((role) => (
-                            <option key={role} value={role}>
-                              {role}
-                            </option>
-                          ))}
-                          {customAuthorRole && !DESIGNATION_ROLES.includes(customAuthorRole) && (
-                            <option value={customAuthorRole}>{customAuthorRole}</option>
-                          )}
-                        </select>
-                      </div>
-
-                      {/* Author Photo / Avatar: Fixed to current media logo */}
-                      <div className="pt-2 border-t border-amber-200/80">
-                        <label className="block text-xs font-bold text-slate-700 mb-1.5">Author Photo / Avatar:</label>
-                        <div className="flex items-center gap-3 p-2.5 bg-white/90 rounded-xl border border-slate-200/80 shadow-2xs">
-                          <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-amber-400 bg-white shrink-0 shadow-xs">
-                            <img
-                              src={DEFAULT_AUTHOR_AVATAR}
-                              alt="NP News Metro Official Media Logo"
-                              className="w-full h-full object-cover"
-                              onError={handleAvatarError}
-                            />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-1.5">
-                              <span className="font-bold text-xs text-slate-900">NP News Metro Media Logo</span>
-                              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                            </div>
-                            <p className="text-[11px] text-slate-500 font-medium">
-                              Fixed official brand watermark
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                  </div>
                 </div>
               )}
             </div>
 
-            <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xs border border-white/80 overflow-hidden transition-all border-l-4 border-l-slate-900">
+            <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xs border border-white/80 overflow-hidden transition-all">
               <div 
-                className="px-5 py-4 border-b border-slate-100/80 flex items-center justify-between cursor-pointer select-none bg-white/40 hover:bg-white/60 backdrop-blur-xs transition-colors"
+                className="px-5 py-4 border-b border-slate-100/80 flex items-center justify-between cursor-pointer select-none bg-white/40 hover:bg-white/60 backdrop-blur-xs transition-colors rounded-t-3xl"
                 onClick={() => toggleBox('featuredImage')}
               >
                 <div className="flex items-center gap-2">
@@ -1718,25 +1598,30 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
               {boxesOpen.featuredImage && (
                 <div className="p-5 space-y-3.5 text-xs">
                   {featuredImage ? (
-                    <div className="space-y-3">
-                      <div className="relative aspect-video rounded-2xl overflow-hidden border border-slate-200/80 group bg-slate-900 shadow-2xs">
+                    <div className="space-y-3.5">
+                      <div className="relative aspect-video rounded-2xl overflow-hidden border border-slate-200/80 group bg-slate-950 shadow-2xs">
                         <img src={featuredImage} alt="Featured" className="w-full h-full object-cover" />
                         
+                        <div className="absolute top-2.5 left-2.5 px-2.5 py-1 bg-slate-950/75 backdrop-blur-md rounded-full text-[10px] font-bold text-white border border-white/20 shadow-xs flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                          <span>16:9 Featured</span>
+                        </div>
+
                         {/* Hover Overlay with Edit & Replace buttons */}
-                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 p-2">
+                        <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-2xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 p-2">
                           <button
                             type="button"
                             onClick={() => setIsImageEditorOpen(true)}
-                            className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-md transition-all cursor-pointer"
+                            className="px-3.5 py-2 bg-white hover:bg-slate-100 text-slate-900 rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-md transition-all cursor-pointer active:scale-95"
                             title="Crop and adjust photo"
                           >
-                            <Crop className="w-3.5 h-3.5 text-amber-400" />
-                            <span>Edit & Crop</span>
+                            <Crop className="w-3.5 h-3.5 text-slate-900" />
+                            <span>Crop & Edit</span>
                           </button>
                           <button
                             type="button"
                             onClick={() => featuredImageInputRef.current?.click()}
-                            className="px-3 py-1.5 bg-white/20 hover:bg-white/30 text-white rounded-xl font-semibold text-xs flex items-center gap-1 transition-colors cursor-pointer"
+                            className="px-3.5 py-2 bg-white/20 hover:bg-white/30 text-white rounded-xl font-semibold text-xs flex items-center gap-1.5 transition-colors cursor-pointer backdrop-blur-xs"
                             title="Upload new image"
                           >
                             <Camera className="w-3.5 h-3.5" />
@@ -1746,20 +1631,20 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                       </div>
 
                       {/* Prominent Action Toolbar */}
-                      <div className="flex items-center gap-2">
+                      <div className="grid grid-cols-2 gap-2">
                         <button
                           type="button"
                           onClick={() => setIsImageEditorOpen(true)}
-                          className="flex-1 py-2 px-3 bg-white hover:bg-slate-50 active:scale-[0.99] text-slate-800 font-bold rounded-xl border border-slate-200/80 transition-all flex items-center justify-center gap-1.5 cursor-pointer text-xs shadow-2xs"
+                          className="h-9 py-2 px-3 bg-white hover:bg-slate-50 active:scale-[0.99] text-slate-800 font-bold rounded-xl border border-slate-200/80 transition-all flex items-center justify-center gap-1.5 cursor-pointer text-xs shadow-2xs"
                         >
                           <Crop className="w-3.5 h-3.5 text-slate-700" />
-                          <span>Edit Image (क्रॉप व संपादन)</span>
+                          <span>Crop & Adjust</span>
                         </button>
 
                         <button
                           type="button"
                           onClick={() => featuredImageInputRef.current?.click()}
-                          className="py-2 px-3 bg-white hover:bg-slate-50 text-slate-700 font-semibold rounded-xl border border-slate-200/80 transition-colors flex items-center justify-center gap-1 cursor-pointer text-xs shadow-2xs"
+                          className="h-9 py-2 px-3 bg-white hover:bg-slate-50 text-slate-700 font-semibold rounded-xl border border-slate-200/80 transition-colors flex items-center justify-center gap-1.5 cursor-pointer text-xs shadow-2xs"
                           title="Choose a different image file"
                         >
                           <Camera className="w-3.5 h-3.5 text-slate-500" />
@@ -1767,55 +1652,71 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                         </button>
                       </div>
 
-                      <div className="space-y-2">
-                        <input
-                          type="text"
-                          value={imageCaption}
-                          onChange={(e) => setImageCaption(e.target.value)}
-                          placeholder="Image caption..."
-                          className="w-full bg-white border border-slate-200/80 rounded-xl px-3 py-2 text-slate-800 shadow-2xs focus:ring-1 focus:ring-slate-300 focus:outline-hidden"
-                        />
-                        <input
-                          type="text"
-                          value={imageCredit}
-                          onChange={(e) => setImageCredit(e.target.value)}
-                          placeholder="Photo credit / Agency..."
-                          className="w-full bg-white border border-slate-200/80 rounded-xl px-3 py-2 text-slate-800 shadow-2xs focus:ring-1 focus:ring-slate-300 focus:outline-hidden"
-                        />
-                        <input
-                          type="text"
-                          value={imageAlt}
-                          onChange={(e) => setImageAlt(e.target.value)}
-                          placeholder="Image Alt text for SEO & accessibility..."
-                          className="w-full bg-white border border-slate-200/80 rounded-xl px-3 py-2 text-slate-800 shadow-2xs focus:ring-1 focus:ring-slate-300 focus:outline-hidden"
-                        />
+                      <div className="space-y-2.5 pt-1">
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-700 mb-1">Image Caption:</label>
+                          <input
+                            type="text"
+                            value={imageCaption}
+                            onChange={(e) => setImageCaption(e.target.value)}
+                            placeholder="Enter image caption..."
+                            className="w-full bg-white border border-slate-200/80 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 shadow-2xs focus:ring-1 focus:ring-slate-300 focus:outline-hidden"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-700 mb-1">Photo Credit / Agency:</label>
+                          <input
+                            type="text"
+                            value={imageCredit}
+                            onChange={(e) => setImageCredit(e.target.value)}
+                            placeholder="e.g. PTI / ANI / NP News Desk"
+                            className="w-full bg-white border border-slate-200/80 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 shadow-2xs focus:ring-1 focus:ring-slate-300 focus:outline-hidden"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-700 mb-1">Alt Text (SEO & Accessibility):</label>
+                          <input
+                            type="text"
+                            value={imageAlt}
+                            onChange={(e) => setImageAlt(e.target.value)}
+                            placeholder="Descriptive Alt text for Google SEO..."
+                            className="w-full bg-white border border-slate-200/80 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 shadow-2xs focus:ring-1 focus:ring-slate-300 focus:outline-hidden"
+                          />
+                        </div>
                       </div>
 
                       <button 
                         type="button"
                         onClick={() => setFeaturedImage('')} 
-                        className="text-red-600 text-xs font-semibold hover:underline block cursor-pointer"
+                        className="w-full py-2 px-3 rounded-xl border border-rose-200/70 bg-rose-50/60 hover:bg-rose-100/80 text-rose-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-2xs"
                       >
-                        Remove featured image
+                        <Trash2 className="w-3.5 h-3.5 text-rose-600" />
+                        <span>Remove Featured Image</span>
                       </button>
                     </div>
                   ) : (
                     <div 
                       onClick={() => featuredImageInputRef.current?.click()} 
-                      className="border-2 border-dashed border-slate-200 hover:border-slate-400 rounded-2xl p-6 text-center cursor-pointer hover:bg-white/50 transition-all group shadow-2xs"
+                      className="border-2 border-dashed border-slate-200/90 hover:border-slate-400 rounded-2xl p-7 text-center cursor-pointer bg-gradient-to-b from-slate-50/50 to-white/80 hover:from-white hover:to-slate-50/80 transition-all group shadow-2xs"
                     >
-                      <Camera className="w-8 h-8 text-slate-400 group-hover:text-slate-800 mx-auto mb-2 transition-colors" />
-                      <span className="text-slate-900 font-bold text-xs block">Upload Featured Photo</span>
-                      <span className="text-[11px] text-slate-400 mt-0.5 block">Recommended 16:9 aspect ratio</span>
+                      <div className="w-12 h-12 rounded-2xl bg-white shadow-xs border border-slate-200/80 flex items-center justify-center mx-auto mb-3 group-hover:scale-105 group-hover:border-slate-300 group-hover:shadow-sm transition-all text-slate-600 group-hover:text-slate-900">
+                        <UploadCloud className="w-6 h-6 text-slate-700 group-hover:text-slate-900 transition-colors" />
+                      </div>
+                      <span className="text-slate-900 font-bold text-xs block group-hover:text-slate-950 transition-colors">Upload Featured Photo</span>
+                      <span className="text-[11px] text-slate-500 mt-1 block">Drag & drop image file or click to browse</span>
+                      <div className="mt-3 inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/90 rounded-full border border-slate-200/80 text-[10px] font-semibold text-slate-500 shadow-2xs">
+                        <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                        <span>16:9 Aspect Ratio • JPG, PNG, WebP</span>
+                      </div>
                     </div>
                   )}
                 </div>
               )}
             </div>
 
-            <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xs border border-white/80 overflow-hidden transition-all">
+            <div className={`bg-white/80 backdrop-blur-md rounded-3xl shadow-xs border border-white/80 transition-all relative ${openSidebarDropdown === 'category' || openSidebarDropdown === 'articleType' ? 'z-30' : 'z-10'}`}>
               <div 
-                className="px-5 py-4 border-b border-slate-100/80 flex items-center justify-between cursor-pointer select-none bg-white/40 hover:bg-white/60 backdrop-blur-xs transition-colors"
+                className="px-5 py-4 border-b border-slate-100/80 flex items-center justify-between cursor-pointer select-none bg-white/40 hover:bg-white/60 backdrop-blur-xs transition-colors rounded-t-3xl"
                 onClick={() => toggleBox('details')}
               >
                 <div className="flex items-center gap-2">
@@ -1829,27 +1730,13 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                 <div className="p-5 space-y-4 text-xs">
                   
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-2">Category / Desk:</label>
-                    <div className="space-y-1.5 max-h-44 overflow-y-auto pr-1 hide-scrollbar">
-                      {CATEGORIES_LIST.map((cat) => {
-                        const isSelected = category === cat.slug;
-                        return (
-                          <button
-                            key={cat.slug}
-                            type="button"
-                            onClick={() => setCategory(cat.slug)}
-                            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all text-left cursor-pointer border ${
-                              isSelected 
-                                ? `${cat.color} font-bold shadow-2xs ring-1 ring-slate-900/10` 
-                                : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200/80 shadow-2xs'
-                            }`}
-                          >
-                            <span>{cat.label}</span>
-                            {isSelected && <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />}
-                          </button>
-                        );
-                      })}
-                    </div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1.5">Category / Desk:</label>
+                    {renderCustomDropdown({
+                      id: 'category',
+                      value: category,
+                      options: CATEGORIES_LIST.map(cat => ({ value: cat.slug, label: cat.label })),
+                      onChange: (val) => setCategory(val as EditorialCategorySlug),
+                    })}
                   </div>
 
                   <div>
@@ -1864,16 +1751,13 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Article Type:</label>
-                    <select
-                      value={articleType}
-                      onChange={(e) => setArticleType(e.target.value)}
-                      className="w-full bg-white border border-slate-200/80 rounded-xl p-2.5 text-xs font-semibold text-slate-800 focus:ring-1 focus:ring-slate-300 focus:outline-hidden shadow-2xs cursor-pointer"
-                    >
-                      {ARTICLE_TYPES.map((type) => (
-                        <option key={type} value={type}>{type}</option>
-                      ))}
-                    </select>
+                    <label className="block text-xs font-bold text-slate-700 mb-1.5">Article Type:</label>
+                    {renderCustomDropdown({
+                      id: 'articleType',
+                      value: articleType,
+                      options: ARTICLE_TYPES.map(type => ({ value: type, label: type })),
+                      onChange: (val) => setArticleType(val),
+                    })}
                   </div>
 
                   <div className="grid grid-cols-2 gap-2">
