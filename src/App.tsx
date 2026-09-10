@@ -574,7 +574,7 @@ function AppContent() {
           // Admin CMS mode: authenticated queries with full editorial fields
           ensureAuthenticatedSession().catch(() => {});
           const [editorialPosts, liveVideos] = await Promise.all([
-            getEditorialArticles('all', 25),
+            getEditorialArticles('all'),
             getPublishedVideos(),
           ]);
 
@@ -661,7 +661,7 @@ function AppContent() {
               if (targetId && prev.some(p => p.id === targetId && p.status === 'published')) {
                 return prev;
               }
-              (isAdmin ? getEditorialArticles('all', 25) : getPublishedArticles()).then(fresh => {
+              (isAdmin ? getEditorialArticles('all') : getPublishedArticles()).then(fresh => {
                 if (fresh && fresh.length > 0) setPosts(fresh);
               });
               return prev;
