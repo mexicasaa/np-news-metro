@@ -101,7 +101,7 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
             }`}
           >
             <Plus className="w-3.5 h-3.5" />
-            <span>+ New Article</span>
+            <span>New Article</span>
           </button>
         </div>
       </div>
