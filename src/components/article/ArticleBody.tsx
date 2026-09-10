@@ -92,7 +92,13 @@ export const ArticleBody: React.FC<ArticleBodyProps> = ({
 
   let activeBlocks: GutenbergBlock[] = rawBlocks;
   if ((rawBlocks.length === 0 || isOnlyPlaceholder) && hasFullContent && post.content) {
-    const paragraphs = post.content.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+    let paragraphs = post.content.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+    if (paragraphs.length <= 1 && post.content.includes('\n')) {
+      const lineParagraphs = post.content.split('\n').map(p => p.trim()).filter(Boolean);
+      if (lineParagraphs.length > 1) {
+        paragraphs = lineParagraphs;
+      }
+    }
     if (paragraphs.length > 0) {
       activeBlocks = paragraphs.map((p, idx) => ({
         id: `content-p-${idx}`,
@@ -139,7 +145,7 @@ export const ArticleBody: React.FC<ArticleBodyProps> = ({
             return (
               <p
                 key={block.id}
-                className={`text-base sm:text-lg text-ink-secondary mb-6 leading-relaxed ${
+                className={`text-base sm:text-lg text-ink-secondary mb-6 leading-relaxed whitespace-pre-line ${
                   isFirstParagraph
                     ? 'first-letter:font-serif first-letter:text-4xl sm:first-letter:text-5xl first-letter:font-bold first-letter:text-primary first-letter:mr-2 sm:first-letter:mr-3 first-letter:float-left first-letter:leading-none'
                     : ''

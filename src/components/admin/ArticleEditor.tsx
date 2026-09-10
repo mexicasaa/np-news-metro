@@ -5,7 +5,7 @@ import {
   ImagePlus, ExternalLink, RefreshCw, ArrowLeft, CheckCircle2,
   HelpCircle, Globe, Clock, ShieldCheck, Tag, Layout, Type, AlertCircle,
   UserCheck, Calendar, User, Image as ImageIcon, Trash2, ArrowUp, ArrowDown,
-  Plus, Check, MapPin, Newspaper, FileCheck, Award, Flame, Crop, UploadCloud
+  Plus, Check, MapPin, Newspaper, FileCheck, Award, Flame, Crop, UploadCloud, WrapText
 } from 'lucide-react';
 import { WpPost, EditorialCategorySlug, GutenbergBlock } from '../../types/wordpress';
 import { UserRole, EditorialStatus } from '../../types/admin';
@@ -18,6 +18,7 @@ import { slugifyText } from '../../utils/slugify';
 import { getAuthorAvatarUrl, DEFAULT_AUTHOR_AVATAR, handleAvatarError } from '../../utils/imageFallback';
 import { saveAutoSaveSession, clearAutoSaveSession, saveDraftPost, setRefreshSession, isPostPublished } from '../../utils/newsStorage';
 import { getNewsroomAuthors } from '../../services/authService';
+import { formatArticleText, formatPastedContent } from '../../utils/editorFormatting';
 
 export interface EditorBlock {
   id: string;
@@ -455,7 +456,8 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
   };
 
   const parseBlocks = (textContent: string): GutenbergBlock[] => {
-    return textContent.split(/\n\n+/).map(p => p.trim()).filter(Boolean).map((chunk, i) => {
+    const normalized = formatArticleText(textContent);
+    return normalized.split(/\n\n+/).map(p => p.trim()).filter(Boolean).map((chunk, i) => {
       const imgMatch = chunk.match(/^!\[([\s\S]*?)\]\(([\s\S]*?)\)$/);
       if (imgMatch) {
         return {
@@ -535,6 +537,66 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       ''
     );
     setContent(updated);
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const clipboardData = e.clipboardData;
+    if (!clipboardData) return;
+
+    const htmlData = clipboardData.getData('text/html');
+    const plainData = clipboardData.getData('text/plain');
+
+    const formatted = formatPastedContent(htmlData, plainData);
+    if (!formatted) return;
+
+    e.preventDefault();
+    const textarea = textareaRef.current;
+    if (!textarea) {
+      setContent(prev => prev ? `${prev}\n\n${formatted}` : formatted);
+      return;
+    }
+
+    // Use document.execCommand if available to preserve native Ctrl+Z undo history
+    const success = document.execCommand?.('insertText', false, formatted);
+    if (!success) {
+      const start = textarea.selectionStart ?? 0;
+      const end = textarea.selectionEnd ?? 0;
+      const prev = textarea.value;
+      const nextVal = prev.substring(0, start) + formatted + prev.substring(end);
+      setContent(nextVal);
+      requestAnimationFrame(() => {
+        textarea.focus();
+        textarea.selectionStart = textarea.selectionEnd = start + formatted.length;
+      });
+    }
+  };
+
+  const handleFormatParagraphSpacing = () => {
+    const textarea = textareaRef.current;
+    if (!textarea) {
+      setContent(prev => formatArticleText(prev));
+      return;
+    }
+
+    const start = textarea.selectionStart ?? 0;
+    const end = textarea.selectionEnd ?? 0;
+
+    if (start !== end) {
+      const selected = content.substring(start, end);
+      const formatted = formatArticleText(selected);
+      const updated = content.substring(0, start) + formatted + content.substring(end);
+      setContent(updated);
+      setTimeout(() => {
+        textarea.focus();
+        textarea.setSelectionRange(start, start + formatted.length);
+      }, 50);
+    } else {
+      const formatted = formatArticleText(content);
+      setContent(formatted);
+      setTimeout(() => {
+        textarea.focus();
+      }, 50);
+    }
   };
 
   const handleAddTag = () => {
@@ -1175,6 +1237,18 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                   >
                     <Link2 className="w-3.5 h-3.5" />
                   </button>
+
+                  <div className="w-px h-4 bg-slate-200/80 mx-1"></div>
+
+                  <button
+                    type="button"
+                    onClick={handleFormatParagraphSpacing}
+                    className="px-2 py-1 text-slate-600 hover:text-slate-950 hover:bg-slate-100 rounded-md transition-colors cursor-pointer flex items-center gap-1.5"
+                    title="Format Paragraph Spacing (Add clean space between lines/paragraphs)"
+                  >
+                    <WrapText className="w-3.5 h-3.5 text-slate-700" />
+                    <span className="text-[11px] font-semibold text-slate-600">Space Lines</span>
+                  </button>
                 </div>
 
                 <div className="text-xs text-slate-400 font-medium select-none">
@@ -1187,9 +1261,10 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                   ref={textareaRef}
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
+                  onPaste={handlePaste}
                   placeholder="Tell your story..."
-                  style={{ outline: 'none', border: 'none', boxShadow: 'none' }}
-                  className="w-full text-base sm:text-lg leading-relaxed text-slate-800 font-serif border-none outline-none focus:outline-none focus:ring-0 ring-0 focus-visible:outline-none resize-none min-h-[460px] bg-transparent placeholder:text-slate-300 selection:bg-slate-200"
+                  style={{ outline: 'none', border: 'none', boxShadow: 'none', lineHeight: '1.9' }}
+                  className="w-full text-base sm:text-lg leading-loose text-slate-800 font-serif border-none outline-none focus:outline-none focus:ring-0 ring-0 focus-visible:outline-none resize-none min-h-[460px] bg-transparent placeholder:text-slate-300 selection:bg-slate-200"
                 />
               </div>
 

@@ -2,13 +2,25 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
   <url>
+    <loc>https://www.npnewsmetro.com/business/pinka-rojagaara-mele-men-486-yuvatiyon-ne-liyaa-hissaa-263-ko-mil</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-10T18:13:18.899Z</news:publication_date>
+      <news:title>पिंक रोजगार मेले में 486 युवतियों ने लिया हिस्सा, 263 को मिला नियुक्ति-पत्र</news:title>
+      <news:keywords>News, India</news:keywords>
+    </news:news>
+  </url>
+  <url>
     <loc>https://www.npnewsmetro.com/politics/hisaara-men-teja-hogaa-aaeeemasee-kaa-nirmaana-seeema-sainee-bole</loc>
     <news:news>
       <news:publication>
         <news:name>NP News Metro</news:name>
         <news:language>hi</news:language>
       </news:publication>
-      <news:publication_date>2026-09-10T18:01:55.023Z</news:publication_date>
+      <news:publication_date>2026-09-10T18:11:41.877Z</news:publication_date>
       <news:title>हिसार में तेज होगा आईएमसी का निर्माण, सीएम सैनी बोले- विकास को मिलेगी नई रफ्तार</news:title>
       <news:keywords>News, India</news:keywords>
     </news:news>
@@ -34,18 +46,6 @@
       </news:publication>
       <news:publication_date>2026-09-10T17:41:52.590Z</news:publication_date>
       <news:title>रोडवेजकर्मियों ने किया शक्ति प्रदर्शन, 16 को गरजेंगे आगरा में</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/business/pinka-rojagaara-mele-men-486-yuvatiyon-ne-liyaa-hissaa-263-ko-mil</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-10T17:37:03.577Z</news:publication_date>
-      <news:title>पिंक रोजगार मेले में 486 युवतियों ने लिया हिस्सा, 263 को मिला नियुक्ति-पत्र</news:title>
       <news:keywords>News, India</news:keywords>
     </news:news>
   </url>
