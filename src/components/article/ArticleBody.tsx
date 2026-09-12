@@ -92,13 +92,7 @@ export const ArticleBody: React.FC<ArticleBodyProps> = ({
 
   let activeBlocks: GutenbergBlock[] = rawBlocks;
   if ((rawBlocks.length === 0 || isOnlyPlaceholder) && hasFullContent && post.content) {
-    let paragraphs = post.content.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
-    if (paragraphs.length <= 1 && post.content.includes('\n')) {
-      const lineParagraphs = post.content.split('\n').map(p => p.trim()).filter(Boolean);
-      if (lineParagraphs.length > 1) {
-        paragraphs = lineParagraphs;
-      }
-    }
+    const paragraphs = post.content.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
     if (paragraphs.length > 0) {
       activeBlocks = paragraphs.map((p, idx) => ({
         id: `content-p-${idx}`,

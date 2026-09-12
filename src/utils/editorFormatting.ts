@@ -1,66 +1,33 @@
 /**
- * Utilities for formatting article text and rich HTML pasted into the editor.
- * Ensures paragraphs are separated by clean double-newlines (\n\n) and bullet lists stay intact.
+ * Utilities for formatting article text and pasted content in the editor.
+ * Preserves exact original spacing, indentation, and alignment without injecting
+ * unwanted blank lines between lines of the same paragraph.
  */
 
 /**
- * Formats plain text to ensure proper paragraph spacing between lines.
- * If text only has single newlines between paragraphs, expands them to double newlines.
- * If text already has double newlines, preserves them and collapses excessive spacing.
+ * Formats article text for clean paragraph presentation:
+ * - Normalizes Windows CRLF to standard Unix LF (\n).
+ * - Preserves single newlines within paragraphs so multi-line sentences stay together.
+ * - Preserves double newlines (\n\n) between distinct paragraphs.
+ * - Collapses excessive blank lines (3 or more newlines become \n\n).
+ * - Trims trailing whitespace from each line while maintaining indentation and structure.
  */
 export const formatArticleText = (text: string): string => {
   if (!text) return '';
-  const normalized = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
-  if (!normalized) return '';
+  const normalized = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  if (!normalized.trim()) return '';
 
-  // Case 1: Text already has double newlines (paragraphs separated by blank lines)
-  if (/\n\s*\n/.test(normalized)) {
-    return normalized
-      .split(/\n\s*\n/)
-      .map(block => block.trim())
-      .filter(Boolean)
-      .join('\n\n');
-  }
-
-  // Case 2: Text has multiple single newlines without double newlines
-  const rawLines = normalized.split('\n').map(l => l.trim()).filter(Boolean);
-  if (rawLines.length <= 1) {
-    return normalized;
-  }
-
-  // If all lines are bullet points or numbered lists, keep single spacing
-  const isAllList = rawLines.every(l => /^[-*•\d+.]\s+/.test(l));
-  if (isAllList) {
-    return rawLines.map(l => l.replace(/^[•]\s*/, '- ')).join('\n');
-  }
-
-  // Group lines into paragraphs, keeping consecutive bullet points together
-  const paragraphs: string[] = [];
-  let currentList: string[] = [];
-
-  rawLines.forEach((line) => {
-    const isBullet = /^[-*•\d+.]\s+/.test(line);
-    if (isBullet) {
-      currentList.push(line.replace(/^[•]\s*/, '- '));
-    } else {
-      if (currentList.length > 0) {
-        paragraphs.push(currentList.join('\n'));
-        currentList = [];
-      }
-      paragraphs.push(line);
-    }
-  });
-
-  if (currentList.length > 0) {
-    paragraphs.push(currentList.join('\n'));
-  }
-
-  return paragraphs.join('\n\n');
+  // Trim trailing whitespace from each line without destroying leading indent/spacing
+  const lines = normalized.split('\n');
+  const cleanedLines = lines.map(line => line.trimEnd());
+  
+  // Collapse 3+ consecutive newlines to standard double newlines (\n\n)
+  return cleanedLines.join('\n').replace(/\n{3,}/g, '\n\n').trim();
 };
 
 /**
- * Converts rich HTML (copied from websites, Google Docs, Word, news portals) into
- * clean markdown with proper \n\n paragraph spacing, bold/italics, links, and bullet lists.
+ * Safely converts rich HTML into clean text/markdown while strictly preserving paragraph
+ * integrity and preventing broken asterisk clusters or unwanted line gaps.
  */
 export const convertHtmlToEditorMarkdown = (html: string): string => {
   if (!html || !html.trim()) return '';
@@ -86,12 +53,12 @@ export const convertHtmlToEditorMarkdown = (html: string): string => {
       const tag = el.tagName.toLowerCase();
 
       if (tag === 'strong' || tag === 'b') {
-        const text = Array.from(el.childNodes).map(serializeNode).join('').trim();
-        return text ? `**${text}**` : '';
+        const text = Array.from(el.childNodes).map(serializeNode).join('');
+        return text.trim() ? `**${text.trim()}**` : text;
       }
       if (tag === 'em' || tag === 'i') {
-        const text = Array.from(el.childNodes).map(serializeNode).join('').trim();
-        return text ? `*${text}*` : '';
+        const text = Array.from(el.childNodes).map(serializeNode).join('');
+        return text.trim() ? `*${text.trim()}*` : text;
       }
       if (tag === 'a') {
         const text = Array.from(el.childNodes).map(serializeNode).join('').trim();
@@ -154,7 +121,7 @@ export const convertHtmlToEditorMarkdown = (html: string): string => {
       }
 
       // For containers like div, section, article
-      const hasBlockChildren = el.querySelector('p, h1, h2, h3, h4, h5, h6, ul, ol, blockquote, div');
+      const hasBlockChildren = el.querySelector('p, h1, h2, h3, h4, h5, h6, ul, ol, blockquote');
       if (hasBlockChildren) {
         Array.from(el.children).forEach(child => {
           if (child instanceof HTMLElement) {
@@ -174,7 +141,6 @@ export const convertHtmlToEditorMarkdown = (html: string): string => {
     });
 
     if (blocks.length > 0) {
-      // Ensure all blocks are properly separated by \n\n
       return blocks.filter(b => b && b.trim()).join('\n\n');
     }
   } catch (err) {
@@ -184,18 +150,21 @@ export const convertHtmlToEditorMarkdown = (html: string): string => {
 };
 
 /**
- * Unified paste formatter: prefers rich HTML extraction, falling back to plain text formatting.
+ * Unified paste formatter:
+ * Strictly prioritizes plain text to preserve the EXACT spacing, indentation, line breaks,
+ * and alignment of copied content without introducing unexpected blank lines or mangled characters.
  */
 export const formatPastedContent = (html?: string, plain?: string): string => {
+  if (typeof plain === 'string' && plain.length > 0) {
+    // Normalize Windows CRLF line endings to standard LF while preserving exact spaces, indents, and newlines
+    return plain.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  }
+
   if (html && html.trim()) {
     const formattedHtml = convertHtmlToEditorMarkdown(html);
     if (formattedHtml && formattedHtml.trim()) {
       return formattedHtml.trim();
     }
-  }
-
-  if (plain && plain.trim()) {
-    return formatArticleText(plain);
   }
 
   return '';

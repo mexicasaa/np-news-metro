@@ -1263,8 +1263,8 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                   onChange={(e) => setContent(e.target.value)}
                   onPaste={handlePaste}
                   placeholder="Tell your story..."
-                  style={{ outline: 'none', border: 'none', boxShadow: 'none', lineHeight: '1.9' }}
-                  className="w-full text-base sm:text-lg leading-loose text-slate-800 font-serif border-none outline-none focus:outline-none focus:ring-0 ring-0 focus-visible:outline-none resize-none min-h-[460px] bg-transparent placeholder:text-slate-300 selection:bg-slate-200"
+                  style={{ outline: 'none', border: 'none', boxShadow: 'none' }}
+                  className="w-full text-base sm:text-lg leading-relaxed text-slate-800 font-serif border-none outline-none focus:outline-none focus:ring-0 ring-0 focus-visible:outline-none resize-none min-h-[460px] bg-transparent placeholder:text-slate-300 selection:bg-slate-200"
                 />
               </div>
 

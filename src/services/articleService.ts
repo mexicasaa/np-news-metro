@@ -62,13 +62,7 @@ export const mapDbToWpPost = (row: any, joinedTags?: string[]): WpPost => {
   if (Array.isArray(rawBlocks) && rawBlocks.length > 0) {
     parsedBlocks = rawBlocks;
   } else if (typeof row.content === 'string' && row.content.trim()) {
-    let paragraphs = row.content.split(/\n\s*\n/).map((p: string) => p.trim()).filter(Boolean);
-    if (paragraphs.length <= 1 && row.content.includes('\n')) {
-      const lineParagraphs = row.content.split('\n').map((p: string) => p.trim()).filter(Boolean);
-      if (lineParagraphs.length > 1) {
-        paragraphs = lineParagraphs;
-      }
-    }
+    const paragraphs = row.content.split(/\n\s*\n/).map((p: string) => p.trim()).filter(Boolean);
     if (paragraphs.length > 0) {
       parsedBlocks = paragraphs.map((p: string, idx: number) => ({
         id: `b-content-${idx}`,
