@@ -96,3 +96,6 @@ export const compressAvatarFile = (file: File): Promise<string> => {
     mimeType: 'image/jpeg',
   });
 };
+
+export { optimizeImageForUpload, type ImageOptimizationOptions, type OptimizedImageResult } from './imageOptimizer';
+

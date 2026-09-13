@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { R2MediaRepository } from '../repositories/r2/R2MediaRepository';
+import { optimizeImageForUpload } from '../utils/imageOptimizer';
 
 export interface MediaAsset {
   id: string;
@@ -25,7 +26,7 @@ export interface MediaAsset {
 }
 
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/gif'];
-const MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
+const MAX_IMAGE_SIZE_BYTES = 30 * 1024 * 1024; // 30MB (optimized client-side before upload)
 
 export const sanitizeFileName = (fileName: string): string => {
   const parts = fileName.split('.');
@@ -74,23 +75,36 @@ export const uploadArticleImage = async (
     return {
       url: '',
       path: '',
-      error: 'File size exceeds maximum 10MB limit.',
+      error: 'File size exceeds maximum 30MB limit.',
     };
   }
 
-  const fileName = customFileName || (file instanceof File ? file.name : `cropped-${Date.now()}.jpg`);
+  const initialName = customFileName || (file instanceof File ? file.name : `cropped-${Date.now()}.jpg`);
   const r2Repo = R2MediaRepository.getInstance();
 
   try {
-    // 1. Calculate SHA-256 content hash
-    const contentHash = await r2Repo.computeContentHash(file);
+    // 0. Automatically optimize and downscale camera photos (e.g. 5-15MB phone photos)
+    const isAvatar = articleId === 'avatars';
+    const optimized = await optimizeImageForUpload(file, {
+      maxWidth: isAvatar ? 512 : 1920,
+      maxHeight: isAvatar ? 512 : 1080,
+      quality: 0.85,
+      fallbackFileName: initialName,
+    });
+
+    const uploadFile = optimized.file;
+    const finalFileName = optimized.fileName || initialName;
+    const finalMimeType = optimized.mimeType || fileType;
+
+    // 1. Calculate SHA-256 content hash on the optimized asset
+    const contentHash = await r2Repo.computeContentHash(uploadFile);
 
     // 2. Deduplicate or upload
-    const { media, isDuplicate } = await r2Repo.upload(file, contentHash, {
-      fileName,
-      mimeType: fileType,
-      fileSize: file.size,
-      altText: fileName.replace(/\.[^/.]+$/, ''),
+    const { media, isDuplicate } = await r2Repo.upload(uploadFile, contentHash, {
+      fileName: finalFileName,
+      mimeType: finalMimeType,
+      fileSize: uploadFile.size,
+      altText: finalFileName.replace(/\.[^/.]+$/, ''),
       caption: 'NP News Metro Media Desk',
     });
 
@@ -140,12 +154,28 @@ export const uploadMedia = async (
   const r2Repo = R2MediaRepository.getInstance();
 
   try {
-    const contentHash = await r2Repo.computeContentHash(file);
-    const { media, isDuplicate } = await r2Repo.upload(file, contentHash, {
-      fileName: file.name,
-      mimeType: file.type,
-      fileSize: file.size,
-      altText: altText || file.name.replace(/\.[^/.]+$/, ''),
+    let uploadFile: File | Blob = file;
+    let finalFileName = file.name;
+    let finalMimeType = file.type;
+
+    if (isImage) {
+      const optimized = await optimizeImageForUpload(file, {
+        maxWidth: 1920,
+        maxHeight: 1080,
+        quality: 0.85,
+        fallbackFileName: file.name,
+      });
+      uploadFile = optimized.file;
+      finalFileName = optimized.fileName;
+      finalMimeType = optimized.mimeType;
+    }
+
+    const contentHash = await r2Repo.computeContentHash(uploadFile);
+    const { media, isDuplicate } = await r2Repo.upload(uploadFile, contentHash, {
+      fileName: finalFileName,
+      mimeType: finalMimeType,
+      fileSize: uploadFile.size,
+      altText: altText || finalFileName.replace(/\.[^/.]+$/, ''),
       caption: credit || 'NP News Metro Media Desk',
     });
 

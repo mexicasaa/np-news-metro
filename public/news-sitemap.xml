@@ -2,6 +2,66 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
   <url>
+    <loc>https://www.npnewsmetro.com/india/seevara-laaina-men-mileen-baaloo-bharee-boriyaan-nagara-nigama-ne</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-13T10:02:53.316Z</news:publication_date>
+      <news:title>सीवर लाइन में मिलीं बालू भरी बोरियां, नगर निगम ने दी एफआईआर की तहरीर</news:title>
+      <news:keywords>News, India</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/opinion/antima-jana-kaa-devataa-vinaayaka-shree-ganesha-sabase-badaa-gane</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-13T09:44:56.766Z</news:publication_date>
+      <news:title>अंतिम जन का देवता विनायक श्री गणेश — सबसे बड़ा गणेश बल</news:title>
+      <news:keywords>News, India</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/social/madhubana-enkleva-nivaasiyon-ne-vidhaayaka-tejapaala-naagara-se-l-1</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-13T09:26:40.391Z</news:publication_date>
+      <news:title>मधुबन एन्क्लेव निवासियों ने विधायक तेजपाल नागर से लगाई मदद की गुहार</news:title>
+      <news:keywords>News, India</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/entertainment/do-ujjvalaa-chakradeva-kee-kaavyakriti-neelimaa-kaa-lokaarpana-sa</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-13T08:42:30.212Z</news:publication_date>
+      <news:title>डॉ. उज्ज्वला चक्रदेव की काव्यकृति ‘नीलिमा’ का लोकार्पण संपन्न</news:title>
+      <news:keywords>News, India</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/lifestyle/palavala-men-sentara-phora-saaita-ne-loncha-kiyaa-edavaansda-skai</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-13T07:41:30.716Z</news:publication_date>
+      <news:title>पलवल में सेंटर फॉर साइट ने लॉन्च किया एडवांस्ड स्कैनसिस सिस्टम</news:title>
+      <news:keywords>News, India</news:keywords>
+    </news:news>
+  </url>
+  <url>
     <loc>https://www.npnewsmetro.com/religion/bhakti-kee-bhaavanaa-se-bhagavata-praapti-kaa-maarga-prashasta-ho</loc>
     <news:news>
       <news:publication>
@@ -82,18 +142,6 @@
       </news:publication>
       <news:publication_date>2026-09-11T17:06:35.510Z</news:publication_date>
       <news:title>9/11 हमलों  की 25वीं बरसी पर पीएम मोदी ने दी श्रद्धांजलि, आतंकवाद के खिलाफ संकल्प दोहराया</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/dillee-men-avaidha-goda-lene-ke-khilaapha-jaagarookataa-kaaryasha</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-11T08:53:16.382Z</news:publication_date>
-      <news:title>दिल्ली में अवैध गोद लेने के खिलाफ जागरूकता कार्यशाला, 200 से ज्यादा हितधारक जुटे</news:title>
       <news:keywords>News, India</news:keywords>
     </news:news>
   </url>

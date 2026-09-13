@@ -91,8 +91,33 @@ export class R2MediaRepository {
   }
 
   /**
+   * Helper to extract friendly error message from HTTP response
+   */
+  private async parseResponseError(resp: Response, defaultMessage: string): Promise<string> {
+    if (resp.status === 413) {
+      return 'File size exceeds maximum upload limit. Please try a compressed image.';
+    }
+    if (resp.status === 504 || resp.status === 524) {
+      return 'Upload timed out. Please check your internet connection.';
+    }
+    try {
+      const text = await resp.text();
+      try {
+        const json = JSON.parse(text);
+        if (json?.error) return `Cloudflare R2 upload failed: ${json.error}`;
+        if (json?.message) return `Cloudflare R2 upload failed: ${json.message}`;
+      } catch {}
+      if (text && text.length < 150 && !text.includes('<') && !text.includes('{')) {
+        return `Cloudflare R2 upload failed: ${text.trim()}`;
+      }
+    } catch {}
+    return `${defaultMessage} (HTTP ${resp.status} ${resp.statusText || 'Error'})`;
+  }
+
+  /**
    * Upload media with SHA-256 deduplication.
-   * If already present, returns existing record immediately.
+   * Uses direct-to-R2 presigned upload first to bypass serverless limits,
+   * with serverless base64 fallback for resilient delivery.
    */
   public async upload(
     file: File | Blob,
@@ -108,9 +133,78 @@ export class R2MediaRepository {
     const cleanName = meta.fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
     const r2Key = `media/${contentHash}/${cleanName}`;
     const storagePath = `media/${contentHash}/${cleanName}`;
-    let publicUrl = this.getUrl(r2Key);
+    const publicUrl = this.getUrl(r2Key);
+    const mimeType = meta.mimeType || file.type || 'image/jpeg';
 
-    // 2. Direct upload exclusively to Cloudflare R2 via Serverless / Dev S3 API
+    // 2. Primary Upload Path: Direct-to-R2 via Presigned PUT URL
+    // (Bypasses Vercel's 4.5MB serverless payload limit entirely)
+    try {
+      const presignResp = await fetch('/api/r2-upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'get-upload-url',
+          fileName: meta.fileName,
+          mimeType,
+          contentHash,
+          altText: meta.altText,
+          caption: meta.caption,
+        }),
+      });
+
+      if (presignResp.ok) {
+        const presignData = await presignResp.json();
+        if (presignData.isDuplicate && presignData.media) {
+          return { media: this.mapToRecord(presignData.media), isDuplicate: true };
+        }
+
+        if (presignData.uploadUrl) {
+          // Direct PUT upload straight to Cloudflare R2 bucket
+          const putResp = await fetch(presignData.uploadUrl, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': mimeType,
+            },
+            body: file,
+          });
+
+          if (putResp.ok) {
+            // Register uploaded media asset in Supabase
+            const regResp = await fetch('/api/r2-upload', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                action: 'register-media',
+                r2Key: presignData.r2Key || r2Key,
+                publicUrl: presignData.publicUrl || publicUrl,
+                fileName: presignData.fileName || meta.fileName,
+                mimeType,
+                fileSize: meta.fileSize || (file instanceof File ? file.size : undefined),
+                contentHash,
+                altText: meta.altText,
+                caption: meta.caption,
+              }),
+            });
+
+            if (regResp.ok) {
+              const regResult = await regResp.json();
+              if (regResult.media) {
+                return { media: this.mapToRecord(regResult.media), isDuplicate: false };
+              }
+            } else {
+              const regError = await this.parseResponseError(regResp, 'Media registration failed');
+              console.warn('[R2 Upload] Direct PUT succeeded, but registration returned:', regError);
+            }
+          } else {
+            console.warn(`[R2 Upload] Direct PUT to R2 failed with status ${putResp.status}, falling back...`);
+          }
+        }
+      }
+    } catch (directErr) {
+      console.warn('[R2 Upload] Direct presigned upload attempt failed, falling back to serverless upload:', directErr);
+    }
+
+    // 3. Fallback Path: Serverless Base64 Upload
     const reader = new FileReader();
     const base64Promise = new Promise<string>((resolve, reject) => {
       reader.onload = () => resolve(reader.result as string);
@@ -125,7 +219,7 @@ export class R2MediaRepository {
       body: JSON.stringify({
         base64Data,
         fileName: meta.fileName,
-        mimeType: meta.mimeType,
+        mimeType,
         contentHash,
         altText: meta.altText,
         caption: meta.caption,
@@ -145,7 +239,7 @@ export class R2MediaRepository {
             storagePath: result.r2Key || r2Key,
             r2Key: result.r2Key || r2Key,
             publicUrl: result.url,
-            mimeType: meta.mimeType,
+            mimeType,
             fileSize: meta.fileSize || (file instanceof File ? file.size : undefined),
             altText: meta.altText,
             caption: meta.caption,
@@ -157,11 +251,7 @@ export class R2MediaRepository {
       }
     }
 
-    let errMessage = 'Cloudflare R2 direct upload failed';
-    try {
-      const errJson = await r2Resp.json();
-      if (errJson?.error) errMessage = `Cloudflare R2 upload failed: ${errJson.error}`;
-    } catch {}
+    const errMessage = await this.parseResponseError(r2Resp, 'Cloudflare R2 upload failed');
     throw new Error(errMessage);
   }
 
