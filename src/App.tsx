@@ -555,7 +555,22 @@ function AppContent() {
     setViewMode(route.viewMode);
     setCurrentTemplate(route.template);
     if (route.category) setSelectedCategory(route.category);
-    if (route.post) setSelectedPost(route.post);
+    if (route.post) {
+      setSelectedPost((prev) => {
+        // If the currently selected post is already this same article and has full content,
+        // do NOT downgrade it with a lightweight list/card projection!
+        const prevHasFullContent = prev && (prev.id === route.post!.id || prev.slug === route.post!.slug) && (
+          (Array.isArray(prev.blocks) && prev.blocks.length > 0 && prev.blocks[0].id !== 'b-default-1') ||
+          (typeof prev.content === 'string' && prev.content.trim().length > 0)
+        );
+        const incomingIsOnlyPlaceholder = !route.post!.blocks || route.post!.blocks.length === 0 || (route.post!.blocks.length === 1 && route.post!.blocks[0].id === 'b-default-1');
+
+        if (prevHasFullContent && incomingIsOnlyPlaceholder) {
+          return prev;
+        }
+        return route.post!;
+      });
+    }
     if (route.video) setSelectedVideo(route.video);
     if (route.authorId) setSelectedAuthorId(route.authorId);
     if (route.staticPage) setStaticPage(route.staticPage);
@@ -568,9 +583,9 @@ function AppContent() {
     let isMounted = true;
     const fetchContent = async () => {
       try {
-        const isAdmin = viewMode === 'admin' || isAdminAuthenticated || (typeof window !== 'undefined' && window.location.pathname.includes('/admin'));
+        const isVisitingAdminWorkspace = viewMode === 'admin' || (typeof window !== 'undefined' && (window.location.pathname === '/admin' || window.location.pathname.startsWith('/admin/')));
 
-        if (isAdmin) {
+        if (isVisitingAdminWorkspace) {
           // Admin CMS mode: authenticated queries with full editorial fields
           ensureAuthenticatedSession().catch(() => {});
           const [editorialPosts, liveVideos] = await Promise.all([
@@ -602,18 +617,19 @@ function AppContent() {
         // Purpose-specific lightweight fetch from Vercel Edge Cache (0 full content bodies)
         const rawPath = typeof window !== 'undefined' ? window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase() : '';
         const pathSegments = rawPath ? rawPath.split('/') : [];
-        const isDirectArticle = pathSegments.length > 1 &&
-          !rawPath.startsWith('category/') &&
-          !rawPath.startsWith('author/') &&
-          !rawPath.startsWith('admin');
+        const knownDeskSlugs = ['latest', 'trending', 'photos', 'gallery', 'search', 'india', 'politics', 'business', 'economy', 'technology', 'world', 'sports', 'entertainment', 'lifestyle', 'opinion', 'metromat', 'metro-mat', 'crime', 'social', 'astrology', 'religion'];
+        const staticPages = ['about', 'privacy', 'terms', 'cookie-policy', 'ethics', 'editorial-team', 'corrections', 'advertise', 'contact', 'sitemap', 'disclaimer'];
 
-        const isCategoryRoute = rawPath.startsWith('category/') || (pathSegments.length === 1 && ['india', 'politics', 'business', 'economy', 'technology', 'world', 'sports', 'entertainment', 'lifestyle', 'opinion', 'metromat', 'crime', 'social', 'astrology', 'religion'].includes(rawPath));
+        const isDirectArticle = (pathSegments.length > 1 && !rawPath.startsWith('category/') && !rawPath.startsWith('author/') && !rawPath.startsWith('admin') && !rawPath.startsWith('videos/')) ||
+          (pathSegments.length === 1 && !knownDeskSlugs.includes(rawPath) && !staticPages.includes(rawPath) && !rawPath.startsWith('admin'));
+
+        const isCategoryRoute = rawPath.startsWith('category/') || (pathSegments.length === 1 && knownDeskSlugs.includes(rawPath));
         const isLatestRoute = rawPath === 'latest';
         const isSearchRoute = rawPath === 'search';
         const isVideoRoute = rawPath.includes('video');
 
         // Only fetch homepage card bundle if on homepage or if transitioning to homepage
-        const shouldFetchHomepageArticles = !isDirectArticle && !isCategoryRoute && !isLatestRoute && !isSearchRoute && !isVideoRoute;
+        const shouldFetchHomepageArticles = !isDirectArticle && !isCategoryRoute && !isLatestRoute && !isSearchRoute && !isVideoRoute && !isVisitingAdminWorkspace;
 
         if (shouldFetchHomepageArticles) {
           const publicPosts = await getPublishedArticles();

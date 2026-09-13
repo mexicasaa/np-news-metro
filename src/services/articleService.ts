@@ -411,10 +411,32 @@ export const getArticleBySlug = async (
     const stored = getStoredPosts();
     const foundInStored = stored.find(p => p.slug === slug);
     if (foundInStored) {
-      return foundInStored;
+      const hasFullContent = (Array.isArray(foundInStored.blocks) && foundInStored.blocks.length > 0 && foundInStored.blocks[0].id !== 'b-default-1') ||
+        (typeof foundInStored.content === 'string' && foundInStored.content.trim().length > 0);
+      if (hasFullContent) {
+        return foundInStored;
+      }
     }
 
-    return null;
+    // Direct Supabase fallback if edge API was temporarily warming or unavailable
+    try {
+      const { data, error } = await supabase
+        .from('articles')
+        .select(ARTICLE_DETAIL_SELECT)
+        .eq('slug', slug)
+        .eq('status', 'published')
+        .maybeSingle();
+
+      if (!error && data) {
+        const mapped = mapDbToWpPost(data);
+        if (isPostPublished(mapped)) {
+          cachedArticleBySlug.set(slug, { data: mapped, timestamp: Date.now() });
+          return mapped;
+        }
+      }
+    } catch (dbErr) {}
+
+    return foundInStored || null;
   }
 
   // 2. Draft preview for authenticated editors ONLY (from /admin preview)

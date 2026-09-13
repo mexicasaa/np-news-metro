@@ -36,15 +36,15 @@ export const OpinionArticleTemplate: React.FC<OpinionArticleTemplateProps> = ({
   // Self-healing: if the active post only has a single placeholder block, fetch full article on-demand
   React.useEffect(() => {
     if (!post?.slug) return;
-    const isPlaceholder = !post.blocks || post.blocks.length === 0 || (post.blocks.length === 1 && post.blocks[0].id === 'b-default-1');
+    const isPlaceholder = !post.blocks || post.blocks.length === 0 || (post.blocks.length === 1 && post.blocks[0].id === 'b-default-1') || !(post as any).content;
     if (isPlaceholder) {
-      getArticleBySlug(post.slug, false, false).then((fullPost) => {
+      getArticleBySlug(post.slug, false, true).then((fullPost) => {
         if (fullPost && fullPost.blocks && fullPost.blocks.length > 0 && fullPost.blocks[0].id !== 'b-default-1') {
           onSelectPost(fullPost);
         }
       }).catch(() => {});
     }
-  }, [post?.slug, post?.blocks?.length]);
+  }, [post?.slug, post?.blocks?.[0]?.id, (post as any)?.content]);
   const author = post.customAuthor?.name ? {
     id: 'guest',
     name: post.customAuthor.name,
