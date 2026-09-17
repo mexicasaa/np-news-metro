@@ -137,6 +137,17 @@
       "destination": "/api/feeds?type=indexnow"
     },
     {
+      "source": "/",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(?i)(googlebot|bingbot|yandex|duckduckbot|baiduspider|facebookexternalhit|facebot|facebookcatalog|whatsapp|twitterbot|twitter|xbot|telegrambot|telegram|linkedinbot|linkedin|discordbot|slackbot|applebot|skypeuripreview|snapchat|pinterest|quora-link-preview|redditbot|google-inspectiontool|storebot-google|mediapartners-google|feedfetcher-google).*"
+        }
+      ],
+      "destination": "/api/share?homepage=true"
+    },
+    {
       "source": "/category/:category",
       "has": [
         {

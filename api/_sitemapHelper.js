@@ -197,7 +197,7 @@ export const FALLBACK_VIDEOS = [
     slug: 'inside-indias-semiconductor-revolution',
     title: "Inside India's Semiconductor Revolution: Ground Report from Dholera Fab",
     description: "Special investigative dispatch from the Dholera Special Investment Region examining mega-fab construction timelines and cleanroom standards.",
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    videoUrl: 'https://www.youtube.com/@NPNewsMetro',
     thumbnailUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=600',
     publishedAt: '2026-08-23T11:00:44.556Z'
   }
