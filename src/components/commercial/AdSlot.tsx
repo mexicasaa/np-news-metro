@@ -3,6 +3,7 @@ import { ExternalLink, Info, Phone } from 'lucide-react';
 import { mockAdSlots } from '../../data/mockWpData';
 import { useLanguage } from '../../context/LanguageContext';
 import { getAdPlacement, trackAdImpression, trackAdClick, ActiveAdPlacement } from '../../services/adService';
+import { DEFAULT_FALLBACK_IMAGE } from '../../utils/imageFallback';
 
 interface AdSlotProps {
   zone: 'A1' | 'A2' | 'A3' | 'A4' | 'A5' | 'A6' | 'A7';
@@ -89,6 +90,8 @@ export const AdSlot: React.FC<AdSlotProps> = ({ zone, className = '' }) => {
                   const target = e.currentTarget;
                   if (!target.src.endsWith('/uploads/shastri-patanjali-chikitsalaya.jpg')) {
                     target.src = '/uploads/shastri-patanjali-chikitsalaya.jpg';
+                  } else if (target.src !== DEFAULT_FALLBACK_IMAGE) {
+                    target.src = DEFAULT_FALLBACK_IMAGE;
                   }
                 }}
               />
@@ -165,6 +168,8 @@ export const AdSlot: React.FC<AdSlotProps> = ({ zone, className = '' }) => {
                 const target = e.currentTarget;
                 if (!target.src.endsWith('/uploads/shastri-patanjali-chikitsalaya.jpg')) {
                   target.src = '/uploads/shastri-patanjali-chikitsalaya.jpg';
+                } else if (target.src !== DEFAULT_FALLBACK_IMAGE) {
+                  target.src = DEFAULT_FALLBACK_IMAGE;
                 }
               }}
             />

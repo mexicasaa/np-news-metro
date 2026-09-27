@@ -42,7 +42,7 @@ export const HorizontalStoryCard: React.FC<HorizontalStoryCardProps> = ({
           e.preventDefault();
           onSelect(post);
         }}
-        className="relative w-full sm:w-44 md:w-48 aspect-[16/10] sm:aspect-[4/3] overflow-hidden bg-slate-950 rounded-sm flex-shrink-0 block"
+        className="relative w-full sm:w-44 md:w-48 aspect-[16/10] sm:aspect-[4/3] overflow-hidden bg-surface-container rounded-sm flex-shrink-0 block"
       >
         <img
           src={getOptimizedImageUrl(localized.featuredImage, 600)}

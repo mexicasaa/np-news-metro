@@ -40,7 +40,7 @@ export const LargeStoryCard: React.FC<LargeStoryCardProps> = ({
     >
       <div>
         {/* Aspect 16:9 Image */}
-        <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-950">
+        <div className="relative aspect-[16/9] w-full overflow-hidden bg-surface-container">
           <img
             src={getOptimizedImageUrl(localized.featuredImage, 800)}
             alt={localized.imageAlt || localized.title}

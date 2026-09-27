@@ -1,6 +1,7 @@
 import React from 'react';
 import { Calendar, CloudSun, Globe, Newspaper, Mail, ShieldCheck, Languages } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import { getFormattedTodayDate } from '../../i18n/translations';
 
 interface UtilityBarProps {
   onSelectEdition?: (edition: string) => void;
@@ -27,7 +28,7 @@ export const UtilityBar: React.FC<UtilityBarProps> = ({
           <span className="flex items-center gap-1.5 font-semibold text-ink whitespace-nowrap">
             <Calendar className="w-3.5 h-3.5 text-primary" />
             <span className="hidden sm:inline">{t.todayDate}</span>
-            <span className="sm:hidden">{isHindi ? '19 अगस्त 2026' : 'Aug 19, 2026'}</span>
+            <span className="sm:hidden">{getFormattedTodayDate(language, true)}</span>
           </span>
 
           <span className="hidden xs:inline-block text-border-strong">•</span>

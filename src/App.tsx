@@ -434,6 +434,19 @@ function AppContent() {
     return posts.filter(isPostPublished);
   }, [posts]);
 
+  // Curated breaking news ticker: prioritize explicit breaking stories, fallback to lead stories, strictly capped to top 5
+  const breakingNewsFeed = React.useMemo(() => {
+    const explicitBreaking = publishedPosts.filter((p) => p.isBreaking);
+    if (explicitBreaking.length > 0) {
+      return explicitBreaking.slice(0, 5);
+    }
+    const leadStories = publishedPosts.filter((p) => p.isLead);
+    if (leadStories.length > 0) {
+      return leadStories.slice(0, 5);
+    }
+    return publishedPosts.slice(0, 5);
+  }, [publishedPosts]);
+
   // Compute Initial Route from URL (with isInitialLoad = true to show instant skeleton rather than 404)
   const initialRoute = React.useMemo(() => parseUrlRoute(posts, videos, true), []);
 
@@ -2034,7 +2047,7 @@ function AppContent() {
 
           {/* GLOBAL SHELL 5: Breaking News Bar */}
           <BreakingNewsBar
-            breakingPosts={publishedPosts.filter((p) => p.isBreaking || p.isLead)}
+            breakingPosts={breakingNewsFeed}
             onSelectPost={handleSelectPost}
             isEmergencyMode={isEmergencyBreaking}
           />

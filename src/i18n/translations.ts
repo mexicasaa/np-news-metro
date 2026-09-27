@@ -107,10 +107,28 @@ export interface Translations {
   allRightsReserved: string;
 }
 
+export const getFormattedTodayDate = (lang: Language = 'hi', isShort: boolean = false): string => {
+  const now = new Date();
+  try {
+    if (lang === 'hi') {
+      return isShort
+        ? new Intl.DateTimeFormat('hi-IN', { day: 'numeric', month: 'long', year: 'numeric' }).format(now)
+        : new Intl.DateTimeFormat('hi-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(now);
+    }
+    return isShort
+      ? new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(now)
+      : new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }).format(now);
+  } catch (e) {
+    return isShort ? '27 Sep 2026' : 'Sunday, September 27, 2026';
+  }
+};
+
 export const translations: Record<Language, Translations> = {
   en: {
     // Utility Bar & Header
-    todayDate: 'Wednesday, August 19, 2026',
+    get todayDate() {
+      return getFormattedTodayDate('en');
+    },
     selectEdition: 'National / New Delhi',
     weatherCity: 'New Delhi 31°C',
     aqiStatus: 'AQI 84 (Moderate)',
@@ -217,7 +235,9 @@ export const translations: Record<Language, Translations> = {
 
   hi: {
     // Utility Bar & Header
-    todayDate: 'बुधवार, 19 अगस्त, 2026',
+    get todayDate() {
+      return getFormattedTodayDate('hi');
+    },
     selectEdition: 'राष्ट्रीय / नई दिल्ली',
     weatherCity: 'नई दिल्ली 31°C',
     aqiStatus: 'AQI 84 (मध्यम)',
