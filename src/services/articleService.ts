@@ -115,6 +115,8 @@ export const mapDbToWpPost = (row: any, joinedTags?: string[]): WpPost => {
     dekHi: row.dek_hi || undefined,
     category: categorySlug as EditorialCategorySlug,
     categoryHi: undefined,
+    desk: row.desk || undefined,
+    subcategory: row.subcategory || undefined,
     location: row.location || 'New Delhi',
     tags: tagList,
     authorId: row.author_id || '04ad79d9-d871-4099-a633-bcb7a1e35055',

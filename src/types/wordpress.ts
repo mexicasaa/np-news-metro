@@ -74,6 +74,8 @@ export interface WpPost {
   dekHi?: string;
   category: EditorialCategorySlug;
   categoryHi?: string;
+  desk?: string;
+  subcategory?: string;
   location?: string;
   tags: string[];
   authorId: string;

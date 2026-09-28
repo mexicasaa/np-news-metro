@@ -72,6 +72,12 @@ export const ArticleHeader: React.FC<ArticleHeaderProps> = ({
           {localized.category}
         </button>
 
+        {post.subcategory && (
+          <span className="bg-surface-container text-ink font-semibold text-xs px-2 py-0.5 rounded-sm border border-border-subtle">
+            {post.subcategory}
+          </span>
+        )}
+
         {post.location && (
           <span className="bg-slate-100 text-slate-800 text-xs font-semibold px-2 py-0.5 rounded-sm border border-slate-300 flex items-center gap-1">
             <MapPin className="w-3 h-3 text-secondary flex-shrink-0" />

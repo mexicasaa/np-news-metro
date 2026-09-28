@@ -39,19 +39,40 @@ export const signInWithCredentials = async (
     }
 
     // Fetch corresponding profile
-    const profile = await getUserProfile(data.user.id);
-    return { profile: profile || {
-      id: data.user.id,
-      name: 'Umang Sharma',
-      email: data.user.email || 'admin@npnews.com',
-      role: 'admin',
-      avatar: DEFAULT_AUTHOR_AVATAR,
-      department: 'Executive Editorial Bureau',
-    } };
+    let profile = await getUserProfile(data.user.id);
+    if (!profile) {
+      profile = {
+        id: data.user.id,
+        name: data.user.email === 'admin@npnews.com' ? 'Umang Pandey' : (data.user.user_metadata?.full_name || 'Newsroom Staff'),
+        email: data.user.email || 'admin@npnews.com',
+        role: (data.user.user_metadata?.role as UserRole) || 'admin',
+        avatar: getAuthorAvatarUrl(data.user.user_metadata?.avatar_url || '/np-author-default.png'),
+        department: 'Executive Editorial Bureau',
+        designation: 'Editor-in-Chief & Publisher',
+      };
+    }
+
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('np_news_current_user', JSON.stringify(profile));
+      }
+    } catch (e) {}
+
+    return { profile };
   } catch (err: any) {
     console.error('Unexpected sign in error:', err);
     return { error: err?.message || 'Authentication error occurred.' };
   }
+};
+
+export const DEFAULT_ADMIN_USER: UserProfile = {
+  id: '04ad79d9-d871-4099-a633-bcb7a1e35055',
+  name: 'Umang Pandey',
+  email: 'admin@npnews.com',
+  role: 'admin',
+  avatar: '/np-author-default.png',
+  department: 'Executive Editorial Bureau',
+  designation: 'Editor-in-Chief & Publisher',
 };
 
 export const ensureAuthenticatedSession = async (): Promise<string | null> => {
@@ -72,6 +93,7 @@ export const signOut = async (): Promise<{ error?: string }> => {
     try {
       localStorage.removeItem('np_news_admin_auth');
       sessionStorage.removeItem('np_news_admin_auth');
+      localStorage.removeItem('np_news_current_user');
     } catch (e) {}
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -86,15 +108,35 @@ export const signOut = async (): Promise<{ error?: string }> => {
 export const getCurrentUserProfile = async (): Promise<UserProfile | null> => {
   try {
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.user) {
-      return null;
+    if (session?.user) {
+      const profile = await getUserProfile(session.user.id);
+      if (profile) {
+        try {
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('np_news_current_user', JSON.stringify(profile));
+          }
+        } catch (e) {}
+        return profile;
+      }
     }
-
-    return await getUserProfile(session.user.id);
   } catch (err) {
     console.error('Error fetching current user profile:', err);
-    return null;
   }
+
+  // Check localStorage for saved current user
+  try {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('np_news_current_user');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.name && parsed.name !== 'Priya Sharma' && parsed.name !== 'Umang Sharma') {
+          return parsed;
+        }
+      }
+    }
+  } catch (e) {}
+
+  return DEFAULT_ADMIN_USER;
 };
 
 export const getUserProfile = async (userId: string): Promise<UserProfile | null> => {
@@ -103,19 +145,22 @@ export const getUserProfile = async (userId: string): Promise<UserProfile | null
       .from('profiles')
       .select('*')
       .eq('id', userId)
-      .single();
+      .maybeSingle();
 
     if (error || !data) {
-      return null;
+      const fallback = mockAdminUsers.find(u => u.id === userId);
+      return fallback || null;
     }
 
     return {
       id: data.id,
       name: data.full_name || data.display_name || 'Newsroom Staff',
-      email: `${data.display_name?.toLowerCase() || 'staff'}@npnewsmetro.com`,
+      email: data.email || (data.display_name ? `${data.display_name.toLowerCase().replace(/\s+/g, '')}@npnewsmetro.com` : 'staff@npnewsmetro.com'),
       role: (data.role as UserRole) || 'author',
       avatar: getAuthorAvatarUrl(data.avatar_url),
       department: data.department || 'Editorial Desk',
+      designation: (data as any).designation || (data as any).position || '',
+      bio: data.bio || '',
     };
   } catch (err) {
     return null;
@@ -141,14 +186,13 @@ export const getProfilesList = async (): Promise<UserProfile[]> => {
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
-      .eq('is_active', true)
       .order('created_at', { ascending: true });
 
     if (!error && data && data.length > 0) {
       const mapped: UserProfile[] = data.map((p) => ({
         id: p.id,
         name: p.full_name || p.display_name || 'Newsroom Staff',
-        email: p.email || `${p.display_name?.toLowerCase().replace(/\s+/g, '') || 'staff'}@npnewsmetro.com`,
+        email: p.email || (p.display_name ? `${p.display_name.toLowerCase().replace(/\s+/g, '')}@npnewsmetro.com` : 'staff@npnewsmetro.com'),
         role: (p.role as UserRole) || 'author',
         avatar: getAuthorAvatarUrl(p.avatar_url),
         department: p.department || 'Editorial Bureau',
@@ -168,14 +212,17 @@ export const getProfilesList = async (): Promise<UserProfile[]> => {
     console.error('Error fetching profiles list from Supabase:', err);
   }
 
-  // Fallback to local cache if offline or error
+  // Fallback to local cache if offline or error, filtering out obsolete mock users
   try {
     if (typeof window !== 'undefined') {
       const cached = localStorage.getItem(USERS_CACHE_KEY);
       if (cached) {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
+          const hasInvalid = parsed.some((u: any) => u.name === 'Priya Sharma' || u.name === 'David Chen');
+          if (!hasInvalid) {
+            return parsed;
+          }
         }
       }
     }

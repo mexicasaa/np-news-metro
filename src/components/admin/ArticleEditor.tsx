@@ -19,6 +19,7 @@ import { getAuthorAvatarUrl, DEFAULT_AUTHOR_AVATAR, handleAvatarError } from '..
 import { saveAutoSaveSession, clearAutoSaveSession, saveDraftPost, setRefreshSession, isPostPublished } from '../../utils/newsStorage';
 import { getNewsroomAuthors } from '../../services/authService';
 import { formatArticleText, formatPastedContent } from '../../utils/editorFormatting';
+import { EDITORIAL_DESKS, EditorialDesk, getDeskByIdOrCategory, getSubcategoriesForDeskOrCategory } from '../../data/editorialTaxonomy';
 
 export interface EditorBlock {
   id: string;
@@ -48,21 +49,12 @@ interface ArticleEditorProps {
   onRedirectToDashboard?: () => void;
 }
 
-const CATEGORIES_LIST: { slug: EditorialCategorySlug; label: string; color: string }[] = [
-  { slug: 'india', label: 'National / India', color: 'bg-orange-50 text-orange-800 border-orange-200' },
-  { slug: 'politics', label: 'Politics', color: 'bg-red-50 text-red-800 border-red-200' },
-  { slug: 'business', label: 'Business & Economy', color: 'bg-emerald-50 text-emerald-800 border-emerald-200' },
-  { slug: 'technology', label: 'Technology', color: 'bg-blue-50 text-blue-800 border-blue-200' },
-  { slug: 'world', label: 'World News', color: 'bg-indigo-50 text-indigo-800 border-indigo-200' },
-  { slug: 'sports', label: 'Sports', color: 'bg-amber-50 text-amber-800 border-amber-200' },
-  { slug: 'entertainment', label: 'Entertainment', color: 'bg-purple-50 text-purple-800 border-purple-200' },
-  { slug: 'lifestyle', label: 'Lifestyle', color: 'bg-pink-50 text-pink-800 border-pink-200' },
-  { slug: 'opinion', label: 'Opinion / Editorial', color: 'bg-slate-100 text-slate-800 border-slate-300' },
-  { slug: 'crime', label: 'Crime & Legal', color: 'bg-rose-50 text-rose-800 border-rose-200' },
-  { slug: 'social', label: 'Social & Society', color: 'bg-teal-50 text-teal-800 border-teal-200' },
-  { slug: 'astrology', label: 'Astrology & Horoscope', color: 'bg-amber-50 text-amber-900 border-amber-300' },
-  { slug: 'religion', label: 'Religion & Culture', color: 'bg-orange-100 text-orange-900 border-orange-300' },
-];
+const CATEGORIES_LIST = EDITORIAL_DESKS.map(desk => ({
+  slug: desk.mappedCategory,
+  deskId: desk.id,
+  label: desk.label,
+  color: desk.badgeColor,
+}));
 
 const ARTICLE_TYPES = [
   'Standard News Report',
@@ -135,10 +127,45 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     return '';
   });
 
-  const [category, setCategory] = useState<EditorialCategorySlug>(
-    (initialPost?.category as EditorialCategorySlug) || 'india'
-  );
-  const [subcategory, setSubcategory] = useState('National Policy');
+  const [deskId, setDeskId] = useState<string>(() => {
+    if (initialPost?.desk) return initialPost.desk;
+    if (initialPost?.category) {
+      const match = EDITORIAL_DESKS.find(d => d.id === initialPost.category || d.mappedCategory === initialPost.category);
+      if (match) return match.id;
+    }
+    return 'india';
+  });
+
+  const [category, setCategory] = useState<EditorialCategorySlug>(() => {
+    const loadedDesk = getDeskByIdOrCategory(initialPost?.desk || initialPost?.category || 'india');
+    return loadedDesk.mappedCategory;
+  });
+
+  const [subcategory, setSubcategory] = useState<string>(() => {
+    if (initialPost?.subcategory) return initialPost.subcategory;
+    const loadedDesk = getDeskByIdOrCategory(initialPost?.desk || initialPost?.category || 'india');
+    return loadedDesk.subcategories[0] || 'National Policy & Governance';
+  });
+
+  const [isCustomSubcategory, setIsCustomSubcategory] = useState<boolean>(() => {
+    if (!initialPost?.subcategory) return false;
+    const loadedDesk = getDeskByIdOrCategory(initialPost?.desk || initialPost?.category || 'india');
+    return !loadedDesk.subcategories.includes(initialPost.subcategory);
+  });
+
+  const currentSubcategories = React.useMemo(() => {
+    return getSubcategoriesForDeskOrCategory(deskId);
+  }, [deskId]);
+
+  const handleSelectDesk = (newDeskId: string) => {
+    setDeskId(newDeskId);
+    const chosenDesk = getDeskByIdOrCategory(newDeskId);
+    setCategory(chosenDesk.mappedCategory);
+    if (!chosenDesk.subcategories.includes(subcategory)) {
+      setSubcategory(chosenDesk.subcategories[0] || '');
+      setIsCustomSubcategory(false);
+    }
+  };
   const [articleType, setArticleType] = useState('Standard News Report');
   const [location, setLocation] = useState('New Delhi');
   const [sourceAgency, setSourceAgency] = useState('NP News Metro Special Bureau');
@@ -314,7 +341,11 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       } else {
         setContent(initialPost.dek || '');
       }
-      setCategory((initialPost.category as EditorialCategorySlug) || 'india');
+      const loadedDesk = getDeskByIdOrCategory(initialPost.desk || initialPost.category || 'india');
+      setDeskId(loadedDesk.id);
+      setCategory(loadedDesk.mappedCategory);
+      setSubcategory(initialPost.subcategory || loadedDesk.subcategories[0] || 'National Policy & Governance');
+      setIsCustomSubcategory(Boolean(initialPost.subcategory && !loadedDesk.subcategories.includes(initialPost.subcategory)));
       setTags(initialPost.tags || ['National News', 'Policy', 'Breaking']);
       setAuthorType('external');
       setAuthorId(initialPost.authorId || currentAuthorId || 'author-1');
@@ -337,7 +368,10 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       setDek('');
       setContent('');
       setSlug('');
+      setDeskId('india');
       setCategory('india');
+      setSubcategory('National Policy & Governance');
+      setIsCustomSubcategory(false);
       setTags(['National News', 'Policy', 'Breaking']);
       setFeaturedImage('');
       setImageCaption('');
@@ -636,6 +670,8 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
         (dek || '') !== (initialPost.dek || '') ||
         content !== initialBlocksContent ||
         category !== (initialPost.category || 'india') ||
+        deskId !== (initialPost.desk || 'india') ||
+        (subcategory || '') !== (initialPost.subcategory || '') ||
         (featuredImage || '') !== (initialPost.featuredImage || '') ||
         (imageCaption || '') !== (initialPost.imageCaption || '') ||
         (imageCredit || 'NP News Metro Photo Desk') !== (initialPost.imageCredit || 'NP News Metro Photo Desk') ||
@@ -669,7 +705,9 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       title: title || 'Untitled News Story',
       titleHi: title || 'Untitled News Story',
       slug: effectiveSlug,
+      desk: deskId,
       category,
+      subcategory,
       authorId: authorId,
       customAuthor: {
         name: customAuthorName.trim() || selectedAuthor.name,
@@ -678,7 +716,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
         bio: (selectedAuthor as any)?.bio || '',
         isGuest: true,
       },
-      tags,
+      tags: Array.from(new Set([...tags, subcategory].filter(Boolean))),
       featuredImage: featuredImage || '',
       imageCredit: imageCredit || 'NP News Metro Photo Desk',
       imageCaption: imageCaption || '',
@@ -853,7 +891,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
 
     return () => clearTimeout(timer);
   }, [
-    title, dek, content, category, subcategory, articleType, location, sourceAgency,
+    title, dek, content, category, deskId, subcategory, articleType, location, sourceAgency,
     authorType, authorId, customAuthorName, customAuthorRole, customAuthorAvatar,
     publishDateType, customPublishDate, tags, featuredImage, imageCredit,
     imageCaption, imageAlt, isBreaking, seoTitle, metaDescription, slug,
@@ -906,7 +944,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [
-    title, dek, content, category, subcategory, articleType, location, sourceAgency,
+    title, dek, content, category, deskId, subcategory, articleType, location, sourceAgency,
     authorType, authorId, customAuthorName, customAuthorRole, customAuthorAvatar,
     publishDateType, customPublishDate, tags, featuredImage, imageCredit,
     imageCaption, imageAlt, isBreaking, seoTitle, metaDescription, slug,
@@ -1789,7 +1827,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
               )}
             </div>
 
-            <div className={`bg-white/80 backdrop-blur-md rounded-3xl shadow-xs border border-white/80 transition-all relative ${openSidebarDropdown === 'category' || openSidebarDropdown === 'articleType' ? 'z-30' : 'z-10'}`}>
+            <div className={`bg-white/80 backdrop-blur-md rounded-3xl shadow-xs border border-white/80 transition-all relative ${openSidebarDropdown === 'category' || openSidebarDropdown === 'subcategory' || openSidebarDropdown === 'articleType' ? 'z-30' : 'z-10'}`}>
               <div 
                 className="px-5 py-4 border-b border-slate-100/80 flex items-center justify-between cursor-pointer select-none bg-white/40 hover:bg-white/60 backdrop-blur-xs transition-colors rounded-t-3xl"
                 onClick={() => toggleBox('details')}
@@ -1805,24 +1843,63 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                 <div className="p-5 space-y-4 text-xs">
                   
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1.5">Category / Desk:</label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs font-bold text-slate-700">Category / Desk:</label>
+                      <span className="text-[10px] text-slate-500 font-medium bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200">
+                        Mapped Page: <strong className="text-slate-800 uppercase">{category}</strong>
+                      </span>
+                    </div>
                     {renderCustomDropdown({
                       id: 'category',
-                      value: category,
-                      options: CATEGORIES_LIST.map(cat => ({ value: cat.slug, label: cat.label })),
-                      onChange: (val) => setCategory(val as EditorialCategorySlug),
+                      value: deskId,
+                      options: EDITORIAL_DESKS.map(desk => ({
+                        value: desk.id,
+                        label: desk.label,
+                      })),
+                      onChange: (val) => handleSelectDesk(val),
+                      maxHeight: 'max-h-72',
                     })}
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Subcategory:</label>
-                    <input
-                      type="text"
-                      value={subcategory}
-                      onChange={(e) => setSubcategory(e.target.value)}
-                      placeholder="e.g. Macroeconomics / Parliament / Markets"
-                      className="w-full bg-white border border-slate-200/80 rounded-xl px-3 py-2 text-xs focus:ring-1 focus:ring-slate-300 focus:outline-hidden shadow-2xs"
-                    />
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-xs font-bold text-slate-700">Subcategory:</label>
+                      <button
+                        type="button"
+                        onClick={() => setIsCustomSubcategory(!isCustomSubcategory)}
+                        className="text-[10px] text-primary hover:underline font-semibold cursor-pointer"
+                      >
+                        {isCustomSubcategory ? '← Curated List' : '+ Custom Subcategory'}
+                      </button>
+                    </div>
+
+                    {isCustomSubcategory ? (
+                      <input
+                        type="text"
+                        value={subcategory}
+                        onChange={(e) => setSubcategory(e.target.value)}
+                        placeholder="Type custom subcategory..."
+                        className="w-full bg-white border border-slate-200/80 rounded-xl px-3 py-2 text-xs focus:ring-1 focus:ring-slate-300 focus:outline-hidden shadow-2xs"
+                      />
+                    ) : (
+                      renderCustomDropdown({
+                        id: 'subcategory',
+                        value: subcategory,
+                        options: [
+                          ...currentSubcategories.map(sub => ({ value: sub, label: sub })),
+                          ...(subcategory && !currentSubcategories.includes(subcategory) ? [{ value: subcategory, label: `${subcategory} (Current)` }] : []),
+                          { value: '__CUSTOM__', label: '✏️ Type Custom Subcategory...' },
+                        ],
+                        onChange: (val) => {
+                          if (val === '__CUSTOM__') {
+                            setIsCustomSubcategory(true);
+                          } else {
+                            setSubcategory(val);
+                          }
+                        },
+                        maxHeight: 'max-h-60',
+                      })
+                    )}
                   </div>
 
                   <div>

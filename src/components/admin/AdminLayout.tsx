@@ -38,6 +38,8 @@ interface AdminLayoutProps {
   onToggleEnvironment: (env: 'production' | 'staging') => void;
   breakingCount?: number;
   reviewCount?: number;
+  newsroomUsers?: UserProfile[];
+  onSwitchUser?: (user: UserProfile) => void;
 }
 
 export const AdminLayout: React.FC<AdminLayoutProps> = ({
@@ -53,6 +55,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   onToggleEnvironment,
   breakingCount = 2,
   reviewCount = 25,
+  newsroomUsers,
+  onSwitchUser,
 }) => {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
@@ -278,23 +282,26 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
               )}
             </div>
 
-            {/* User Profile Card (Matching "Priya Sharma, Editor" in screenshot) */}
+            {/* Real Newsroom User Profile Card */}
             <div className="relative">
               <div
                 onClick={() => setUserDropdownOpen(!userDropdownOpen)}
                 className="h-10 flex items-center gap-2.5 bg-white/80 backdrop-blur-md border border-white/80 shadow-xs px-3 rounded-2xl cursor-pointer hover:bg-white transition-all select-none"
               >
                 <img
-                  src={currentUser.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150'}
+                  src={currentUser.avatar || '/np-author-default.png'}
                   alt={currentUser.name}
                   className="w-7 h-7 rounded-full object-cover border border-slate-200 shrink-0"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = '/np-author-default.png';
+                  }}
                 />
                 <div className="text-left hidden sm:block">
                   <div className="text-xs font-bold text-slate-900 leading-tight">
-                    {currentUser.name || 'Priya Sharma'}
+                    {currentUser.name || 'Umang Pandey'}
                   </div>
                   <div className="text-[10px] text-slate-500 capitalize leading-tight">
-                    {currentUser.role ? currentUser.role.replace('_', ' ') : 'Editor'}
+                    {currentUser.designation || (currentUser.role ? currentUser.role.replace('_', ' ') : 'Administrator')}
                   </div>
                 </div>
                 <ChevronDown className="w-3.5 h-3.5 text-slate-400 ml-0.5" />
@@ -302,30 +309,92 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
 
               {/* User Dropdown Menu */}
               {userDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-64 bg-white/95 backdrop-blur-xl border border-white/90 rounded-2xl shadow-xl p-2 z-50 text-xs animate-fadeIn space-y-1">
-                  <div className="px-3 py-1.5 text-[10px] font-mono text-slate-400 uppercase font-bold border-b border-slate-100">
-                    Role Switcher (Testing Mode)
-                  </div>
-                  {mockAdminUsers.map((user) => (
-                    <button
-                      key={user.id}
-                      onClick={() => {
-                        onChangeUserRole(user.role);
-                        setUserDropdownOpen(false);
+                <div className="absolute right-0 mt-2 w-72 bg-white/95 backdrop-blur-xl border border-white/90 rounded-2xl shadow-xl p-2.5 z-50 text-xs animate-fadeIn space-y-2">
+                  {/* Current Real User Details Card */}
+                  <div className="p-3 bg-slate-50/90 rounded-xl border border-slate-100 flex items-center gap-3">
+                    <img
+                      src={currentUser.avatar || '/np-author-default.png'}
+                      alt={currentUser.name}
+                      className="w-10 h-10 rounded-full object-cover border border-slate-200 shrink-0"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/np-author-default.png';
                       }}
-                      className={`w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between cursor-pointer ${
-                        currentUser.role === user.role
-                          ? 'bg-red-50 text-red-600 font-bold'
-                          : 'hover:bg-slate-100 text-slate-700'
-                      }`}
-                    >
-                      <div>
-                        <div className="capitalize font-semibold">{user.role.replace('_', ' ')}</div>
-                        <div className="text-[10px] text-slate-400">{user.name}</div>
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="font-bold text-slate-900 text-sm truncate">{currentUser.name}</div>
+                      <div className="text-[11px] text-slate-500 truncate font-mono">{currentUser.email}</div>
+                      <div className="flex items-center gap-1.5 mt-1">
+                        <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-red-100 text-red-700">
+                          {currentUser.role.replace('_', ' ')}
+                        </span>
+                        {currentUser.department && (
+                          <span className="text-[10px] text-slate-400 truncate">
+                            • {currentUser.department}
+                          </span>
+                        )}
                       </div>
-                      {currentUser.role === user.role && <Check className="w-3.5 h-3.5 text-red-600" />}
-                    </button>
-                  ))}
+                    </div>
+                  </div>
+
+                  {/* Quick Link to Newsroom Users & Role Permissions */}
+                  <button
+                    onClick={() => {
+                      onNavigateSection('users');
+                      setUserDropdownOpen(false);
+                    }}
+                    className="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-100 flex items-center justify-between transition-colors cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Users className="w-4 h-4 text-slate-500" />
+                      <span>Newsroom Users & Roles</span>
+                    </div>
+                    <span className="text-[10px] text-primary font-bold">Open →</span>
+                  </button>
+
+                  {/* Real Team Switcher */}
+                  <div className="pt-1 border-t border-slate-100">
+                    <div className="px-2 py-1 text-[10px] font-mono text-slate-400 uppercase font-bold">
+                      Newsroom Team
+                    </div>
+                    <div className="max-h-48 overflow-y-auto space-y-1">
+                      {(newsroomUsers && newsroomUsers.length > 0 ? newsroomUsers : mockAdminUsers).map((user) => (
+                        <button
+                          key={user.id}
+                          onClick={() => {
+                            if (onSwitchUser) {
+                              onSwitchUser(user);
+                            } else {
+                              onChangeUserRole(user.role);
+                            }
+                            setUserDropdownOpen(false);
+                          }}
+                          className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs flex items-center justify-between cursor-pointer transition-colors ${
+                            currentUser.id === user.id
+                              ? 'bg-red-50 text-red-600 font-bold'
+                              : 'hover:bg-slate-100 text-slate-700'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <img
+                              src={user.avatar || '/np-author-default.png'}
+                              alt={user.name}
+                              className="w-6 h-6 rounded-full object-cover shrink-0 border border-slate-200"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = '/np-author-default.png';
+                              }}
+                            />
+                            <div className="truncate">
+                              <div className="font-semibold truncate">{user.name}</div>
+                              <div className="text-[10px] text-slate-400 truncate">
+                                {user.designation || user.role.replace('_', ' ')}
+                              </div>
+                            </div>
+                          </div>
+                          {currentUser.id === user.id && <Check className="w-3.5 h-3.5 text-red-600 shrink-0 ml-1" />}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
 
                   {onLogout && (
                     <div className="pt-1 border-t border-slate-100">
@@ -334,7 +403,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
                           onLogout();
                           setUserDropdownOpen(false);
                         }}
-                        className="w-full text-left px-3 py-2 text-red-600 hover:bg-red-50 rounded-xl font-bold flex items-center gap-2 cursor-pointer"
+                        className="w-full text-left px-3 py-2 text-red-600 hover:bg-red-50 rounded-xl font-bold flex items-center gap-2 cursor-pointer transition-colors"
                       >
                         <LogOut className="w-3.5 h-3.5" />
                         <span>Sign Out / Lock</span>

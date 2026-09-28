@@ -18,7 +18,7 @@ import { WpPost, WpVideo, WpGallery } from './types/wordpress';
 import { mockVideos, mockGalleries } from './data/mockWpData';
 import { getStoredPosts, savePublishedPost, popRefreshSession, clearAutoSaveSession, getStoredVideos, isPostPublished, removeStoredDraft } from './utils/newsStorage';
 import { getPublishedArticles, getEditorialArticles, getArticleBySlug, saveArticle, deleteArticle, getDeletedArticles, restoreDeletedArticle, permanentDeleteArticle, DeletedArticle, mapDbToWpPost } from './services/articleService';
-import { getCurrentUserProfile, ensureAuthenticatedSession, signOut as authSignOut } from './services/authService';
+import { getCurrentUserProfile, getProfilesList, ensureAuthenticatedSession, signOut as authSignOut } from './services/authService';
 import { getVideos } from './services/taxonomyService';
 import { getVideoBySlug, getPublishedVideos } from './services/videoService';
 import { supabase } from './lib/supabase';
@@ -43,36 +43,23 @@ import { ArticleLoadingTemplate } from './templates/15_ArticleLoadingTemplate';
 
 import { FrontendLoadingScreen } from './components/common/FrontendLoadingScreen';
 
-// P0 Admin & Daily Publishing Center Suite - Code-Split with React.lazy
-import type { AdminSection } from './components/admin/AdminLayout';
-import type { PublishingTab } from './components/admin/PublishingCenter';
-
-const AdminLayout = React.lazy(() => import('./components/admin/AdminLayout').then(m => ({ default: m.AdminLayout })));
-const DashboardHome = React.lazy(() => import('./components/admin/DashboardHome').then(m => ({ default: m.DashboardHome })));
-const PublishingCenter = React.lazy(() => import('./components/admin/PublishingCenter').then(m => ({ default: m.PublishingCenter })));
-const ArticleEditor = React.lazy(() => import('./components/admin/ArticleEditor').then(m => ({ default: m.ArticleEditor })));
-const EditorialListView = React.lazy(() => import('./components/admin/EditorialListView').then(m => ({ default: m.EditorialListView })));
-const VideoStudioManager = React.lazy(() => import('./components/admin/VideoStudioManager').then(m => ({ default: m.VideoStudioManager })));
-const HomepageLayoutManager = React.lazy(() => import('./components/admin/HomepageLayoutManager').then(m => ({ default: m.HomepageLayoutManager })));
-const PublishingReadinessModal = React.lazy(() => import('./components/admin/PublishingReadinessModal').then(m => ({ default: m.PublishingReadinessModal })));
-const PublishOrchestratorModal = React.lazy(() => import('./components/admin/PublishOrchestratorModal').then(m => ({ default: m.PublishOrchestratorModal })));
-const EmergencyBreakingModal = React.lazy(() => import('./components/admin/EmergencyBreakingModal').then(m => ({ default: m.EmergencyBreakingModal })));
-const RevisionHistoryModal = React.lazy(() => import('./components/admin/RevisionHistoryModal').then(m => ({ default: m.RevisionHistoryModal })));
-const YouTubeManagerModal = React.lazy(() => import('./components/admin/YouTubeManagerModal').then(m => ({ default: m.YouTubeManagerModal })));
-const MediaLibraryView = React.lazy(() => import('./components/admin/AdminSecondaryViews').then(m => ({ default: m.MediaLibraryView })));
-const MonetizationView = React.lazy(() => import('./components/admin/AdminSecondaryViews').then(m => ({ default: m.MonetizationView })));
-const SeoHealthView = React.lazy(() => import('./components/admin/AdminSecondaryViews').then(m => ({ default: m.SeoHealthView })));
-const UsersView = React.lazy(() => import('./components/admin/AdminSecondaryViews').then(m => ({ default: m.UsersView })));
-const SystemView = React.lazy(() => import('./components/admin/AdminSecondaryViews').then(m => ({ default: m.SystemView })));
-const AudienceView = React.lazy(() => import('./components/admin/AdminSecondaryViews').then(m => ({ default: m.AudienceView })));
-const AnalyticsDashboardView = React.lazy(() => import('./components/admin/AdminSecondaryViews').then(m => ({ default: m.AnalyticsDashboardView })));
-
-const AdminLoadingFallback = () => (
-  <div className="min-h-screen bg-slate-900 text-slate-200 flex flex-col items-center justify-center space-y-4">
-    <div className="w-10 h-10 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
-    <p className="font-mono text-sm tracking-wider uppercase text-slate-400">Loading Editorial Workspace...</p>
-  </div>
-);
+// P0 Admin & Daily Publishing Center Suite
+import { AdminLayout, AdminSection } from './components/admin/AdminLayout';
+import { DashboardHome } from './components/admin/DashboardHome';
+import { PublishingCenter, PublishingTab } from './components/admin/PublishingCenter';
+import { ArticleEditor } from './components/admin/ArticleEditor';
+import { EditorialListView } from './components/admin/EditorialListView';
+import { VideoStudioManager } from './components/admin/VideoStudioManager';
+import { HomepageLayoutManager } from './components/admin/HomepageLayoutManager';
+import { PublishingReadinessModal } from './components/admin/PublishingReadinessModal';
+import { PublishOrchestratorModal } from './components/admin/PublishOrchestratorModal';
+import { EmergencyBreakingModal } from './components/admin/EmergencyBreakingModal';
+import { RevisionHistoryModal } from './components/admin/RevisionHistoryModal';
+import { YouTubeManagerModal } from './components/admin/YouTubeManagerModal';
+import { 
+  MediaLibraryView, MonetizationView, SeoHealthView, UsersView, SystemView,
+  AudienceView, AnalyticsDashboardView
+} from './components/admin/AdminSecondaryViews';
 import { SeoHead } from './components/common/SeoHead';
 import { 
   generateArticleStructuredData, 
@@ -550,7 +537,84 @@ function AppContent() {
     }
     return 'dashboard';
   });
-  const [currentUserRole, setCurrentUserRole] = useState<UserRole>('editor');
+  const [currentUser, setCurrentUser] = useState<UserProfile>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('np_news_current_user');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed && parsed.name && parsed.name !== 'Priya Sharma' && parsed.name !== 'Umang Sharma') {
+            return parsed;
+          }
+        }
+      } catch (e) {}
+    }
+    return mockAdminUsers[0];
+  });
+  const [currentUserRole, setCurrentUserRole] = useState<UserRole>(currentUser.role || 'admin');
+  const [newsroomUsers, setNewsroomUsers] = useState<UserProfile[]>(mockAdminUsers);
+
+  useEffect(() => {
+    let isSubscribed = true;
+    const loadRealNewsroomTeam = async () => {
+      try {
+        const [profile, teamList] = await Promise.all([
+          getCurrentUserProfile(),
+          getProfilesList(),
+        ]);
+        if (!isSubscribed) return;
+        if (teamList && teamList.length > 0) {
+          setNewsroomUsers(teamList);
+        }
+        if (profile) {
+          setCurrentUser(profile);
+          setCurrentUserRole(profile.role);
+        }
+      } catch (err) {
+        console.error('Error loading real newsroom profile / team:', err);
+      }
+    };
+
+    loadRealNewsroomTeam();
+
+    const handleUsersUpdated = (e: any) => {
+      if (e.detail && Array.isArray(e.detail)) {
+        setNewsroomUsers(e.detail);
+      } else {
+        getProfilesList().then(list => {
+          if (isSubscribed && list) setNewsroomUsers(list);
+        });
+      }
+    };
+    window.addEventListener('NEWSROOM_USERS_UPDATED', handleUsersUpdated);
+
+    return () => {
+      isSubscribed = false;
+      window.removeEventListener('NEWSROOM_USERS_UPDATED', handleUsersUpdated);
+    };
+  }, []);
+
+  const handleSwitchUser = (user: UserProfile) => {
+    setCurrentUser(user);
+    setCurrentUserRole(user.role);
+    try {
+      localStorage.setItem('np_news_current_user', JSON.stringify(user));
+    } catch (e) {}
+  };
+
+  const handleChangeUserRole = (newRole: UserRole) => {
+    setCurrentUserRole(newRole);
+    const matched = newsroomUsers.find(u => u.role === newRole);
+    if (matched) {
+      setCurrentUser(matched);
+      try {
+        localStorage.setItem('np_news_current_user', JSON.stringify(matched));
+      } catch (e) {}
+    } else {
+      setCurrentUser(prev => ({ ...prev, role: newRole }));
+    }
+  };
+
   const [activeEnvironment, setActiveEnvironment] = useState<'production' | 'staging'>('production');
   const [publishingTab, setPublishingTab] = useState<PublishingTab>('all');
   const [activeEditingPost, setActiveEditingPost] = useState<WpPost | undefined>(() => {
@@ -866,8 +930,6 @@ function AppContent() {
   const [currentOperation, setCurrentOperation] = useState<PublishingOperation | null>(null);
   const [pendingPostData, setPendingPostData] = useState<Partial<WpPost> | null>(null);
 
-  const currentUser: UserProfile = mockAdminUsers.find(u => u.role === currentUserRole) || mockAdminUsers[0];
-
   // Helper Navigation Handlers (Public with PushState)
   const handleNavigateHome = () => {
     setCurrentTemplate('homepage');
@@ -1033,6 +1095,9 @@ function AppContent() {
       await authSignOut();
       localStorage.removeItem('np_news_admin_auth');
       sessionStorage.removeItem('np_news_admin_auth');
+      localStorage.removeItem('np_news_current_user');
+      setCurrentUser(mockAdminUsers[0]);
+      setCurrentUserRole('admin');
       if (typeof window !== 'undefined' && (window.location.pathname === '/admin' || window.location.pathname.startsWith('/admin') || window.location.hash === '#admin')) {
         window.history.pushState({ view: 'public' }, '', '/');
       }
@@ -1704,8 +1769,7 @@ function AppContent() {
           A. ADMIN PUBLISHING CENTER SUITE (When viewMode === 'admin')
           ====================================================================== */}
       {viewMode === 'admin' && isAdminAuthenticated ? (
-        <React.Suspense fallback={<AdminLoadingFallback />}>
-          <AdminLayout
+        <AdminLayout
           currentSection={adminSection}
           onNavigateSection={async (sec) => {
             const isAlreadyPub = isPostPublished(activeEditingPost) || activeEditingPost?.status === 'published';
@@ -1718,7 +1782,9 @@ function AppContent() {
             else setAdminSection(sec);
           }}
           currentUser={currentUser}
-          onChangeUserRole={(role) => setCurrentUserRole(role)}
+          newsroomUsers={newsroomUsers}
+          onSwitchUser={handleSwitchUser}
+          onChangeUserRole={handleChangeUserRole}
           onExitToPublicSite={async () => {
             const isAlreadyPub = isPostPublished(activeEditingPost) || activeEditingPost?.status === 'published';
             if ((adminSection === 'new-article' || adminSection === 'edit-article') && editorDraftSaverRef.current && !isAlreadyPub) {
@@ -1996,7 +2062,6 @@ function AppContent() {
           {adminSection === 'users' && <UsersView />}
           {adminSection === 'system' && <SystemView />}
         </AdminLayout>
-      </React.Suspense>
       ) : (
         /* ======================================================================
             B. PUBLIC READER FRONTEND (14 Templates)
@@ -2268,9 +2333,8 @@ function AppContent() {
       )}
 
       {/* ======================================================================
-          C. GLOBAL SHARED ADMIN MODALS (Lazy Loaded)
+          C. GLOBAL SHARED ADMIN MODALS
           ====================================================================== */}
-      <React.Suspense fallback={null}>
         {/* 1. Publishing Readiness & Duplicate Check Modal */}
         {readinessModalOpen && pendingPostData && (
           <PublishingReadinessModal
@@ -2346,9 +2410,8 @@ function AppContent() {
             }}
           />
         )}
-      </React.Suspense>
 
-      {/* 5. Secure Admin Login Modal */}
+        {/* 5. Secure Admin Login Modal */}
       <AdminLoginModal
         isOpen={adminLoginModalOpen}
         onClose={() => {
@@ -2359,9 +2422,12 @@ function AppContent() {
             } catch (e) {}
           }
         }}
-        onSuccess={() => {
+        onSuccess={(profile) => {
           setIsAdminAuthenticated(true);
           setAdminLoginModalOpen(false);
+          if (profile) {
+            handleSwitchUser(profile);
+          }
           setAdminSection(pendingAdminSection);
           if (pendingPublishingTab) setPublishingTab(pendingPublishingTab);
           setViewMode('admin');

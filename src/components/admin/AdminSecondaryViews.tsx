@@ -699,6 +699,14 @@ export const UsersView: React.FC = () => {
 
   useEffect(() => {
     fetchUsers();
+
+    const handleUsersUpdated = () => {
+      fetchUsers();
+    };
+    window.addEventListener('NEWSROOM_USERS_UPDATED', handleUsersUpdated);
+    return () => {
+      window.removeEventListener('NEWSROOM_USERS_UPDATED', handleUsersUpdated);
+    };
   }, []);
 
   const showNotification = (type: 'success' | 'error', message: string) => {
@@ -1000,9 +1008,12 @@ export const UsersView: React.FC = () => {
                       <td className="p-3.5 pl-4">
                         <div className="flex items-center gap-3">
                           <img 
-                            src={u.avatar} 
+                            src={u.avatar || '/np-author-default.png'} 
                             alt={u.name} 
                             className="w-8 h-8 rounded-full object-cover border border-slate-200 shrink-0" 
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = '/np-author-default.png';
+                            }}
                           />
                           <div className="min-w-0">
                             <div className="flex items-center gap-1.5">

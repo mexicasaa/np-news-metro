@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Lock, User, Key, Eye, EyeOff, ShieldCheck, ArrowRight, X, AlertCircle } from 'lucide-react';
 import { signInWithCredentials } from '../../services/authService';
+import { UserProfile } from '../../types/admin';
 
 interface AdminLoginModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (profile?: UserProfile) => void;
 }
 
 export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
@@ -41,10 +42,13 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
       try {
         localStorage.setItem('np_news_admin_auth', 'true');
         sessionStorage.setItem('np_news_admin_auth', 'true');
+        if (profile) {
+          localStorage.setItem('np_news_current_user', JSON.stringify(profile));
+        }
       } catch (e) {}
       
       setIsSubmitting(false);
-      onSuccess();
+      onSuccess(profile);
     } catch (err: any) {
       setIsSubmitting(false);
       setError(err?.message || 'Authentication error. Please try again.');
