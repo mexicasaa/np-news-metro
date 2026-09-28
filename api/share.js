@@ -92,14 +92,18 @@ const CATEGORY_NAMES = {
   india: "India & National",
   politics: "Politics",
   business: "Business & Economy",
+  economy: "Business & Economy",
   technology: "Technology & AI",
   world: "World News",
   sports: "Sports",
   entertainment: "Entertainment",
   lifestyle: "Lifestyle & Health",
   opinion: "Opinion & Editorial",
+  metromat: "Opinion & Editorial",
+  "metro-mat": "Opinion & Editorial",
   videos: "Videos & Broadcasts",
   photos: "Photo Galleries",
+  gallery: "Photo Galleries",
   social: "Social & Community",
   astrology: "Astrology & Horoscope",
   crime: "Crime & Legal",
@@ -107,7 +111,8 @@ const CATEGORY_NAMES = {
   culture: "Culture & Heritage",
   ncr: "Delhi-NCR",
   religion: "Spiritual & Religion",
-  latest: "Latest News"
+  latest: "Latest News",
+  trending: "Trending News"
 };
 
 // ---------------------------------------------------------------------------
@@ -901,17 +906,261 @@ export default async function handler(req, res) {
       return sendResponse(res, 200, "text/html; charset=utf-8", staticHtml);
     }
 
-    // 3. CATEGORY PRE-RENDERER
-    if ((cleanCategory && !cleanSlug) || cleanCategory === "category") {
-      const targetCat = (cleanSlug || cleanCategory).toLowerCase();
+    // 3A. VIDEOS HUB PRE-RENDERER (/videos)
+    if (normalizedSlug === "videos" && (!cleanCategory || cleanCategory === "videos")) {
+      const vidHubCacheKey = "hub:videos";
+      const cachedVidHub = shareWarmCache.get(vidHubCacheKey);
+      if (cachedVidHub && Date.now() - cachedVidHub.timestamp < SHARE_CACHE_TTL) {
+        return sendResponse(res, 200, "text/html; charset=utf-8", cachedVidHub.html);
+      }
+
+      let hubVideos = [];
+      try {
+        const { data: vList } = await supabase
+          .from("videos")
+          .select("title, description, thumbnail_url, youtube_url, published_at, slug")
+          .order("published_at", { ascending: false })
+          .limit(30);
+        if (vList && vList.length > 0) hubVideos = vList;
+      } catch (e) {}
+
+      if (hubVideos.length === 0) {
+        hubVideos = FALLBACK_VIDEOS;
+      }
+
+      const topThumb = hubVideos[0]?.thumbnail_url ? getAbsoluteUrl(hubVideos[0].thumbnail_url) : DEFAULT_OG_IMAGE;
+      const vidBodyHtml = `
+        <div class="breadcrumbs">
+          <a href="${SITE_ORIGIN}/">Home</a> &rsaquo; <span>Videos &amp; Broadcasts</span>
+        </div>
+        <div style="margin-bottom: 24px;">
+          <h1 style="margin-bottom: 8px;">Videos &amp; Special Video Reports</h1>
+          <p class="dek">Watch ground reports, investigative documentaries, executive interviews, and video journalism from NP News Metro.</p>
+        </div>
+        <div class="stories-grid">
+          ${hubVideos.map(v => {
+            const vDate = new Date(v.published_at || Date.now()).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
+            const vImg = v.thumbnail_url || DEFAULT_OG_IMAGE;
+            return `
+              <article class="story-card">
+                <a href="${SITE_ORIGIN}/videos/${escapeHtml(v.slug)}">
+                  <img src="${getAbsoluteUrl(vImg)}" alt="${escapeHtml(v.title)}" style="width: 100%; height: 180px; object-fit: cover; border-radius: 4px; margin-bottom: 10px;" />
+                </a>
+                <span class="meta" style="color: var(--primary);">Video Dispatch</span>
+                <h3><a href="${SITE_ORIGIN}/videos/${escapeHtml(v.slug)}">${escapeHtml(v.title)}</a></h3>
+                <p>${escapeHtml(v.description || v.title)}</p>
+                <div class="meta">${vDate} &bull; NP News Metro Video Bureau</div>
+              </article>
+            `;
+          }).join("\n")}
+        </div>
+      `;
+
+      const vidJsonLd = {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        "name": "Videos & Special Video Reports | NP News Metro",
+        "url": `${SITE_ORIGIN}/videos`,
+        "description": "Watch ground reports, investigative documentaries, executive interviews, and video journalism from NP News Metro.",
+        "publisher": { "@type": "NewsMediaOrganization", "name": "NP News Metro", "url": SITE_ORIGIN, "logo": `${SITE_ORIGIN}/logo.png` }
+      };
+
+      const vidHtml = buildCrawlerHtml({
+        title: "Videos & Special Video Reports | NP News Metro",
+        description: "Watch ground reports, investigative documentaries, executive interviews, and video journalism from NP News Metro.",
+        canonicalUrl: `${SITE_ORIGIN}/videos`,
+        ogType: "website",
+        ogImage: topThumb,
+        jsonLd: vidJsonLd,
+        bodyHtml: vidBodyHtml
+      });
+
+      shareWarmCache.set(vidHubCacheKey, { html: vidHtml, timestamp: Date.now() });
+      return sendResponse(res, 200, "text/html; charset=utf-8", vidHtml);
+    }
+
+    // 3B. PHOTOS & GALLERIES HUB PRE-RENDERER (/photos, /gallery)
+    if (normalizedSlug === "photos" || normalizedSlug === "gallery" || cleanCategory === "photos") {
+      const photoHubKey = "hub:photos";
+      const cachedPhotos = shareWarmCache.get(photoHubKey);
+      if (cachedPhotos && Date.now() - cachedPhotos.timestamp < SHARE_CACHE_TTL) {
+        return sendResponse(res, 200, "text/html; charset=utf-8", cachedPhotos.html);
+      }
+
+      let photoArticles = [];
+      try {
+        const { data: pList } = await supabase
+          .from("articles")
+          .select("title, title_hi, slug, excerpt, dek_hi, featured_image_url, published_at, categories(slug, name)")
+          .eq("status", "published")
+          .not("featured_image_url", "is", null)
+          .order("published_at", { ascending: false })
+          .limit(24);
+        if (pList && pList.length > 0) photoArticles = pList;
+      } catch (e) {}
+
+      if (photoArticles.length === 0) {
+        photoArticles = FALLBACK_ARTICLES.slice(0, 10).map(a => ({
+          title: a.title,
+          slug: a.slug,
+          excerpt: a.caption || a.title,
+          featured_image_url: a.featuredImage,
+          published_at: a.publishedAt,
+          categories: { slug: a.category, name: CATEGORY_NAMES[a.category] || a.category.toUpperCase() }
+        }));
+      }
+
+      const topPhoto = photoArticles[0]?.featured_image_url ? getAbsoluteUrl(photoArticles[0].featured_image_url) : DEFAULT_OG_IMAGE;
+      const photoBodyHtml = `
+        <div class="breadcrumbs">
+          <a href="${SITE_ORIGIN}/">Home</a> &rsaquo; <span>Photo Galleries &amp; Visual Journalism</span>
+        </div>
+        <div style="margin-bottom: 24px;">
+          <h1 style="margin-bottom: 8px;">Photo Galleries &amp; Visual Journalism</h1>
+          <p class="dek">Curated photographic essays, high-resolution dispatches, and on-ground photojournalism from across India.</p>
+        </div>
+        <div class="stories-grid">
+          ${photoArticles.map(p => {
+            const pCat = p.categories?.slug || "india";
+            const pDate = new Date(p.published_at || Date.now()).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
+            const pImg = p.featured_image_url || DEFAULT_OG_IMAGE;
+            return `
+              <article class="story-card">
+                <a href="${SITE_ORIGIN}/${pCat}/${escapeHtml(p.slug)}">
+                  <img src="${getAbsoluteUrl(pImg)}" alt="${escapeHtml(p.title)}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 4px; margin-bottom: 10px;" />
+                </a>
+                <span class="meta" style="color: var(--primary);">Photo Essay</span>
+                <h3><a href="${SITE_ORIGIN}/${pCat}/${escapeHtml(p.slug)}">${escapeHtml(p.title_hi || p.title)}</a></h3>
+                <p>${escapeHtml(p.dek_hi || p.excerpt || p.title)}</p>
+                <div class="meta">${pDate} &bull; NP News Metro Photo Desk</div>
+              </article>
+            `;
+          }).join("\n")}
+        </div>
+      `;
+
+      const photoJsonLd = {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        "name": "Photo Galleries & Visual Journalism | NP News Metro",
+        "url": `${SITE_ORIGIN}/photos`,
+        "description": "Curated photographic essays, high-resolution dispatches, and on-ground photojournalism from across India.",
+        "publisher": { "@type": "NewsMediaOrganization", "name": "NP News Metro", "url": SITE_ORIGIN, "logo": `${SITE_ORIGIN}/logo.png` }
+      };
+
+      const photoHtml = buildCrawlerHtml({
+        title: "Photo Galleries & Visual Journalism | NP News Metro",
+        description: "Curated photographic essays, high-resolution dispatches, and on-ground photojournalism from across India.",
+        canonicalUrl: `${SITE_ORIGIN}/photos`,
+        ogType: "website",
+        ogImage: topPhoto,
+        jsonLd: photoJsonLd,
+        bodyHtml: photoBodyHtml
+      });
+
+      shareWarmCache.set(photoHubKey, { html: photoHtml, timestamp: Date.now() });
+      return sendResponse(res, 200, "text/html; charset=utf-8", photoHtml);
+    }
+
+    // 3C. AUTHOR PROFILE PRE-RENDERER (/author/:id)
+    if (cleanCategory === "author" && cleanSlug) {
+      const authorCacheKey = `author:${cleanSlug}`;
+      const cachedAuthor = shareWarmCache.get(authorCacheKey);
+      if (cachedAuthor && Date.now() - cachedAuthor.timestamp < SHARE_CACHE_TTL) {
+        return sendResponse(res, 200, "text/html; charset=utf-8", cachedAuthor.html);
+      }
+
+      let authorArticles = [];
+      try {
+        const { data: aList } = await supabase
+          .from("articles")
+          .select("title, title_hi, slug, excerpt, dek_hi, featured_image_url, published_at, categories(slug, name)")
+          .eq("status", "published")
+          .order("published_at", { ascending: false })
+          .limit(20);
+        if (aList && aList.length > 0) authorArticles = aList;
+      } catch (e) {}
+
+      const authorName = decodeURIComponent(cleanSlug).replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase());
+      const authorCanonical = `${SITE_ORIGIN}/author/${cleanSlug}`;
+
+      const authorBodyHtml = `
+        <div class="breadcrumbs">
+          <a href="${SITE_ORIGIN}/">Home</a> &rsaquo; <span>Journalist Profile</span>
+        </div>
+        <div style="margin-bottom: 24px; background: #fff; padding: 24px; border: 1px solid var(--border); border-radius: 4px;">
+          <h1 style="margin: 0 0 8px 0;">${escapeHtml(authorName)}</h1>
+          <p class="dek" style="margin: 0;">Staff Correspondent &bull; NP News Metro Bureau</p>
+        </div>
+        <h2>Published Dispatches &amp; Articles</h2>
+        <div class="stories-grid">
+          ${authorArticles.map(a => {
+            const aCat = a.categories?.slug || "india";
+            const aTitle = a.title_hi || a.title;
+            const aDate = new Date(a.published_at || Date.now()).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
+            return `
+              <article class="story-card">
+                <span class="meta" style="color: var(--primary);">${escapeHtml(CATEGORY_NAMES[aCat] || aCat.toUpperCase())}</span>
+                <h3><a href="${SITE_ORIGIN}/${aCat}/${escapeHtml(a.slug)}">${escapeHtml(aTitle)}</a></h3>
+                <p>${escapeHtml(a.dek_hi || a.excerpt || a.title)}</p>
+                <div class="meta">Published: ${aDate}</div>
+              </article>
+            `;
+          }).join("\n")}
+        </div>
+      `;
+
+      const authorJsonLd = {
+        "@context": "https://schema.org",
+        "@type": "ProfilePage",
+        "name": `${authorName} | NP News Metro`,
+        "url": authorCanonical,
+        "mainEntity": {
+          "@type": "Person",
+          "name": authorName,
+          "worksFor": { "@type": "NewsMediaOrganization", "name": "NP News Metro", "url": SITE_ORIGIN }
+        }
+      };
+
+      const authorHtml = buildCrawlerHtml({
+        title: `${authorName} — Editorial Profile | NP News Metro`,
+        description: `Read investigative reports, ground dispatches, and analysis authored by ${authorName} at NP News Metro.`,
+        canonicalUrl: authorCanonical,
+        ogType: "profile",
+        ogImage: DEFAULT_OG_IMAGE,
+        jsonLd: authorJsonLd,
+        bodyHtml: authorBodyHtml
+      });
+
+      shareWarmCache.set(authorCacheKey, { html: authorHtml, timestamp: Date.now() });
+      return sendResponse(res, 200, "text/html; charset=utf-8", authorHtml);
+    }
+
+    // 3D. CATEGORY & NEWS DESK PRE-RENDERER (/category/:slug, /latest, /trending, or direct /:cat)
+    const isCategoryOrDesk = 
+      (cleanCategory && !cleanSlug) ||
+      cleanCategory === "category" ||
+      (!cleanCategory && (
+        normalizedSlug === "latest" ||
+        normalizedSlug === "trending" ||
+        CATEGORY_NAMES[normalizedSlug]
+      ));
+
+    if (isCategoryOrDesk) {
+      let targetCat = (cleanCategory === "category" ? (cleanSlug || cleanCategory) : (cleanCategory || cleanSlug)).toLowerCase();
+      if (targetCat === "metromat" || targetCat === "metro-mat") targetCat = "opinion";
+      if (targetCat === "economy") targetCat = "business";
+
       const catCacheKey = `cat:${targetCat}`;
       const cachedCat = shareWarmCache.get(catCacheKey);
       if (cachedCat && Date.now() - cachedCat.timestamp < SHARE_CACHE_TTL) {
         return sendResponse(res, 200, "text/html; charset=utf-8", cachedCat.html);
       }
 
-      const catDisplayName = CATEGORY_NAMES[targetCat] || targetCat.toUpperCase();
-      const canonicalCatUrl = `${SITE_ORIGIN}/category/${targetCat}`;
+      const isLatest = targetCat === "latest";
+      const isTrending = targetCat === "trending";
+      const catDisplayName = isLatest ? "Latest News" : (isTrending ? "Trending Stories" : (CATEGORY_NAMES[targetCat] || targetCat.toUpperCase()));
+      const canonicalCatUrl = isLatest ? `${SITE_ORIGIN}/latest` : (isTrending ? `${SITE_ORIGIN}/trending` : `${SITE_ORIGIN}/category/${targetCat}`);
 
       let catArticles = [];
       try {
@@ -920,14 +1169,14 @@ export default async function handler(req, res) {
           .select("title, title_hi, slug, excerpt, dek_hi, featured_image_url, published_at, author_name, categories(id, name, slug)")
           .eq("status", "published");
 
-        if (targetCat !== "latest") {
+        if (!isLatest && !isTrending) {
           const { data: catRow } = await supabase.from("categories").select("id").eq("slug", targetCat).maybeSingle();
           if (catRow?.id) {
             catQuery = catQuery.eq("category_id", catRow.id);
           }
         }
 
-        const { data: catData } = await catQuery.order("published_at", { ascending: false }).limit(15);
+        const { data: catData } = await catQuery.order("published_at", { ascending: false }).limit(30);
         if (catData && catData.length > 0) {
           catArticles = catData;
         }
@@ -935,7 +1184,7 @@ export default async function handler(req, res) {
 
       if (catArticles.length < 6) {
         const matchingFallbacks = FALLBACK_ARTICLES.filter(
-          a => a.category.toLowerCase() === targetCat || targetCat === "latest"
+          a => a.category.toLowerCase() === targetCat || isLatest || isTrending
         ).map(a => ({
           title: a.title,
           slug: a.slug,
@@ -958,11 +1207,11 @@ export default async function handler(req, res) {
 
       const catBodyHtml = `
         <div class="breadcrumbs">
-          <a href="${SITE_ORIGIN}/">Home</a> &rsaquo; <span>${escapeHtml(catDisplayName)} News</span>
+          <a href="${SITE_ORIGIN}/">Home</a> &rsaquo; <span>${escapeHtml(catDisplayName)}</span>
         </div>
 
         <div style="margin-bottom: 24px;">
-          <h1 style="margin-bottom: 8px;">${escapeHtml(catDisplayName)} News &amp; Latest Coverage</h1>
+          <h1 style="margin-bottom: 8px;">${escapeHtml(catDisplayName)} &amp; Latest Coverage</h1>
           <p class="dek">Explore authoritative, fact-verified journalism, policy dispatches, and in-depth investigative reports from NP News Metro's ${escapeHtml(catDisplayName)} desk.</p>
         </div>
 
@@ -994,7 +1243,7 @@ export default async function handler(req, res) {
       const catJsonLd = {
         "@context": "https://schema.org",
         "@type": "CollectionPage",
-        "name": `${catDisplayName} News | NP News Metro`,
+        "name": `${catDisplayName} | NP News Metro`,
         "url": canonicalCatUrl,
         "description": `Latest breaking headlines, reports, and exclusive analysis in ${catDisplayName} from NP News Metro.`,
         "publisher": {
@@ -1009,13 +1258,13 @@ export default async function handler(req, res) {
             "@type": "ListItem",
             "position": idx + 1,
             "url": `${SITE_ORIGIN}/${a.categories?.slug || targetCat}/${a.slug}`,
-            "name": a.title
+            "name": a.title_hi || a.title
           }))
         }
       };
 
       const catHtml = buildCrawlerHtml({
-        title: `${catDisplayName} News & Latest Analysis | NP News Metro`,
+        title: `${catDisplayName} | NP News Metro`,
         description: `Latest breaking headlines, reports, and exclusive analysis in ${catDisplayName} from NP News Metro.`,
         canonicalUrl: canonicalCatUrl,
         ogType: "website",
@@ -1229,6 +1478,26 @@ export default async function handler(req, res) {
     const authorRole = mediaItem.authorRole || "Editorial";
     const paragraphs = mediaItem.paragraphs && mediaItem.paragraphs.length > 0 ? mediaItem.paragraphs : [description];
 
+    let relatedArticles = [];
+    try {
+      const { data: relData } = await supabase
+        .from("articles")
+        .select("title, title_hi, slug, excerpt, dek_hi, categories(slug, name)")
+        .eq("status", "published")
+        .neq("slug", slug)
+        .order("published_at", { ascending: false })
+        .limit(6);
+      if (relData && relData.length > 0) relatedArticles = relData;
+    } catch (e) {}
+
+    if (relatedArticles.length === 0) {
+      relatedArticles = FALLBACK_ARTICLES.filter(a => a.slug !== slug).slice(0, 6).map(a => ({
+        title: a.title,
+        slug: a.slug,
+        categories: { slug: a.category, name: CATEGORY_NAMES[a.category] || a.category.toUpperCase() }
+      }));
+    }
+
     const articleBodyHtml = `
       <div class="breadcrumbs">
         <a href="${SITE_ORIGIN}/">Home</a> &rsaquo; 
@@ -1254,6 +1523,25 @@ export default async function handler(req, res) {
 
         <div style="margin: 36px 0 20px 0; text-align: center;">
           <a href="${SITE_ORIGIN}/${category}/${slug}" style="display: inline-block; background-color: var(--primary); color: #ffffff; padding: 12px 24px; font-size: 15px; font-weight: bold; text-decoration: none; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">ताज़ा ख़बरें और पूरा डिजिटल संस्करण पढ़ें &rarr;</a>
+        </div>
+
+        <div class="related-stories" style="margin-top: 40px; padding-top: 24px; border-top: 2px solid var(--border);">
+          <h2 style="font-family: Georgia, serif; font-size: 20px; color: var(--primary); margin-bottom: 16px;">
+            संबंधित और प्रमुख समाचार (Related &amp; Top Stories)
+          </h2>
+          <div class="stories-grid">
+            ${relatedArticles.map(rel => {
+              const relCat = rel.categories?.slug || category || "india";
+              const relTitle = rel.title_hi || rel.title;
+              return `
+                <article class="story-card">
+                  <span class="meta" style="color: var(--primary);">${escapeHtml(CATEGORY_NAMES[relCat] || relCat.toUpperCase())}</span>
+                  <h3><a href="${SITE_ORIGIN}/${relCat}/${escapeHtml(rel.slug)}">${escapeHtml(relTitle)}</a></h3>
+                  <div class="meta"><a href="${SITE_ORIGIN}/${relCat}/${escapeHtml(rel.slug)}" style="color: var(--primary); text-decoration: none;">पूरा समाचार पढ़ें &rarr;</a></div>
+                </article>
+              `;
+            }).join("\n")}
+          </div>
         </div>
       </article>
     `;

@@ -2,6 +2,138 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
   <url>
+    <loc>https://www.npnewsmetro.com/social/poravaala-samaaja-sevaa-samiti-kee-raashtreeya-kaaryakaarinee-bai</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-28T08:49:21.776Z</news:publication_date>
+      <news:title>पोरवाल समाज सेवा समिति की राष्ट्रीय कार्यकारिणी बैठक संपन्न, समाज सेवा और संगठन को मजबूत करने पर बनी रणनीति</news:title>
+      <news:keywords>News, India</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/opinion/thaalee-men-kemikala-jubaana-para-braanda-hindustaana-kee-rasoee</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-27T18:37:05.738Z</news:publication_date>
+      <news:title>थाली में केमिकल, जुबान पर ब्रांड: हिंदुस्तान की रसोई का सबसे बड़ा कत्लेआम</news:title>
+      <news:keywords>News, India</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/astrology/pitripaksha-vishesha-raashiphala-28-sitanbara-ko-12-raashiyon-ke</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-27T18:30:13.568Z</news:publication_date>
+      <news:title>पितृपक्ष विशेष राशिफल: 28 सितंबर को 12 राशियों के लिए कैसा रहेगा दिन</news:title>
+      <news:keywords>News, India</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/social/vrindaavana-men-jarooratamandon-ko-prasaada-vitarita-vrindaavana</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-27T18:15:11.332Z</news:publication_date>
+      <news:title>वृंदावन में जरूरतमंदों को प्रसाद वितरित</news:title>
+      <news:keywords>News, India</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/social/mathuraa-men-bhaajapaa-kaaryakartaaon-ne-chalaayaa-svachchhataa-a</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-27T18:03:00.655Z</news:publication_date>
+      <news:title>मथुरा में भाजपा कार्यकर्ताओं ने चलाया स्वच्छता अभियान</news:title>
+      <news:keywords>News, India</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/social/beerapuraa-ke-hari-darshana-raaya-ne-emabeebeeesa-kara-gaanva-kaa</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-27T17:51:49.506Z</news:publication_date>
+      <news:title>बीरपुरा के हरि दर्शन राय ने एमबीबीएस कर गांव का नाम रोशन किया</news:title>
+      <news:keywords>News, India</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/crime/raboopuraa-pulisa-ne-68-eteeema-kaarda-ke-saatha-aaropee-pakadaaa</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-27T17:42:02.221Z</news:publication_date>
+      <news:title>रबूपुरा पुलिस ने 68 एटीएम कार्ड के साथ आरोपी पकड़ा</news:title>
+      <news:keywords>News, India</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/social/titikshaa-pablika-skoola-men-daadaa-daadee-divasa-manaayaa-gayaaa</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-27T17:30:05.120Z</news:publication_date>
+      <news:title>तितिक्षा पब्लिक स्कूल में दादा-दादी दिवस मनाया गया</news:title>
+      <news:keywords>News, India</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/business/yoopeeaaeeteeesa-2026-men-uttara-pradesha-pulisa-kaa-stola-banaa</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-27T17:21:35.326Z</news:publication_date>
+      <news:title>यूपीआईटीएस-2026 में उत्तर प्रदेश पुलिस का स्टॉल बना आकर्षण का केंद्र</news:title>
+      <news:keywords>News, India</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/lifestyle/pushpaanjali-medikona-2026-men-3000-se-adhika-doktaron-ne-liyaa-h</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-27T17:08:50.112Z</news:publication_date>
+      <news:title>पुष्पांजलि मेडिकॉन 2026 में 3,000 से अधिक डॉक्टरों ने लिया हिस्सा</news:title>
+      <news:keywords>News, India</news:keywords>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.npnewsmetro.com/social/bilaasapura-men-prajaapati-prabuddha-mahaasammelana-shikshaa-aura</loc>
+    <news:news>
+      <news:publication>
+        <news:name>NP News Metro</news:name>
+        <news:language>hi</news:language>
+      </news:publication>
+      <news:publication_date>2026-09-27T16:52:46.394Z</news:publication_date>
+      <news:title>बिलासपुर में प्रजापति प्रबुद्ध महासम्मेलन, शिक्षा और सामाजिक एकता पर जोर</news:title>
+      <news:keywords>News, India</news:keywords>
+    </news:news>
+  </url>
+  <url>
     <loc>https://www.npnewsmetro.com/lifestyle/medaantaa-kaardiyaka-konkleva-2026-men-hridaya-chikitsaa-kee-naee</loc>
     <news:news>
       <news:publication>
@@ -22,246 +154,6 @@
       </news:publication>
       <news:publication_date>2026-09-27T12:05:10.979Z</news:publication_date>
       <news:title>भारत किसी देश की भूमि पर कब्जा नहीं करना चाहता, खतरा होने पर सुरक्षा और रणनीतिक स्वायत्तता की करेगा रक्षा: राजनाथ सिंह</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/opinion/kshamaayaachanaa-jaba-mastaka-jhukataa-hai-taba-ahankaara-tootata</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-26T15:46:57.543Z</news:publication_date>
-      <news:title>क्षमायाचना — जब मस्तक झुकता है, तब अहंकार टूटता है</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/kaandalaa-men-desha-kee-pahalee-porta-aadhaarita-ee-methanola-par</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-26T15:37:31.693Z</news:publication_date>
-      <news:title>कांडला में देश की पहली पोर्ट आधारित ई-मेथनॉल परियोजना का शिलान्यास</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/politics/panjaaba-ko-nashaamukta-aura-aarthika-roopa-se-majaboota-banaane</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-26T15:08:53.699Z</news:publication_date>
-      <news:title>पंजाब को नशामुक्त और आर्थिक रूप से मजबूत बनाने के लिए एकजुट हों: नायब सिंह सैनी</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/business/upits-2026-men-kaushala-kaa-pradarshana-aao-karake-seekhen-theema</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-26T14:51:00.444Z</news:publication_date>
-      <news:title>UPITS 2026 में कौशल का प्रदर्शन, ‘आओ करके सीखें’ थीम ने खींचा दर्शकों का ध्यान</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/politics/bhaajapaa-adhyaksha-nitina-nabeena-27-28-sitanbara-ko-pashchima-b</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-26T14:29:55.627Z</news:publication_date>
-      <news:title>भाजपा अध्यक्ष नितिन नबीन 27-28 सितंबर को पश्चिम बंगाल दौरे पर, संगठनात्मक बैठकों में भी होंगे शामिल</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/sports/seeaaeeesaepha-kee-ritu-shyoraana-ne-eshiyaaee-khelon-men-bhaarat</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-26T14:04:54.742Z</news:publication_date>
-      <news:title>सीआईएसएफ की रितु श्योरान ने एशियाई खेलों में भारत को दिलाया महिला कबड्डी का स्वर्ण पदक</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/religion/santa-bhakton-ne-lee-shree-krishna-janmabhoomi-para-mandira-nirma</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-26T13:36:35.865Z</news:publication_date>
-      <news:title>संत-भक्तों ने ली श्री कृष्ण जन्मभूमि पर मंदिर निर्माण की शपथ</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/social/patrakaaritaa-samaagama-aura-peeteejee-acheevarsa-praaija-avaarda</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-26T13:21:26.094Z</news:publication_date>
-      <news:title>पत्रकारिता समागम और पीटीजी अचीवर्स प्राइज अवार्ड 2026 में सम्मानित हुईं हस्तियां</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/crime/aatmahatyaa-ke-lie-ukasaane-ke-maamale-men-vaanchhita-aaropee-gir</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-26T12:43:48.401Z</news:publication_date>
-      <news:title>आत्महत्या के लिए उकसाने के मामले में वांछित आरोपी गिरफ्तार</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/seeema-yogee-aadityanaatha-ne-pradhaanamantree-modee-se-kee-mulaa</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-26T12:21:07.473Z</news:publication_date>
-      <news:title>सीएम योगी आदित्यनाथ ने प्रधानमंत्री मोदी से की मुलाकात</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/vishesha-abhiyaana-60-kee-taiyaaree-men-jutaa-rasaayana-evan-petr</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-26T11:43:34.550Z</news:publication_date>
-      <news:title>विशेष अभियान 6.0 की तैयारी में जुटा रसायन एवं पेट्रो-रसायन विभाग, ई-कचरा निपटान पर रहेगा विशेष जोर</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/opinion/aakhiree-aadamee-kee-thaalee-aura-eaaee-kee-pyaasa-dharatee-para</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-26T03:05:06.564Z</news:publication_date>
-      <news:title>आखिरी आदमी की थाली और एआई की प्यास - धरती पर उतरा सच</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/crime/noedaa-men-pulisa-ne-phuta-petrolinga-kara-surakshaa-vyavasthaa-k</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-26T03:00:21.339Z</news:publication_date>
-      <news:title>नोएडा में पुलिस ने फुट पेट्रोलिंग कर सुरक्षा व्यवस्था का लिया जायजा</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/business/bhaarata-men-raninga-kaa-badhataa-kreja-dekaathalona-kaa-badaa-da</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-25T18:52:06.800Z</news:publication_date>
-      <news:title>भारत में रनिंग का बढ़ता क्रेज, डेकाथलॉन का बड़ा दांव; 50 लाख रनर्स तक पहुंचने का लक्ष्य</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/religion/jhandevaalaa-devee-mandira-men-ganeshotsava-kaa-samaapana-bhakton</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-25T18:43:23.183Z</news:publication_date>
-      <news:title>झण्डेवाला देवी मंदिर में गणेशोत्सव का समापन, भक्तों ने निकाली शोभायात्रा</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/politics/keshava-prasaada-maurya-ne-amita-shaaha-se-kee-bhenta-mishana-yoo</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-25T18:31:17.815Z</news:publication_date>
-      <news:title>केशव प्रसाद मौर्य ने अमित शाह से की भेंट, मिशन यूपी और संगठन पर गहन मंथन-2027 में यूपी में फिर खिलेगा कमल</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/jhaansee-aagaraa-kainta-eksapresa-aba-mathuraa-taka-chalegee-ina</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-25T18:18:28.512Z</news:publication_date>
-      <news:title>झांसी-आगरा कैंट एक्सप्रेस अब मथुरा तक चलेगी, इन स्टेशनों पर भी मिलेगा ठहराव</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/technology/story-7</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-25T18:04:04.949Z</news:publication_date>
-      <news:title>ट्राई ने लॉन्च किया डिजिटल कनेक्टिविटी रेटिंग प्लेटफॉर्म, संपत्ति खरीदने से पहले मिल सकेगी कनेक्टिविटी की जानकारी</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/india/gulabargaa-tuara-daala-kee-maaladeeva-ko-khepa-ravaanaa-kisaanon</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-25T17:29:57.075Z</news:publication_date>
-      <news:title>गुलबर्गा तुअर दाल की मालदीव को खेप रवाना, किसानों को मिलेगा बेहतर मूल्य की</news:title>
-      <news:keywords>News, India</news:keywords>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://www.npnewsmetro.com/social/kashmeeree-pandita-raahata-dhaarakon-se-jude-aadesha-para-jekeaae</loc>
-    <news:news>
-      <news:publication>
-        <news:name>NP News Metro</news:name>
-        <news:language>hi</news:language>
-      </news:publication>
-      <news:publication_date>2026-09-25T16:56:31.692Z</news:publication_date>
-      <news:title>कश्मीरी पंडित राहत धारकों से जुड़े आदेश पर जेकेआईडब्ल्यूएस ने जताया आभार</news:title>
       <news:keywords>News, India</news:keywords>
     </news:news>
   </url>
