@@ -44,6 +44,12 @@ export const SeoHead: React.FC<SeoHeadProps> = ({ metadata, structuredData }) =>
     setMetaTag('meta[name="googlebot"]', 'name', 'googlebot', robotsContent);
     setMetaTag('meta[name="googlebot-news"]', 'name', 'googlebot-news', googleNewsContent);
 
+    // Geographic & Regional Targeting (GEO)
+    setMetaTag('meta[name="geo.region"]', 'name', 'geo.region', 'IN-DL');
+    setMetaTag('meta[name="geo.placename"]', 'name', 'geo.placename', 'New Delhi, India');
+    setMetaTag('meta[name="geo.position"]', 'name', 'geo.position', '28.6139;77.2090');
+    setMetaTag('meta[name="ICBM"]', 'name', 'ICBM', '28.6139, 77.2090');
+
     // 3. Open Graph (Facebook, WhatsApp, LinkedIn, iMessage, etc.)
     setMetaTag('meta[property="og:title"]', 'property', 'og:title', finalTitle);
     setMetaTag('meta[property="og:description"]', 'property', 'og:description', finalDesc);

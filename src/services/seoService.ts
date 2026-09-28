@@ -40,39 +40,107 @@ export const generateArticleStructuredData = (
 ) => {
   const canonicalUrl = `${siteUrl}/${post.category}/${post.slug}`;
   const authorName = post.customAuthor?.name || 'NP News Metro Bureau';
+  const authorRole = post.customAuthor?.role || 'Staff Journalist';
+  const authorSlug = (authorName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')) || 'editorial';
   const absoluteImage = getAbsoluteImageUrl(post.featuredImage, siteUrl);
+  const isHindi = !!(post.titleHi || /[\u0900-\u097F]/.test(post.title));
+  const categoryUpper = post.category?.toUpperCase() || 'NATIONAL';
 
   return {
     '@context': 'https://schema.org',
-    '@type': 'NewsArticle',
-    mainEntityOfPage: {
-      '@type': 'WebPage',
-      '@id': canonicalUrl,
-    },
-    headline: post.seoTitle || post.title,
-    description: post.seoDescription || post.dek || post.title,
-    image: [absoluteImage],
-    datePublished: post.publishedAt || new Date().toISOString(),
-    dateModified: post.updatedAt || post.publishedAt || new Date().toISOString(),
-    author: [
+    '@graph': [
       {
-        '@type': 'Person',
-        name: authorName,
-        jobTitle: post.customAuthor?.role || 'Staff Journalist',
+        '@type': 'NewsMediaOrganization',
+        '@id': `${siteUrl}/#organization`,
+        name: siteName,
+        url: siteUrl,
+        logo: {
+          '@type': 'ImageObject',
+          url: `${siteUrl}/logo.png`,
+          width: 600,
+          height: 120,
+        },
+        publishingPrinciples: `${siteUrl}/ethics`,
+        correctionsPolicy: `${siteUrl}/corrections`,
+        ethicsPolicy: `${siteUrl}/ethics`,
+        masthead: `${siteUrl}/editorial-team`,
+        diversityPolicy: `${siteUrl}/about`,
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: 'New Delhi',
+          addressRegion: 'Delhi',
+          addressCountry: 'IN',
+        },
+        sameAs: [
+          'https://twitter.com/NPNewsMetro',
+          'https://www.youtube.com/@NPNewsMetro',
+        ],
+      },
+      {
+        '@type': 'WebSite',
+        '@id': `${siteUrl}/#website`,
+        url: siteUrl,
+        name: siteName,
+        publisher: { '@id': `${siteUrl}/#organization` },
+        potentialAction: {
+          '@type': 'SearchAction',
+          target: `${siteUrl}/search?q={search_term_string}`,
+          'query-input': 'required name=search_term_string',
+        },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        '@id': `${canonicalUrl}#breadcrumb`,
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: siteUrl },
+          { '@type': 'ListItem', position: 2, name: categoryUpper, item: `${siteUrl}/category/${post.category}` },
+          { '@type': 'ListItem', position: 3, name: post.title, item: canonicalUrl },
+        ],
+      },
+      {
+        '@type': 'NewsArticle',
+        '@id': `${canonicalUrl}#article`,
+        isPartOf: { '@id': `${siteUrl}/#website` },
+        mainEntityOfPage: {
+          '@type': 'WebPage',
+          '@id': canonicalUrl,
+        },
+        headline: post.seoTitle || post.title,
+        description: post.seoDescription || post.dek || post.title,
+        image: [absoluteImage],
+        datePublished: post.publishedAt || new Date().toISOString(),
+        dateModified: post.updatedAt || post.publishedAt || new Date().toISOString(),
+        articleSection: categoryUpper,
+        inLanguage: isHindi ? 'hi-IN' : 'en-IN',
+        isAccessibleForFree: 'True',
+        copyrightYear: new Date(post.publishedAt || Date.now()).getFullYear(),
+        copyrightHolder: { '@id': `${siteUrl}/#organization` },
+        publisher: { '@id': `${siteUrl}/#organization` },
+        author: [
+          {
+            '@type': 'Person',
+            name: authorName,
+            jobTitle: authorRole,
+            url: `${siteUrl}/author/${authorSlug}`,
+            worksFor: { '@id': `${siteUrl}/#organization` },
+          },
+        ],
+        keywords: post.tags?.join(', ') || 'News, India, Policy, Analysis',
+        speakable: {
+          '@type': 'SpeakableSpecification',
+          cssSelector: ['h1', '.dek', '.key-takeaways', '.article-body p:first-of-type'],
+        },
+        spatialCoverage: {
+          '@type': 'Place',
+          name: 'India',
+          geo: {
+            '@type': 'GeoCoordinates',
+            latitude: 28.6139,
+            longitude: 77.2090,
+          },
+        },
       },
     ],
-    publisher: {
-      '@type': 'NewsMediaOrganization',
-      name: siteName,
-      url: siteUrl,
-      logo: {
-        '@type': 'ImageObject',
-        url: `${siteUrl}/logo.png`,
-      },
-    },
-    articleSection: post.category?.toUpperCase() || 'NATIONAL',
-    keywords: post.tags?.join(', ') || 'News, India, Policy',
-    inLanguage: post.titleHi ? 'hi-IN' : 'en-IN',
   };
 };
 
@@ -86,21 +154,34 @@ export const generateVideoStructuredData = (
 
   return {
     '@context': 'https://schema.org',
-    '@type': 'VideoObject',
-    name: video.title,
-    description: video.caption || video.title,
-    thumbnailUrl: [absolutePoster],
-    uploadDate: video.publishedAt || new Date().toISOString(),
-    duration: 'PT5M00S',
-    contentUrl: video.videoUrl,
-    embedUrl: video.videoUrl.includes('watch?v=')
-      ? video.videoUrl.replace('watch?v=', 'embed/')
-      : video.videoUrl,
-    publisher: {
-      '@type': 'NewsMediaOrganization',
-      name: siteName,
-      url: siteUrl,
-    },
+    '@graph': [
+      {
+        '@type': 'NewsMediaOrganization',
+        '@id': `${siteUrl}/#organization`,
+        name: siteName,
+        url: siteUrl,
+        logo: {
+          '@type': 'ImageObject',
+          url: `${siteUrl}/logo.png`,
+        },
+        sameAs: ['https://twitter.com/NPNewsMetro', 'https://www.youtube.com/@NPNewsMetro'],
+      },
+      {
+        '@type': 'VideoObject',
+        '@id': `${canonicalUrl}#video`,
+        name: video.title,
+        description: video.caption || video.title,
+        thumbnailUrl: [absolutePoster],
+        uploadDate: video.publishedAt || new Date().toISOString(),
+        duration: 'PT5M00S',
+        contentUrl: video.videoUrl,
+        embedUrl: video.videoUrl.includes('watch?v=')
+          ? video.videoUrl.replace('watch?v=', 'embed/')
+          : video.videoUrl,
+        publisher: { '@id': `${siteUrl}/#organization` },
+        inLanguage: 'hi-IN',
+      },
+    ],
   };
 };
 
@@ -110,14 +191,40 @@ export const generateWebsiteStructuredData = (
 ) => {
   return {
     '@context': 'https://schema.org',
-    '@type': 'WebSite',
-    name: siteName,
-    url: siteUrl,
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: `${siteUrl}/search?q={search_term_string}`,
-      'query-input': 'required name=search_term_string',
-    },
+    '@graph': [
+      {
+        '@type': 'NewsMediaOrganization',
+        '@id': `${siteUrl}/#organization`,
+        name: siteName,
+        url: siteUrl,
+        logo: {
+          '@type': 'ImageObject',
+          url: `${siteUrl}/logo.png`,
+          width: 600,
+          height: 120,
+        },
+        publishingPrinciples: `${siteUrl}/ethics`,
+        correctionsPolicy: `${siteUrl}/corrections`,
+        ethicsPolicy: `${siteUrl}/ethics`,
+        masthead: `${siteUrl}/editorial-team`,
+        sameAs: [
+          'https://twitter.com/NPNewsMetro',
+          'https://www.youtube.com/@NPNewsMetro',
+        ],
+      },
+      {
+        '@type': 'WebSite',
+        '@id': `${siteUrl}/#website`,
+        name: siteName,
+        url: siteUrl,
+        publisher: { '@id': `${siteUrl}/#organization` },
+        potentialAction: {
+          '@type': 'SearchAction',
+          target: `${siteUrl}/search?q={search_term_string}`,
+          'query-input': 'required name=search_term_string',
+        },
+      },
+    ],
   };
 };
 

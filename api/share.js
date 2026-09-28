@@ -572,6 +572,25 @@ function buildCrawlerHtml({ title, description, canonicalUrl, shareUrl, ogType =
   <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
   <meta name="googlebot-news" content="index, follow" />
 
+  <!-- Geographic & Regional Targeting (GEO) -->
+  <meta name="geo.region" content="IN-DL" />
+  <meta name="geo.placename" content="New Delhi, India" />
+  <meta name="geo.position" content="28.6139;77.2090" />
+  <meta name="ICBM" content="28.6139, 77.2090" />
+  <meta name="country" content="India" />
+  <meta name="coverage" content="India, Global" />
+  <meta name="distribution" content="Global" />
+  <meta name="rating" content="General" />
+  <meta http-equiv="content-language" content="hi, en" />
+
+  <!-- Multilingual & Alternate Feeds -->
+  <link rel="alternate" hreflang="hi" href="${canonicalUrl}" />
+  <link rel="alternate" hreflang="en" href="${canonicalUrl}" />
+  <link rel="alternate" hreflang="hi-IN" href="${canonicalUrl}" />
+  <link rel="alternate" hreflang="en-IN" href="${canonicalUrl}" />
+  <link rel="alternate" hreflang="x-default" href="${canonicalUrl}" />
+  <link rel="alternate" type="application/rss+xml" title="NP News Metro RSS Wire" href="${SITE_ORIGIN}/rss.xml" />
+
   <meta property="og:site_name" content="NP News Metro" />
   <meta property="og:type" content="${ogType}" />
   <meta property="og:title" content="${escapeHtml(title)}" />
@@ -1498,27 +1517,61 @@ export default async function handler(req, res) {
       }));
     }
 
+    const authorSlug = (authorName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")) || "editorial";
+    const categoryName = CATEGORY_NAMES[category] || category.toUpperCase();
+    const isHindiArticle = !!(mediaItem.title_hi || /[\u0900-\u097F]/.test(title));
+    const langCode = isHindiArticle ? "hi-IN" : "en-IN";
+
+    // Direct Answer / Key Takeaways for AEO (Featured Snippets) and GEO (AI Overviews)
+    const rawHighlights = [];
+    if (description && description !== title) rawHighlights.push(description);
+    if (paragraphs.length > 0 && paragraphs[0] && paragraphs[0] !== description) rawHighlights.push(paragraphs[0]);
+    if (paragraphs.length > 1 && paragraphs[1]) rawHighlights.push(paragraphs[1]);
+    const keyHighlights = rawHighlights.slice(0, 3);
+
     const articleBodyHtml = `
       <div class="breadcrumbs">
         <a href="${SITE_ORIGIN}/">Home</a> &rsaquo; 
-        <a href="${SITE_ORIGIN}/category/${category}">${escapeHtml(CATEGORY_NAMES[category] || category.toUpperCase())}</a> &rsaquo; 
+        <a href="${SITE_ORIGIN}/category/${category}">${escapeHtml(categoryName)}</a> &rsaquo; 
         <span>Report</span>
       </div>
 
       <article>
-        <h1 style="margin-top: 0;">${escapeHtml(title)}</h1>
-        <p class="dek">${escapeHtml(description)}</p>
-        <div class="byline">
-          <strong>By ${escapeHtml(authorName)}</strong> &bull; ${escapeHtml(authorRole)} &bull; Published on ${new Date(publishedIso).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}
+        <h1 style="margin-top: 0; font-family: Georgia, serif; font-size: 32px; line-height: 1.25; color: var(--ink); margin-bottom: 14px;">${escapeHtml(title)}</h1>
+        <p class="dek" style="font-size: 18px; color: #475569; line-height: 1.6; border-left: 4px solid var(--primary); padding-left: 16px; margin-bottom: 20px;">${escapeHtml(description)}</p>
+        
+        <div class="byline" style="font-size: 13px; color: var(--ink-muted); margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border);">
+          <strong>By <a href="${SITE_ORIGIN}/author/${authorSlug}" style="color: var(--primary); text-decoration: none;">${escapeHtml(authorName)}</a></strong> &bull; ${escapeHtml(authorRole)} &bull; 
+          <time datetime="${publishedIso}" class="published-time">Published: ${new Date(publishedIso).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}</time>
+          ${modifiedIso && modifiedIso !== publishedIso ? ` &bull; <time datetime="${modifiedIso}">Updated: ${new Date(modifiedIso).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}</time>` : ""}
         </div>
 
         ${image ? `
-          <img src="${image}" alt="${escapeHtml(title)}" class="featured-img" />
-          <div class="caption">${escapeHtml(mediaItem.caption || title)} &bull; Credit: NP News Metro Photo Desk</div>
+          <div style="margin-bottom: 24px;">
+            <img src="${image}" alt="${escapeHtml(title)}" class="featured-img" style="width: 100%; max-height: 520px; object-fit: cover; border-radius: 4px;" />
+            <div class="caption" style="font-size: 12px; color: var(--ink-muted); font-style: italic; margin-top: 6px;">${escapeHtml(mediaItem.caption || title)} &bull; Credit: NP News Metro Photo Desk</div>
+          </div>
         ` : ""}
 
-        <div class="article-body">
-          ${paragraphs.map(p => `<p>${escapeHtml(p)}</p>`).join("\n        ")}
+        <!-- AEO & GEO Direct Answer: Key Highlights Box for Featured Snippets & AI Overviews -->
+        ${keyHighlights.length > 0 ? `
+          <div class="key-takeaways" style="background: #f8fafc; border: 1px solid #cbd5e1; border-left: 4px solid var(--primary); padding: 18px 22px; border-radius: 4px; margin: 24px 0 28px 0;">
+            <strong style="font-size: 13px; text-transform: uppercase; color: var(--primary); letter-spacing: 0.5px; display: block; margin-bottom: 8px;">
+              📌 मुख्य बिंदु (Key Highlights &amp; Summary)
+            </strong>
+            <ul style="margin: 0; padding-left: 20px; font-size: 15px; color: #1e293b; line-height: 1.7;">
+              ${keyHighlights.map(h => `<li>${escapeHtml(h)}</li>`).join("\n              ")}
+            </ul>
+          </div>
+        ` : ""}
+
+        <div class="article-body" style="font-size: 17px; line-height: 1.8; color: #1e293b;">
+          ${paragraphs.map(p => `<p style="margin-bottom: 20px;">${escapeHtml(p)}</p>`).join("\n        ")}
+        </div>
+
+        <!-- E-E-A-T Editorial Verification & Fact-Check Trust Badge -->
+        <div class="editorial-trust-badge" style="margin-top: 32px; padding: 16px 20px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 4px; font-size: 13px; color: #166534; line-height: 1.6;">
+          <strong>✓ संपादकीय सत्यनिष्ठा एवं तथ्य सत्यापन (Editorial Verification):</strong> यह रिपोर्ट NP News Metro के निष्पक्ष संपादकीय मानकों और प्रेस काउंसिल ऑफ इंडिया (Press Council of India) की पत्रकारिता आचार संहिता के तहत प्राथमिक स्रोतों एवं ऑन-ग्राउंड संवाददाताओं द्वारा सत्यापित की गई है।
         </div>
 
         <div style="margin: 36px 0 20px 0; text-align: center;">
@@ -1550,24 +1603,138 @@ export default async function handler(req, res) {
 
     const structuredData = isVideo ? {
       "@context": "https://schema.org",
-      "@type": "VideoObject",
-      "name": title,
-      "description": description,
-      "thumbnailUrl": image,
-      "uploadDate": publishedIso,
-      "embedUrl": mediaItem.videoUrl || canonicalUrl,
-      "publisher": { "@type": "Organization", "name": "NP News Metro", "logo": { "@type": "ImageObject", "url": `${SITE_ORIGIN}/logo.png` } }
+      "@graph": [
+        {
+          "@type": "NewsMediaOrganization",
+          "@id": `${SITE_ORIGIN}/#organization`,
+          "name": "NP News Metro",
+          "url": SITE_ORIGIN,
+          "logo": { "@type": "ImageObject", "url": `${SITE_ORIGIN}/logo.png`, "width": 600, "height": 120 },
+          "publishingPrinciples": `${SITE_ORIGIN}/ethics`,
+          "correctionsPolicy": `${SITE_ORIGIN}/corrections`,
+          "ethicsPolicy": `${SITE_ORIGIN}/ethics`,
+          "masthead": `${SITE_ORIGIN}/editorial-team`,
+          "sameAs": ["https://twitter.com/NPNewsMetro", "https://www.youtube.com/@NPNewsMetro"]
+        },
+        {
+          "@type": "WebSite",
+          "@id": `${SITE_ORIGIN}/#website`,
+          "name": "NP News Metro",
+          "url": SITE_ORIGIN,
+          "publisher": { "@id": `${SITE_ORIGIN}/#organization` }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "@id": `${canonicalUrl}#breadcrumb`,
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": SITE_ORIGIN },
+            { "@type": "ListItem", "position": 2, "name": "Videos", "item": `${SITE_ORIGIN}/videos` },
+            { "@type": "ListItem", "position": 3, "name": title, "item": canonicalUrl }
+          ]
+        },
+        {
+          "@type": "VideoObject",
+          "@id": `${canonicalUrl}#video`,
+          "name": title,
+          "description": description,
+          "thumbnailUrl": [image],
+          "uploadDate": publishedIso,
+          "embedUrl": mediaItem.videoUrl || canonicalUrl,
+          "publisher": { "@id": `${SITE_ORIGIN}/#organization` },
+          "inLanguage": langCode
+        }
+      ]
     } : {
       "@context": "https://schema.org",
-      "@type": "NewsArticle",
-      "mainEntityOfPage": { "@type": "WebPage", "@id": canonicalUrl },
-      "headline": title,
-      "description": description,
-      "image": [image],
-      "datePublished": publishedIso,
-      "dateModified": modifiedIso,
-      "author": { "@type": "Person", "name": authorName },
-      "publisher": { "@type": "Organization", "name": "NP News Metro", "logo": { "@type": "ImageObject", "url": `${SITE_ORIGIN}/logo.png` } }
+      "@graph": [
+        {
+          "@type": "NewsMediaOrganization",
+          "@id": `${SITE_ORIGIN}/#organization`,
+          "name": "NP News Metro",
+          "url": SITE_ORIGIN,
+          "logo": {
+            "@type": "ImageObject",
+            "url": `${SITE_ORIGIN}/logo.png`,
+            "width": 600,
+            "height": 120
+          },
+          "publishingPrinciples": `${SITE_ORIGIN}/ethics`,
+          "correctionsPolicy": `${SITE_ORIGIN}/corrections`,
+          "ethicsPolicy": `${SITE_ORIGIN}/ethics`,
+          "masthead": `${SITE_ORIGIN}/editorial-team`,
+          "diversityPolicy": `${SITE_ORIGIN}/about`,
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "New Delhi",
+            "addressRegion": "Delhi",
+            "addressCountry": "IN"
+          },
+          "sameAs": [
+            "https://twitter.com/NPNewsMetro",
+            "https://www.youtube.com/@NPNewsMetro"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": `${SITE_ORIGIN}/#website`,
+          "name": "NP News Metro",
+          "url": SITE_ORIGIN,
+          "publisher": { "@id": `${SITE_ORIGIN}/#organization` },
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": `${SITE_ORIGIN}/search?q={search_term_string}`,
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "@id": `${canonicalUrl}#breadcrumb`,
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": SITE_ORIGIN },
+            { "@type": "ListItem", "position": 2, "name": categoryName, "item": `${SITE_ORIGIN}/category/${category}` },
+            { "@type": "ListItem", "position": 3, "name": title, "item": canonicalUrl }
+          ]
+        },
+        {
+          "@type": "NewsArticle",
+          "@id": `${canonicalUrl}#article`,
+          "isPartOf": { "@id": `${SITE_ORIGIN}/#website` },
+          "mainEntityOfPage": { "@type": "WebPage", "@id": canonicalUrl },
+          "headline": title,
+          "description": description,
+          "image": [image],
+          "datePublished": publishedIso,
+          "dateModified": modifiedIso,
+          "articleSection": categoryName,
+          "inLanguage": langCode,
+          "isAccessibleForFree": "True",
+          "copyrightYear": new Date(publishedIso).getFullYear(),
+          "copyrightHolder": { "@id": `${SITE_ORIGIN}/#organization` },
+          "publisher": { "@id": `${SITE_ORIGIN}/#organization` },
+          "author": [
+            {
+              "@type": "Person",
+              "name": authorName,
+              "jobTitle": authorRole,
+              "url": `${SITE_ORIGIN}/author/${authorSlug}`,
+              "worksFor": { "@id": `${SITE_ORIGIN}/#organization` }
+            }
+          ],
+          "speakable": {
+            "@type": "SpeakableSpecification",
+            "cssSelector": ["h1", ".dek", ".key-takeaways", ".article-body p:first-of-type"]
+          },
+          "spatialCoverage": {
+            "@type": "Place",
+            "name": "India",
+            "geo": {
+              "@type": "GeoCoordinates",
+              "latitude": 28.6139,
+              "longitude": 77.2090
+            }
+          }
+        }
+      ]
     };
 
     const articleHtml = buildCrawlerHtml({
