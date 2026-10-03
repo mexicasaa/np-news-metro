@@ -10,7 +10,7 @@ export const signInWithCredentials = async (
   const cleanInput = usernameOrEmail.trim().toLowerCase();
   
   let email = cleanInput;
-  if (cleanInput === 'admin' || cleanInput === 'admin@npnewsmetro.com' || cleanInput === 'admin@npnews.com') {
+  if (cleanInput === 'admin' || cleanInput === 'admin@npnewsmetro.com' || cleanInput === 'admin@npnews.com' || cleanInput === 'admin@npnewsmetro.in') {
     email = 'admin@npnews.com';
   } else if (cleanInput === 'siddharth' || cleanInput === 'siddharth@npnewsmetro.com') {
     email = 'siddharth.npnews@gmail.com';

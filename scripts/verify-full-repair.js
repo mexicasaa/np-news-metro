@@ -1,11 +1,21 @@
 /**
- * NP NEWS METRO — FULL REPAIR VERIFICATION SUITE
+ * NP NEWS METRO ï¿½ FULL REPAIR VERIFICATION SUITE
  * Verifies End-to-End Persistence, Realtime Authentication, RLS, and Cross-System Visibility
  */
 import fs from 'fs';
 
-const SUPABASE_URL = 'https://jkzrjqclgqpfjdqxsnut.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprenJqcWNsZ3FwZmpkcXhzbnV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NjU0ODksImV4cCI6MjEwMzE0MTQ4OX0.tDPKLptID2tvWKAKstPVr73I7p_cFt3PPGX9AXL4l28';
+import { resolve } from 'path';
+
+// Parse .env file
+const envContent = fs.readFileSync(resolve('.env'), 'utf-8');
+const env = {};
+envContent.split('\n').forEach(line => {
+  const [k, ...v] = line.split('=');
+  if (k && v.length) env[k.trim()] = v.join('=').trim();
+});
+
+const SUPABASE_URL = env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = env.VITE_SUPABASE_ANON_KEY;
 
 let authToken = '';
 let testArticleId = '';
@@ -22,7 +32,7 @@ function logTest(testNum, title, passed, detail) {
 
 async function runFullVerification() {
   console.log('\n' + '='.repeat(68));
-  console.log('   NP NEWS METRO — FULL REPAIR & PERSISTENCE VERIFICATION HARNESS');
+  console.log('   NP NEWS METRO ï¿½ FULL REPAIR & PERSISTENCE VERIFICATION HARNESS');
   console.log('='.repeat(68) + '\n');
 
   try {
@@ -89,7 +99,7 @@ async function runFullVerification() {
     });
     const publicReadData = await publicReadRes.json();
     const isPublicVisible = publicReadData.length === 1 && publicReadData[0].author_name === 'Umang Sharma';
-    logTest(4, 'Public Website Read (Anonymous)', isPublicVisible, `Author: ${publicReadData[0]?.author_name} — ${publicReadData[0]?.author_role}`);
+    logTest(4, 'Public Website Read (Anonymous)', isPublicVisible, `Author: ${publicReadData[0]?.author_name} ï¿½ ${publicReadData[0]?.author_role}`);
 
     // TEST 5: Article Update Persistence
     const updateRes = await fetch(SUPABASE_URL + `/rest/v1/articles?id=eq.${testArticleId}`, {
