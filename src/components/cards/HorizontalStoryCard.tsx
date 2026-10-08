@@ -6,6 +6,7 @@ import { handleImageError, getAuthorAvatarUrl, getOptimizedImageUrl } from '../.
 import { useLanguage } from '../../context/LanguageContext';
 import { ShareModal } from '../article/ShareModal';
 import { getCanonicalArticleUrl } from '../../utils/shareUtils';
+import { formatRelativeTime } from '../../utils/dateUtils';
 
 interface HorizontalStoryCardProps {
   post: WpPost;
@@ -74,9 +75,9 @@ export const HorizontalStoryCard: React.FC<HorizontalStoryCardProps> = ({
               {localized.category}
             </button>
             <span className="text-slate-300">•</span>
-            <span className="text-slate-500 text-xs flex items-center gap-1 font-medium">
+            <span className="text-slate-600 text-xs flex items-center gap-1 font-medium">
               <Clock className="w-3 h-3 text-slate-400" />
-              <span>{isHindi ? localized.readTime.replace('min read', 'मिनट') : localized.readTime}</span>
+              <span>{formatRelativeTime(post.publishedAt, language)}</span>
             </span>
           </div>
 

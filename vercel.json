@@ -97,6 +97,10 @@
       "destination": "/api/engagement?action=ads"
     },
     {
+      "source": "/api/markets",
+      "destination": "/api/markets.js"
+    },
+    {
       "source": "/sitemap_index.xml",
       "destination": "/api/feeds?type=index"
     },
@@ -142,7 +146,7 @@
         {
           "type": "header",
           "key": "user-agent",
-          "value": ".*(?i)(google|bingbot|yandex|duckduckbot|baiduspider|facebookexternalhit|facebot|facebookcatalog|whatsapp|twitterbot|twitter|xbot|telegrambot|telegram|linkedinbot|linkedin|discordbot|slackbot|applebot|skypeuripreview|snapchat|pinterest|quora-link-preview|redditbot|lighthouse).*"
+          "value": ".*(?i)(google|bingbot|yandex|duckduckbot|baiduspider|facebookexternalhit|facebot|facebookcatalog|whatsapp|twitterbot|twitter|xbot|telegrambot|telegram|linkedinbot|linkedin|discordbot|slackbot|applebot|skypeuripreview|snapchat|pinterest|quora-link-preview|redditbot|lighthouse|gptbot|chatgpt|oai-searchbot|claudebot|anthropic|petalbot|semrush|ahrefs).*"
         }
       ],
       "destination": "/api/share?homepage=true"

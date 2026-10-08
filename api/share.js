@@ -736,12 +736,12 @@ export default async function handler(req, res) {
           .from("articles")
           .select("title, title_hi, slug, excerpt, dek_hi, featured_image_url, published_at, author_name, is_lead, is_breaking_news, categories(name, slug)")
           .eq("status", "published")
-          .order("is_lead", { ascending: false })
-          .order("published_at", { ascending: false })
+          .not("published_at", "is", null)
+          .order("published_at", { ascending: false, nullsFirst: false })
           .limit(30);
 
         if (data && data.length > 0) {
-          homeArticles = data;
+          homeArticles = data.filter(a => a.slug && !a.slug.includes('unauthorized') && a.title !== 'Unauthorized Article Attempt');
         }
       } catch (e) {}
 

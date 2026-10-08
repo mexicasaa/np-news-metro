@@ -10,6 +10,7 @@ import { handleImageError, getAuthorAvatarUrl, handleAvatarError, getOptimizedIm
 import { useLanguage } from '../../context/LanguageContext';
 import { ShareModal } from '../article/ShareModal';
 import { getCanonicalArticleUrl } from '../../utils/shareUtils';
+import { formatRelativeTime, isFreshStory } from '../../utils/dateUtils';
 
 interface HeroStoryProps {
   post: WpPost;
@@ -260,9 +261,14 @@ export const HeroStory: React.FC<HeroStoryProps> = ({
               <span>{currentStory.readTime}</span>
             </span>
             <span className="text-border-strong hidden sm:inline">•</span>
-            <span className="text-ink-muted text-[11px] hidden sm:inline">
-              {isHindi ? '25 मिनट पहले प्रकाशित' : 'Published 25m ago'}
+            <span className="text-ink-secondary text-[11px] hidden sm:inline font-medium">
+              {formatRelativeTime(rawStory.publishedAt, language)}
             </span>
+            {isFreshStory(rawStory.publishedAt, 24) && (
+              <span className="bg-emerald-100 text-emerald-800 border border-emerald-300 text-[10px] font-bold uppercase px-1.5 py-0.2 rounded-xs">
+                {isHindi ? 'ताज़ा अपडेट' : 'Fresh Wire'}
+              </span>
+            )}
           </div>
 
           {/* Action Tools: Listen, Bookmark, Share */}

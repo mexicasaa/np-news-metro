@@ -4,6 +4,7 @@ import { WpPost } from '../../types/wordpress';
 import { handleImageError, getOptimizedImageUrl } from '../../utils/imageFallback';
 import { useLanguage } from '../../context/LanguageContext';
 import { getLocalizedPost } from '../../data/mockWpData';
+import { formatRelativeTime } from '../../utils/dateUtils';
 
 interface CompactStoryCardProps {
   post: WpPost;
@@ -50,12 +51,12 @@ export const CompactStoryCard: React.FC<CompactStoryCardProps> = ({
       )}
 
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5 text-[10px] uppercase font-extrabold text-secondary tracking-wider mb-1">
+        <div className="flex items-center gap-1.5 text-[10px] uppercase font-extrabold text-secondary tracking-wider mb-1 flex-wrap">
           <span className="hover:underline">{localized.category}</span>
           <span className="text-border-strong">•</span>
-          <span className="text-ink-muted normal-case font-medium flex items-center gap-0.5">
-            <Clock className="w-2.5 h-2.5" />
-            <span>{isHindi ? localized.readTime.replace('min read', 'मिनट') : localized.readTime}</span>
+          <span className="text-ink-secondary normal-case font-medium flex items-center gap-0.5">
+            <Clock className="w-2.5 h-2.5 text-ink-muted" />
+            <span>{formatRelativeTime(post.publishedAt, language)}</span>
           </span>
         </div>
         

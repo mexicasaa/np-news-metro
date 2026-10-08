@@ -464,8 +464,9 @@ export default async function handler(req, res) {
         .from('articles')
         .select(CARD_PROJECTION_FIELDS)
         .eq('status', 'published')
+        .not('published_at', 'is', null)
         .or(`title.ilike.%${safeQ}%,excerpt.ilike.%${safeQ}%,title_hi.ilike.%${safeQ}%`)
-        .order('published_at', { ascending: false })
+        .order('published_at', { ascending: false, nullsFirst: false })
         .limit(limit);
 
       if (error) {
@@ -499,7 +500,8 @@ export default async function handler(req, res) {
       let query = supabase
         .from('articles')
         .select(CARD_PROJECTION_FIELDS)
-        .eq('status', 'published');
+        .eq('status', 'published')
+        .not('published_at', 'is', null);
 
       const { data: catRow } = await supabase
         .from('categories')
@@ -512,7 +514,7 @@ export default async function handler(req, res) {
       }
 
       const { data, error } = await query
-        .order('published_at', { ascending: false })
+        .order('published_at', { ascending: false, nullsFirst: false })
         .range(offset, offset + limit - 1);
 
       if (error) {
@@ -547,8 +549,9 @@ export default async function handler(req, res) {
         .from('articles')
         .select(CARD_PROJECTION_FIELDS)
         .eq('status', 'published')
+        .not('published_at', 'is', null)
         .order('is_lead', { ascending: false })
-        .order('published_at', { ascending: false })
+        .order('published_at', { ascending: false, nullsFirst: false })
         .limit(35);
 
       if (error) {
@@ -583,7 +586,8 @@ export default async function handler(req, res) {
         .from('articles')
         .select(CARD_PROJECTION_FIELDS)
         .eq('status', 'published')
-        .order('published_at', { ascending: false })
+        .not('published_at', 'is', null)
+        .order('published_at', { ascending: false, nullsFirst: false })
         .range(offset, offset + limit - 1);
 
       if (error) {

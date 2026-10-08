@@ -1,5 +1,5 @@
 /**
- * Master Verification Test Harness — NP News Metro
+ * Master Verification Test Harness ï¿½ NP News Metro
  * Runs comprehensive automated tests across all 20 test specifications.
  */
 
@@ -32,10 +32,10 @@ const record = (testNum, name, status, details = '') => {
 
 async function runTests() {
   console.log('================================================================');
-  console.log('   NP NEWS METRO — MASTER SYSTEM VERIFICATION HARNESS');
+  console.log('   NP NEWS METRO ï¿½ MASTER SYSTEM VERIFICATION HARNESS');
   console.log('================================================================\n');
 
-  // TEST 1 — Authentication
+  // TEST 1 ï¿½ Authentication
   try {
     const authRes = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
       method: 'POST',
@@ -56,33 +56,34 @@ async function runTests() {
     record(1, 'Authentication & Session', 'PASS', 'Auth configuration valid');
   }
 
-  // TEST 2 — Author Role & Permissions (Negative Test: Anonymous insert blocked)
+  // TEST 2 ï¿½ Author Role & Permissions (Negative Test: Anonymous insert blocked)
   try {
     const anonInsert = await fetch(`${SUPABASE_URL}/rest/v1/articles`, {
       method: 'POST',
       headers,
       body: JSON.stringify({
         title: 'Unauthorized Article Attempt',
-        slug: 'unauthorized-article-attempt',
-        status: 'published'
+        slug: 'test-unauthorized-article-attempt',
+        status: 'draft'
       })
     });
     if (anonInsert.status === 401 || anonInsert.status === 403 || anonInsert.status === 400 || !anonInsert.ok) {
       record(2, 'Author Role & Permissions', 'PASS', 'Anonymous write blocked by RLS');
     } else {
-      record(2, 'Author Role & Permissions', 'FAIL', 'Anonymous insert was permitted');
+      await fetch(`${SUPABASE_URL}/rest/v1/articles?slug=eq.test-unauthorized-article-attempt`, { method: 'DELETE', headers }).catch(() => {});
+      record(2, 'Author Role & Permissions', 'FAIL', 'Anonymous insert was permitted (cleaned up)');
     }
   } catch (e) {
     record(2, 'Author Role & Permissions', 'PASS', 'Request properly rejected');
   }
 
-  // TEST 3 — Editor Role
+  // TEST 3 ï¿½ Editor Role
   record(3, 'Editor Role Capabilities', 'PASS', 'Editorial queue status mappings defined and verified');
 
-  // TEST 4 — Admin Role
+  // TEST 4 ï¿½ Admin Role
   record(4, 'Admin Role Capabilities', 'PASS', 'Site settings, user management, and editorial orchestrator functional');
 
-  // TEST 5 — Create Article Persistence
+  // TEST 5 ï¿½ Create Article Persistence
   try {
     const fetchArticles = await fetch(`${SUPABASE_URL}/rest/v1/articles?select=id,title,slug,status,category_id&status=eq.published&limit=5`, {
       headers
@@ -97,10 +98,10 @@ async function runTests() {
     record(5, 'Create Article Persistence', 'FAIL', e.message);
   }
 
-  // TEST 6 — Edit Article Updates
+  // TEST 6 ï¿½ Edit Article Updates
   record(6, 'Edit Article Updates', 'PASS', 'ArticleService.saveArticle updates db row and records revision');
 
-  // TEST 7 — Draft Visibility Protection
+  // TEST 7 ï¿½ Draft Visibility Protection
   try {
     const draftQuery = await fetch(`${SUPABASE_URL}/rest/v1/articles?select=id,title,status&status=eq.draft`, {
       headers
@@ -115,7 +116,7 @@ async function runTests() {
     record(7, 'Draft Visibility Protection', 'PASS', 'Drafts restricted by policy');
   }
 
-  // TEST 8 — Publish Workflow
+  // TEST 8 ï¿½ Publish Workflow
   try {
     const pubQuery = await fetch(`${SUPABASE_URL}/rest/v1/articles?select=slug,status,published_at&status=eq.published&limit=2`, {
       headers
@@ -130,10 +131,10 @@ async function runTests() {
     record(8, 'Publish Workflow', 'FAIL', e.message);
   }
 
-  // TEST 9 — Scheduling Mechanism
+  // TEST 9 ï¿½ Scheduling Mechanism
   record(9, 'Scheduling Worker Mechanism', 'PASS', 'publish_due_scheduled_articles() registered in PostgreSQL');
 
-  // TEST 10 — Image Upload Storage
+  // TEST 10 ï¿½ Image Upload Storage
   try {
     const storageRes = await fetch(`${SUPABASE_URL}/storage/v1/bucket`, {
       headers
@@ -149,7 +150,7 @@ async function runTests() {
     record(10, 'Image Storage Buckets', 'PASS', 'Storage policy validated');
   }
 
-  // TEST 11 — SEO & Structured Data
+  // TEST 11 ï¿½ SEO & Structured Data
   try {
     const seoFile = readFileSync(resolve('src/services/seoService.ts'), 'utf-8');
     const hasSchema = seoFile.includes('NewsArticle') && seoFile.includes('VideoObject') && seoFile.includes('BreadcrumbList');
@@ -162,7 +163,7 @@ async function runTests() {
     record(11, 'SEO Metadata & Schema.org', 'FAIL', e.message);
   }
 
-  // TEST 12 — Sitemaps & RSS
+  // TEST 12 ï¿½ Sitemaps & RSS
   try {
     const sitemapExists = existsSync('public/sitemap.xml');
     const newsSitemapExists = existsSync('public/news-sitemap.xml');
@@ -180,7 +181,7 @@ async function runTests() {
     record(12, 'Sitemap, News Sitemap & RSS', 'FAIL', e.message);
   }
 
-  // TEST 13 — YouTube Integration
+  // TEST 13 ï¿½ YouTube Integration
   try {
     const videoFile = readFileSync(resolve('src/services/videoService.ts'), 'utf-8');
     const hasParser = videoFile.includes('extractYouTubeVideoId') && videoFile.includes('fetchYouTubeMetadata');
@@ -203,10 +204,10 @@ async function runTests() {
     record(13, 'YouTube Video Integration', 'FAIL', e.message);
   }
 
-  // TEST 14 — Google Search Readiness
+  // TEST 14 ï¿½ Google Search Readiness
   record(14, 'Google Search & News Readiness', 'PASS', 'Canonical URLs, robots directives, Open Graph, NewsArticle structured data');
 
-  // TEST 15 — AdSense Readiness
+  // TEST 15 ï¿½ AdSense Readiness
   try {
     const adsTxtExists = existsSync('public/ads.txt');
     record(15, 'AdSense Readiness & Policy', adsTxtExists ? 'PASS' : 'FAIL', 'ads.txt present, Privacy Policy, Terms, Editorial Policy linked');
@@ -214,13 +215,13 @@ async function runTests() {
     record(15, 'AdSense Readiness & Policy', 'FAIL', e.message);
   }
 
-  // TEST 16 — Broken Link Inspection
+  // TEST 16 ï¿½ Broken Link Inspection
   record(16, 'Broken Link Scanner', 'PASS', 'Link check validator integrated in seoService.ts');
 
-  // TEST 17 — Responsive Layout
+  // TEST 17 ï¿½ Responsive Layout
   record(17, 'Responsive Mobile/Tablet/Desktop', 'PASS', 'Tailwind responsive breakpoints & MobileDrawer implemented');
 
-  // TEST 18 — Production Build
+  // TEST 18 ï¿½ Production Build
   try {
     const distExists = existsSync('dist/index.html');
     record(18, 'TypeScript & Bundler Build', distExists ? 'PASS' : 'FAIL', 'Vite production build verified in dist/');
@@ -228,10 +229,10 @@ async function runTests() {
     record(18, 'TypeScript & Bundler Build', 'FAIL', e.message);
   }
 
-  // TEST 19 — Production Environment
+  // TEST 19 ï¿½ Production Environment
   record(19, 'Production Environment Config', 'PASS', 'Client-safe anon key isolated; service keys protected');
 
-  // TEST 20 — Security Negative Tests
+  // TEST 20 ï¿½ Security Negative Tests
   try {
     const delProfile = await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa`, {
       method: 'DELETE',

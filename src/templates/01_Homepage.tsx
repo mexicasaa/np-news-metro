@@ -18,6 +18,8 @@ import { AdSlot } from '../components/commercial/AdSlot';
 import { NewsletterModule } from '../components/common/NewsletterModule';
 import { MetromatPoll } from '../components/common/MetromatPoll';
 import { useLanguage } from '../context/LanguageContext';
+import { getFormattedTodayDate } from '../i18n/translations';
+import { formatRelativeTime } from '../utils/dateUtils';
 
 interface HomepageProps {
   posts?: WpPost[];
@@ -44,7 +46,7 @@ export const Homepage: React.FC<HomepageProps> = ({
   onOpenNewsletter,
   showAds = true,
 }) => {
-  const { t, isHindi } = useLanguage();
+  const { t, isHindi, language } = useLanguage();
   const allPosts = (externalPosts && externalPosts.length > 0 ? externalPosts : getStoredPosts()).filter(isPostPublished);
   const activeVideos = externalVideos && externalVideos.length > 0 ? externalVideos : mockVideos;
   
@@ -88,6 +90,28 @@ export const Homepage: React.FC<HomepageProps> = ({
     <main className="max-w-site mx-auto px-3 sm:px-4 py-4 sm:py-6 space-y-6 sm:space-y-8">
       {/* 1. Top Interstitial Billboard Ad (A1/A2) */}
       {showAds && <AdSlot zone="A2" />}
+
+      {/* Active Editorial Wire & Edition Header */}
+      <div className="flex flex-wrap items-center justify-between gap-2 py-2 px-3 sm:px-4 bg-surface-lowest border border-border-subtle rounded-sm text-xs text-ink-secondary shadow-2xs">
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+          <span className="flex items-center gap-1.5 font-bold text-ink">
+            <span className="w-2 h-2 rounded-full bg-editorial-red animate-pulse"></span>
+            <span>{isHindi ? 'दैनिक राष्ट्रीय संस्करण' : 'National Digital Edition'}</span>
+          </span>
+          <span className="text-border-strong hidden sm:inline">•</span>
+          <span className="text-primary font-bold">
+            {getFormattedTodayDate(language, false)}
+          </span>
+          <span className="text-border-strong hidden md:inline">•</span>
+          <span className="text-ink-muted text-[11px] hidden md:inline">
+            {isHindi ? 'भारतीय मानक समय (IST) अनुसार अद्यतित' : 'Updated Live IST'}
+          </span>
+        </div>
+        <div className="flex items-center gap-2 text-[11px] font-mono text-ink-muted ml-auto">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+          <span>{isHindi ? '24x7 न्यूज़रूम वायर सक्रिय' : 'Newsroom Active 24x7'}</span>
+        </div>
+      </div>
 
       {/* 2. Grand Hero Showcase & Supporting Cluster */}
       <section aria-label="Lead Story and Top Headlines">
@@ -146,6 +170,9 @@ export const Homepage: React.FC<HomepageProps> = ({
                 <h2 className="font-serif text-xl font-bold text-ink">
                   {t.latestNewsWire}
                 </h2>
+                <span className="hidden sm:inline-block text-[11px] font-mono text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-xs border border-emerald-200 uppercase font-bold">
+                  {isHindi ? 'रीयल-टाइम बुलेटिन' : 'Real-Time Wire'}
+                </span>
               </div>
               <button
                 onClick={() => onSelectCategory('latest')}

@@ -213,14 +213,14 @@ export const translations: Record<Language, Translations> = {
 
     // Newsletter Box
     newsletterTitle: 'Get India’s Most Credible Morning Dispatch',
-    newsletterSubhead: 'Join over 450,000 discerning readers. Curated investigative journalism, geopolitical insights, and market briefings delivered to your inbox every morning at 7 AM IST.',
+    newsletterSubhead: 'Daily verified national headlines, grassroots ground reports, policy scrutiny, and market briefings delivered directly to your inbox every morning at 7 AM IST.',
     newsletterPlaceholder: 'Enter your email address...',
     newsletterBtn: 'Subscribe Free',
     newsletterPrivacy: 'We respect your privacy. Unsubscribe anytime with 1-click.',
 
     // Footer & Common
     footerAbout: 'NP News Metro',
-    footerAboutDesc: 'India’s premier independent digital newsroom delivering real-time investigative journalism, deep-tech coverage, market intelligence, and ground reports.',
+    footerAboutDesc: 'Independent Indian digital newspaper providing daily verified reporting, policy analysis, grassroots ground coverage, and real-time news updates across national desks.',
     footerQuickLinks: 'Quick Links',
     footerCategories: 'News Categories',
     footerLegal: 'Legal & Standards',
@@ -322,14 +322,14 @@ export const translations: Record<Language, Translations> = {
 
     // Newsletter Box
     newsletterTitle: 'भारत का सबसे विश्वसनीय प्रभात समाचार पत्र प्राप्त करें',
-    newsletterSubhead: '4.5 लाख से अधिक सुधी पाठकों से जुड़ें। खोजी पत्रकारिता, भू-राजनीतिक विश्लेषण और बाजार के प्रमुख समाचार हर सुबह 7 बजे आपके इनबॉक्स में।',
+    newsletterSubhead: 'दैनिक सत्यापित राष्ट्रीय समाचार, ज़मीनी रिपोर्ट, नीतिगत विश्लेषण और प्रमुख बाज़ार अपडेट हर सुबह 7 बजे सीधे आपके इनबॉक्स में।',
     newsletterPlaceholder: 'अपना ईमेल पता दर्ज करें...',
     newsletterBtn: 'निःशुल्क सदस्यता लें',
     newsletterPrivacy: 'हम आपकी गोपनीयता का सम्मान करते हैं। 1-क्लिक में कभी भी सदस्यता समाप्त करें।',
 
     // Footer & Common
     footerAbout: 'एनपी न्यूज़ मेट्रो',
-    footerAboutDesc: 'भारत का प्रमुख स्वतंत्र डिजिटल न्यूज़रूम जो वास्तविक समय की खोजी पत्रकारिता, डीप-टेक कवरेज, बाजार विश्लेषण और निष्पक्ष ज़मीनी रिपोर्ट प्रस्तुत करता है।',
+    footerAboutDesc: 'स्वतंत्र राष्ट्रीय डिजिटल समाचार पत्र, जो दैनिक सत्यापित रिपोर्टिंग, नीतिगत विश्लेषण, निष्पक्ष ज़मीनी कवरेज और देश भर की ताज़ा ख़बरें प्रस्तुत करता है।',
     footerQuickLinks: 'त्वरित लिंक',
     footerCategories: 'समाचार श्रेणियां',
     footerLegal: 'कानूनी एवं मानक',

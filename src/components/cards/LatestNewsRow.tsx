@@ -4,6 +4,7 @@ import { WpPost } from '../../types/wordpress';
 import { handleImageError, getAuthorAvatarUrl, handleAvatarError, getOptimizedImageUrl } from '../../utils/imageFallback';
 import { useLanguage } from '../../context/LanguageContext';
 import { getLocalizedPost, mockAuthors } from '../../data/mockWpData';
+import { formatRelativeTime } from '../../utils/dateUtils';
 
 interface LatestNewsRowProps {
   post: WpPost;
@@ -68,9 +69,9 @@ export const LatestNewsRow: React.FC<LatestNewsRowProps> = ({
           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
             <span className="text-amber-800 font-extrabold">{localized.category}</span>
             <span className="text-slate-300">•</span>
-            <span className="text-slate-500 normal-case font-medium flex items-center gap-1">
+            <span className="text-slate-600 normal-case font-medium flex items-center gap-1">
               <Clock className="w-3.5 h-3.5 text-slate-400" />
-              <span>{isHindi ? localized.readTime.replace('min read', 'मिनट') : localized.readTime}</span>
+              <span>{formatRelativeTime(post.publishedAt, language)}</span>
             </span>
           </div>
 

@@ -4,6 +4,7 @@ import { WpPost } from '../../types/wordpress';
 import { handleImageError, getOptimizedImageUrl } from '../../utils/imageFallback';
 import { useLanguage } from '../../context/LanguageContext';
 import { getLocalizedPost } from '../../data/mockWpData';
+import { formatRelativeTime } from '../../utils/dateUtils';
 
 interface MediumStoryCardProps {
   post: WpPost;
@@ -72,10 +73,13 @@ export const MediumStoryCard: React.FC<MediumStoryCardProps> = ({
       </div>
 
       <div className="pt-2 border-t border-border-subtle flex items-center justify-between text-[11px] text-ink-muted mt-2">
-        <span className="truncate max-w-[140px]">
+        <span className="truncate max-w-[130px] font-medium text-ink-secondary">
           {post.authorId ? (isHindi ? 'एनपी ब्यूरो' : 'NP Bureau') : (isHindi ? 'संवाददाता' : 'Staff Reporter')}
         </span>
-        <span>{isHindi ? localized.readTime.replace('min read', 'मिनट') : localized.readTime}</span>
+        <span className="flex items-center gap-1 text-[11px] font-medium text-ink-secondary">
+          <Clock className="w-3 h-3 text-ink-muted" />
+          <span>{formatRelativeTime(post.publishedAt, language)}</span>
+        </span>
       </div>
     </article>
   );

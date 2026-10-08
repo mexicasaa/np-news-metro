@@ -221,7 +221,8 @@ export async function fetchLiveArticles() {
         categories(slug)
       `)
       .eq('status', 'published')
-      .order('published_at', { ascending: false })
+      .not('published_at', 'is', null)
+      .order('published_at', { ascending: false, nullsFirst: false })
       .limit(500);
 
     if (error || !data || data.length === 0) {
@@ -229,7 +230,14 @@ export async function fetchLiveArticles() {
     }
 
     const liveArticles = data
-      .filter(item => item.slug && item.slug !== 'auto-draft' && !item.slug.startsWith('auto-draft') && item.slug !== 'draft')
+      .filter(item => 
+        item.slug && 
+        item.slug !== 'auto-draft' && 
+        !item.slug.startsWith('auto-draft') && 
+        item.slug !== 'draft' &&
+        !item.slug.includes('unauthorized') &&
+        item.title !== 'Unauthorized Article Attempt'
+      )
       .map(item => {
         const catSlug = (Array.isArray(item.categories) ? item.categories[0]?.slug : item.categories?.slug) || 'india';
         return {

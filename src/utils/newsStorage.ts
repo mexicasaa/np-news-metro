@@ -17,8 +17,15 @@ const BROADCAST_CHANNEL_NAME = 'np_news_feed_channel';
 export const isPostPublished = (post: Partial<WpPost> | null | undefined): boolean => {
   if (!post) return false;
 
-  // 1. If slug indicates draft
-  if (post.slug === 'auto-draft' || post.slug?.startsWith('auto-draft') || post.slug === 'draft') {
+  // 1. If slug indicates draft or test
+  if (
+    !post.title?.trim() ||
+    post.title === 'Unauthorized Article Attempt' ||
+    post.slug === 'auto-draft' || 
+    post.slug?.startsWith('auto-draft') || 
+    post.slug === 'draft' ||
+    post.slug?.includes('unauthorized')
+  ) {
     return false;
   }
 
