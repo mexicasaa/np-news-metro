@@ -181,7 +181,7 @@ export const translations: Record<Language, Translations> = {
     playing: 'Playing',
 
     // Homepage Section Titles
-    latestNewsWire: 'Latest News Wire',
+    latestNewsWire: 'Latest News',
     viewAllUpdates: 'View All 24/7 Updates',
     mostReadAcrossIndia: 'Most Read Across India',
     top10List: 'Top 10 Full List',
@@ -290,7 +290,7 @@ export const translations: Record<Language, Translations> = {
     playing: 'सक्रिय',
 
     // Homepage Section Titles
-    latestNewsWire: 'ताज़ा समाचार वायर',
+    latestNewsWire: 'ताज़ा समाचार',
     viewAllUpdates: 'सभी 24/7 अपडेट देखें',
     mostReadAcrossIndia: 'भारत में सर्वाधिक पढ़े गए',
     top10List: 'शीर्ष 10 पूरी सूची',

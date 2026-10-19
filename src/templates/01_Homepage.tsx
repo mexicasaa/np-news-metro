@@ -170,9 +170,6 @@ export const Homepage: React.FC<HomepageProps> = ({
                 <h2 className="font-serif text-xl font-bold text-ink">
                   {t.latestNewsWire}
                 </h2>
-                <span className="hidden sm:inline-block text-[11px] font-mono text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-xs border border-emerald-200 uppercase font-bold">
-                  {isHindi ? 'रीयल-टाइम बुलेटिन' : 'Real-Time Wire'}
-                </span>
               </div>
               <button
                 onClick={() => onSelectCategory('latest')}
