@@ -88,8 +88,8 @@ export const AdSlot: React.FC<AdSlotProps> = ({ zone, className = '' }) => {
                 loading="lazy"
                 onError={(e) => {
                   const target = e.currentTarget;
-                  if (!target.src.endsWith('/uploads/ads/suresh-chand-agarwal-memorial.png')) {
-                    target.src = '/uploads/ads/suresh-chand-agarwal-memorial.png';
+                  if (!target.src.endsWith('/uploads/shastri-patanjali-chikitsalaya.jpg')) {
+                    target.src = '/uploads/shastri-patanjali-chikitsalaya.jpg';
                   } else if (target.src !== DEFAULT_FALLBACK_IMAGE) {
                     target.src = DEFAULT_FALLBACK_IMAGE;
                   }
@@ -166,8 +166,8 @@ export const AdSlot: React.FC<AdSlotProps> = ({ zone, className = '' }) => {
               loading="lazy"
               onError={(e) => {
                 const target = e.currentTarget;
-                if (!target.src.endsWith('/uploads/ads/suresh-chand-agarwal-memorial.png')) {
-                  target.src = '/uploads/ads/suresh-chand-agarwal-memorial.png';
+                if (!target.src.endsWith('/uploads/shastri-patanjali-chikitsalaya.jpg')) {
+                  target.src = '/uploads/shastri-patanjali-chikitsalaya.jpg';
                 } else if (target.src !== DEFAULT_FALLBACK_IMAGE) {
                   target.src = DEFAULT_FALLBACK_IMAGE;
                 }
@@ -212,80 +212,7 @@ export const AdSlot: React.FC<AdSlotProps> = ({ zone, className = '' }) => {
     );
   }
 
-  // Horizontal Banner Ad Layout with Image Support (A1, A2, A5, A6, A7)
-  if (mediaUrl) {
-    return (
-      <div
-        className={`my-2 sm:my-3.5 flex flex-col items-center justify-center w-full ${className}`}
-        data-slot={zone}
-      >
-        <div className="w-full max-w-[970px] bg-surface-lowest border border-border-subtle rounded-sm p-2 sm:p-3 shadow-2xs hover:border-primary/40 transition-all">
-          <div className="flex items-center justify-between text-[9px] uppercase font-bold text-ink-muted tracking-widest pb-1.5 border-b border-border-subtle mb-2">
-            <span className="text-secondary-gold">{isHindi ? 'प्रायोजित' : 'Sponsored Partner'}</span>
-            <span className="flex items-center gap-0.5 text-ink-muted/70">
-              <Info className="w-2.5 h-2.5" />
-              <span>{isHindi ? 'विज्ञापन' : 'Ad'}</span>
-            </span>
-          </div>
-
-          <a
-            href={ctaUrl}
-            target={isExternalLink ? '_blank' : undefined}
-            rel={isExternalLink ? 'noopener noreferrer' : undefined}
-            onClick={handleClick}
-            className="block group overflow-hidden rounded-xs bg-slate-50 border border-border-subtle/80 hover:border-primary/50 transition-all"
-            title={advertiserName}
-          >
-            <img
-              src={mediaUrl}
-              alt={altText}
-              className="w-full h-auto max-h-[180px] sm:max-h-[260px] object-contain block mx-auto transition-transform duration-300 group-hover:scale-[1.005]"
-              loading="lazy"
-              onError={(e) => {
-                const target = e.currentTarget;
-                if (!target.src.endsWith('/uploads/ads/suresh-chand-agarwal-memorial.png')) {
-                  target.src = '/uploads/ads/suresh-chand-agarwal-memorial.png';
-                } else if (target.src !== DEFAULT_FALLBACK_IMAGE) {
-                  target.src = DEFAULT_FALLBACK_IMAGE;
-                }
-              }}
-            />
-          </a>
-
-          {(creativeText || (ctaUrl && ctaUrl !== '#')) && (
-            <div className="flex flex-wrap items-center justify-between gap-2 mt-2 pt-1.5 border-t border-border-subtle/60 text-xs">
-              <span className="font-bold text-primary text-[11px] uppercase tracking-wide">
-                {advertiserName}: <span className="font-serif font-medium text-ink normal-case">{creativeText}</span>
-              </span>
-              {ctaUrl && ctaUrl !== '#' && (
-                <a
-                  href={ctaUrl}
-                  target={isExternalLink ? '_blank' : undefined}
-                  rel={isExternalLink ? 'noopener noreferrer' : undefined}
-                  onClick={handleClick}
-                  className="bg-primary hover:bg-primary-container text-white px-2.5 py-1 rounded-xs text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 transition-colors ml-auto"
-                >
-                  {isPhoneCta ? (
-                    <>
-                      <Phone className="w-2.5 h-2.5" />
-                      <span>{isHindi ? 'कॉल करें' : 'Call Now'}</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>{isHindi ? 'और जानें' : 'Learn More'}</span>
-                      <ExternalLink className="w-2.5 h-2.5" />
-                    </>
-                  )}
-                </a>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  // Text-only Horizontal Banner Ad Layout fallback
+  // Horizontal Banner Ad Layout (A1, A2, A5, A6, A7, or text fallback)
   return (
     <div
       className={`my-2 sm:my-2.5 flex flex-col items-center justify-center ${className}`}

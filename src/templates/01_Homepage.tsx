@@ -139,11 +139,8 @@ export const Homepage: React.FC<HomepageProps> = ({
               </span>
             </div>
 
-            {/* Vertical Sidebar Ad Placement (A3) - Prominently Displayed at Top of Right Rail */}
-            {showAds && <AdSlot zone="A3" className="mb-2" />}
-
             <div className="space-y-3">
-              {supportingLeadPosts.slice(0, 4).map((post) => (
+              {supportingLeadPosts.map((post) => (
                 <div key={post.id} className="bg-surface-lowest rounded-sm border border-border-subtle shadow-subtle hover:border-border-strong transition-all overflow-hidden">
                   <CompactStoryCard
                     post={post}
@@ -153,6 +150,9 @@ export const Homepage: React.FC<HomepageProps> = ({
                 </div>
               ))}
             </div>
+
+            {/* Vertical Sidebar Ad Placement (A3) */}
+            {showAds && <AdSlot zone="A3" className="mt-2" />}
           </div>
         </div>
       </section>

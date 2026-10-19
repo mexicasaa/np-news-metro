@@ -112,24 +112,6 @@ export const ArticleBody: React.FC<ArticleBodyProps> = ({
     ];
   }
 
-  // Ensure every article with at least 2 paragraphs includes an in-article ad slot (A4)
-  const hasAdSlot = activeBlocks.some(b => b.type === 'ad_slot');
-  if (!hasAdSlot && activeBlocks.length >= 2) {
-    const injectedBlocks: GutenbergBlock[] = [];
-    activeBlocks.forEach((b, idx) => {
-      injectedBlocks.push(b);
-      if (idx === 1) {
-        injectedBlocks.push({
-          id: `auto-ad-slot-${post.id || 'article'}`,
-          type: 'ad_slot' as const,
-          adZone: 'A4',
-          content: '',
-        });
-      }
-    });
-    activeBlocks = injectedBlocks;
-  }
-
   return (
     <div className="gutenberg-content font-body text-ink leading-relaxed">
       {activeBlocks.map((block, index) => {
