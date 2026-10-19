@@ -88,8 +88,8 @@ export const AdSlot: React.FC<AdSlotProps> = ({ zone, className = '' }) => {
                 loading="lazy"
                 onError={(e) => {
                   const target = e.currentTarget;
-                  if (!target.src.endsWith('/uploads/shastri-patanjali-chikitsalaya.jpg')) {
-                    target.src = '/uploads/shastri-patanjali-chikitsalaya.jpg';
+                  if (!target.src.endsWith('/uploads/ads/suresh-chand-agarwal-memorial.png')) {
+                    target.src = '/uploads/ads/suresh-chand-agarwal-memorial.png';
                   } else if (target.src !== DEFAULT_FALLBACK_IMAGE) {
                     target.src = DEFAULT_FALLBACK_IMAGE;
                   }
