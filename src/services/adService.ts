@@ -289,7 +289,27 @@ export const getDirectAds = (): DirectAd[] => {
     if (!Array.isArray(parsed)) {
       return [];
     }
-    return parsed.filter((a) => !cleared.has(a.zone));
+    const sanitized = parsed.filter((a) => {
+      if (!a || !a.zone) return false;
+      if (cleared.has(a.zone)) return false;
+      const adv = `${a.advertiserName || ''} ${a.creativeText || ''} ${a.mediaUrl || ''}`.toLowerCase();
+      if (
+        adv.includes('गिरिराज') ||
+        adv.includes('girraj') ||
+        adv.includes('supari') ||
+        adv.includes('पतंजलि') ||
+        adv.includes('patanjali') ||
+        adv.includes('suresh-chand-agarwal')
+      ) {
+        return false;
+      }
+      return true;
+    });
+
+    if (sanitized.length !== parsed.length) {
+      localStorage.setItem(DIRECT_ADS_KEY, JSON.stringify(sanitized));
+    }
+    return sanitized;
   } catch {
     return [];
   }
@@ -466,6 +486,11 @@ export const getAdPlacement = async (zone: string): Promise<ActiveAdPlacement | 
       }
       adPlacementCache.set(zone, { data: repoPlacement, timestamp: Date.now() });
       return repoPlacement;
+    } else {
+      // Supabase answered authoritatively: NO active ad campaign exists in DB for this zone!
+      // Do NOT resurrect from old cached localStorage!
+      adPlacementCache.set(zone, { data: null, timestamp: Date.now() });
+      return null;
     }
   } catch {}
 

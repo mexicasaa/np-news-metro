@@ -145,8 +145,6 @@ const ZONE_DESCRIPTIONS: Record<string, string> = {
 };
 
 const SAMPLE_IMAGE_OPTIONS = [
-  { label: 'Suresh Chand Agarwal Memorial', value: '/uploads/ads/suresh-chand-agarwal-memorial.png' },
-  { label: 'Shastri Patanjali Chikitsalaya', value: '/uploads/ads/shastri-patanjali-chikitsalaya.jpg' },
   { label: 'NP News Metro Official Logo', value: '/logo.png' },
   { label: 'Sugarcane Ethanol Initiative', value: '/uploads/sugarcane-ethanol-future-featured.jpg' },
   { label: 'National Culture / Janmashtami', value: '/uploads/iskcon-noida-janmashtami-2026.jpg' },
@@ -173,13 +171,14 @@ export const AdManagerView: React.FC = () => {
   const [wireframeMode, setWireframeMode] = useState<'homepage' | 'article'>('homepage');
 
   const loadData = async () => {
-    setDirectAds(getDirectAds());
     setAdSenseConfig(getAdSenseSettings());
     setVisibilityConfig(getAdsVisibility());
     setStats(getAggregatedAdStats());
 
     try {
+      const dbAds = await AdRepository.getInstance().getAllDirectAds();
       const dbPlacements = await AdRepository.getInstance().getAllPlacements();
+
       if (dbPlacements && dbPlacements.length > 0) {
         const currentVis = getAdsVisibility();
         let changed = false;
@@ -199,7 +198,16 @@ export const AdManagerView: React.FC = () => {
           setVisibilityConfig({ ...currentVis, zones: newZones });
         }
       }
-    } catch {}
+
+      if (dbAds && dbAds.length > 0) {
+        setDirectAds(dbAds as any);
+        localStorage.setItem('np_direct_ads', JSON.stringify(dbAds));
+      } else {
+        setDirectAds(getDirectAds());
+      }
+    } catch {
+      setDirectAds(getDirectAds());
+    }
   };
 
   useEffect(() => {
@@ -1296,7 +1304,7 @@ export const AdManagerView: React.FC = () => {
                           </button>
                         </div>
                         <p className="font-bold text-xs text-ink">Right Rail Top Ad (Next to Title & Intro)</p>
-                        <p className="text-[11px] text-slate-600 truncate">{ad?.advertiserName || 'Suresh Chand Agarwal Memorial'}</p>
+                        <p className="text-[11px] text-slate-600 truncate">{ad?.advertiserName || 'Direct Commercial Partner (Zone A3)'}</p>
                         <button
                           onClick={() => {
                             setPreviewZone('A3');
@@ -1338,7 +1346,7 @@ export const AdManagerView: React.FC = () => {
                           </button>
                         </div>
                         <p className="font-bold text-xs text-ink">Sidebar Middle Ad (Below Most Read)</p>
-                        <p className="text-[11px] text-slate-600 truncate">{ad?.advertiserName || 'Shastri Patanjali'}</p>
+                        <p className="text-[11px] text-slate-600 truncate">{ad?.advertiserName || 'Direct Commercial Partner (Zone A4)'}</p>
                         <button
                           onClick={() => {
                             setPreviewZone('A4');
@@ -1728,7 +1736,7 @@ export const AdManagerView: React.FC = () => {
                   required
                   value={editingAd.advertiserName}
                   onChange={(e) => setEditingAd({ ...editingAd, advertiserName: e.target.value })}
-                  placeholder="e.g. Reserve Bank of India / Patanjali Chikitsalaya"
+                  placeholder="e.g. Reserve Bank of India / Commercial Sponsor"
                   className="w-full bg-surface-container border border-border-subtle px-3 py-2 rounded-sm text-ink"
                 />
               </div>
@@ -1755,7 +1763,7 @@ export const AdManagerView: React.FC = () => {
                   type="text"
                   value={editingAd.mediaUrl || ''}
                   onChange={(e) => setEditingAd({ ...editingAd, mediaUrl: e.target.value })}
-                  placeholder="/uploads/ads/suresh-chand-agarwal-memorial.png"
+                  placeholder="e.g. /uploads/partner-banner.png or https://cdn.example.com/ad.png"
                   className="w-full bg-surface-container border border-border-subtle px-3 py-2 rounded-sm text-ink font-mono"
                 />
 

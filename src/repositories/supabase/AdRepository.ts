@@ -139,6 +139,66 @@ export class AdRepository {
   }
 
   /**
+   * Fetch all direct ads configured in Supabase with associated campaign and creative.
+   */
+  public async getAllDirectAds(): Promise<Array<{
+    id: string;
+    zone: string;
+    advertiserName: string;
+    creativeText: string;
+    destinationUrl: string;
+    mediaUrl?: string;
+    altText?: string;
+    ctaText?: string;
+    isActive: boolean;
+    createdAt: string;
+    updatedAt: string;
+    impressionsCount?: number;
+    clicksCount?: number;
+  }>> {
+    try {
+      const { data, error } = await supabase
+        .from('ad_placements')
+        .select(`
+          id, zone, campaign_id, is_active, created_at,
+          campaigns (
+            id, name, start_at, end_at, status, created_at,
+            advertisers (id, name),
+            ad_creatives (id, headline, destination_url, alt_text, media_id, media (public_url))
+          )
+        `);
+
+      if (error || !data) return [];
+
+      const list: any[] = [];
+      for (const item of data) {
+        if (!item.campaigns || !item.zone) continue;
+        const c: any = item.campaigns;
+        const cr = Array.isArray(c.ad_creatives) && c.ad_creatives.length > 0 ? c.ad_creatives[0] : null;
+
+        list.push({
+          id: c.id,
+          zone: item.zone,
+          advertiserName: c.advertisers?.name || c.name || `Partner ${item.zone}`,
+          creativeText: cr?.headline || c.name,
+          destinationUrl: cr?.destination_url || '#',
+          mediaUrl: cr?.media?.public_url || '',
+          altText: cr?.alt_text || c.name,
+          ctaText: cr?.destination_url?.startsWith('tel:') ? 'Call Now' : 'Learn More',
+          isActive: Boolean(item.is_active && c.status === 'active'),
+          createdAt: c.created_at || item.created_at,
+          updatedAt: c.created_at || item.created_at,
+          impressionsCount: 0,
+          clicksCount: 0,
+        });
+      }
+      return list;
+    } catch {
+      return [];
+    }
+  }
+
+  /**
    * Delete ad campaign, placement, creatives, and analytics from Supabase Database.
    * Completely purges the ad from the database so it will never reappear.
    */
@@ -317,12 +377,22 @@ export class AdRepository {
           alt_text: ad.altText || ad.advertiserName,
         });
 
-        // Insert placement
-        await supabase.from('ad_placements').insert({
-          zone: ad.zone,
-          campaign_id: campaignId,
-          is_active: ad.isActive,
-        });
+        // Insert or update placement
+        if (placementId) {
+          await supabase
+            .from('ad_placements')
+            .update({
+              campaign_id: campaignId,
+              is_active: ad.isActive,
+            })
+            .eq('id', placementId);
+        } else {
+          await supabase.from('ad_placements').insert({
+            zone: ad.zone,
+            campaign_id: campaignId,
+            is_active: ad.isActive,
+          });
+        }
       }
 
       return { success: true, campaignId };

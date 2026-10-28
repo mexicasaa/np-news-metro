@@ -211,11 +211,7 @@ export const AdSlot: React.FC<AdSlotProps> = ({
                   loading="lazy"
                   onError={(e) => {
                     const target = e.currentTarget;
-                    if (zone === 'A3' && !target.src.endsWith('/uploads/ads/suresh-chand-agarwal-memorial.png')) {
-                      target.src = '/uploads/ads/suresh-chand-agarwal-memorial.png';
-                    } else if (zone === 'A4' && !target.src.endsWith('/uploads/ads/shastri-patanjali-chikitsalaya.jpg')) {
-                      target.src = '/uploads/ads/shastri-patanjali-chikitsalaya.jpg';
-                    } else if (target.src !== DEFAULT_FALLBACK_IMAGE) {
+                    if (target.src !== DEFAULT_FALLBACK_IMAGE) {
                       target.src = DEFAULT_FALLBACK_IMAGE;
                     }
                   }}
@@ -315,9 +311,7 @@ export const AdSlot: React.FC<AdSlotProps> = ({
                 loading="lazy"
                 onError={(e) => {
                   const target = e.currentTarget;
-                  if (!target.src.endsWith('/uploads/ads/suresh-chand-agarwal-memorial.png')) {
-                    target.src = '/uploads/ads/suresh-chand-agarwal-memorial.png';
-                  } else if (target.src !== DEFAULT_FALLBACK_IMAGE) {
+                  if (target.src !== DEFAULT_FALLBACK_IMAGE) {
                     target.src = DEFAULT_FALLBACK_IMAGE;
                   }
                 }}
