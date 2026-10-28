@@ -6,7 +6,6 @@ import {
   Edit3, 
   Eye, 
   EyeOff, 
-  Power, 
   CheckCircle2, 
   AlertCircle, 
   RefreshCw, 
@@ -16,11 +15,12 @@ import {
   Sparkles, 
   Plus, 
   X, 
-  Layers, 
-  Phone, 
   Link2,
   Check,
-  ArrowRight
+  LayoutGrid,
+  Settings2,
+  Filter,
+  ArrowUpRight
 } from 'lucide-react';
 import { 
   DirectAd, 
@@ -35,7 +35,6 @@ import {
   DEFAULT_ADSENSE_SETTINGS, 
   getAdsVisibility, 
   saveAdsVisibility, 
-  isZoneVisible, 
   toggleZoneVisibility, 
   toggleMasterAds, 
   AdsVisibilityConfig 
@@ -43,121 +42,119 @@ import {
 import { AdRepository } from '../../repositories/supabase/AdRepository';
 import { uploadMedia } from '../../services/mediaService';
 
-export interface ZonePlacementInfo {
+export interface FriendlyZoneInfo {
   zone: string;
   name: string;
-  pageLocations: string[];
-  desktopPosition: string;
-  mobilePosition: string;
-  defaultFormat: 'card' | 'sidebar' | 'banner';
+  subtitle: string;
+  location: string;
+  dimensions: string;
+  badge: string;
 }
 
-export const ZONE_PLACEMENT_DETAILS: Record<string, ZonePlacementInfo> = {
+export const FRIENDLY_ZONE_MAP: Record<string, FriendlyZoneInfo> = {
   A1: {
     zone: 'A1',
-    name: 'Strip 1 (Slot 1) & Article Bottom Strip',
-    pageLocations: ['Homepage: Below Feature & Editor’s Picks (Column 1)', 'Article Pages: Below Related Stories (Slot 1)'],
-    desktopPosition: '4-Card Row (Column 1 of 4)',
-    mobilePosition: '2x2 Grid (Top-Left Card)',
-    defaultFormat: 'card',
+    name: 'Header Top Banner',
+    subtitle: 'Top of Homepage & Article Pages',
+    location: '4-Card Row 1 (Column 1)',
+    dimensions: '728×90 or Responsive Card',
+    badge: 'Primary Banner',
   },
   A2: {
     zone: 'A2',
-    name: 'Strip 1 (Slot 2) & Article Bottom Strip',
-    pageLocations: ['Homepage: Below Feature & Editor’s Picks (Column 2)', 'Article Pages: Below Related Stories (Slot 2)'],
-    desktopPosition: '4-Card Row (Column 2 of 4)',
-    mobilePosition: '2x2 Grid (Top-Right Card)',
-    defaultFormat: 'card',
+    name: "Editor's Choice Banner",
+    subtitle: 'Below Curated Stories & Editor Picks',
+    location: '4-Card Row 1 (Column 2)',
+    dimensions: '728×90 or Responsive Card',
+    badge: 'Curated Strip',
   },
   A3: {
     zone: 'A3',
-    name: 'Primary Article Right Rail Sidebar',
-    pageLocations: ['Standard Article Page', 'Breaking News Page', 'Opinion Page', 'Category Feeds'],
-    desktopPosition: 'Right Rail Sidebar (Top position next to headline)',
-    mobilePosition: 'Adaptive: Placed below Article Body',
-    defaultFormat: 'sidebar',
+    name: 'Article Sidebar (Top)',
+    subtitle: 'Sticky Right Rail next to headline',
+    location: 'Article Sidebar (Top position)',
+    dimensions: '300×250 or 300×600 Poster',
+    badge: 'High Impact',
   },
   A4: {
     zone: 'A4',
-    name: 'Strip 1 (Slot 4) & Article Middle Sidebar',
-    pageLocations: ['Homepage: Below Feature & Editor’s Picks (Column 4)', 'Article Pages: Below Most Read Briefing'],
-    desktopPosition: 'Right Rail Sidebar (Middle) / Homepage Column 4',
-    mobilePosition: 'Adaptive: Placed below Most Read',
-    defaultFormat: 'card',
+    name: 'In-Article Native Card',
+    subtitle: 'Inside Reading Flow & Middle Sidebar',
+    location: '4-Card Row 1 (Column 4)',
+    dimensions: '300×250 or Native Card',
+    badge: 'Native In-Feed',
   },
   A5: {
     zone: 'A5',
-    name: 'Strip 2 (Slot 1) — Below Tech & World',
-    pageLocations: ['Homepage: Below Tech & World News (Column 1)', 'Article Pages: Bottom Strip (Slot 3)'],
-    desktopPosition: '4-Card Row (Column 1 of 4, Above Metromat)',
-    mobilePosition: '2x2 Grid (Bottom-Left Card)',
-    defaultFormat: 'card',
+    name: 'Tech Desk Card',
+    subtitle: 'Directly below Technology News',
+    location: '4-Card Row 2 (Column 1)',
+    dimensions: '300×250 Card',
+    badge: 'Tech Desk',
   },
   A6: {
     zone: 'A6',
-    name: 'Strip 2 (Slot 2) — Below Tech & World',
-    pageLocations: ['Homepage: Below Tech & World News (Column 2)', 'Article Pages: Bottom Strip (Slot 4)'],
-    desktopPosition: '4-Card Row (Column 2 of 4, Above Metromat)',
-    mobilePosition: '2x2 Grid (Bottom-Right Card)',
-    defaultFormat: 'card',
+    name: 'World Desk Card',
+    subtitle: 'Directly below International Affairs',
+    location: '4-Card Row 2 (Column 2)',
+    dimensions: '300×250 Card',
+    badge: 'World Affairs',
   },
   A7: {
     zone: 'A7',
-    name: 'Strip 2 (Slot 3) — Lower Sidebar Card',
-    pageLocations: ['Homepage: Below Tech & World News (Column 3)', 'Article Pages: Opposite Reader Perspectives'],
-    desktopPosition: 'Right Rail Sidebar (Lower) / Homepage Column 3',
-    mobilePosition: 'Adaptive: Placed below Reader Perspectives',
-    defaultFormat: 'card',
+    name: 'Article Lower Sidebar',
+    subtitle: 'Next to Reader Discussion & Comments',
+    location: '4-Card Row 2 (Column 3)',
+    dimensions: '300×250 Card',
+    badge: 'Sidebar Lower',
   },
   A8: {
     zone: 'A8',
-    name: 'Strip 2 (Slot 4) — Metromat Lead-in',
-    pageLocations: ['Homepage: Below Tech & World News (Column 4, Above Metromat Poll)'],
-    desktopPosition: '4-Card Row (Column 4 of 4)',
-    mobilePosition: '2x2 Grid (Bottom-Right Card)',
-    defaultFormat: 'card',
+    name: 'Metromat Lead-in Card',
+    subtitle: 'Above Opinion Section & Today’s Poll',
+    location: '4-Card Row 2 (Column 4)',
+    dimensions: '300×250 Card',
+    badge: 'Editorial Poll',
   },
 };
 
-const ALL_ZONES = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8'];
+const ZONES_LIST = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8'];
 
 export const AdManagerView: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'zones' | 'adsense'>('zones');
+  const [activeTab, setActiveTab] = useState<'slots' | 'adsense'>('slots');
+  const [filterMode, setFilterMode] = useState<'all' | 'live' | 'empty'>('all');
   const [directAds, setDirectAds] = useState<DirectAd[]>([]);
   const [adSenseConfig, setAdSenseConfig] = useState<AdSenseSettings>(DEFAULT_ADSENSE_SETTINGS);
   const [visibilityConfig, setVisibilityConfig] = useState<AdsVisibilityConfig>(getAdsVisibility());
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [dbConnected, setDbConnected] = useState<boolean>(true);
-  const [flashMessage, setFlashMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+  const [isDbSynced, setIsDbSynced] = useState<boolean>(true);
+  const [notice, setNotice] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
-  // Modal State for Image Upload & Direct Ad Creation / Editing
+  // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAd, setEditingAd] = useState<DirectAd | null>(null);
-  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const [isSavingToDb, setIsSavingToDb] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [showUrlInput, setShowUrlInput] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const flashNotice = (text: string, type: 'success' | 'error' = 'success') => {
-    setFlashMessage({ text, type });
-    setTimeout(() => {
-      setFlashMessage(null);
-    }, 4500);
+  const showNotice = (message: string, type: 'success' | 'error' = 'success') => {
+    setNotice({ message, type });
+    setTimeout(() => setNotice(null), 4000);
   };
 
-  const loadData = async () => {
+  const loadAllData = async () => {
     setIsLoading(true);
     setAdSenseConfig(getAdSenseSettings());
     setVisibilityConfig(getAdsVisibility());
 
     try {
-      // 1. Fetch real direct ads and placements directly from Supabase Database
       const dbAds = await AdRepository.getInstance().getAllDirectAds();
       const dbPlacements = await AdRepository.getInstance().getAllPlacements();
+      setIsDbSynced(true);
 
-      setDbConnected(true);
-
-      // Sync visibility switches from Supabase
+      // Synchronize visibility switches from Supabase Database
       if (dbPlacements && dbPlacements.length > 0) {
         const currentVis = getAdsVisibility();
         let changed = false;
@@ -178,17 +175,15 @@ export const AdManagerView: React.FC = () => {
         }
       }
 
-      // Prioritize Supabase DB as the single source of truth
+      // Supabase is authoritative single source of truth
       if (dbAds && dbAds.length > 0) {
         setDirectAds(dbAds as any);
         localStorage.setItem('np_direct_ads', JSON.stringify(dbAds));
       } else {
-        const local = getDirectAds();
-        setDirectAds(local);
+        setDirectAds(getDirectAds());
       }
-    } catch (err) {
-      console.warn('Database load notice, using local cache:', err);
-      setDbConnected(false);
+    } catch {
+      setIsDbSynced(false);
       setDirectAds(getDirectAds());
     } finally {
       setIsLoading(false);
@@ -196,62 +191,57 @@ export const AdManagerView: React.FC = () => {
   };
 
   useEffect(() => {
-    loadData();
-
-    const handleUpdate = () => {
-      loadData();
-    };
-
+    loadAllData();
+    const handleUpdate = () => loadAllData();
     window.addEventListener('np_ads_updated', handleUpdate);
     return () => window.removeEventListener('np_ads_updated', handleUpdate);
   }, []);
 
-  // Global Master Toggle (Show / Hide all commercial ads across the entire site)
+  // Global Master Toggle: Show or Hide all commercial ads
   const handleToggleMaster = () => {
     const next = toggleMasterAds();
-    loadData();
-    flashNotice(
-      next 
-        ? 'Commercial ads ENABLED across the website!' 
-        : 'All commercial ads PAUSED and hidden from website.',
+    loadAllData();
+    showNotice(
+      next ? 'All commercial ads are now LIVE on the website.' : 'All commercial ads are now PAUSED across the site.',
       next ? 'success' : 'error'
     );
   };
 
-  // Open / Close Individual Zone Toggle (Synchronizes with Supabase & live website)
-  const handleToggleOpenClose = async (zone: string, id?: string) => {
+  // Toggle individual zone active/paused
+  const handleToggleZone = async (zone: string, id?: string) => {
     try {
       const next = await toggleAdOpenClose(zone, id);
-      await loadData();
-      flashNotice(
+      await loadAllData();
+      showNotice(
         next 
-          ? `Ad for Zone ${zone} is now OPEN (Live on Website & Supabase Database)!` 
-          : `Ad for Zone ${zone} is now CLOSED (Hidden from Website & Database).`
+          ? `Slot ${zone} is now LIVE on the website.` 
+          : `Slot ${zone} is now PAUSED (hidden).`
       );
     } catch (err: any) {
-      flashNotice(`Failed to toggle Zone ${zone}: ${err?.message || 'Error'}`, 'error');
+      showNotice(`Error updating slot: ${err?.message || 'Failed'}`, 'error');
     }
   };
 
-  // Delete Ad (Purges from Supabase DB, localStorage, and website)
+  // Delete ad permanently from Supabase & site
   const handleDeleteAd = async (id: string, zone: string) => {
-    if (confirm(`Are you sure you want to delete the ad for Zone ${zone}? This will permanently remove it from both the website and the database.`)) {
+    if (confirm(`Remove advertisement from Slot ${zone}? This will delete it from both the website and the database.`)) {
       try {
         await deleteDirectAd(id, zone);
-        await loadData();
-        flashNotice(`Permanently deleted ad for Zone ${zone} from website and database.`);
+        await loadAllData();
+        showNotice(`Advertisement for Slot ${zone} has been deleted.`);
       } catch (err: any) {
-        flashNotice(`Delete error: ${err?.message || 'Failed to delete ad'}`, 'error');
+        showNotice(`Delete error: ${err?.message || 'Failed'}`, 'error');
       }
     }
   };
 
-  // Open Modal for New Ad Creation
-  const handleOpenCreateModal = (targetZone: string = 'A1') => {
+  // Open modal to add ad to a specific zone
+  const handleOpenAddModal = (zone: string = 'A1') => {
     setUploadError(null);
+    setShowUrlInput(false);
     setEditingAd({
       id: '',
-      zone: targetZone,
+      zone,
       advertiserName: '',
       creativeText: '',
       destinationUrl: '',
@@ -261,21 +251,20 @@ export const AdManagerView: React.FC = () => {
       isActive: true,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      impressionsCount: 0,
-      clicksCount: 0,
     });
     setIsModalOpen(true);
   };
 
-  // Open Modal for Editing Existing Ad
+  // Open modal to edit existing ad
   const handleOpenEditModal = (ad: DirectAd) => {
     setUploadError(null);
+    setShowUrlInput(Boolean(ad.mediaUrl && ad.mediaUrl.startsWith('http')));
     setEditingAd({ ...ad });
     setIsModalOpen(true);
   };
 
-  // Handle Image File Selection and Direct Upload to Media Storage
-  const handleImageFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Handle direct file upload
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !editingAd) return;
 
@@ -285,51 +274,48 @@ export const AdManagerView: React.FC = () => {
     }
 
     if (file.size > 20 * 1024 * 1024) {
-      setUploadError('Image file size exceeds 20MB limit. Please choose a compressed image.');
+      setUploadError('Image size exceeds 20MB. Please use a compressed image.');
       return;
     }
 
-    setIsUploadingImage(true);
+    setIsUploading(true);
     setUploadError(null);
 
     try {
-      // 1. Create instant local object URL for immediate user preview
-      const localPreviewUrl = URL.createObjectURL(file);
-      setEditingAd((prev) => prev ? { ...prev, mediaUrl: localPreviewUrl } : null);
+      // 1. Instant local preview
+      const preview = URL.createObjectURL(file);
+      setEditingAd((prev) => prev ? { ...prev, mediaUrl: preview } : null);
 
-      // 2. Upload to Cloudflare R2 / Supabase Storage via mediaService
-      const uploadRes = await uploadMedia(
+      // 2. Upload to storage
+      const res = await uploadMedia(
         file,
-        editingAd.advertiserName || `Commercial Ad Zone ${editingAd.zone}`,
-        'Commercial Advertising Desk'
+        editingAd.advertiserName || `Ad ${editingAd.zone}`,
+        'Commercial Media Desk'
       );
 
-      if (uploadRes.error) {
-        setUploadError(`Upload warning: ${uploadRes.error}. Using local media.`);
-      } else if (uploadRes.asset?.url) {
-        setEditingAd((prev) => prev ? { ...prev, mediaUrl: uploadRes.asset!.url } : null);
+      if (res.asset?.url) {
+        setEditingAd((prev) => prev ? { ...prev, mediaUrl: res.asset!.url } : null);
       }
-    } catch (err: any) {
-      console.warn('Image upload error:', err);
-      setUploadError('Upload failed, but you can paste a direct image URL below.');
+    } catch {
+      setUploadError('Upload failed. You can paste a direct image URL instead.');
     } finally {
-      setIsUploadingImage(false);
+      setIsUploading(false);
     }
   };
 
-  // Save Ad Directly to Supabase Database and Live Website
-  const handleSaveAdToDatabase = async (e: React.FormEvent) => {
+  // Save Ad to Supabase & Live site
+  const handleSaveAd = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingAd) return;
 
     if (!editingAd.advertiserName.trim()) {
-      alert('Please enter an Advertiser or Brand Name.');
+      alert('Please enter a Brand or Advertiser name.');
       return;
     }
 
-    setIsSavingToDb(true);
+    setIsSaving(true);
     try {
-      // 1. Save directly into Supabase Database (campaigns, ad_creatives, ad_placements, media)
+      // 1. Save directly into Supabase Database
       const dbResult = await AdRepository.getInstance().saveCampaignAndPlacement({
         id: editingAd.id || undefined,
         zone: editingAd.zone,
@@ -341,8 +327,8 @@ export const AdManagerView: React.FC = () => {
         isActive: editingAd.isActive,
       });
 
-      // 2. Save into local direct ads cache & broadcast live event to all tabs
-      const savedLocal = saveDirectAd({
+      // 2. Save local & notify open tabs
+      saveDirectAd({
         ...editingAd,
         id: dbResult.campaignId || editingAd.id,
         advertiserName: editingAd.advertiserName.trim(),
@@ -351,618 +337,528 @@ export const AdManagerView: React.FC = () => {
         mediaUrl: editingAd.mediaUrl?.trim() || '',
       });
 
-      // 3. Ensure zone visibility reflects the active status
       toggleZoneVisibility(editingAd.zone, editingAd.isActive);
 
       setIsModalOpen(false);
-      await loadData();
-      flashNotice(
-        `Ad for Zone ${editingAd.zone} (${editingAd.advertiserName}) successfully saved to Supabase Database and published to the website!`
-      );
+      await loadAllData();
+      showNotice(`Advertisement for Slot ${editingAd.zone} saved to Database and published live!`);
     } catch (err: any) {
-      console.error('Error saving ad to DB:', err);
-      alert(`Error saving ad: ${err?.message || 'Database error'}`);
+      alert(`Save error: ${err?.message || 'Database error'}`);
     } finally {
-      setIsSavingToDb(false);
+      setIsSaving(false);
     }
   };
 
-  // Save AdSense Settings
+  // Save AdSense settings
   const handleSaveAdSense = () => {
     saveAdSenseSettings(adSenseConfig);
-    loadData();
-    flashNotice('Google AdSense configuration saved and synced across all tabs!');
+    loadAllData();
+    showNotice('Google AdSense configuration saved successfully!');
   };
 
-  const handleResetDefaults = () => {
-    if (confirm('Reset all commercial ads and AdSense settings to default factory settings?')) {
-      resetAdsToDefaults();
-      loadData();
-      flashNotice('Reset all ad configurations to factory defaults.');
-    }
-  };
+  // Filter slots for view
+  const filteredZones = ZONES_LIST.filter((zone) => {
+    const ad = directAds.find((a) => a.zone === zone);
+    const isShowing = visibilityConfig.masterEnabled && visibilityConfig.zones[zone] !== false && Boolean(ad && ad.isActive);
+    if (filterMode === 'live') return isShowing;
+    if (filterMode === 'empty') return !ad;
+    return true;
+  });
 
-  // Count active live ads
-  const activeAdsCount = ALL_ZONES.filter((z) => {
-    const ad = directAds.find((a) => a.zone === z);
-    return visibilityConfig.masterEnabled && visibilityConfig.zones[z] !== false && ad && ad.isActive;
+  const liveSlotsCount = ZONES_LIST.filter((zone) => {
+    const ad = directAds.find((a) => a.zone === zone);
+    return visibilityConfig.masterEnabled && visibilityConfig.zones[zone] !== false && Boolean(ad && ad.isActive);
   }).length;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-7xl mx-auto">
       {/* ======================================================================
-          HEADER & STATUS BANNER
+          1. CLEAN, MODERN HEADER
           ====================================================================== */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-border-subtle">
+      <div className="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="w-2.5 h-2.5 rounded-full bg-secondary-gold inline-block"></span>
-            <h1 className="font-serif text-xl sm:text-2xl font-bold text-ink">
-              Ad Operations & Commercial Hub
+          <div className="flex items-center gap-2.5">
+            <h1 className="font-serif text-2xl font-bold text-slate-900 tracking-tight">
+              Ad Management
             </h1>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              {isDbSynced ? 'Database Synced' : 'Offline Cache'}
+            </span>
           </div>
-          <p className="text-xs sm:text-sm text-ink-muted">
-            Upload commercial sponsor banners, connect directly with Supabase Database, and manage live website slots.
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            Manage banner images, links, and commercial availability across all 8 website slots.
           </p>
         </div>
 
-        {/* Action Controls & Master Switch */}
-        <div className="flex items-center gap-2.5 flex-wrap">
-          <button
-            onClick={() => handleOpenCreateModal('A1')}
-            className="px-4 py-2 bg-primary hover:bg-primary-container text-white text-xs font-bold rounded-sm flex items-center gap-2 transition-all cursor-pointer shadow-sm hover:shadow-md"
-          >
-            <Plus className="w-4 h-4 text-secondary-gold" />
-            <span>Upload New Ad</span>
-          </button>
+        {/* Global Action Buttons */}
+        <div className="flex items-center gap-3 flex-wrap">
+          {/* Master Visibility Switch */}
+          <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl">
+            <span className="text-xs font-medium text-slate-600">
+              Site Commercial Ads:
+            </span>
+            <button
+              onClick={handleToggleMaster}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer focus:outline-none ${
+                visibilityConfig.masterEnabled ? 'bg-emerald-600' : 'bg-slate-300'
+              }`}
+              title={visibilityConfig.masterEnabled ? 'Click to hide all commercial ads' : 'Click to enable all commercial ads'}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-xs ${
+                  visibilityConfig.masterEnabled ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
+            <span className={`text-xs font-bold ${visibilityConfig.masterEnabled ? 'text-emerald-700' : 'text-slate-500'}`}>
+              {visibilityConfig.masterEnabled ? 'ON' : 'OFF'}
+            </span>
+          </div>
 
+          {/* New Ad Button */}
           <button
-            onClick={handleToggleMaster}
-            className={`px-3 py-2 text-xs font-bold rounded-sm border transition-all flex items-center gap-2 cursor-pointer shadow-2xs ${
-              visibilityConfig.masterEnabled
-                ? 'bg-rose-50 text-rose-700 border-rose-300 hover:bg-rose-100'
-                : 'bg-emerald-600 text-white border-emerald-500 hover:bg-emerald-700'
-            }`}
-            title={visibilityConfig.masterEnabled ? 'Click to pause all commercial ads on website' : 'Click to show commercial ads on website'}
+            onClick={() => handleOpenAddModal('A1')}
+            className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition-all cursor-pointer shadow-sm hover:shadow active:scale-98"
           >
-            {visibilityConfig.masterEnabled ? (
-              <>
-                <EyeOff className="w-3.5 h-3.5 text-rose-500" />
-                <span>Pause All Ads</span>
-              </>
-            ) : (
-              <>
-                <Eye className="w-3.5 h-3.5 text-white" />
-                <span>Enable All Ads</span>
-              </>
-            )}
+            <Plus className="w-4 h-4 text-amber-400" />
+            <span>Upload New Banner</span>
           </button>
         </div>
       </div>
 
-      {/* Floating Flash Message Banner */}
-      {flashMessage && (
+      {/* Floating Notice Toast */}
+      {notice && (
         <div
-          className={`p-3 rounded-sm border flex items-center justify-between gap-2 text-xs font-bold animate-in fade-in duration-200 ${
-            flashMessage.type === 'success'
-              ? 'bg-emerald-50 text-emerald-900 border-emerald-300'
-              : 'bg-rose-50 text-rose-900 border-rose-300'
+          className={`p-3.5 rounded-xl border flex items-center justify-between gap-3 text-xs font-semibold animate-in fade-in slide-in-from-top-2 duration-200 shadow-sm ${
+            notice.type === 'success'
+              ? 'bg-emerald-50 text-emerald-900 border-emerald-200'
+              : 'bg-rose-50 text-rose-900 border-rose-200'
           }`}
         >
           <div className="flex items-center gap-2">
-            {flashMessage.type === 'success' ? (
+            {notice.type === 'success' ? (
               <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
             ) : (
               <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
             )}
-            <span>{flashMessage.text}</span>
+            <span>{notice.message}</span>
           </div>
-          <button
-            onClick={() => setFlashMessage(null)}
-            className="text-slate-400 hover:text-slate-600 cursor-pointer"
-          >
-            <X className="w-3.5 h-3.5" />
+          <button onClick={() => setNotice(null)} className="text-slate-400 hover:text-slate-600">
+            <X className="w-4 h-4" />
           </button>
         </div>
       )}
 
-      {/* Overview Stat Badges */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="bg-surface-lowest border border-border-subtle rounded-sm p-3.5 shadow-2xs flex items-center justify-between">
-          <div>
-            <div className="text-[11px] font-bold text-ink-muted uppercase tracking-wider">
-              Database Connection
-            </div>
-            <div className="text-sm font-bold text-ink flex items-center gap-1.5 mt-0.5">
-              <span className={`w-2 h-2 rounded-full ${dbConnected ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`}></span>
-              <span>{dbConnected ? 'Connected to Supabase DB' : 'Local Storage Mode'}</span>
-            </div>
-          </div>
-          <Database className={`w-5 h-5 ${dbConnected ? 'text-emerald-600' : 'text-amber-500'}`} />
-        </div>
-
-        <div className="bg-surface-lowest border border-border-subtle rounded-sm p-3.5 shadow-2xs flex items-center justify-between">
-          <div>
-            <div className="text-[11px] font-bold text-ink-muted uppercase tracking-wider">
-              Live Commercial Slots
-            </div>
-            <div className="text-sm font-bold text-ink mt-0.5">
-              <span className="text-primary font-mono text-base">{activeAdsCount}</span> of 8 Zones Showing
-            </div>
-          </div>
-          <Sparkles className="w-5 h-5 text-secondary-gold" />
-        </div>
-
-        <div className="bg-surface-lowest border border-border-subtle rounded-sm p-3.5 shadow-2xs flex items-center justify-between">
-          <div>
-            <div className="text-[11px] font-bold text-ink-muted uppercase tracking-wider">
-              Website Visibility Master
-            </div>
-            <div className="text-sm font-bold mt-0.5 flex items-center gap-1.5">
-              <span className={visibilityConfig.masterEnabled ? 'text-emerald-700' : 'text-rose-600'}>
-                {visibilityConfig.masterEnabled ? 'Commercial Ads Live' : 'All Ads Master Paused'}
-              </span>
-            </div>
-          </div>
-          <Power className={`w-5 h-5 ${visibilityConfig.masterEnabled ? 'text-emerald-600' : 'text-rose-500'}`} />
-        </div>
-      </div>
-
       {/* ======================================================================
-          SIMPLIFIED TABS NAVIGATION (2 TABS ONLY)
+          2. NAVIGATION PILLS & QUICK FILTERS
           ====================================================================== */}
-      <div className="border-b border-border-subtle flex items-center gap-2">
-        <button
-          onClick={() => setActiveTab('zones')}
-          className={`px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-all border-b-2 cursor-pointer flex items-center gap-2 ${
-            activeTab === 'zones'
-              ? 'border-primary text-primary bg-primary/5'
-              : 'border-transparent text-ink-secondary hover:text-ink hover:bg-slate-50'
-          }`}
-        >
-          <Layers className="w-4 h-4" />
-          <span>All 8 Website Ad Zones (A1 — A8)</span>
-        </button>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1 border-b border-slate-200">
+        {/* Main Tabs */}
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setActiveTab('slots')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+              activeTab === 'slots'
+                ? 'bg-slate-900 text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+            }`}
+          >
+            <LayoutGrid className="w-3.5 h-3.5" />
+            <span>Website Ad Slots (8)</span>
+            <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
+              activeTab === 'slots' ? 'bg-slate-700 text-white' : 'bg-slate-200 text-slate-700'
+            }`}>
+              {liveSlotsCount} Live
+            </span>
+          </button>
 
-        <button
-          onClick={() => setActiveTab('adsense')}
-          className={`px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-all border-b-2 cursor-pointer flex items-center gap-2 ${
-            activeTab === 'adsense'
-              ? 'border-primary text-primary bg-primary/5'
-              : 'border-transparent text-ink-secondary hover:text-ink hover:bg-slate-50'
-          }`}
-        >
-          <Globe className="w-4 h-4" />
-          <span>Google AdSense Settings</span>
-        </button>
-      </div>
+          <button
+            onClick={() => setActiveTab('adsense')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+              activeTab === 'adsense'
+                ? 'bg-slate-900 text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+            }`}
+          >
+            <Settings2 className="w-3.5 h-3.5" />
+            <span>Google AdSense Settings</span>
+          </button>
+        </div>
 
-      {/* ======================================================================
-          TAB 1: ALL 8 AD ZONES (VISUAL COMMAND CENTER)
-          ====================================================================== */}
-      {activeTab === 'zones' && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between text-xs text-ink-muted">
-            <span>Click any zone to upload a banner, edit details, or toggle live status on the website.</span>
+        {/* Slot Filters (When in Slots view) */}
+        {activeTab === 'slots' && (
+          <div className="flex items-center gap-1 text-xs">
+            <span className="text-slate-400 font-medium mr-1 flex items-center gap-1">
+              <Filter className="w-3 h-3" />
+              <span>Show:</span>
+            </span>
             <button
-              onClick={loadData}
-              disabled={isLoading}
-              className="text-primary hover:underline flex items-center gap-1 cursor-pointer font-bold"
+              onClick={() => setFilterMode('all')}
+              className={`px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer ${
+                filterMode === 'all' ? 'bg-slate-200 text-slate-900 font-bold' : 'text-slate-500 hover:text-slate-800'
+              }`}
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
-              <span>Refresh from Database</span>
+              All (8)
+            </button>
+            <button
+              onClick={() => setFilterMode('live')}
+              className={`px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer ${
+                filterMode === 'live' ? 'bg-emerald-100 text-emerald-900 font-bold' : 'text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              Live ({liveSlotsCount})
+            </button>
+            <button
+              onClick={() => setFilterMode('empty')}
+              className={`px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer ${
+                filterMode === 'empty' ? 'bg-slate-200 text-slate-900 font-bold' : 'text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              Empty ({8 - directAds.length})
             </button>
           </div>
+        )}
+      </div>
 
-          {/* Grid of 8 Zone Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {ALL_ZONES.map((zone) => {
-              const locationInfo = ZONE_PLACEMENT_DETAILS[zone];
-              const ad = directAds.find((a) => a.zone === zone);
-              const isZoneShowing = 
-                visibilityConfig.masterEnabled && 
-                (visibilityConfig.zones[zone] !== false) && 
-                Boolean(ad && ad.isActive);
+      {/* ======================================================================
+          3. TAB 1: ALL 8 AD SLOTS (CLEAN VISUAL TILES)
+          ====================================================================== */}
+      {activeTab === 'slots' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {filteredZones.map((zone) => {
+            const info = FRIENDLY_ZONE_MAP[zone];
+            const ad = directAds.find((a) => a.zone === zone);
+            const isLive = 
+              visibilityConfig.masterEnabled && 
+              visibilityConfig.zones[zone] !== false && 
+              Boolean(ad && ad.isActive);
 
-              return (
-                <div
-                  key={zone}
-                  className={`bg-surface-lowest border rounded-sm p-3.5 shadow-2xs flex flex-col justify-between transition-all ${
-                    isZoneShowing
-                      ? 'border-border-subtle hover:border-primary/50'
-                      : ad
-                      ? 'border-amber-200 bg-amber-50/20 opacity-90'
-                      : 'border-dashed border-slate-300 bg-slate-50/50'
-                  }`}
-                >
-                  <div>
-                    {/* Zone Badge & Status Indicator */}
-                    <div className="flex items-center justify-between pb-2 border-b border-border-subtle/60 mb-2.5">
+            return (
+              <div
+                key={zone}
+                className={`bg-white rounded-2xl border transition-all duration-200 flex flex-col justify-between overflow-hidden ${
+                  isLive 
+                    ? 'border-emerald-300/80 shadow-xs hover:shadow-md' 
+                    : ad 
+                    ? 'border-slate-200 hover:border-slate-300 opacity-80' 
+                    : 'border-dashed border-slate-300 hover:border-slate-400 bg-slate-50/40'
+                }`}
+              >
+                {/* Card Top: Zone Badge, Human Title, and Live Toggle Switch */}
+                <div className="p-4 pb-3 border-b border-slate-100">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-800 text-[11px] font-mono font-bold tracking-tight">
+                      Slot {zone}
+                    </span>
+
+                    {/* Smooth Toggle Switch (if ad exists) */}
+                    {ad ? (
                       <div className="flex items-center gap-1.5">
-                        <span className="px-2 py-0.5 rounded-xs bg-primary text-white text-[10px] font-mono font-bold">
-                          ZONE {zone}
-                        </span>
-                        <span className="text-[10px] font-mono text-ink-muted">
-                          {locationInfo.defaultFormat.toUpperCase()}
+                        <button
+                          onClick={() => handleToggleZone(zone, ad.id)}
+                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors cursor-pointer focus:outline-none ${
+                            isLive ? 'bg-emerald-600' : 'bg-slate-300'
+                          }`}
+                          title={isLive ? 'Ad is currently LIVE. Click to hide.' : 'Ad is currently PAUSED. Click to show.'}
+                        >
+                          <span
+                            className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform shadow-xs ${
+                              isLive ? 'translate-x-4.5' : 'translate-x-0.5'
+                            }`}
+                          />
+                        </button>
+                        <span className={`text-[10px] font-bold uppercase tracking-wider ${isLive ? 'text-emerald-700' : 'text-slate-400'}`}>
+                          {isLive ? 'Live' : 'Off'}
                         </span>
                       </div>
+                    ) : (
+                      <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                        Available
+                      </span>
+                    )}
+                  </div>
 
-                      {/* Status Badge */}
-                      <span
-                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 ${
-                          isZoneShowing
-                            ? 'bg-emerald-100 text-emerald-800'
-                            : ad
-                            ? 'bg-amber-100 text-amber-800'
-                            : 'bg-slate-200 text-slate-700'
-                        }`}
+                  <h3 className="font-serif font-bold text-sm text-slate-900 truncate" title={info.name}>
+                    {info.name}
+                  </h3>
+                  <p className="text-[11px] text-slate-500 truncate mt-0.5" title={info.subtitle}>
+                    {info.subtitle}
+                  </p>
+                </div>
+
+                {/* Card Middle: Creative Image or Single Upload Area */}
+                <div className="p-4 flex-1 flex flex-col justify-center">
+                  {ad ? (
+                    <div className="space-y-3">
+                      {/* Banner Image Preview */}
+                      <div 
+                        onClick={() => handleOpenEditModal(ad)}
+                        className="w-full h-32 bg-slate-50 rounded-xl border border-slate-200 overflow-hidden flex items-center justify-center relative group cursor-pointer"
                       >
-                        <span
-                          className={`w-1.5 h-1.5 rounded-full ${
-                            isZoneShowing ? 'bg-emerald-600 animate-pulse' : ad ? 'bg-amber-600' : 'bg-slate-400'
-                          }`}
-                        ></span>
-                        <span>{isZoneShowing ? 'LIVE ON SITE' : ad ? 'OFF (PAUSED)' : 'EMPTY'}</span>
+                        {ad.mediaUrl ? (
+                          <img
+                            src={ad.mediaUrl}
+                            alt={ad.altText || ad.advertiserName}
+                            className="max-h-full max-w-full object-contain block mx-auto transition-transform duration-300 group-hover:scale-105"
+                          />
+                        ) : (
+                          <div className="flex flex-col items-center justify-center text-slate-400 text-xs">
+                            <ImageIcon className="w-6 h-6 mb-1 text-slate-300" />
+                            <span>No banner image</span>
+                          </div>
+                        )}
+
+                        {/* Hover Overlay */}
+                        <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                          <span className="px-2.5 py-1 bg-white text-slate-900 text-xs font-bold rounded-lg flex items-center gap-1 shadow-sm">
+                            <Edit3 className="w-3 h-3" />
+                            <span>Edit Banner</span>
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Brand Info */}
+                      <div>
+                        <div className="font-bold text-xs text-slate-900 truncate" title={ad.advertiserName}>
+                          {ad.advertiserName}
+                        </div>
+                        {ad.destinationUrl && ad.destinationUrl !== '#' && (
+                          <a
+                            href={ad.destinationUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[11px] text-slate-500 hover:text-slate-800 font-mono flex items-center gap-1 mt-0.5 truncate hover:underline"
+                            title={ad.destinationUrl}
+                          >
+                            <Link2 className="w-3 h-3 shrink-0 text-slate-400" />
+                            <span className="truncate">{ad.destinationUrl.replace(/^https?:\/\//, '')}</span>
+                            <ArrowUpRight className="w-2.5 h-2.5 shrink-0" />
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    /* Single Clean Empty State Upload Area (NO duplicate buttons) */
+                    <div
+                      onClick={() => handleOpenAddModal(zone)}
+                      className="w-full h-36 rounded-xl border border-dashed border-slate-300 hover:border-slate-800 hover:bg-slate-50 transition-all flex flex-col items-center justify-center p-4 text-center cursor-pointer group"
+                    >
+                      <div className="w-9 h-9 rounded-full bg-slate-100 group-hover:bg-slate-200 flex items-center justify-center mb-2 transition-colors">
+                        <Upload className="w-4 h-4 text-slate-500 group-hover:text-slate-800" />
+                      </div>
+                      <span className="text-xs font-bold text-slate-700 group-hover:text-slate-900 transition-colors">
+                        Upload Ad Banner
+                      </span>
+                      <span className="text-[10px] text-slate-400 mt-0.5">
+                        {info.dimensions}
                       </span>
                     </div>
-
-                    {/* Zone Location Description */}
-                    <div className="mb-3">
-                      <h3 className="font-bold text-xs text-ink line-clamp-1" title={locationInfo.name}>
-                        {locationInfo.name}
-                      </h3>
-                      <p className="text-[10px] text-ink-muted line-clamp-1 mt-0.5">
-                        {locationInfo.desktopPosition}
-                      </p>
-                    </div>
-
-                    {/* Creative Media Preview Box */}
-                    {ad ? (
-                      <div className="space-y-2 mb-3">
-                        {/* Image Preview */}
-                        <div className="w-full h-32 bg-slate-100 dark:bg-slate-800 rounded border border-border-subtle/80 overflow-hidden flex items-center justify-center relative group">
-                          {ad.mediaUrl ? (
-                            <img
-                              src={ad.mediaUrl}
-                              alt={ad.altText || ad.advertiserName}
-                              className="max-h-full max-w-full object-contain block mx-auto transition-transform duration-200 group-hover:scale-105"
-                              onError={(e) => {
-                                e.currentTarget.style.display = 'none';
-                              }}
-                            />
-                          ) : (
-                            <div className="flex flex-col items-center justify-center text-slate-400 text-[10px]">
-                              <ImageIcon className="w-6 h-6 mb-1 text-slate-300" />
-                              <span>Text-only Banner</span>
-                            </div>
-                          )}
-
-                          {/* Overlay on hover */}
-                          <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                            <button
-                              onClick={() => handleOpenEditModal(ad)}
-                              className="px-2 py-1 bg-white text-slate-900 text-[10px] font-bold rounded cursor-pointer flex items-center gap-1 shadow-sm"
-                            >
-                              <Edit3 className="w-3 h-3" />
-                              <span>Change</span>
-                            </button>
-                            {ad.destinationUrl && ad.destinationUrl !== '#' && (
-                              <a
-                                href={ad.destinationUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="p-1 bg-white text-slate-900 rounded cursor-pointer"
-                                title="Open Link"
-                              >
-                                <ExternalLink className="w-3 h-3" />
-                              </a>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Advertiser Details */}
-                        <div>
-                          <div className="font-bold text-xs text-ink truncate" title={ad.advertiserName}>
-                            {ad.advertiserName}
-                          </div>
-                          <p className="text-[11px] text-ink-secondary line-clamp-2 leading-snug mt-0.5">
-                            {ad.creativeText || 'No description entered.'}
-                          </p>
-                          {ad.destinationUrl && ad.destinationUrl !== '#' && (
-                            <div className="text-[10px] text-primary truncate font-mono mt-1 flex items-center gap-1">
-                              <Link2 className="w-3 h-3 shrink-0" />
-                              <span className="truncate">{ad.destinationUrl}</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ) : (
-                      /* Empty Zone Box */
-                      <div
-                        onClick={() => handleOpenCreateModal(zone)}
-                        className="w-full h-36 border border-dashed border-slate-300 rounded hover:border-primary/60 hover:bg-primary/5 transition-all flex flex-col items-center justify-center p-3 text-center cursor-pointer mb-3 group"
-                      >
-                        <div className="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-primary/10 flex items-center justify-center mb-1.5 transition-colors">
-                          <Plus className="w-4 h-4 text-slate-400 group-hover:text-primary" />
-                        </div>
-                        <span className="text-xs font-bold text-slate-700 group-hover:text-primary transition-colors">
-                          + Add Ad for Zone {zone}
-                        </span>
-                        <span className="text-[10px] text-slate-400 mt-0.5">
-                          Upload image banner & connect to DB
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Actions Area */}
-                  <div className="pt-2 border-t border-border-subtle/60 flex items-center justify-between gap-1.5">
-                    {ad ? (
-                      <>
-                        {/* Prominent OPEN / CLOSE Toggle Button */}
-                        <button
-                          onClick={() => handleToggleOpenClose(zone, ad.id)}
-                          className={`text-[10px] font-bold px-2.5 py-1.5 rounded transition-all flex items-center gap-1.5 cursor-pointer flex-1 justify-center border shadow-2xs ${
-                            isZoneShowing
-                              ? 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-500'
-                              : 'bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-300'
-                          }`}
-                          title={isZoneShowing ? 'Click to HIDE this ad from website' : 'Click to SHOW this ad on live website'}
-                        >
-                          <Power className="w-3 h-3" />
-                          <span>{isZoneShowing ? 'OPEN (LIVE)' : 'CLOSED (OFF)'}</span>
-                        </button>
-
-                        {/* Edit Button */}
-                        <button
-                          onClick={() => handleOpenEditModal(ad)}
-                          className="p-1.5 hover:bg-slate-100 text-slate-600 rounded transition-colors cursor-pointer border border-slate-200"
-                          title="Edit Ad Details / Change Image"
-                        >
-                          <Edit3 className="w-3.5 h-3.5" />
-                        </button>
-
-                        {/* Delete Button */}
-                        <button
-                          onClick={() => handleDeleteAd(ad.id, zone)}
-                          className="p-1.5 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded transition-colors cursor-pointer border border-slate-200"
-                          title="Delete Ad from Database & Website"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </>
-                    ) : (
-                      <button
-                        onClick={() => handleOpenCreateModal(zone)}
-                        className="w-full py-1.5 bg-primary/10 hover:bg-primary/20 text-primary text-xs font-bold rounded transition-colors cursor-pointer flex items-center justify-center gap-1"
-                      >
-                        <Upload className="w-3 h-3" />
-                        <span>Upload Banner</span>
-                      </button>
-                    )}
-                  </div>
+                  )}
                 </div>
-              );
-            })}
-          </div>
+
+                {/* Card Bottom: Quick Actions (Only when ad exists) */}
+                {ad && (
+                  <div className="px-4 py-2.5 bg-slate-50/70 border-t border-slate-100 flex items-center justify-between text-xs">
+                    <button
+                      onClick={() => handleOpenEditModal(ad)}
+                      className="text-slate-600 hover:text-slate-900 font-semibold flex items-center gap-1 cursor-pointer"
+                    >
+                      <Edit3 className="w-3.5 h-3.5" />
+                      <span>Edit Details</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleDeleteAd(ad.id, zone)}
+                      className="text-slate-400 hover:text-rose-600 transition-colors cursor-pointer p-1"
+                      title="Delete ad from database & site"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
 
       {/* ======================================================================
-          TAB 2: GOOGLE ADSENSE SETTINGS
+          4. TAB 2: GOOGLE ADSENSE SETTINGS (CLEAN & MODERN)
           ====================================================================== */}
       {activeTab === 'adsense' && (
-        <div className="bg-surface-lowest border border-border-subtle rounded-sm p-5 shadow-2xs space-y-5 max-w-3xl">
-          <div className="border-b border-border-subtle pb-3">
-            <h2 className="font-serif text-lg font-bold text-ink">
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs max-w-2xl space-y-6">
+          <div className="border-b border-slate-100 pb-4">
+            <h2 className="font-serif text-lg font-bold text-slate-900">
               Google AdSense Monetization
             </h2>
-            <p className="text-xs text-ink-muted mt-0.5">
-              Configure AdSense publisher credentials, priority routing, and zone fallbacks.
+            <p className="text-xs text-slate-500 mt-0.5">
+              Configure publisher credentials and fallbacks for when commercial banners are unfilled.
             </p>
           </div>
 
           {/* Master AdSense Switch */}
-          <div className="flex items-center justify-between p-3.5 bg-slate-50 dark:bg-slate-800/40 rounded border border-border-subtle">
+          <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200/80">
             <div>
-              <div className="text-xs font-bold text-ink">Google AdSense Network Status</div>
-              <div className="text-[11px] text-ink-muted">Master switch to enable or disable AdSense tags across the site.</div>
+              <div className="text-xs font-bold text-slate-900">Google AdSense Network</div>
+              <div className="text-[11px] text-slate-500 mt-0.5">Enable automatic Google AdSense units across slots.</div>
             </div>
             <button
               onClick={() => setAdSenseConfig((prev) => ({ ...prev, enabled: !prev.enabled }))}
-              className={`px-3 py-1.5 text-xs font-bold rounded transition-colors cursor-pointer ${
-                adSenseConfig.enabled
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-slate-300 text-slate-700'
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
+                adSenseConfig.enabled ? 'bg-emerald-600' : 'bg-slate-300'
               }`}
             >
-              {adSenseConfig.enabled ? 'AdSense Enabled' : 'AdSense Disabled'}
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-xs ${
+                  adSenseConfig.enabled ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
             </button>
           </div>
 
-          {/* Publisher ID & Inventory Priority */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Publisher ID & Routing */}
+          <div className="space-y-4 text-xs">
             <div>
-              <label className="block text-xs font-bold text-ink mb-1">
-                AdSense Publisher Client ID
+              <label className="block font-bold text-slate-700 mb-1">
+                Publisher Client ID
               </label>
               <input
                 type="text"
                 value={adSenseConfig.clientId}
                 onChange={(e) => setAdSenseConfig({ ...adSenseConfig, clientId: e.target.value })}
                 placeholder="ca-pub-XXXXXXXXXXXXXXXX"
-                className="w-full bg-surface-container border border-border-subtle px-3 py-2 rounded text-xs font-mono text-ink"
+                className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl font-mono text-slate-900 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900"
               />
-              <span className="text-[10px] text-ink-muted">Default: ca-pub-6758961188222479</span>
+              <span className="text-[10px] text-slate-400 mt-1 block">Default: ca-pub-6758961188222479</span>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-ink mb-1">
-                Monetization Routing Priority
+              <label className="block font-bold text-slate-700 mb-1">
+                Display Strategy
               </label>
               <select
                 value={adSenseConfig.priority}
                 onChange={(e) => setAdSenseConfig({ ...adSenseConfig, priority: e.target.value as any })}
-                className="w-full bg-surface-container border border-border-subtle px-3 py-2 rounded text-xs text-ink font-bold"
+                className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-slate-900 font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900"
               >
-                <option value="direct_first">Direct Ads First (AdSense Fallback) — Recommended</option>
-                <option value="adsense_first">AdSense First (Direct Ad Fallback)</option>
-                <option value="direct_only">Direct Ads Only (Never Show AdSense)</option>
-                <option value="adsense_only">AdSense Only (Never Show Direct Ads)</option>
+                <option value="direct_first">Direct Ads First, AdSense Fallback (Recommended)</option>
+                <option value="adsense_first">AdSense First, Direct Ad Fallback</option>
+                <option value="direct_only">Direct Ads Only (Disable AdSense)</option>
+                <option value="adsense_only">AdSense Only (Disable Direct Ads)</option>
               </select>
             </div>
           </div>
 
-          {/* Zone Fallback Matrix */}
-          <div>
-            <label className="block text-xs font-bold text-ink mb-2">
-              AdSense Fallback Enabled per Zone
-            </label>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-              {ALL_ZONES.map((zone) => {
-                const zoneCfg = adSenseConfig.zones[zone];
-                const isEnabled = zoneCfg ? zoneCfg.enabled : true;
-
-                return (
-                  <label
-                    key={zone}
-                    className={`flex items-center gap-2 p-2 rounded border cursor-pointer text-xs ${
-                      isEnabled ? 'bg-emerald-50/50 border-emerald-300 font-bold text-emerald-900' : 'bg-slate-50 border-slate-200 text-slate-500'
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={isEnabled}
-                      onChange={(e) => {
-                        const checked = e.target.checked;
-                        setAdSenseConfig({
-                          ...adSenseConfig,
-                          zones: {
-                            ...adSenseConfig.zones,
-                            [zone]: {
-                              ...(adSenseConfig.zones[zone] || { slotId: `slot-${zone}`, format: 'rectangle' }),
-                              enabled: checked,
-                            },
-                          },
-                        });
-                      }}
-                      className="rounded text-primary"
-                    />
-                    <span>Zone {zone}</span>
-                  </label>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Save / Reset Actions */}
-          <div className="pt-3 border-t border-border-subtle flex items-center justify-between">
+          {/* Action Buttons */}
+          <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
             <button
-              onClick={handleResetDefaults}
-              className="text-xs text-slate-500 hover:text-rose-600 transition-colors cursor-pointer"
+              onClick={() => {
+                if (confirm('Reset AdSense settings to default?')) {
+                  resetAdsToDefaults();
+                  loadAllData();
+                }
+              }}
+              className="text-xs text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
             >
-              Reset to Factory Defaults
+              Reset to Defaults
             </button>
 
             <button
               onClick={handleSaveAdSense}
-              className="px-4 py-2 bg-primary hover:bg-primary-container text-white text-xs font-bold rounded transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm"
+              className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition-all cursor-pointer shadow-xs"
             >
-              <Check className="w-3.5 h-3.5 text-secondary-gold" />
-              <span>Save AdSense Settings</span>
+              Save AdSense Settings
             </button>
           </div>
         </div>
       )}
 
       {/* ======================================================================
-          EASY IMAGE UPLOAD & AD CREATOR MODAL (Direct DB Connection)
+          5. REDESIGNED USER-FRIENDLY MODAL (SIMPLE, FAST & SLEEK)
           ====================================================================== */}
       {isModalOpen && editingAd && (
-        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-surface-lowest border border-border-subtle rounded-md shadow-2xl max-w-lg w-full p-5 sm:p-6 space-y-4 animate-in fade-in zoom-in-95 duration-200 my-8">
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-lg w-full p-6 space-y-5 animate-in fade-in zoom-in-95 duration-200 my-8">
             
-            {/* Modal Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-border-subtle">
+            {/* Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div>
-                <h3 className="font-serif text-lg font-bold text-ink">
-                  {editingAd.id ? `Edit Ad for Zone ${editingAd.zone}` : `Upload New Ad for Zone ${editingAd.zone}`}
+                <h3 className="font-serif text-lg font-bold text-slate-900">
+                  {editingAd.id ? 'Edit Advertisement' : 'Upload Advertisement'}
                 </h3>
-                <p className="text-[11px] text-ink-muted">
-                  Upload an image banner, fill details, and connect directly with Supabase Database.
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Slot {editingAd.zone} • {FRIENDLY_ZONE_MAP[editingAd.zone]?.name}
                 </p>
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="p-1 hover:bg-slate-100 rounded text-slate-400 hover:text-slate-600 cursor-pointer"
+                className="p-1.5 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-600 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSaveAdToDatabase} className="space-y-4 text-xs">
+            <form onSubmit={handleSaveAd} className="space-y-4 text-xs">
               
-              {/* Target Zone Selection */}
+              {/* 1. Target Slot Selector */}
               <div>
-                <label className="block font-bold text-ink uppercase text-[11px] mb-1">
-                  1. Select Target Website Zone *
+                <label className="block font-bold text-slate-700 mb-1">
+                  Website Placement Slot
                 </label>
                 <select
                   value={editingAd.zone}
                   onChange={(e) => setEditingAd({ ...editingAd, zone: e.target.value })}
-                  className="w-full bg-surface-container border border-border-subtle px-3 py-2 rounded font-bold text-ink"
+                  className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900"
                 >
-                  {ALL_ZONES.map((z) => (
+                  {ZONES_LIST.map((z) => (
                     <option key={z} value={z}>
-                      Zone {z} — {ZONE_PLACEMENT_DETAILS[z]?.name} ({ZONE_PLACEMENT_DETAILS[z]?.desktopPosition})
+                      Slot {z} — {FRIENDLY_ZONE_MAP[z]?.name} ({FRIENDLY_ZONE_MAP[z]?.subtitle})
                     </option>
                   ))}
                 </select>
               </div>
 
-              {/* IMAGE UPLOAD & PREVIEW AREA */}
+              {/* 2. Visual Image Upload Box */}
               <div>
-                <label className="block font-bold text-ink uppercase text-[11px] mb-1">
-                  2. Upload Ad Banner / Creative Image *
+                <label className="block font-bold text-slate-700 mb-1">
+                  Banner Creative Image
                 </label>
 
-                {/* Upload Error Banner */}
                 {uploadError && (
-                  <div className="mb-2 p-2 bg-rose-50 border border-rose-300 rounded text-[11px] text-rose-800 flex items-center gap-1.5">
+                  <div className="mb-2 p-2.5 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-[11px] flex items-center gap-1.5">
                     <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                     <span>{uploadError}</span>
                   </div>
                 )}
 
-                {/* If Image exists, show preview with change button */}
+                {/* If Image Loaded -> Show clean preview */}
                 {editingAd.mediaUrl ? (
-                  <div className="p-3 bg-slate-50 dark:bg-slate-800/40 border rounded space-y-2">
-                    <div className="w-full h-40 bg-slate-200 dark:bg-slate-900 rounded overflow-hidden flex items-center justify-center p-2 relative">
+                  <div className="rounded-xl border border-slate-200 p-3 bg-slate-50 space-y-2">
+                    <div className="w-full h-36 bg-slate-200 rounded-lg overflow-hidden flex items-center justify-center relative">
                       <img
                         src={editingAd.mediaUrl}
-                        alt="Ad Banner Preview"
+                        alt="Ad preview"
                         className="max-h-full max-w-full object-contain block mx-auto"
                       />
                     </div>
-
-                    <div className="flex items-center justify-between text-[11px]">
+                    <div className="flex items-center justify-between text-xs">
                       <span className="text-emerald-700 font-bold flex items-center gap-1">
                         <CheckCircle2 className="w-3.5 h-3.5" />
-                        <span>Image Ready</span>
+                        <span>Banner Image Ready</span>
                       </span>
-
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
                           onClick={() => fileInputRef.current?.click()}
-                          className="px-2.5 py-1 bg-white hover:bg-slate-100 border text-slate-700 font-bold rounded cursor-pointer"
+                          className="px-2.5 py-1 bg-white hover:bg-slate-100 border text-slate-700 font-semibold rounded-lg cursor-pointer"
                         >
-                          Change File
+                          Change
                         </button>
                         <button
                           type="button"
                           onClick={() => setEditingAd({ ...editingAd, mediaUrl: '' })}
-                          className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded cursor-pointer"
+                          className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold rounded-lg cursor-pointer"
                         >
                           Remove
                         </button>
@@ -970,101 +866,109 @@ export const AdManagerView: React.FC = () => {
                     </div>
                   </div>
                 ) : (
-                  /* Drag and Drop / File Input Box */
+                  /* Modern, Clean Drag & Drop Area */
                   <div
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-full border-2 border-dashed border-slate-300 hover:border-primary rounded-lg p-5 text-center cursor-pointer transition-colors bg-slate-50/50 hover:bg-primary/5 flex flex-col items-center justify-center"
+                    className="w-full border-2 border-dashed border-slate-200 hover:border-slate-800 rounded-xl p-6 text-center cursor-pointer transition-colors bg-slate-50/50 hover:bg-slate-50 flex flex-col items-center justify-center group"
                   >
-                    {isUploadingImage ? (
-                      <div className="flex flex-col items-center justify-center space-y-2 py-3">
-                        <RefreshCw className="w-6 h-6 text-primary animate-spin" />
-                        <span className="text-xs font-bold text-primary">Uploading to Media Storage...</span>
+                    {isUploading ? (
+                      <div className="flex flex-col items-center justify-center space-y-2 py-2">
+                        <RefreshCw className="w-6 h-6 text-slate-800 animate-spin" />
+                        <span className="text-xs font-bold text-slate-800">Uploading to Media Storage...</span>
                       </div>
                     ) : (
                       <>
-                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-                          <Upload className="w-5 h-5 text-primary" />
+                        <div className="w-10 h-10 rounded-full bg-slate-100 group-hover:bg-slate-200 flex items-center justify-center mb-2 transition-colors">
+                          <Upload className="w-5 h-5 text-slate-600 group-hover:text-slate-900" />
                         </div>
-                        <span className="text-xs font-bold text-ink">
-                          Click to select an image from your computer
+                        <span className="text-xs font-bold text-slate-900">
+                          Click to browse image from your device
                         </span>
-                        <span className="text-[10px] text-ink-muted mt-1">
-                          PNG, JPG, WebP, or GIF (Recommended: 300x250 or 728x90)
+                        <span className="text-[11px] text-slate-400 mt-0.5">
+                          PNG, JPG, or WebP ({FRIENDLY_ZONE_MAP[editingAd.zone]?.dimensions})
                         </span>
                       </>
                     )}
                   </div>
                 )}
 
-                {/* Hidden Native File Input */}
                 <input
                   ref={fileInputRef}
                   type="file"
                   accept="image/png, image/jpeg, image/webp, image/gif"
-                  onChange={handleImageFileChange}
+                  onChange={handleFileUpload}
                   className="hidden"
                 />
 
-                {/* Manual Image URL Input (Fallback) */}
-                <div className="mt-2">
-                  <div className="text-[10px] text-ink-muted mb-0.5">Or paste direct image URL:</div>
+                {/* Optional Direct URL Toggle */}
+                <div className="mt-1.5 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setShowUrlInput(!showUrlInput)}
+                    className="text-[11px] text-slate-500 hover:text-slate-800 hover:underline cursor-pointer"
+                  >
+                    {showUrlInput ? 'Hide manual URL input' : 'Or paste image URL instead'}
+                  </button>
+                </div>
+
+                {showUrlInput && (
                   <input
                     type="text"
                     value={editingAd.mediaUrl || ''}
                     onChange={(e) => setEditingAd({ ...editingAd, mediaUrl: e.target.value })}
-                    placeholder="https://example.com/banner.png or /uploads/..."
-                    className="w-full bg-surface-container border border-border-subtle px-2.5 py-1.5 rounded font-mono text-[11px] text-ink"
+                    placeholder="https://example.com/banner.png"
+                    className="w-full mt-1.5 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg font-mono text-[11px] text-slate-900"
                   />
-                </div>
+                )}
               </div>
 
-              {/* ADVERTISER & HEADLINE */}
+              {/* 3. Advertiser Name & Headline */}
               <div className="space-y-3">
                 <div>
-                  <label className="block font-bold text-ink uppercase text-[11px] mb-1">
-                    3. Advertiser / Sponsor Name *
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Brand / Advertiser Name *
                   </label>
                   <input
                     type="text"
                     required
                     value={editingAd.advertiserName}
                     onChange={(e) => setEditingAd({ ...editingAd, advertiserName: e.target.value })}
-                    placeholder="e.g. Reserve Bank of India / Commercial Sponsor"
-                    className="w-full bg-surface-container border border-border-subtle px-3 py-2 rounded text-ink font-medium"
+                    placeholder="e.g. Reserve Bank of India, Tata Motors, etc."
+                    className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-slate-900 font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-bold text-ink uppercase text-[11px] mb-1">
-                    4. Ad Headline & Description Copy
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Headline or Ad Description (Optional)
                   </label>
                   <textarea
                     rows={2}
                     value={editingAd.creativeText}
                     onChange={(e) => setEditingAd({ ...editingAd, creativeText: e.target.value })}
-                    placeholder="Brief message, initiative notice, or offer description..."
-                    className="w-full bg-surface-container border border-border-subtle px-3 py-2 rounded text-ink"
+                    placeholder="Short message or announcement..."
+                    className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900"
                   />
                 </div>
               </div>
 
-              {/* DESTINATION LINK & BUTTON TEXT */}
+              {/* 4. Target Link / Phone */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-ink uppercase text-[11px] mb-1">
-                    5. Target URL or Phone
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Destination URL or Phone
                   </label>
                   <input
                     type="text"
                     value={editingAd.destinationUrl}
                     onChange={(e) => setEditingAd({ ...editingAd, destinationUrl: e.target.value })}
                     placeholder="https://... or tel:9871937299"
-                    className="w-full bg-surface-container border border-border-subtle px-3 py-2 rounded text-ink font-mono text-[11px]"
+                    className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl font-mono text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-bold text-ink uppercase text-[11px] mb-1">
+                  <label className="block font-bold text-slate-700 mb-1">
                     Button Label
                   </label>
                   <input
@@ -1072,56 +976,57 @@ export const AdManagerView: React.FC = () => {
                     value={editingAd.ctaText || 'Learn More'}
                     onChange={(e) => setEditingAd({ ...editingAd, ctaText: e.target.value })}
                     placeholder="Learn More / Call Now"
-                    className="w-full bg-surface-container border border-border-subtle px-3 py-2 rounded text-ink"
+                    className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900"
                   />
                 </div>
               </div>
 
-              {/* INITIAL STATUS SWITCH */}
-              <div className="p-3 bg-slate-50 dark:bg-slate-800/40 rounded border border-border-subtle flex items-center justify-between">
+              {/* 5. Live Display Switch */}
+              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
                 <div>
-                  <div className="font-bold text-ink text-xs">Live Display Status</div>
-                  <div className="text-[10px] text-ink-muted">Set whether this ad should appear on the website immediately.</div>
+                  <div className="font-bold text-slate-800 text-xs">Live Display Status</div>
+                  <div className="text-[11px] text-slate-500">Make this banner live on the website immediately.</div>
                 </div>
 
                 <button
                   type="button"
                   onClick={() => setEditingAd({ ...editingAd, isActive: !editingAd.isActive })}
-                  className={`px-3 py-1.5 rounded text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5 ${
-                    editingAd.isActive
-                      ? 'bg-emerald-600 text-white'
-                      : 'bg-slate-300 text-slate-700'
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
+                    editingAd.isActive ? 'bg-emerald-600' : 'bg-slate-300'
                   }`}
                 >
-                  <Power className="w-3 h-3" />
-                  <span>{editingAd.isActive ? 'Active (Live)' : 'Paused (Hidden)'}</span>
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-xs ${
+                      editingAd.isActive ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
                 </button>
               </div>
 
-              {/* SUBMIT BUTTON */}
-              <div className="pt-2 border-t border-border-subtle flex items-center justify-between gap-3">
+              {/* Submit Buttons */}
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-3">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 border border-slate-300 text-slate-700 hover:bg-slate-100 text-xs font-bold rounded cursor-pointer"
+                  className="px-4 py-2 border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold rounded-xl cursor-pointer"
                 >
                   Cancel
                 </button>
 
                 <button
                   type="submit"
-                  disabled={isSavingToDb}
-                  className="px-5 py-2.5 bg-primary hover:bg-primary-container text-white text-xs font-bold rounded flex items-center gap-2 cursor-pointer shadow-md disabled:opacity-50 transition-all"
+                  disabled={isSaving}
+                  className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl flex items-center gap-2 cursor-pointer shadow-md disabled:opacity-50 transition-all active:scale-98"
                 >
-                  {isSavingToDb ? (
+                  {isSaving ? (
                     <>
-                      <RefreshCw className="w-4 h-4 animate-spin text-secondary-gold" />
-                      <span>Saving to Supabase Database...</span>
+                      <RefreshCw className="w-4 h-4 animate-spin text-amber-400" />
+                      <span>Saving to Database...</span>
                     </>
                   ) : (
                     <>
-                      <Database className="w-4 h-4 text-secondary-gold" />
-                      <span>Save Ad to Database & Publish</span>
+                      <Database className="w-4 h-4 text-amber-400" />
+                      <span>Save & Publish Live</span>
                     </>
                   )}
                 </button>
