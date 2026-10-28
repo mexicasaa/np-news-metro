@@ -89,45 +89,45 @@ export const HomepageLayoutManager: React.FC<HomepageLayoutManagerProps> = ({
         </button>
       </div>
 
-      {/* Main Title & Action Row (Matching Screenshot 3) */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* Main Title & Action Row */}
+      <div className="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="font-serif text-3xl font-extrabold text-ink tracking-tight">
-            Homepage Layout
+          <h1 className="font-serif text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+            Homepage Front Page Sections
           </h1>
-          <p className="text-sm text-ink-secondary mt-0.5">
-            Manage editorial curation, slot priorities, and pin lead stories to fixed slots.
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            Choose lead stories, arrange news sections, and control what appears on the front page.
           </p>
         </div>
 
         <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap sm:flex-nowrap w-full sm:w-auto justify-end">
           <button
             onClick={() => setVersionModalOpen(true)}
-            className="px-3.5 py-2 bg-white hover:bg-slate-100 border border-border-subtle rounded-xs text-xs font-bold text-ink flex items-center gap-1.5 transition-colors cursor-pointer"
+            className="px-3.5 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer"
           >
             <History className="w-3.5 h-3.5 text-slate-500" />
-            <span>Version History</span>
+            <span>Saved Layouts</span>
           </button>
 
           <button
             onClick={handleSaveHomepage}
             disabled={isPublishing}
-            className="px-4 py-2 bg-editorial-red hover:bg-red-800 text-white rounded-xs text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
+            className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
           >
             {isPublishing ? (
-              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+              <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-400" />
             ) : (
-              <Check className="w-3.5 h-3.5" />
+              <Check className="w-3.5 h-3.5 text-emerald-400" />
             )}
-            <span>{isPublishing ? 'Publishing...' : 'Publish Changes'}</span>
+            <span>{isPublishing ? 'Publishing...' : 'Publish to Front Page'}</span>
           </button>
         </div>
       </div>
 
       {publishedToast && (
-        <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold rounded-xs flex items-center gap-2 animate-fadeIn">
+        <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold rounded-xl flex items-center gap-2 animate-fadeIn">
           <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-          <span>Homepage slot arrangement published live to Edge CDN.</span>
+          <span>Homepage stories arrangement published live to website.</span>
         </div>
       )}
 

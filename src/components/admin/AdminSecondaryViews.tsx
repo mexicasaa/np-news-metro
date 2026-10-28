@@ -89,37 +89,37 @@ export const MediaLibraryView: React.FC = () => {
         accept="image/*,video/*,application/pdf"
         className="hidden"
       />
-      <div className="flex items-center justify-between flex-wrap gap-3">
+      <div className="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="font-serif text-2xl sm:text-3xl font-extrabold text-ink">
-            Media Library & Asset Management
+          <h1 className="font-serif text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+            Photos & Media Library
           </h1>
-          <p className="text-xs sm:text-sm text-ink-secondary mt-1">
-            Supabase Storage synchronization with reserved dimensions and metadata verification.
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            Upload, search, and manage photos, story banners, and graphic assets.
           </p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setIsYouTubeModalOpen(true)}
-            className="px-3.5 py-2 bg-slate-900 text-white text-xs font-bold rounded-sm shadow-xs hover:bg-slate-800 transition-colors flex items-center gap-1.5 cursor-pointer"
+            className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer"
           >
-            <Globe className="w-3.5 h-3.5 text-red-400" />
-            <span>Import YouTube Video</span>
+            <Globe className="w-3.5 h-3.5 text-red-600" />
+            <span>Add YouTube Clip</span>
           </button>
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={isUploading}
-            className="px-4 py-2 bg-editorial-red text-white text-xs font-bold rounded-sm shadow-xs hover:bg-red-800 transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+            className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
           >
             {isUploading ? (
               <>
-                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-400" />
                 <span>Uploading...</span>
               </>
             ) : (
               <>
-                <Plus className="w-3.5 h-3.5" />
-                <span>Upload Asset</span>
+                <Plus className="w-3.5 h-3.5 text-amber-400" />
+                <span>Upload Photo</span>
               </>
             )}
           </button>
@@ -766,13 +766,13 @@ export const UsersView: React.FC = () => {
       )}
 
       {/* Header & Main Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="font-serif text-2xl sm:text-3xl font-extrabold text-ink">
-            Newsroom Users & Role Permissions
+          <h1 className="font-serif text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+            Team & Staff Access
           </h1>
-          <p className="text-xs sm:text-sm text-ink-secondary mt-1">
-            Enforced server-side least-privilege role matrix across authoring, reviewing, publishing, and curation (Supabase Auth & Profiles).
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            Manage reporters, editors, and assign access permissions to the newsroom.
           </p>
         </div>
 
@@ -783,11 +783,11 @@ export const UsersView: React.FC = () => {
               fetchUsers();
             }}
             disabled={refreshing}
-            className="px-3 py-2 bg-surface-lowest hover:bg-slate-100 border border-border-subtle text-ink rounded-sm text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+            className="px-3 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
             title="Reload team members from database"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-primary' : 'text-ink-muted'}`} />
-            <span>{refreshing ? 'Syncing...' : 'Sync DB'}</span>
+            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-slate-900' : 'text-slate-400'}`} />
+            <span>{refreshing ? 'Syncing...' : 'Sync Team'}</span>
           </button>
 
           <button
@@ -795,9 +795,9 @@ export const UsersView: React.FC = () => {
               setAddError(null);
               setIsAddModalOpen(true);
             }}
-            className="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-sm text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
+            className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
           >
-            <UserPlus className="w-4 h-4" />
+            <UserPlus className="w-4 h-4 text-amber-400" />
             <span>+ Add Team Member</span>
           </button>
         </div>
@@ -1488,30 +1488,30 @@ export const AudienceView: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 animate-fadeIn">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="font-serif text-2xl sm:text-3xl font-extrabold text-ink">
-            Audience Engagement & Moderation
+          <h1 className="font-serif text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+            Reader Comments & Feedback
           </h1>
-          <p className="text-xs sm:text-sm text-ink-secondary mt-1">
-            Civil reader discussion moderation, comment approval queues, and newsletter subscriber management.
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            Review reader comments, approve genuine discussions, and view newsletter subscribers.
           </p>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-sm border border-border-subtle shrink-0">
+        <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200 shrink-0">
           <button
             onClick={() => setActiveTab('comments')}
-            className={`px-3 py-1.5 text-xs font-bold rounded-xs transition-colors flex items-center gap-1.5 cursor-pointer ${
+            className={`px-3.5 py-2 text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer ${
               activeTab === 'comments'
-                ? 'bg-white text-ink shadow-2xs'
-                : 'text-ink-secondary hover:text-ink'
+                ? 'bg-white text-slate-900 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <MessageSquare className="w-3.5 h-3.5" />
-            <span>Comments Moderation</span>
+            <span>Reader Comments</span>
             {pendingCommentsCount > 0 && (
-              <span className="px-1.5 py-0.2 bg-editorial-red text-white rounded-full text-[10px] font-mono">
+              <span className="px-1.5 py-0.2 bg-red-600 text-white rounded-full text-[10px] font-mono">
                 {pendingCommentsCount}
               </span>
             )}
@@ -1519,14 +1519,14 @@ export const AudienceView: React.FC = () => {
 
           <button
             onClick={() => setActiveTab('subscribers')}
-            className={`px-3 py-1.5 text-xs font-bold rounded-xs transition-colors flex items-center gap-1.5 cursor-pointer ${
+            className={`px-3.5 py-2 text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer ${
               activeTab === 'subscribers'
-                ? 'bg-white text-ink shadow-2xs'
-                : 'text-ink-secondary hover:text-ink'
+                ? 'bg-white text-slate-900 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <Mail className="w-3.5 h-3.5" />
-            <span>Subscribers</span>
+            <span>Newsletter Readers</span>
             <span className="px-1.5 py-0.2 bg-slate-200 text-slate-700 rounded-full text-[10px] font-mono">
               {subscribers.length}
             </span>
@@ -1796,51 +1796,51 @@ export const AnalyticsDashboardView: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 animate-fadeIn">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="font-serif text-2xl sm:text-3xl font-extrabold text-ink">
-            Newsroom Analytics & Trending Engine
+          <h1 className="font-serif text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+            Readership & Trending News
           </h1>
-          <p className="text-xs sm:text-sm text-ink-secondary mt-1">
-            Aggregated reader interactions, decaying viral ranking scores, and infrastructure quota thresholds.
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            Track real-time readers, most-read stories, and reader engagement across the website.
           </p>
         </div>
         <button
           onClick={loadTrending}
-          className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-sm flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
+          className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer shrink-0 shadow-xs active:scale-98"
         >
-          <RefreshCw className={`w-3.5 h-3.5 ${loadingTrending ? 'animate-spin' : ''}`} />
-          <span>Refresh Analytics</span>
+          <RefreshCw className={`w-3.5 h-3.5 text-amber-400 ${loadingTrending ? 'animate-spin' : ''}`} />
+          <span>Refresh Stats</span>
         </button>
       </div>
 
       {/* Engagement Summary Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-        <div className="bg-surface-lowest border border-border-subtle p-4 rounded-sm shadow-subtle">
-          <div className="flex items-center justify-between text-ink-muted">
-            <span className="text-[11px] font-mono uppercase">Aggregated Views</span>
-            <BarChart3 className="w-4 h-4 text-primary" />
+        <div className="bg-white border border-slate-200/80 p-4 rounded-2xl shadow-xs">
+          <div className="flex items-center justify-between text-slate-500">
+            <span className="text-[11px] font-semibold uppercase tracking-wider">Total Story Views</span>
+            <BarChart3 className="w-4 h-4 text-slate-900" />
           </div>
-          <p className="font-serif text-2xl font-bold text-ink mt-2">
+          <p className="font-serif text-2xl font-bold text-slate-900 mt-2">
             {totalAggregatedViews > 0 ? totalAggregatedViews.toLocaleString() : '1,000,000+ Ready'}
           </p>
-          <span className="text-[10px] font-mono text-emerald-700 font-semibold">Edge CDN Cache-First</span>
+          <span className="text-[10px] text-emerald-700 font-semibold">Fast Realtime Delivery</span>
         </div>
 
-        <div className="bg-surface-lowest border border-border-subtle p-4 rounded-sm shadow-subtle">
-          <div className="flex items-center justify-between text-ink-muted">
-            <span className="text-[11px] font-mono uppercase">Verified Likes</span>
-            <Heart className="w-4 h-4 text-editorial-red" />
+        <div className="bg-white border border-slate-200/80 p-4 rounded-2xl shadow-xs">
+          <div className="flex items-center justify-between text-slate-500">
+            <span className="text-[11px] font-semibold uppercase tracking-wider">Reader Likes</span>
+            <Heart className="w-4 h-4 text-red-600" />
           </div>
-          <p className="font-serif text-2xl font-bold text-editorial-red mt-2">
+          <p className="font-serif text-2xl font-bold text-red-600 mt-2">
             {totalAggregatedLikes.toLocaleString()}
           </p>
-          <span className="text-[10px] font-mono text-slate-500">Atomic Count (1/user)</span>
+          <span className="text-[10px] text-slate-500">Unique Readers</span>
         </div>
 
-        <div className="bg-surface-lowest border border-border-subtle p-4 rounded-sm shadow-subtle">
-          <div className="flex items-center justify-between text-ink-muted">
-            <span className="text-[11px] font-mono uppercase">Reader Comments</span>
+        <div className="bg-white border border-slate-200/80 p-4 rounded-2xl shadow-xs">
+          <div className="flex items-center justify-between text-slate-500">
+            <span className="text-[11px] font-semibold uppercase tracking-wider">Reader Comments</span>
             <MessageSquare className="w-4 h-4 text-blue-600" />
           </div>
           <p className="font-serif text-2xl font-bold text-blue-800 mt-2">
@@ -2056,86 +2056,106 @@ export const SystemView: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 animate-fadeIn">
-      <div>
-        <h1 className="font-serif text-2xl sm:text-3xl font-extrabold text-ink">
-          System Infrastructure & Edge Cache
-        </h1>
-        <p className="text-xs sm:text-sm text-ink-secondary mt-1">
-          Server health, Supabase PostgreSQL, Storage Buckets, Cloudflare CDN distribution nodes, and admin audit trail.
-        </p>
+      <div className="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="font-serif text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+            Website Health & Cache
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            Check server connections, database status, and refresh website cache.
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            All Systems Operational
+          </span>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        <div className="bg-surface-lowest border border-border-subtle p-5 rounded-sm shadow-subtle space-y-4">
-          <h3 className="font-serif font-bold text-base text-ink pb-2 border-b border-slate-100 flex items-center gap-2">
-            <Globe className="w-4 h-4 text-primary" />
-            <span>Edge CDN Cache Control</span>
+        <div className="bg-white border border-slate-200/80 p-5 rounded-2xl shadow-xs space-y-4">
+          <h3 className="font-serif font-bold text-base text-slate-900 pb-2 border-b border-slate-100 flex items-center gap-2">
+            <Globe className="w-4 h-4 text-slate-900" />
+            <span>Website Cache Refresh</span>
           </h3>
-          <p className="text-xs text-ink-secondary leading-relaxed">
-            Purge targeted distribution routes for homepage, categories, and article feeds across Cloudflare edge nodes.
+          <p className="text-xs text-slate-500 leading-relaxed">
+            Clear cached pages across the global network so visitors immediately receive newly updated layout, article headings, or design updates.
           </p>
           <div className="pt-1 flex items-center gap-3">
             <button
               onClick={handlePurge}
               disabled={clearing}
-              className="px-4 py-2 bg-primary hover:bg-slate-800 text-white rounded-sm text-xs font-bold flex items-center gap-2 transition-colors cursor-pointer disabled:opacity-50"
+              className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold flex items-center gap-2 transition-colors cursor-pointer disabled:opacity-50 shadow-xs"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${clearing ? 'animate-spin' : ''}`} />
-              <span>{clearing ? 'Purging Cloudflare Edge...' : 'Purge Targeted Cache'}</span>
+              <span>{clearing ? 'Clearing Cache...' : 'Clear & Refresh Website Cache'}</span>
             </button>
             {purged && (
               <p className="text-xs text-emerald-600 font-bold flex items-center gap-1 animate-fadeIn">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Edge cache invalidated successfully.</span>
+                <span>Website cache cleared successfully.</span>
               </p>
             )}
           </div>
         </div>
 
-        <div className="bg-surface-lowest border border-border-subtle p-5 rounded-sm shadow-subtle space-y-4">
-          <h3 className="font-serif font-bold text-base text-ink pb-2 border-b border-slate-100 flex items-center gap-2">
+        <div className="bg-white border border-slate-200/80 p-5 rounded-2xl shadow-xs space-y-4">
+          <h3 className="font-serif font-bold text-base text-slate-900 pb-2 border-b border-slate-100 flex items-center gap-2">
             <Database className="w-4 h-4 text-emerald-600" />
-            <span>Supabase Backend Health</span>
+            <span>Database & Cloud Connections</span>
           </h3>
-          <div className="space-y-2 font-mono text-xs">
+          <div className="space-y-2.5 text-xs">
             <div className="flex items-center justify-between">
-              <span className="text-ink">PostgreSQL Database</span>
-              <span className="text-emerald-700 font-bold">Connected (Active Healthy)</span>
+              <span className="text-slate-600 font-medium">Database (Supabase PostgreSQL)</span>
+              <span className="text-emerald-700 font-bold flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                Connected & Active
+              </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-ink">Cloudflare R2 / Storage</span>
-              <span className="text-emerald-700 font-bold">SHA-256 Deduplicated</span>
+              <span className="text-slate-600 font-medium">Media Storage (Cloud Storage)</span>
+              <span className="text-emerald-700 font-bold flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                Online & Fast
+              </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-ink">Row Level Security</span>
-              <span className="text-emerald-700 font-bold">Enforced (11 Tables)</span>
+              <span className="text-slate-600 font-medium">Access Security & Permissions</span>
+              <span className="text-emerald-700 font-bold flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                Protected & Enforced
+              </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-ink">Failure Isolation (Rule 35)</span>
-              <span className="text-emerald-700 font-bold">Active & Decoupled</span>
+              <span className="text-slate-600 font-medium">Live Background Updates Engine</span>
+              <span className="text-emerald-700 font-bold flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                Active & Synchronized
+              </span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Administrative Audit Logs Table */}
-      <div className="bg-surface-lowest border border-border-subtle rounded-sm p-5 shadow-subtle space-y-4">
+      {/* Activity Logs Table */}
+      <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-serif font-bold text-base text-ink flex items-center gap-2">
+            <h3 className="font-serif font-bold text-base text-slate-900 flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-slate-700" />
-              <span>Administrative Audit Trail (`admin_audit_logs`)</span>
+              <span>Newsroom Activity Log</span>
             </h3>
-            <p className="text-xs text-ink-muted mt-0.5">
-              Lean, high-density audit records for all content deletions, role changes, and system operations.
+            <p className="text-xs text-slate-500 mt-0.5">
+              Records of published stories, deletions, and role permissions changes.
             </p>
           </div>
           <button
             onClick={loadAuditLogs}
-            className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-sm flex items-center gap-1.5 cursor-pointer"
+            className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl flex items-center gap-1.5 cursor-pointer transition-colors"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loadingLogs ? 'animate-spin' : ''}`} />
-            <span>Refresh Logs</span>
+            <span>Refresh Log</span>
           </button>
         </div>
 

@@ -236,23 +236,23 @@ export const VideoStudioManager: React.FC<VideoStudioManagerProps> = ({
   return (
     <div className="max-w-6xl mx-auto space-y-6 animate-fadeIn pb-16">
       {/* Header bar */}
-      <div className="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-2xs">
+      <div className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-red-600 text-white flex items-center justify-center shadow-sm">
-              <Video className="w-6 h-6" />
+            <div className="w-10 h-10 rounded-xl bg-red-600 text-white flex items-center justify-center shadow-xs">
+              <Video className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="font-serif text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-                  Video Studio & Explainers
+                <h1 className="font-serif text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+                  Video News & Studio
                 </h1>
                 <span className="bg-red-50 text-red-700 border border-red-200 text-xs font-bold px-2.5 py-0.5 rounded-full">
-                  YouTube News Hub
+                  YouTube Videos
                 </span>
               </div>
               <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-                Curate and publish YouTube news reports, visual documentaries, and policy explainers for Homepage and Video Hub.
+                Publish and manage video reports, YouTube bulletins, and explainers across the website.
               </p>
             </div>
           </div>
@@ -260,21 +260,21 @@ export const VideoStudioManager: React.FC<VideoStudioManagerProps> = ({
           <div className="flex items-center gap-2.5">
             <button
               onClick={openAddModal}
-              className="px-4 py-2.5 bg-red-600 hover:bg-red-700 active:scale-[0.98] text-white rounded-lg text-xs sm:text-sm font-bold shadow-xs transition-all flex items-center gap-2 cursor-pointer"
+              className="px-4 py-2.5 bg-red-600 hover:bg-red-700 active:scale-98 text-white rounded-xl text-xs font-bold shadow-xs transition-all flex items-center gap-2 cursor-pointer"
             >
               <Plus className="w-4 h-4" />
-              <span>+ Add YouTube Video</span>
+              <span>+ Add Video</span>
             </button>
           </div>
         </div>
 
         {/* Quick Metrics */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-5 border-t border-slate-100 text-xs">
-          <div className="p-3 bg-slate-50 rounded-lg border border-slate-200/70">
+          <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/70">
             <span className="text-slate-500 block">Total Videos Published</span>
             <span className="font-serif text-xl font-bold text-slate-900 mt-0.5 block">{videos.length}</span>
           </div>
-          <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-200/70">
+          <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200/70">
             <span className="text-emerald-700 font-semibold block">Live on Homepage</span>
             <span className="font-serif text-xl font-bold text-emerald-900 mt-0.5 block">Top 4 Videos</span>
           </div>

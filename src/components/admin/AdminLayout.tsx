@@ -66,17 +66,17 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
 
   const sidebarItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Home },
-    { id: 'publishing', label: 'Publishing Center', icon: FileText, badge: reviewCount || 25 },
-    { id: 'editorial', label: 'Editorial', icon: Newspaper },
-    { id: 'videos', label: 'Videos', icon: Video },
-    { id: 'media', label: 'Media Library', icon: ImageIcon },
+    { id: 'publishing', label: 'Write Story', icon: FileText, badge: reviewCount || 25 },
+    { id: 'editorial', label: 'All Stories', icon: Newspaper },
+    { id: 'videos', label: 'Video News', icon: Video },
+    { id: 'media', label: 'Photos & Media', icon: ImageIcon },
     { id: 'homepage-layout', label: 'Homepage', icon: LayoutTemplate },
-    { id: 'monetization', label: 'Monetization', icon: DollarSign },
-    { id: 'seo', label: 'SEO', icon: Search },
-    { id: 'audience', label: 'Audience', icon: Users },
-    { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-    { id: 'users', label: 'Users', icon: Users },
-    { id: 'system', label: 'System', icon: Settings },
+    { id: 'monetization', label: 'Ad Placements', icon: DollarSign },
+    { id: 'seo', label: 'Google Search & SEO', icon: Search },
+    { id: 'audience', label: 'Reader Comments', icon: Users },
+    { id: 'analytics', label: 'Readership Stats', icon: BarChart3 },
+    { id: 'users', label: 'Staff & Team', icon: Users },
+    { id: 'system', label: 'Website Health', icon: Settings },
   ];
 
   const handleNavigate = (section: AdminSection) => {

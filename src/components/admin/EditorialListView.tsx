@@ -112,66 +112,66 @@ export const EditorialListView: React.FC<EditorialListViewProps> = ({
   return (
     <div className="max-w-7xl mx-auto space-y-6 animate-fadeIn">
       {/* Top Header Row */}
-      <div>
-        <h1 className="font-serif text-3xl font-extrabold text-ink tracking-tight">
-          Editorial List
-        </h1>
-        <p className="text-sm text-ink-secondary mt-1">
-          Manage and track all articles across sections.
-        </p>
+      <div className="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="font-serif text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+            All Written Stories
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            Search, edit, organize, and monitor all news stories, drafts, and published reports.
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="px-3 py-1 bg-slate-100 text-slate-800 text-xs font-bold rounded-xl border border-slate-200">
+            {allPosts.length} Total Stories
+          </span>
+        </div>
       </div>
 
-      {/* Filter Toolbar (Matching Screenshot 2) */}
-      <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center justify-end gap-2 text-xs">
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="p-2 border border-border-subtle rounded-sm bg-white font-medium focus:outline-hidden focus:border-editorial-red cursor-pointer"
-        >
-          <option value="all">All Statuses</option>
-          <option value="published">Published</option>
-          <option value="review">Needs Review</option>
-          <option value="scheduled">Scheduled</option>
-          <option value="draft">Draft</option>
-        </select>
+      {/* Filter Toolbar */}
+      <div className="bg-white rounded-2xl border border-slate-200/80 p-3.5 shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div className="flex items-center gap-2 flex-wrap">
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="px-3 py-1.5 border border-slate-200 rounded-xl bg-slate-50 text-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-slate-900 cursor-pointer"
+          >
+            <option value="all">All Statuses</option>
+            <option value="published">Published</option>
+            <option value="review">Needs Review</option>
+            <option value="scheduled">Scheduled</option>
+            <option value="draft">Drafts</option>
+          </select>
 
-        <select
-          value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value)}
-          className="p-2 border border-border-subtle rounded-sm bg-white font-medium focus:outline-hidden focus:border-editorial-red cursor-pointer"
-        >
-          <option value="all">All Categories</option>
-          <option value="politics">Politics</option>
-          <option value="economy">Economy</option>
-          <option value="culture">Culture</option>
-          <option value="metro">Metro</option>
-        </select>
+          <select
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            className="px-3 py-1.5 border border-slate-200 rounded-xl bg-slate-50 text-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-slate-900 cursor-pointer"
+          >
+            <option value="all">All Desks & Categories</option>
+            <option value="politics">Politics</option>
+            <option value="economy">Economy</option>
+            <option value="culture">Culture</option>
+            <option value="metro">Metro</option>
+          </select>
 
-        <select
-          value={authorFilter}
-          onChange={(e) => setAuthorFilter(e.target.value)}
-          className="p-2 border border-border-subtle rounded-sm bg-white font-medium focus:outline-hidden focus:border-editorial-red cursor-pointer"
-        >
-          <option value="all">All Authors</option>
-          <option value="sarah">Sarah Jenkins</option>
-          <option value="david">David Chen</option>
-          <option value="elena">Elena Rostova</option>
-        </select>
-
-        <select
-          className="p-2 border border-border-subtle rounded-sm bg-white font-medium focus:outline-hidden focus:border-editorial-red cursor-pointer"
-        >
-          <option>Bulk Actions</option>
-          <option>Approve Selected</option>
-          <option>Publish Selected</option>
-          <option>Move to Trash</option>
-        </select>
+          <select
+            value={authorFilter}
+            onChange={(e) => setAuthorFilter(e.target.value)}
+            className="px-3 py-1.5 border border-slate-200 rounded-xl bg-slate-50 text-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-slate-900 cursor-pointer"
+          >
+            <option value="all">All Authors</option>
+            <option value="sarah">Sarah Jenkins</option>
+            <option value="david">David Chen</option>
+            <option value="elena">Elena Rostova</option>
+          </select>
+        </div>
       </div>
 
       {/* ======================================================================
-          EDITORIAL TABLE (Exact layout & styling from Screenshot 2)
+          STORIES TABLE (Clean, modern rounded card)
           ====================================================================== */}
-      <div className="bg-surface-lowest border border-border-subtle rounded-xs shadow-subtle overflow-hidden">
+      <div className="bg-white border border-slate-200/80 rounded-2xl shadow-xs overflow-hidden">
                 {/* Mobile Cards View (<md) */}
         <div className="md:hidden divide-y divide-border-subtle">
           {displayedArticles.length === 0 ? (
