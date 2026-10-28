@@ -5,11 +5,14 @@ import {
   ImagePlus, ExternalLink, RefreshCw, ArrowLeft, CheckCircle2,
   HelpCircle, Globe, Clock, ShieldCheck, Tag, Layout, Type, AlertCircle,
   UserCheck, Calendar, User, Image as ImageIcon, Trash2, ArrowUp, ArrowDown,
-  Plus, Check, MapPin, Newspaper, FileCheck, Award, Flame, Crop, UploadCloud, WrapText
+  Plus, Check, MapPin, Newspaper, FileCheck, Award, Flame, Crop, UploadCloud, WrapText,
+  Smartphone, Tablet, Monitor
 } from 'lucide-react';
 import { WpPost, EditorialCategorySlug, GutenbergBlock } from '../../types/wordpress';
 import { UserRole, EditorialStatus } from '../../types/admin';
 import { StandardArticleTemplate } from '../../templates/04_StandardArticleTemplate';
+import { BreakingArticleTemplate } from '../../templates/05_BreakingArticleTemplate';
+import { OpinionArticleTemplate } from '../../templates/06_OpinionArticleTemplate';
 import { ImageEditorModal } from './ImageEditorModal';
 import { AvatarCropModal } from './AvatarCropModal';
 import { compressImageFile, compressAvatarFile } from '../../utils/imageCompressor';
@@ -254,6 +257,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
   );
   const [visibility, setVisibility] = useState('Public');
   const [isBreaking, setIsBreaking] = useState(initialPost?.isBreaking || false);
+  const [isOpinion, setIsOpinion] = useState(initialPost?.isOpinion || false);
   const [publishDateType, setPublishDateType] = useState<'now' | 'custom'>('now');
   const [customPublishDate, setCustomPublishDate] = useState<string>(() => {
     if (initialPost?.publishedAt) {
@@ -285,6 +289,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const isSavingRef = useRef<boolean>(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [previewDevice, setPreviewDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
   const [isImageEditorOpen, setIsImageEditorOpen] = useState(false);
   const [isAvatarCropOpen, setIsAvatarCropOpen] = useState(false);
   const [cursorPos, setCursorPos] = useState<number | null>(null);
@@ -353,6 +358,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       setCustomAuthorRole(initialPost.customAuthor?.role || 'Newsroom');
       setCustomAuthorAvatar(initialPost.customAuthor?.avatar || '');
       setIsBreaking(initialPost.isBreaking || false);
+      setIsOpinion(initialPost.isOpinion || false);
       setFeaturedImage(initialPost.featuredImage || '');
       setImageCredit(initialPost.imageCredit || 'NP News Metro Photo Desk');
       setImageCaption(initialPost.imageCaption || '');
@@ -379,6 +385,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       setSeoTitle('');
       setMetaDescription('');
       setIsBreaking(false);
+      setIsOpinion(false);
     }
   }, [initialPost?.id]);
 
@@ -677,6 +684,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
         (imageCredit || 'NP News Metro Photo Desk') !== (initialPost.imageCredit || 'NP News Metro Photo Desk') ||
         (imageAlt || '') !== (initialPost.imageAlt || '') ||
         isBreaking !== (initialPost.isBreaking || false) ||
+        isOpinion !== (initialPost.isOpinion || false) ||
         (seoTitle || '') !== (initialPost.seoTitle || '') ||
         (metaDescription || '') !== (initialPost.seoDescription || '') ||
         (slug || '') !== (initialPost.slug || '')
@@ -722,6 +730,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       imageCaption: imageCaption || '',
       imageAlt: imageAlt || title,
       isBreaking: isBreaking,
+      isOpinion: isOpinion || category === 'opinion' || deskId === 'opinion',
       seoTitle: seoTitle || title,
       seoDescription: metaDescription || dek || title,
       blocks: blocks.length > 0 ? blocks : [
@@ -868,7 +877,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
   }, [
     registerSaveDraft, title, dek, content, category, featuredImage, tags,
     persistedDraftId, isEditMode, authorType, customAuthorName, customAuthorRole,
-    customAuthorAvatar, slug, seoTitle, metaDescription, isBreaking
+    customAuthorAvatar, slug, seoTitle, metaDescription, isBreaking, isOpinion
   ]);
 
   // Continuous background auto-save to draft
@@ -894,7 +903,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     title, dek, content, category, deskId, subcategory, articleType, location, sourceAgency,
     authorType, authorId, customAuthorName, customAuthorRole, customAuthorAvatar,
     publishDateType, customPublishDate, tags, featuredImage, imageCredit,
-    imageCaption, imageAlt, isBreaking, seoTitle, metaDescription, slug,
+    imageCaption, imageAlt, isBreaking, isOpinion, seoTitle, metaDescription, slug,
     primaryTopic, focusKeyphrase, secondaryKeywords, status, initialPost
   ]);
 
@@ -947,7 +956,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     title, dek, content, category, deskId, subcategory, articleType, location, sourceAgency,
     authorType, authorId, customAuthorName, customAuthorRole, customAuthorAvatar,
     publishDateType, customPublishDate, tags, featuredImage, imageCredit,
-    imageCaption, imageAlt, isBreaking, seoTitle, metaDescription, slug,
+    imageCaption, imageAlt, isBreaking, isOpinion, seoTitle, metaDescription, slug,
     primaryTopic, focusKeyphrase, secondaryKeywords, persistedDraftId, isEditMode
   ]);
 
@@ -961,7 +970,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
         channel.close();
       }
     } catch (err) {}
-    const previewUrl = window.location.origin + window.location.pathname + '?preview=true';
+    const previewUrl = window.location.origin + '/?preview=true';
     window.open(previewUrl, '_blank');
   };
 
@@ -1611,6 +1620,26 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                         <div className={`w-4 h-4 rounded-full bg-white shadow-xs transform transition-transform duration-200 ease-in-out ${isBreaking ? 'translate-x-4' : 'translate-x-0'}`} />
                       </div>
                     </div>
+
+                    {/* Mark as Opinion / Column Toggle */}
+                    <div 
+                      onClick={() => setIsOpinion(!isOpinion)}
+                      className={`flex items-center justify-between p-3 rounded-2xl border transition-all cursor-pointer select-none ${
+                        isOpinion 
+                          ? 'bg-amber-50/90 border-amber-200/90 shadow-2xs' 
+                          : 'bg-white border-slate-200/80 hover:bg-slate-50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <Quote className={`w-4 h-4 ${isOpinion ? 'text-amber-600' : 'text-slate-400'}`} />
+                        <span className={`text-xs font-bold ${isOpinion ? 'text-amber-900' : 'text-slate-700'}`}>
+                          Mark as Opinion / Column
+                        </span>
+                      </div>
+                      <div className={`w-9 h-5 rounded-full p-0.5 transition-colors duration-200 ease-in-out ${isOpinion ? 'bg-amber-600' : 'bg-slate-200'}`}>
+                        <div className={`w-4 h-4 rounded-full bg-white shadow-xs transform transition-transform duration-200 ease-in-out ${isOpinion ? 'translate-x-4' : 'translate-x-0'}`} />
+                      </div>
+                    </div>
                   </div>
 
                   <div className="pt-3 border-t border-slate-100/80">
@@ -1994,33 +2023,77 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       </main>
 
       {isPreviewOpen && (
-        <div className="fixed inset-0 z-[100] bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-0 md:p-6 animate-fadeIn">
-          <div className="bg-white md:rounded-2xl w-full h-full md:h-[95vh] overflow-y-auto shadow-2xl relative flex flex-col">
+        <div className="fixed inset-0 z-[100] bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-0 md:p-4 animate-fadeIn">
+          <div className="bg-slate-100 md:rounded-2xl w-full h-full md:h-[96vh] overflow-hidden shadow-2xl relative flex flex-col border border-slate-700">
             
-            <div className="sticky top-0 z-[110] bg-slate-900 text-white px-6 py-3.5 flex items-center justify-between shadow-md">
+            {/* Header Toolbar with Device Switchers */}
+            <div className="sticky top-0 z-[110] bg-slate-900 text-white px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3 shadow-md border-b border-slate-800">
               <div className="flex items-center gap-3">
                 <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600/30 text-blue-400">
                   <Eye className="w-4 h-4" />
                 </span>
                 <div>
-                  <h3 className="font-bold text-sm tracking-wide">LIVE READER PREVIEW MODAL</h3>
-                  <p className="text-xs text-slate-400">This renders the real website article page.</p>
+                  <h3 className="font-bold text-xs sm:text-sm tracking-wide flex items-center gap-2">
+                    <span>LIVE ARTICLE PREVIEW</span>
+                    <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-blue-500/20 text-blue-300">
+                      {isBreaking ? 'Breaking News' : isOpinion ? 'Opinion Column' : 'Standard News'}
+                    </span>
+                  </h3>
+                  <p className="text-[11px] text-slate-400 hidden sm:block">Full editorial layout with responsive ad placements</p>
                 </div>
               </div>
 
+              {/* Device Frame Switcher */}
+              <div className="flex items-center gap-1 bg-slate-800 p-1 rounded-xl border border-slate-700">
+                <button
+                  type="button"
+                  onClick={() => setPreviewDevice('desktop')}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
+                    previewDevice === 'desktop' ? 'bg-primary text-white shadow-xs' : 'text-slate-400 hover:text-white'
+                  }`}
+                  title="Desktop (Full)"
+                >
+                  <Monitor className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Desktop</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPreviewDevice('tablet')}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
+                    previewDevice === 'tablet' ? 'bg-primary text-white shadow-xs' : 'text-slate-400 hover:text-white'
+                  }`}
+                  title="Tablet (768px)"
+                >
+                  <Tablet className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Tablet</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPreviewDevice('mobile')}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
+                    previewDevice === 'mobile' ? 'bg-primary text-white shadow-xs' : 'text-slate-400 hover:text-white'
+                  }`}
+                  title="Mobile Phone (390px)"
+                >
+                  <Smartphone className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Mobile</span>
+                </button>
+              </div>
+
+              {/* Action Buttons */}
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={handleOpenNewTabPreview}
-                  className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+                  className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
-                  <span>Open in Separate Tab</span>
+                  <span className="hidden sm:inline">Open in Tab</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsPreviewOpen(false)}
-                  className="px-3.5 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer"
+                  className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                   <span>Close</span>
@@ -2028,14 +2101,65 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
               </div>
             </div>
 
-            <div className="flex-1 bg-white relative">
-              <StandardArticleTemplate
-                post={getPostData() as WpPost}
-                onSelectPost={() => {}}
-                onNavigateHome={() => {}}
-                onSelectCategory={() => {}}
-                onSelectAuthor={() => {}}
-              />
+            {/* Preview Frame Container */}
+            <div className="flex-1 bg-slate-200/70 overflow-y-auto p-2 sm:p-6 flex justify-center items-start">
+              <div
+                className={`transition-all duration-300 bg-white shadow-2xl relative ${
+                  previewDevice === 'mobile'
+                    ? 'w-[390px] min-h-[844px] rounded-3xl border-8 border-slate-900 my-4 overflow-hidden shadow-2xl ring-1 ring-black/20'
+                    : previewDevice === 'tablet'
+                    ? 'w-[768px] min-h-[1024px] rounded-2xl border-8 border-slate-800 my-4 overflow-hidden shadow-2xl ring-1 ring-black/20'
+                    : 'w-full rounded-none'
+                }`}
+              >
+                {/* Mobile / Tablet Status Bar Mock */}
+                {previewDevice !== 'desktop' && (
+                  <div className="bg-slate-900 text-white text-[11px] px-5 py-1.5 flex items-center justify-between font-mono select-none">
+                    <span>9:41</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px]">5G</span>
+                      <div className="w-4 h-2 border border-white rounded-xs p-0.5">
+                        <div className="w-full h-full bg-white rounded-2xs"></div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {(() => {
+                  const postData = getPostData() as WpPost;
+                  if (postData.isBreaking) {
+                    return (
+                      <BreakingArticleTemplate
+                        post={postData}
+                        onSelectPost={() => {}}
+                        onNavigateHome={() => {}}
+                        onSelectCategory={() => {}}
+                        onSelectAuthor={() => {}}
+                      />
+                    );
+                  }
+                  if (postData.isOpinion) {
+                    return (
+                      <OpinionArticleTemplate
+                        post={postData}
+                        onSelectPost={() => {}}
+                        onNavigateHome={() => {}}
+                        onSelectCategory={() => {}}
+                        onSelectAuthor={() => {}}
+                      />
+                    );
+                  }
+                  return (
+                    <StandardArticleTemplate
+                      post={postData}
+                      onSelectPost={() => {}}
+                      onNavigateHome={() => {}}
+                      onSelectCategory={() => {}}
+                      onSelectAuthor={() => {}}
+                    />
+                  );
+                })()}
+              </div>
             </div>
             
           </div>

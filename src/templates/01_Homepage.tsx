@@ -15,6 +15,7 @@ import { LatestNewsRow } from '../components/cards/LatestNewsRow';
 import { RankingItem } from '../components/cards/RankingItem';
 import { VideoCard } from '../components/cards/VideoCard';
 import { AdSlot } from '../components/commercial/AdSlot';
+import { AdGridRow } from '../components/commercial/AdGridRow';
 import { NewsletterModule } from '../components/common/NewsletterModule';
 import { MetromatPoll } from '../components/common/MetromatPoll';
 import { useLanguage } from '../context/LanguageContext';
@@ -88,9 +89,6 @@ export const Homepage: React.FC<HomepageProps> = ({
 
   return (
     <main className="max-w-site mx-auto px-3 sm:px-4 py-4 sm:py-6 space-y-6 sm:space-y-8">
-      {/* 1. Top Interstitial Billboard Ad (A1/A2) */}
-      {showAds && <AdSlot zone="A2" />}
-
       {/* Active Editorial Wire & Edition Header */}
       <div className="flex flex-wrap items-center justify-between gap-2 py-2 px-3 sm:px-4 bg-surface-lowest border border-border-subtle rounded-sm text-xs text-ink-secondary shadow-2xs">
         <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
@@ -151,11 +149,17 @@ export const Homepage: React.FC<HomepageProps> = ({
               ))}
             </div>
 
-            {/* Vertical Sidebar Ad Placement (A3) */}
-            {showAds && <AdSlot zone="A3" className="mt-2" />}
           </div>
         </div>
       </section>
+
+      {/* 4-Ad Grid Row 1: Placed below Feature Section and Editor’s Picks */}
+      {showAds && (
+        <AdGridRow
+          zones={['A1', 'A2', 'A3', 'A4']}
+          id="ads-feature-strip"
+        />
+      )}
 
       {/* 3. Latest News Chronological Stream & Editorial Wire */}
       <section aria-label="Latest News Stream" className="pt-2 sm:pt-4">
@@ -265,9 +269,6 @@ export const Homepage: React.FC<HomepageProps> = ({
           ))}
         </div>
       </section>
-
-      {/* 5. Mid-page Interstitial Advertisement (A7) */}
-      {showAds && <AdSlot zone="A7" />}
 
       {/* 6. Section Module: Business, Economy & Markets */}
       <section aria-label="Business & Economy Section" className="pt-2 sm:pt-4">
@@ -399,6 +400,14 @@ export const Homepage: React.FC<HomepageProps> = ({
           </div>
         </div>
       </section>
+
+      {/* 4-Ad Grid Row 2: Placed below Technology & Deep Tech and World & Diplomacy */}
+      {showAds && (
+        <AdGridRow
+          zones={['A5', 'A6', 'A7', 'A8']}
+          id="ads-tech-world-strip"
+        />
+      )}
 
       {/* 9. Metromat: Editorial Voice & Today's Public Poll */}
       <section aria-label="Metromat Section" className="pt-2 sm:pt-4">

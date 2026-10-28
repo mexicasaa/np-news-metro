@@ -12,6 +12,7 @@ import { LiveTimeline } from '../components/article/LiveTimeline';
 import { RelatedStoriesBlock } from '../components/article/RelatedStoriesBlock';
 import { RankingItem } from '../components/cards/RankingItem';
 import { AdSlot } from '../components/commercial/AdSlot';
+import { AdGridRow } from '../components/commercial/AdGridRow';
 import { Breadcrumbs } from '../components/layout/Breadcrumbs';
 import { useLanguage } from '../context/LanguageContext';
 import { getAuthorAvatarUrl } from '../utils/imageFallback';
@@ -194,6 +195,36 @@ export const BreakingArticleTemplate: React.FC<BreakingArticleTemplateProps> = (
             {/* Gutenberg Blocks */}
             <ArticleBody post={post} />
 
+            {/* Mobile / Responsive Ad A3: Dynamically moves down below article body */}
+            <div className="block lg:hidden my-6">
+              <AdSlot zone="A3" variant="card" />
+            </div>
+
+            {/* Mobile Trending Breaking Stories Block */}
+            <div className="block lg:hidden my-6 space-y-6">
+              <div className="bg-surface-lowest border border-border-subtle p-4 rounded-sm shadow-subtle">
+                <div className="flex items-center justify-between pb-2 border-b-2 border-editorial-red mb-3">
+                  <h3 className="font-serif text-base font-bold text-ink flex items-center gap-1.5">
+                    <Flame className="w-4 h-4 text-editorial-red" />
+                    <span>{isHindi ? 'ट्रेंडिंग ब्रेकिंग ख़बरें' : 'Trending Breaking Stories'}</span>
+                  </h3>
+                </div>
+                <div className="divide-y divide-border-subtle">
+                  {trendingRanking.map((p, idx) => (
+                    <RankingItem
+                      key={p.id}
+                      rank={idx + 1}
+                      post={p}
+                      onSelect={onSelectPost}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Mobile Ad A4: Moves down below trending breaking */}
+              <AdSlot zone="A4" variant="card" />
+            </div>
+
             {/* Author */}
             {author && (
               <AuthorBioBox
@@ -201,6 +232,11 @@ export const BreakingArticleTemplate: React.FC<BreakingArticleTemplateProps> = (
                 onViewAuthorProfile={onSelectAuthor}
               />
             )}
+
+            {/* Mobile Ad A7: Moves down below author bio */}
+            <div className="block lg:hidden my-6">
+              <AdSlot zone="A7" variant="card" />
+            </div>
 
             {/* Related Breaking Coverage */}
             <RelatedStoriesBlock
@@ -211,8 +247,8 @@ export const BreakingArticleTemplate: React.FC<BreakingArticleTemplateProps> = (
             />
           </article>
 
-          {/* Right Rail Sidebar */}
-          <aside className="lg:col-span-4 space-y-6">
+          {/* Right Rail Sidebar - Desktop only */}
+          <aside className="hidden lg:block lg:col-span-4 space-y-6">
             <AdSlot zone="A3" />
 
             <div className="bg-surface-lowest border border-border-subtle p-4 rounded-sm shadow-subtle">
@@ -233,7 +269,21 @@ export const BreakingArticleTemplate: React.FC<BreakingArticleTemplateProps> = (
                 ))}
               </div>
             </div>
+
+            {/* Sidebar Middle Ad */}
+            <AdSlot zone="A4" variant="card" />
+
+            {/* Sidebar Lower Ad */}
+            <AdSlot zone="A7" variant="card" />
           </aside>
+        </div>
+
+        {/* Bottom 4-Ad Grid Strip */}
+        <div className="mt-12 pt-8 border-t border-border-subtle">
+          <AdGridRow
+            zones={['A1', 'A2', 'A5', 'A6']}
+            id="breaking-bottom-ads"
+          />
         </div>
       </main>
     </div>

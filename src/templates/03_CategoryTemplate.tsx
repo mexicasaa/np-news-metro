@@ -10,6 +10,7 @@ import { CompactStoryCard } from '../components/cards/CompactStoryCard';
 import { HorizontalStoryCard } from '../components/cards/HorizontalStoryCard';
 import { RankingItem } from '../components/cards/RankingItem';
 import { AdSlot } from '../components/commercial/AdSlot';
+import { AdGridRow } from '../components/commercial/AdGridRow';
 import { Breadcrumbs } from '../components/layout/Breadcrumbs';
 import { Pagination } from '../components/common/Pagination';
 import { MetromatPoll } from '../components/common/MetromatPoll';
@@ -238,8 +239,21 @@ export const CategoryTemplate: React.FC<CategoryTemplateProps> = ({
                 ))}
               </div>
             </div>
+
+            {/* Sidebar Ad Slot */}
+            {showAds && <AdSlot zone="A4" variant="card" />}
           </aside>
         </div>
+
+        {/* Bottom 4-Ad Grid Strip */}
+        {showAds && (
+          <div className="mt-12 pt-8 border-t border-border-subtle">
+            <AdGridRow
+              zones={['A5', 'A6', 'A7', 'A8']}
+              id="category-bottom-ads"
+            />
+          </div>
+        )}
       </main>
     </div>
   );

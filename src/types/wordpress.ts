@@ -182,7 +182,7 @@ export interface WpLiveBlog {
 }
 
 export interface AdSlotConfig {
-  zone: 'A1' | 'A2' | 'A3' | 'A4' | 'A5' | 'A6' | 'A7';
+  zone: 'A1' | 'A2' | 'A3' | 'A4' | 'A5' | 'A6' | 'A7' | 'A8' | string;
   name: string;
   desktopDimensions: string;
   mobileDimensions: string;

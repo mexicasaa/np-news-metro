@@ -14,6 +14,7 @@ import { CorrectionNotice } from '../components/article/CorrectionNotice';
 import { RelatedStoriesBlock } from '../components/article/RelatedStoriesBlock';
 import { RankingItem } from '../components/cards/RankingItem';
 import { AdSlot } from '../components/commercial/AdSlot';
+import { AdGridRow } from '../components/commercial/AdGridRow';
 import { Breadcrumbs } from '../components/layout/Breadcrumbs';
 import { NewsletterModule } from '../components/common/NewsletterModule';
 import { useLanguage } from '../context/LanguageContext';
@@ -178,6 +179,13 @@ export const StandardArticleTemplate: React.FC<StandardArticleTemplateProps> = (
             {/* Gutenberg Block-Driven Body */}
             <ArticleBody post={post} showAds={showAds} />
 
+            {/* Mobile / Responsive Ad A3: Dynamically moves down below article body on mobile & tablet */}
+            {showAds && (
+              <div className="block lg:hidden my-6">
+                <AdSlot zone="A3" variant="card" />
+              </div>
+            )}
+
             {/* Tags / Topics Pill Bar */}
             <div className="my-8 pt-6 border-t border-border-subtle flex items-center gap-2 flex-wrap text-xs">
               <span className="font-bold text-ink uppercase tracking-wider text-[11px]">
@@ -191,6 +199,54 @@ export const StandardArticleTemplate: React.FC<StandardArticleTemplateProps> = (
                   #{tag}
                 </span>
               ))}
+            </div>
+
+            {/* Mobile / Responsive Most Read & Newsletter Block: Moves down below body on mobile */}
+            <div className="block lg:hidden my-6 space-y-6">
+              <div className="bg-surface-lowest border border-border-subtle p-4 rounded-sm shadow-subtle">
+                <div className="flex items-center justify-between pb-2 border-b-2 border-secondary mb-3">
+                  <div className="flex items-center gap-1.5">
+                    <Flame className="w-4 h-4 text-secondary" />
+                    <h3 className="font-serif text-base font-bold text-ink">
+                      {isHindi ? 'सभी डेस्कों पर सर्वाधिक पढ़े गए' : 'Most Read Across Desks'}
+                    </h3>
+                  </div>
+                </div>
+
+                <div className="divide-y divide-border-subtle">
+                  {trendingRanking.map((p, idx) => (
+                    <RankingItem
+                      key={p.id}
+                      rank={idx + 1}
+                      post={p}
+                      onSelect={onSelectPost}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-primary-container text-white p-5 rounded-sm border border-slate-700">
+                <span className="text-[10px] uppercase font-bold text-secondary-gold tracking-widest block mb-1">
+                  {isHindi ? 'एनपी न्यूज़ मेट्रो ब्रीफिंग' : 'NP News Metro Briefing'}
+                </span>
+                <h4 className="font-serif text-lg font-bold text-white leading-snug mb-2">
+                  {isHindi ? 'कोई भी महत्वपूर्ण ख़बर न चूकें' : 'Never Miss a Developing Story'}
+                </h4>
+                <p className="text-xs text-slate-300 mb-4 leading-relaxed">
+                  {isHindi
+                    ? 'सुबह की खुफिया रिपोर्ट और ब्रेकिंग न्यूज़ बुलेटिन सीधे व्हाट्सएप या ईमेल पर प्राप्त करें।'
+                    : 'Get morning intelligence briefs and breaking news bulletins directly on WhatsApp or Email.'}
+                </p>
+                <button
+                  onClick={() => alert(isHindi ? 'न्यूज़लेटर सदस्यता फॉर्म खोला गया।' : 'Newsletter signup modal triggered.')}
+                  className="w-full bg-secondary-gold hover:bg-secondary text-white py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-colors cursor-pointer"
+                >
+                  {t.newsletterBtn}
+                </button>
+              </div>
+
+              {/* Mobile Ad Slot A4: Moves down below Most Read & Newsletter */}
+              {showAds && <AdSlot zone="A4" variant="card" />}
             </div>
 
             {/* Author Biography Box */}
@@ -208,6 +264,13 @@ export const StandardArticleTemplate: React.FC<StandardArticleTemplateProps> = (
               onToggleOpen={() => setCommentsOpen(!commentsOpen)}
             />
 
+            {/* Mobile Ad Slot A7: Moves down below Reader Perspectives & Comments */}
+            {showAds && (
+              <div className="block lg:hidden my-6">
+                <AdSlot zone="A7" variant="card" />
+              </div>
+            )}
+
             {/* Related Coverage Block */}
             <RelatedStoriesBlock
               relatedPosts={relatedPosts}
@@ -216,8 +279,8 @@ export const StandardArticleTemplate: React.FC<StandardArticleTemplateProps> = (
             />
           </article>
 
-          {/* Right Rail Sidebar (4 cols) */}
-          <aside className="lg:col-span-4 space-y-6">
+          {/* Right Rail Sidebar (4 cols) - Displayed alongside content on Desktop */}
+          <aside className="hidden lg:block lg:col-span-4 space-y-6">
             {/* Sidebar Ad (A3) */}
             {showAds && <AdSlot zone="A3" />}
 
@@ -259,13 +322,29 @@ export const StandardArticleTemplate: React.FC<StandardArticleTemplateProps> = (
               </p>
               <button
                 onClick={() => alert(isHindi ? 'न्यूज़लेटर सदस्यता फॉर्म खोला गया।' : 'Newsletter signup modal triggered.')}
-                className="w-full bg-secondary-gold hover:bg-secondary text-white py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-colors"
+                className="w-full bg-secondary-gold hover:bg-secondary text-white py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-colors cursor-pointer"
               >
                 {t.newsletterBtn}
               </button>
             </div>
+
+            {/* Sidebar Middle Ad (Below Most Read & Newsletter) */}
+            {showAds && <AdSlot zone="A4" variant="card" />}
+
+            {/* Sidebar Lower Ad */}
+            {showAds && <AdSlot zone="A7" variant="card" />}
           </aside>
         </div>
+
+        {/* Bottom 4-Ad Grid Strip: Placed below Related Coverage & Analysis */}
+        {showAds && (
+          <div className="mt-12 pt-8 border-t border-border-subtle">
+            <AdGridRow
+              zones={['A1', 'A2', 'A5', 'A6']}
+              id="article-bottom-ads"
+            />
+          </div>
+        )}
       </main>
     </div>
   );

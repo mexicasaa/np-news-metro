@@ -103,7 +103,28 @@ const parseUrlRoute = (currentPosts: WpPost[], currentVideos: WpVideo[], isIniti
   const hash = window.location.hash.toLowerCase();
   const search = window.location.search;
 
-  // 1. Admin
+  // 1. Preview mode (Priority: allow previewing drafts instantly from admin or any page)
+  if (search.includes('preview=true') || hash.includes('preview')) {
+    let draftPost: WpPost | undefined;
+    const draft = localStorage.getItem('np_news_preview_draft');
+    if (draft) {
+      try { draftPost = JSON.parse(draft); } catch (e) {}
+    }
+    const resolvedPost = draftPost || currentPosts[0];
+    const templateName = resolvedPost?.isBreaking ? 'article-breaking' : (resolvedPost?.isOpinion ? 'article-opinion' : 'article-standard');
+    return {
+      viewMode: 'public',
+      template: templateName as any,
+      category: resolvedPost?.category || 'india',
+      post: resolvedPost,
+      authorId: resolvedPost?.authorId || 'author-1',
+      staticPage: 'about',
+      searchQuery: '',
+      isAdminLoginModalOpen: false,
+    };
+  }
+
+  // 2. Admin
   if (cleanPath === 'admin' || cleanPath.startsWith('admin/') || cleanPath === 'wp-admin' || hash === '#admin') {
     const isAuth = localStorage.getItem('np_news_admin_auth') === 'true' || sessionStorage.getItem('np_news_admin_auth') === 'true';
     return {
@@ -114,25 +135,6 @@ const parseUrlRoute = (currentPosts: WpPost[], currentVideos: WpVideo[], isIniti
       staticPage: 'about',
       searchQuery: '',
       isAdminLoginModalOpen: !isAuth,
-    };
-  }
-
-  // 2. Preview mode
-  if (search.includes('preview=true') || hash.includes('preview')) {
-    let draftPost: WpPost | undefined;
-    const draft = localStorage.getItem('np_news_preview_draft');
-    if (draft) {
-      try { draftPost = JSON.parse(draft); } catch (e) {}
-    }
-    return {
-      viewMode: 'public',
-      template: 'article-standard',
-      category: 'india',
-      post: draftPost || currentPosts[0],
-      authorId: 'author-1',
-      staticPage: 'about',
-      searchQuery: '',
-      isAdminLoginModalOpen: false,
     };
   }
 
@@ -835,12 +837,23 @@ function AppContent() {
   React.useEffect(() => {
     if (isPreviewTab) {
       setViewMode('public');
-      setCurrentTemplate('article-standard');
       const draft = localStorage.getItem('np_news_preview_draft');
       if (draft) {
         try {
-          setSelectedPost(JSON.parse(draft));
-        } catch (e) {}
+          const parsed = JSON.parse(draft);
+          setSelectedPost(parsed);
+          if (parsed.isBreaking) {
+            setCurrentTemplate('article-breaking');
+          } else if (parsed.isOpinion) {
+            setCurrentTemplate('article-opinion');
+          } else {
+            setCurrentTemplate('article-standard');
+          }
+        } catch (e) {
+          setCurrentTemplate('article-standard');
+        }
+      } else {
+        setCurrentTemplate('article-standard');
       }
     }
 

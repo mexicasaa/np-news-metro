@@ -7,6 +7,7 @@ import { LatestNewsRow } from '../components/cards/LatestNewsRow';
 import { LargeStoryCard } from '../components/cards/LargeStoryCard';
 import { RankingItem } from '../components/cards/RankingItem';
 import { AdSlot } from '../components/commercial/AdSlot';
+import { AdGridRow } from '../components/commercial/AdGridRow';
 import { Breadcrumbs } from '../components/layout/Breadcrumbs';
 import { Pagination } from '../components/common/Pagination';
 import { useLanguage } from '../context/LanguageContext';
@@ -213,8 +214,21 @@ export const LatestNewsTemplate: React.FC<LatestNewsTemplateProps> = ({
                 ))}
               </div>
             </div>
+
+            {/* Sidebar Ad Slot */}
+            {showAds && <AdSlot zone="A4" variant="card" />}
           </aside>
         </div>
+
+        {/* Bottom 4-Ad Grid Strip */}
+        {showAds && (
+          <div className="mt-12 pt-8 border-t border-border-subtle">
+            <AdGridRow
+              zones={['A5', 'A6', 'A7', 'A8']}
+              id="latest-bottom-ads"
+            />
+          </div>
+        )}
       </main>
     </div>
   );

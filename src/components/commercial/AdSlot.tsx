@@ -1,38 +1,115 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ExternalLink, Info, Phone } from 'lucide-react';
 import { mockAdSlots } from '../../data/mockWpData';
 import { useLanguage } from '../../context/LanguageContext';
-import { getAdPlacement, trackAdImpression, trackAdClick, ActiveAdPlacement } from '../../services/adService';
+import { 
+  getAdPlacement, 
+  trackAdImpression, 
+  trackAdClick, 
+  ActiveAdPlacement, 
+  getAdSenseSettings, 
+  AdSenseSettings,
+  isZoneVisible
+} from '../../services/adService';
 import { DEFAULT_FALLBACK_IMAGE } from '../../utils/imageFallback';
 
-interface AdSlotProps {
-  zone: 'A1' | 'A2' | 'A3' | 'A4' | 'A5' | 'A6' | 'A7';
+export interface AdSlotProps {
+  zone: 'A1' | 'A2' | 'A3' | 'A4' | 'A5' | 'A6' | 'A7' | 'A8' | string;
   className?: string;
+  variant?: 'banner' | 'card' | 'sidebar' | 'inline';
 }
 
-export const AdSlot: React.FC<AdSlotProps> = ({ zone, className = '' }) => {
+export const AdSlot: React.FC<AdSlotProps> = ({
+  zone,
+  className = '',
+  variant,
+}) => {
   const { isHindi } = useLanguage();
   const [directAd, setDirectAd] = useState<ActiveAdPlacement | null>(null);
+  const [adSenseSettings, setAdSenseSettings] = useState<AdSenseSettings>(getAdSenseSettings());
+  const [adSenseFailed, setAdSenseFailed] = useState<boolean>(false);
+  const insRef = useRef<HTMLModElement | null>(null);
 
-  useEffect(() => {
-    let isMounted = true;
+  const fetchPlacement = () => {
     getAdPlacement(zone)
       .then((placement) => {
-        if (isMounted && placement) {
-          setDirectAd(placement);
+        setDirectAd(placement);
+        if (placement) {
           trackAdImpression(placement.campaignId, placement.placementId);
         }
       })
       .catch(() => {});
+    setAdSenseSettings(getAdSenseSettings());
+  };
 
+  useEffect(() => {
+    fetchPlacement();
+
+    // Listen for real-time ad updates from Admin panel or other tabs
+    const handleUpdate = () => {
+      fetchPlacement();
+      setAdSenseFailed(false);
+    };
+
+    window.addEventListener('np_ads_updated', handleUpdate);
     return () => {
-      isMounted = false;
+      window.removeEventListener('np_ads_updated', handleUpdate);
     };
   }, [zone]);
 
-  // Fallback to Google AdSense / static placement configuration if no direct campaign active
+  // Determine AdSense vs Direct priority
+  const zoneConfig = adSenseSettings.zones[zone];
+  const isAdSenseGloballyEnabled = adSenseSettings.enabled;
+  const isAdSenseZoneEnabled = zoneConfig ? zoneConfig.enabled : true;
+  const canShowAdSense = isAdSenseGloballyEnabled && isAdSenseZoneEnabled && !adSenseFailed;
+
+  let shouldShowAdSense = false;
+  if (adSenseSettings.priority === 'adsense_only') {
+    shouldShowAdSense = canShowAdSense;
+  } else if (adSenseSettings.priority === 'adsense_first') {
+    shouldShowAdSense = canShowAdSense;
+  } else if (adSenseSettings.priority === 'direct_only') {
+    shouldShowAdSense = false;
+  } else {
+    // direct_first (default recommended)
+    shouldShowAdSense = !directAd && canShowAdSense;
+  }
+
+  // Google AdSense Push Effect with React 18 Double-Push Protection
+  useEffect(() => {
+    if (shouldShowAdSense && insRef.current) {
+      const status = insRef.current.getAttribute('data-adsbygoogle-status');
+      if (!status) {
+        try {
+          ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
+        } catch (err) {
+          console.warn('[AdSense] Push notice for zone', zone, err);
+        }
+      }
+
+      // Fallback monitor: if AdSense is blocked by ad-blocker or unfilled after 2.5s, fallback to direct ad
+      const timer = setTimeout(() => {
+        if (insRef.current) {
+          const isUnfilled = insRef.current.getAttribute('data-ad-status') === 'unfilled';
+          const hasChildren = insRef.current.children.length > 0;
+          if (isUnfilled || (!hasChildren && !(window as any).adsbygoogle)) {
+            setAdSenseFailed(true);
+          }
+        }
+      }, 2500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [shouldShowAdSense, zone]);
+
+  // Check if zone is visible (Admin toggle)
+  if (!isZoneVisible(zone)) {
+    return null;
+  }
+
+  // Active Direct Campaign Details
   const adConfig = mockAdSlots[zone];
-  const isEnabled = directAd ? true : adConfig?.isEnabled;
+  const isEnabled = shouldShowAdSense || (directAd ? true : (isZoneVisible(zone) && adConfig?.isEnabled));
   if (!isEnabled) {
     return null;
   }
@@ -55,19 +132,165 @@ export const AdSlot: React.FC<AdSlotProps> = ({ zone, className = '' }) => {
     }
   };
 
-  // Sidebar Ad (A3) Specific Layout - Optimized for Vertical / Portrait Posters
-  if (zone === 'A3') {
+  /* ======================================================================
+     CASE 1: Render Google AdSense Unit
+     ====================================================================== */
+  if (shouldShowAdSense) {
+    const isCard = variant === 'card' || variant === 'sidebar';
+    return (
+      <div
+        className={`bg-white dark:bg-surface-lowest border border-border-subtle rounded-md p-4 sm:p-5 shadow-xs transition-all ${
+          isCard ? 'h-full flex flex-col justify-between min-h-[340px]' : 'min-h-[120px] w-full max-w-[970px] mx-auto'
+        } ${className}`}
+        data-slot={zone}
+        data-provider="adsense"
+      >
+        <div className="flex items-center justify-between text-[10px] sm:text-xs uppercase font-bold text-ink-muted tracking-wider pb-2.5 border-b border-border-subtle mb-3">
+          <span className="text-secondary-gold font-sans font-bold flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-secondary-gold inline-block"></span>
+            {isHindi ? 'प्रायोजित साझेदार' : 'SPONSORED PARTNER'}
+          </span>
+          <span className="flex items-center gap-1 text-ink-muted/70 font-mono text-[10px] sm:text-[11px] font-semibold">
+            <Info className="w-3.5 h-3.5" />
+            <span>{isHindi ? 'विज्ञापन' : 'AD'}</span>
+          </span>
+        </div>
+
+        <div className="w-full flex-1 flex items-center justify-center overflow-hidden">
+          <ins
+            ref={insRef}
+            className="adsbygoogle block w-full text-center"
+            style={{ display: 'block', minHeight: isCard ? '280px' : '90px' }}
+            data-ad-client={adSenseSettings.clientId}
+            data-ad-slot={zoneConfig?.slotId || '1029384756'}
+            data-ad-format={zoneConfig?.format || (isCard ? 'rectangle' : 'auto')}
+            data-full-width-responsive="true"
+            data-ad-test={adSenseSettings.testMode ? 'on' : undefined}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  /* ======================================================================
+     CASE 2: Card Layout for 4-in-a-row multi-slot ad strips & grid cards
+     ====================================================================== */
+  if (variant === 'card') {
+    return (
+      <div
+        className={`bg-white dark:bg-surface-lowest border border-border-subtle hover:border-primary/50 rounded-md p-3 sm:p-4 lg:p-5 shadow-xs hover:shadow-subtle transition-all duration-200 flex flex-col justify-between h-full group ${className}`}
+        data-slot={zone}
+        aria-label={`Sponsored: ${advertiserName}`}
+      >
+        <div className="flex-1 flex flex-col">
+          {/* Compliant Ad Header */}
+          <div className="flex items-center justify-between text-[9px] sm:text-[10px] lg:text-xs uppercase font-bold text-ink-muted tracking-wider pb-2 border-b border-border-subtle mb-2.5">
+            <span className="text-secondary-gold font-sans font-bold flex items-center gap-1 sm:gap-1.5 truncate">
+              <span className="w-1.5 h-1.5 rounded-full bg-secondary-gold inline-block flex-shrink-0"></span>
+              <span className="truncate">{isHindi ? 'प्रायोजित साझेदार' : 'SPONSORED PARTNER'}</span>
+            </span>
+            <span className="flex items-center gap-1 text-ink-muted/70 font-mono text-[9px] sm:text-[10px] lg:text-[11px] font-semibold flex-shrink-0">
+              <Info className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+              <span>{isHindi ? 'विज्ञापन' : 'AD'}</span>
+            </span>
+          </div>
+
+          {/* Media Creative Image: Natural Responsive Sizing with Max Boundaries */}
+          {mediaUrl ? (
+            <a
+              href={ctaUrl}
+              target={isExternalLink ? '_blank' : undefined}
+              rel={isExternalLink ? 'noopener noreferrer' : undefined}
+              onClick={handleClick}
+              className="block group/img overflow-hidden rounded-xs bg-white border border-border-subtle/80 hover:border-primary/40 transition-all mb-2 flex-shrink-0"
+              title={advertiserName}
+            >
+              <img
+                src={mediaUrl}
+                alt={altText}
+                className="w-full h-auto max-h-[220px] sm:max-h-[300px] md:max-h-[380px] lg:max-h-[460px] object-contain block mx-auto transition-transform duration-300 group-hover/img:scale-[1.02]"
+                loading="lazy"
+                onError={(e) => {
+                  const target = e.currentTarget;
+                  if (zone === 'A3' && !target.src.endsWith('/uploads/ads/suresh-chand-agarwal-memorial.png')) {
+                    target.src = '/uploads/ads/suresh-chand-agarwal-memorial.png';
+                  } else if (zone === 'A4' && !target.src.endsWith('/uploads/ads/shastri-patanjali-chikitsalaya.jpg')) {
+                    target.src = '/uploads/ads/shastri-patanjali-chikitsalaya.jpg';
+                  } else if (target.src !== DEFAULT_FALLBACK_IMAGE) {
+                    target.src = DEFAULT_FALLBACK_IMAGE;
+                  }
+                }}
+              />
+            </a>
+          ) : (
+            <div className="w-full py-5 px-3 bg-gradient-to-br from-primary/10 via-surface-container to-secondary-gold/15 rounded-xs border border-border-subtle/70 flex flex-col items-center justify-center mb-2 text-center flex-shrink-0">
+              <div className="w-7 h-7 rounded-full bg-secondary-gold/20 flex items-center justify-center mb-1.5">
+                <span className="w-2 h-2 rounded-full bg-secondary-gold inline-block"></span>
+              </div>
+              <span className="font-serif font-bold text-xs sm:text-sm text-primary uppercase tracking-wider line-clamp-2">
+                {advertiserName}
+              </span>
+              <span className="text-[10px] text-ink-muted mt-0.5 font-sans">Official Partner Initiative</span>
+            </div>
+          )}
+
+          {/* Content Details: Adjusts dynamically based on image height */}
+          <div className="space-y-1 mb-2 mt-1 flex-1 flex flex-col justify-start">
+            <h4 className="font-sans font-bold text-xs sm:text-sm lg:text-base text-ink block leading-snug line-clamp-2 hover:text-primary transition-colors">
+              {advertiserName}
+            </h4>
+            {creativeText && (
+              <p className="font-serif text-[11px] sm:text-xs lg:text-[13px] text-ink-secondary leading-relaxed line-clamp-2 mt-0.5">
+                {creativeText}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* CTA Button pinned to bottom */}
+        {ctaUrl && ctaUrl !== '#' && (
+          <a
+            href={ctaUrl}
+            target={isExternalLink ? '_blank' : undefined}
+            rel={isExternalLink ? 'noopener noreferrer' : undefined}
+            onClick={handleClick}
+            className="inline-flex items-center justify-center gap-1.5 w-full py-1.5 sm:py-2 px-2.5 sm:px-3.5 bg-primary hover:bg-primary-container text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider rounded-xs shadow-2xs transition-colors cursor-pointer mt-2.5 flex-shrink-0"
+          >
+            {isPhoneCta ? (
+              <>
+                <Phone className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-secondary-gold" />
+                <span>{isHindi ? 'कॉल करें' : 'Call to Order'}</span>
+              </>
+            ) : (
+              <>
+                <span>{isHindi ? 'और जानें' : (directAd?.ctaText || 'Learn More')}</span>
+                <ExternalLink className="w-3 h-3" />
+              </>
+            )}
+          </a>
+        )}
+      </div>
+    );
+  }
+
+  /* ======================================================================
+     CASE 3: Sidebar Vertical Poster (A3 / variant='sidebar')
+     ====================================================================== */
+  if (variant === 'sidebar' || (!variant && zone === 'A3')) {
     return (
       <aside
-        className={`my-4 bg-surface-lowest border border-border-subtle rounded-sm p-3.5 shadow-2xs hover:border-primary/40 transition-all ${className}`}
+        className={`my-3 sm:my-4 bg-white dark:bg-surface-lowest border border-border-subtle rounded-md p-3.5 sm:p-5 shadow-xs hover:border-primary/40 transition-all ${className}`}
         data-slot={zone}
         aria-label="Sponsored Partner"
       >
-        <div className="flex items-center justify-between text-[9px] uppercase font-bold text-ink-muted tracking-widest pb-2 border-b border-border-subtle mb-2.5">
-          <span className="text-secondary-gold">{isHindi ? 'प्रायोजित साझेदार' : 'Sponsored Partner'}</span>
-          <span className="flex items-center gap-0.5 text-ink-muted/70">
-            <Info className="w-2.5 h-2.5" />
-            <span>{isHindi ? 'विज्ञापन' : 'Ad'}</span>
+        <div className="flex items-center justify-between text-[10px] sm:text-xs uppercase font-bold text-ink-muted tracking-wider pb-2 border-b border-border-subtle mb-3">
+          <span className="text-secondary-gold font-sans font-bold flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-secondary-gold inline-block"></span>
+            {isHindi ? 'प्रायोजित साझेदार' : 'SPONSORED PARTNER'}
+          </span>
+          <span className="flex items-center gap-1 text-ink-muted/70 font-mono text-[10px] sm:text-[11px] font-semibold">
+            <Info className="w-3.5 h-3.5" />
+            <span>{isHindi ? 'विज्ञापन' : 'AD'}</span>
           </span>
         </div>
 
@@ -78,13 +301,13 @@ export const AdSlot: React.FC<AdSlotProps> = ({ zone, className = '' }) => {
               target={isExternalLink ? '_blank' : undefined}
               rel={isExternalLink ? 'noopener noreferrer' : undefined}
               onClick={handleClick}
-              className="block group overflow-hidden rounded-xs bg-slate-50 border border-border-subtle/80 hover:border-primary/50 transition-all shadow-2xs"
+              className="block group overflow-hidden rounded-xs bg-white border border-border-subtle/80 hover:border-primary/50 transition-all shadow-2xs"
               title={advertiserName}
             >
               <img
                 src={mediaUrl}
                 alt={altText}
-                className="w-full h-auto max-h-[540px] object-contain block mx-auto transition-transform duration-300 group-hover:scale-[1.01]"
+                className="w-full h-auto max-h-[460px] sm:max-h-[520px] lg:max-h-[580px] object-contain block mx-auto transition-transform duration-300 group-hover:scale-[1.01]"
                 loading="lazy"
                 onError={(e) => {
                   const target = e.currentTarget;
@@ -98,12 +321,12 @@ export const AdSlot: React.FC<AdSlotProps> = ({ zone, className = '' }) => {
             </a>
           )}
 
-          <div className="space-y-1.5">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-primary block leading-snug">
+          <div className="space-y-1">
+            <h4 className="font-sans font-bold text-sm sm:text-base text-ink block leading-snug">
               {advertiserName}
-            </span>
+            </h4>
             {creativeText && (
-              <p className="font-serif text-xs font-semibold text-ink leading-relaxed">
+              <p className="font-serif text-xs sm:text-[13px] text-ink-secondary leading-relaxed">
                 {creativeText}
               </p>
             )}
@@ -114,7 +337,7 @@ export const AdSlot: React.FC<AdSlotProps> = ({ zone, className = '' }) => {
                 target={isExternalLink ? '_blank' : undefined}
                 rel={isExternalLink ? 'noopener noreferrer' : undefined}
                 onClick={handleClick}
-                className="inline-flex items-center justify-center gap-1.5 w-full mt-2.5 py-2 px-3 bg-primary hover:bg-primary-container text-white text-[11px] font-bold uppercase tracking-wider rounded-xs shadow-2xs transition-colors cursor-pointer"
+                className="inline-flex items-center justify-center gap-1.5 w-full mt-2.5 py-2 px-3.5 bg-primary hover:bg-primary-container text-white text-xs font-bold uppercase tracking-wider rounded-xs shadow-2xs transition-colors cursor-pointer"
               >
                 {isPhoneCta ? (
                   <>
@@ -123,7 +346,7 @@ export const AdSlot: React.FC<AdSlotProps> = ({ zone, className = '' }) => {
                   </>
                 ) : (
                   <>
-                    <span>{isHindi ? 'साझेदार पहल देखें' : 'Explore Partner Initiative'}</span>
+                    <span>{isHindi ? 'साझेदार पहल देखें' : (directAd?.ctaText || 'Explore Partner Initiative')}</span>
                     <ExternalLink className="w-3 h-3" />
                   </>
                 )}
@@ -135,18 +358,23 @@ export const AdSlot: React.FC<AdSlotProps> = ({ zone, className = '' }) => {
     );
   }
 
-  // In-Article Native Placement (A4) with Vertical Poster Support
-  if (zone === 'A4' && mediaUrl) {
+  /* ======================================================================
+     CASE 4: In-Article Native Placement (A4 / variant='inline')
+     ====================================================================== */
+  if (variant === 'inline' || (!variant && zone === 'A4' && mediaUrl)) {
     return (
       <div
-        className={`my-6 bg-surface-lowest border border-border-subtle rounded-sm p-3.5 sm:p-4 shadow-2xs hover:border-primary/40 transition-all max-w-[760px] mx-auto ${className}`}
+        className={`my-6 bg-white dark:bg-surface-lowest border border-border-subtle rounded-md p-4 sm:p-5 shadow-xs hover:border-primary/40 transition-all max-w-[820px] mx-auto ${className}`}
         data-slot={zone}
       >
-        <div className="flex items-center justify-between text-[9px] uppercase font-bold text-ink-muted tracking-widest pb-2 border-b border-border-subtle mb-3">
-          <span className="text-secondary-gold">{isHindi ? 'प्रायोजित विज्ञापन' : 'Sponsored Feature'}</span>
-          <span className="flex items-center gap-0.5 text-ink-muted/70">
-            <Info className="w-2.5 h-2.5" />
-            <span>{isHindi ? 'विज्ञापन' : 'Ad'}</span>
+        <div className="flex items-center justify-between text-[10px] sm:text-xs uppercase font-bold text-ink-muted tracking-wider pb-2.5 border-b border-border-subtle mb-3">
+          <span className="text-secondary-gold font-sans font-bold flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-secondary-gold inline-block"></span>
+            {isHindi ? 'प्रायोजित साझेदार' : 'SPONSORED PARTNER'}
+          </span>
+          <span className="flex items-center gap-1 text-ink-muted/70 font-mono text-[10px] sm:text-[11px] font-semibold">
+            <Info className="w-3.5 h-3.5" />
+            <span>{isHindi ? 'विज्ञापन' : 'AD'}</span>
           </span>
         </div>
 
@@ -156,18 +384,18 @@ export const AdSlot: React.FC<AdSlotProps> = ({ zone, className = '' }) => {
             target={isExternalLink ? '_blank' : undefined}
             rel={isExternalLink ? 'noopener noreferrer' : undefined}
             onClick={handleClick}
-            className="w-full sm:w-44 flex-shrink-0 group overflow-hidden rounded-xs bg-slate-50 border border-border-subtle/80 hover:border-primary/50 transition-all shadow-2xs"
+            className="w-full sm:w-60 flex-shrink-0 group overflow-hidden rounded-xs bg-white border border-border-subtle/80 hover:border-primary/50 transition-all shadow-2xs"
             title={advertiserName}
           >
             <img
               src={mediaUrl}
               alt={altText}
-              className="w-full h-auto max-h-[300px] object-contain block mx-auto transition-transform duration-300 group-hover:scale-[1.01]"
+              className="w-full h-auto max-h-[300px] sm:max-h-[360px] object-contain block mx-auto transition-transform duration-300 group-hover:scale-[1.01]"
               loading="lazy"
               onError={(e) => {
                 const target = e.currentTarget;
-                if (!target.src.endsWith('/uploads/shastri-patanjali-chikitsalaya.jpg')) {
-                  target.src = '/uploads/shastri-patanjali-chikitsalaya.jpg';
+                if (!target.src.endsWith('/uploads/ads/shastri-patanjali-chikitsalaya.jpg')) {
+                  target.src = '/uploads/ads/shastri-patanjali-chikitsalaya.jpg';
                 } else if (target.src !== DEFAULT_FALLBACK_IMAGE) {
                   target.src = DEFAULT_FALLBACK_IMAGE;
                 }
@@ -177,10 +405,10 @@ export const AdSlot: React.FC<AdSlotProps> = ({ zone, className = '' }) => {
 
           <div className="flex-1 min-w-0 flex flex-col justify-between h-full space-y-2 text-center sm:text-left">
             <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-primary block mb-1">
+              <h4 className="font-sans font-bold text-sm sm:text-base text-ink block mb-1">
                 {advertiserName}
-              </span>
-              <p className="font-serif text-sm font-semibold text-ink leading-relaxed">
+              </h4>
+              <p className="font-serif text-xs sm:text-sm font-semibold text-ink leading-relaxed">
                 {creativeText}
               </p>
             </div>
@@ -191,7 +419,7 @@ export const AdSlot: React.FC<AdSlotProps> = ({ zone, className = '' }) => {
                 target={isExternalLink ? '_blank' : undefined}
                 rel={isExternalLink ? 'noopener noreferrer' : undefined}
                 onClick={handleClick}
-                className="inline-flex items-center justify-center gap-1.5 self-center sm:self-start mt-2 py-2 px-4 bg-primary hover:bg-primary-container text-white text-[11px] font-bold uppercase tracking-wider rounded-xs shadow-2xs transition-colors cursor-pointer"
+                className="inline-flex items-center justify-center gap-1.5 self-center sm:self-start mt-2 py-2 px-4 bg-primary hover:bg-primary-container text-white text-xs font-bold uppercase tracking-wider rounded-xs shadow-2xs transition-colors cursor-pointer"
               >
                 {isPhoneCta ? (
                   <>
@@ -200,7 +428,7 @@ export const AdSlot: React.FC<AdSlotProps> = ({ zone, className = '' }) => {
                   </>
                 ) : (
                   <>
-                    <span>{isHindi ? 'और जानें' : 'Learn More'}</span>
+                    <span>{isHindi ? 'और जानें' : (directAd?.ctaText || 'Learn More')}</span>
                     <ExternalLink className="w-3 h-3" />
                   </>
                 )}
@@ -212,24 +440,26 @@ export const AdSlot: React.FC<AdSlotProps> = ({ zone, className = '' }) => {
     );
   }
 
-  // Horizontal Banner Ad Layout (A1, A2, A5, A6, A7, or text fallback)
+  /* ======================================================================
+     CASE 5: Horizontal Banner Ad Layout (A1, A2, A5, A6, A7, or text fallback)
+     ====================================================================== */
   return (
     <div
-      className={`my-2 sm:my-2.5 flex flex-col items-center justify-center ${className}`}
+      className={`my-3 sm:my-3.5 flex flex-col items-center justify-center ${className}`}
       data-slot={zone}
     >
       <div
-        className="w-full bg-surface-lowest border border-border-subtle rounded-sm py-1.5 px-3 sm:py-2 sm:px-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left transition-all hover:border-primary/40 shadow-2xs max-w-[970px]"
+        className="w-full bg-white dark:bg-surface-lowest border border-border-subtle rounded-md py-2 px-3 sm:py-2.5 sm:px-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left transition-all hover:border-primary/40 shadow-xs max-w-[970px]"
       >
         <div className="flex items-center gap-2.5 min-w-0 flex-1 flex-wrap sm:flex-nowrap">
-          <span className="text-[9px] uppercase font-bold text-secondary-gold bg-secondary-gold/10 px-1.5 py-0.5 rounded-xs tracking-wider flex-shrink-0">
-            {isHindi ? 'प्रायोजित' : 'Sponsored'}
+          <span className="text-[10px] uppercase font-bold text-secondary-gold bg-secondary-gold/10 px-2 py-0.5 rounded-xs tracking-wider flex-shrink-0">
+            {isHindi ? 'प्रायोजित' : 'SPONSORED'}
           </span>
           <div className="min-w-0 text-left">
-            <span className="text-[10px] font-bold text-primary mr-1.5 inline">
+            <span className="text-xs font-bold text-primary mr-1.5 inline">
               {advertiserName}:
             </span>
-            <span className="text-xs font-serif font-bold text-ink leading-tight">
+            <span className="text-xs sm:text-sm font-serif font-bold text-ink leading-tight">
               {creativeText}
             </span>
           </div>
@@ -240,17 +470,17 @@ export const AdSlot: React.FC<AdSlotProps> = ({ zone, className = '' }) => {
           target={isExternalLink ? '_blank' : undefined}
           rel={isExternalLink ? 'noopener noreferrer' : undefined}
           onClick={handleClick}
-          className="bg-primary hover:bg-primary-container text-white px-2.5 py-1 rounded-xs text-[10px] sm:text-[11px] font-bold uppercase tracking-wider flex-shrink-0 flex items-center gap-1 transition-colors"
+          className="bg-primary hover:bg-primary-container text-white px-3 py-1.5 rounded-xs text-xs font-bold uppercase tracking-wider flex-shrink-0 flex items-center gap-1 transition-colors"
         >
           {isPhoneCta ? (
             <>
-              <Phone className="w-2.5 h-2.5" />
+              <Phone className="w-3 h-3" />
               <span>{isHindi ? 'कॉल करें' : 'Call Now'}</span>
             </>
           ) : (
             <>
-              <span>{isHindi ? 'और जानें' : 'Learn More'}</span>
-              <ExternalLink className="w-2.5 h-2.5" />
+              <span>{isHindi ? 'और जानें' : (directAd?.ctaText || 'Learn More')}</span>
+              <ExternalLink className="w-3 h-3" />
             </>
           )}
         </a>

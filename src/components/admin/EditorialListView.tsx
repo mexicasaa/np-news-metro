@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { 
   Edit, MoreVertical, ChevronLeft, ChevronRight, Check, 
-  Trash2, Send, Eye, Shield, Filter, Search
+  Trash2, Send, Eye, Shield, Filter, Search,
+  ExternalLink, X, Smartphone, Tablet, Monitor
 } from 'lucide-react';
 import { WpPost } from '../../types/wordpress';
 import { mockAuthors } from '../../data/mockWpData';
 import { getStoredPosts, isPostPublished } from '../../utils/newsStorage';
+import { StandardArticleTemplate } from '../../templates/04_StandardArticleTemplate';
+import { BreakingArticleTemplate } from '../../templates/05_BreakingArticleTemplate';
+import { OpinionArticleTemplate } from '../../templates/06_OpinionArticleTemplate';
 
 interface EditorialListViewProps {
   posts?: WpPost[];
@@ -25,6 +29,8 @@ export const EditorialListView: React.FC<EditorialListViewProps> = ({
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [authorFilter, setAuthorFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [previewPost, setPreviewPost] = useState<WpPost | null>(null);
+  const [previewDevice, setPreviewDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
 
   const allPosts = externalPosts && externalPosts.length > 0 ? externalPosts : getStoredPosts();
 
@@ -244,11 +250,12 @@ export const EditorialListView: React.FC<EditorialListViewProps> = ({
                     <span>Edit</span>
                   </button>
                   <button
-                    onClick={() => onViewLiveArticle(article.rawPost)}
-                    className="px-3 py-1.5 bg-white hover:bg-slate-100 border border-border-subtle text-slate-700 rounded text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+                    onClick={() => setPreviewPost(article.rawPost)}
+                    className="px-3 py-1.5 bg-white hover:bg-slate-100 border border-border-subtle text-slate-700 rounded text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                    title="Live Article Preview"
                   >
-                    <Eye className="w-3.5 h-3.5 text-slate-500" />
-                    <span>View</span>
+                    <Eye className="w-3.5 h-3.5 text-blue-600" />
+                    <span>Preview</span>
                   </button>
 
                   {onDeleteArticle && (
@@ -388,9 +395,9 @@ export const EditorialListView: React.FC<EditorialListViewProps> = ({
                           <Edit className="w-3.5 h-3.5" />
                         </button>
                         <button
-                          onClick={() => onViewLiveArticle(article.rawPost)}
-                          className="p-1 hover:bg-slate-200 rounded text-slate-600 hover:text-ink transition-colors cursor-pointer"
-                          title="View Live"
+                          onClick={() => setPreviewPost(article.rawPost)}
+                          className="p-1.5 hover:bg-blue-50 rounded text-slate-600 hover:text-blue-600 transition-colors cursor-pointer"
+                          title="Instant Article Preview (Desktop/Tablet/Mobile)"
                         >
                           <Eye className="w-3.5 h-3.5" />
                         </button>
@@ -448,6 +455,155 @@ export const EditorialListView: React.FC<EditorialListViewProps> = ({
           </div>
         </div>
       </div>
+      {/* Instant In-Admin Article Preview Modal */}
+      {previewPost && (
+        <div className="fixed inset-0 z-[100] bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-0 md:p-4 animate-fadeIn">
+          <div className="bg-slate-100 md:rounded-2xl w-full h-full md:h-[96vh] overflow-hidden shadow-2xl relative flex flex-col border border-slate-700">
+            
+            {/* Header Toolbar with Device Switchers & Actions */}
+            <div className="sticky top-0 z-[110] bg-slate-900 text-white px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3 shadow-md border-b border-slate-800">
+              <div className="flex items-center gap-3">
+                <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600/30 text-blue-400">
+                  <Eye className="w-4 h-4" />
+                </span>
+                <div>
+                  <h3 className="font-bold text-xs sm:text-sm tracking-wide flex items-center gap-2">
+                    <span className="truncate max-w-[280px] sm:max-w-md">{previewPost.title}</span>
+                    <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 flex-shrink-0">
+                      {previewPost.isBreaking ? 'Breaking' : previewPost.isOpinion ? 'Opinion' : 'Standard'}
+                    </span>
+                  </h3>
+                  <p className="text-[11px] text-slate-400 hidden sm:block">
+                    Section: <span className="text-white font-medium capitalize">{previewPost.category}</span> • Status: <span className="text-white font-medium capitalize">{previewPost.status || 'published'}</span>
+                  </p>
+                </div>
+              </div>
+
+              {/* Device Frame Switcher */}
+              <div className="flex items-center gap-1 bg-slate-800 p-1 rounded-xl border border-slate-700">
+                <button
+                  type="button"
+                  onClick={() => setPreviewDevice('desktop')}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
+                    previewDevice === 'desktop' ? 'bg-primary text-white shadow-xs' : 'text-slate-400 hover:text-white'
+                  }`}
+                  title="Desktop (Full)"
+                >
+                  <Monitor className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Desktop</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPreviewDevice('tablet')}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
+                    previewDevice === 'tablet' ? 'bg-primary text-white shadow-xs' : 'text-slate-400 hover:text-white'
+                  }`}
+                  title="Tablet (768px)"
+                >
+                  <Tablet className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Tablet</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPreviewDevice('mobile')}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
+                    previewDevice === 'mobile' ? 'bg-primary text-white shadow-xs' : 'text-slate-400 hover:text-white'
+                  }`}
+                  title="Mobile Phone (390px)"
+                >
+                  <Smartphone className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Mobile</span>
+                </button>
+              </div>
+
+              {/* Quick Actions */}
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => onEditArticle(previewPost)}
+                  className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer border border-slate-700"
+                >
+                  <Edit className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Edit</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    try {
+                      localStorage.setItem('np_news_preview_draft', JSON.stringify(previewPost));
+                    } catch {}
+                    window.open(window.location.origin + '/?preview=true', '_blank');
+                  }}
+                  className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Open in Tab</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPreviewPost(null)}
+                  className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                  <span>Close</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Preview Frame Container */}
+            <div className="flex-1 bg-slate-200/70 overflow-y-auto p-2 sm:p-6 flex justify-center items-start">
+              <div
+                className={`transition-all duration-300 bg-white shadow-2xl relative ${
+                  previewDevice === 'mobile'
+                    ? 'w-[390px] min-h-[844px] rounded-3xl border-8 border-slate-900 my-4 overflow-hidden shadow-2xl ring-1 ring-black/20'
+                    : previewDevice === 'tablet'
+                    ? 'w-[768px] min-h-[1024px] rounded-2xl border-8 border-slate-800 my-4 overflow-hidden shadow-2xl ring-1 ring-black/20'
+                    : 'w-full rounded-none'
+                }`}
+              >
+                {previewDevice !== 'desktop' && (
+                  <div className="bg-slate-900 text-white text-[11px] px-5 py-1.5 flex items-center justify-between font-mono select-none">
+                    <span>9:41</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px]">5G</span>
+                      <div className="w-4 h-2 border border-white rounded-xs p-0.5">
+                        <div className="w-full h-full bg-white rounded-2xs"></div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {previewPost.isBreaking ? (
+                  <BreakingArticleTemplate
+                    post={previewPost}
+                    onSelectPost={() => {}}
+                    onNavigateHome={() => {}}
+                    onSelectCategory={() => {}}
+                    onSelectAuthor={() => {}}
+                  />
+                ) : previewPost.isOpinion ? (
+                  <OpinionArticleTemplate
+                    post={previewPost}
+                    onSelectPost={() => {}}
+                    onNavigateHome={() => {}}
+                    onSelectCategory={() => {}}
+                    onSelectAuthor={() => {}}
+                  />
+                ) : (
+                  <StandardArticleTemplate
+                    post={previewPost}
+                    onSelectPost={() => {}}
+                    onNavigateHome={() => {}}
+                    onSelectCategory={() => {}}
+                    onSelectAuthor={() => {}}
+                  />
+                )}
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      )}
     </div>
   );
 };
