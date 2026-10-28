@@ -12,7 +12,7 @@ export class AdRepository {
   }
 
   /**
-   * Fetch active first-party campaign placements for a given zone (A1 to A7).
+   * Fetch active first-party campaign placements for a given zone (A1 to A8).
    * Note: If none active, caller falls back to Google AdSense slot.
    */
   public async getActivePlacementForZone(zone: string): Promise<{
@@ -23,13 +23,14 @@ export class AdRepository {
     destinationUrl: string;
     mediaUrl?: string;
     altText?: string;
+    isExplicitlyDisabled?: boolean;
   } | null> {
     try {
       const now = new Date().toISOString();
       const { data, error } = await supabase
         .from('ad_placements')
         .select(`
-          id, zone, campaign_id,
+          id, zone, campaign_id, is_active,
           campaigns (
             id, name, start_at, end_at, status,
             advertisers (name),
@@ -37,14 +38,22 @@ export class AdRepository {
           )
         `)
         .eq('zone', zone)
-        .eq('is_active', true)
         .limit(1)
         .maybeSingle();
 
-      if (error || !data || !data.campaigns) return null;
+      if (error || !data) return null;
+
+      // If placement is explicitly closed/disabled in DB
+      if (data.is_active === false) {
+        return { isExplicitlyDisabled: true } as any;
+      }
+
+      if (!data.campaigns) return null;
 
       const campaign: any = data.campaigns;
-      if (campaign.status !== 'active') return null;
+      if (campaign.status !== 'active') {
+        return { isExplicitlyDisabled: true } as any;
+      }
       if (campaign.start_at && campaign.start_at > now) return null;
       if (campaign.end_at && campaign.end_at < now) return null;
 
@@ -65,6 +74,245 @@ export class AdRepository {
       };
     } catch {
       return null;
+    }
+  }
+
+  /**
+   * Toggle a zone open or closed in Supabase Database.
+   * Updates ad_placements (is_active) and campaigns (status: active/paused).
+   */
+  public async toggleZoneStatus(
+    zone: string,
+    isActive: boolean
+  ): Promise<{ success: boolean; error?: string }> {
+    try {
+      const { data: existing } = await supabase
+        .from('ad_placements')
+        .select('id, campaign_id')
+        .eq('zone', zone);
+
+      if (existing && existing.length > 0) {
+        // Update all placements for this zone
+        await supabase
+          .from('ad_placements')
+          .update({ is_active: isActive })
+          .eq('zone', zone);
+
+        // Update corresponding campaigns
+        for (const p of existing) {
+          if (p.campaign_id) {
+            await supabase
+              .from('campaigns')
+              .update({ status: isActive ? 'active' : 'paused' })
+              .eq('id', p.campaign_id);
+          }
+        }
+      } else {
+        // If no placement row exists yet for this zone, create one to persist the open/closed state
+        await supabase.from('ad_placements').insert({
+          zone,
+          is_active: isActive,
+        });
+      }
+
+      return { success: true };
+    } catch (err: any) {
+      console.error('Failed to toggle zone status in Supabase:', err);
+      return { success: false, error: err?.message };
+    }
+  }
+
+  /**
+   * Delete ad campaign, placement, creatives, and analytics from Supabase Database.
+   * Completely purges the ad from the database so it will never reappear.
+   */
+  public async deleteCampaignAndPlacement(
+    zone: string,
+    campaignId?: string
+  ): Promise<{ success: boolean; error?: string }> {
+    try {
+      const targetCampaignIds: string[] = [];
+      const targetPlacementIds: string[] = [];
+
+      // 1. Find all placements matching the zone
+      if (zone) {
+        const { data: placementsByZone } = await supabase
+          .from('ad_placements')
+          .select('id, campaign_id')
+          .eq('zone', zone);
+
+        if (Array.isArray(placementsByZone)) {
+          placementsByZone.forEach((p) => {
+            if (p.id) targetPlacementIds.push(p.id);
+            if (p.campaign_id) targetCampaignIds.push(p.campaign_id);
+          });
+        }
+      }
+
+      // 2. If a specific campaignId was passed, include it
+      if (campaignId && !campaignId.startsWith('direct-ad-') && !campaignId.startsWith('mock-')) {
+        targetCampaignIds.push(campaignId);
+
+        // Also check if any placements reference this campaignId
+        const { data: placementsByCampaign } = await supabase
+          .from('ad_placements')
+          .select('id')
+          .eq('campaign_id', campaignId);
+
+        if (Array.isArray(placementsByCampaign)) {
+          placementsByCampaign.forEach((p) => {
+            if (p.id) targetPlacementIds.push(p.id);
+          });
+        }
+      }
+
+      const uniqueCampaignIds = Array.from(new Set(targetCampaignIds.filter(Boolean)));
+      const uniquePlacementIds = Array.from(new Set(targetPlacementIds.filter(Boolean)));
+
+      // 3. Delete from ad_analytics_daily
+      for (const pId of uniquePlacementIds) {
+        await supabase.from('ad_analytics_daily').delete().eq('placement_id', pId);
+      }
+      for (const cId of uniqueCampaignIds) {
+        await supabase.from('ad_analytics_daily').delete().eq('campaign_id', cId);
+      }
+
+      // 4. Delete placements
+      if (zone) {
+        await supabase.from('ad_placements').delete().eq('zone', zone);
+      }
+      for (const pId of uniquePlacementIds) {
+        await supabase.from('ad_placements').delete().eq('id', pId);
+      }
+
+      // 5. Delete creatives
+      for (const cId of uniqueCampaignIds) {
+        await supabase.from('ad_creatives').delete().eq('campaign_id', cId);
+      }
+
+      // 6. Delete campaigns
+      for (const cId of uniqueCampaignIds) {
+        await supabase.from('campaigns').delete().eq('id', cId);
+      }
+
+      return { success: true };
+    } catch (err: any) {
+      console.error('Failed to delete ad from Supabase DB:', err);
+      return { success: false, error: err?.message || 'Database deletion error' };
+    }
+  }
+
+  /**
+   * Save or update an ad in Supabase Database.
+   * Keeps campaigns, ad_creatives, and ad_placements in sync.
+   */
+  public async saveCampaignAndPlacement(ad: {
+    id?: string;
+    zone: string;
+    advertiserName: string;
+    creativeText: string;
+    destinationUrl: string;
+    mediaUrl?: string;
+    altText?: string;
+    isActive: boolean;
+  }): Promise<{ success: boolean; campaignId?: string; error?: string }> {
+    try {
+      const now = new Date().toISOString();
+
+      // Check for existing placement by zone
+      const { data: existingPlacements } = await supabase
+        .from('ad_placements')
+        .select('id, campaign_id')
+        .eq('zone', ad.zone)
+        .limit(1);
+
+      let campaignId = existingPlacements?.[0]?.campaign_id;
+      let placementId = existingPlacements?.[0]?.id;
+
+      if (campaignId) {
+        // Update existing campaign
+        await supabase
+          .from('campaigns')
+          .update({
+            name: ad.advertiserName || `Zone ${ad.zone} Campaign`,
+            status: ad.isActive ? 'active' : 'paused',
+          })
+          .eq('id', campaignId);
+
+        // Update or insert creative
+        const { data: existingCreatives } = await supabase
+          .from('ad_creatives')
+          .select('id')
+          .eq('campaign_id', campaignId)
+          .limit(1);
+
+        if (existingCreatives && existingCreatives.length > 0) {
+          await supabase
+            .from('ad_creatives')
+            .update({
+              headline: ad.creativeText,
+              destination_url: ad.destinationUrl || '#',
+              alt_text: ad.altText || ad.advertiserName,
+            })
+            .eq('id', existingCreatives[0].id);
+        } else {
+          await supabase.from('ad_creatives').insert({
+            campaign_id: campaignId,
+            type: 'banner',
+            headline: ad.creativeText,
+            destination_url: ad.destinationUrl || '#',
+            alt_text: ad.altText || ad.advertiserName,
+          });
+        }
+
+        // Update placement
+        if (placementId) {
+          await supabase
+            .from('ad_placements')
+            .update({
+              is_active: ad.isActive,
+            })
+            .eq('id', placementId);
+        }
+      } else {
+        // Create new campaign
+        const { data: newCampaign, error: campErr } = await supabase
+          .from('campaigns')
+          .insert({
+            name: ad.advertiserName || `Zone ${ad.zone} Campaign`,
+            status: ad.isActive ? 'active' : 'paused',
+            start_at: now,
+          })
+          .select('id')
+          .single();
+
+        if (campErr || !newCampaign) {
+          return { success: false, error: campErr?.message };
+        }
+
+        campaignId = newCampaign.id;
+
+        // Insert creative
+        await supabase.from('ad_creatives').insert({
+          campaign_id: campaignId,
+          type: 'banner',
+          headline: ad.creativeText,
+          destination_url: ad.destinationUrl || '#',
+          alt_text: ad.altText || ad.advertiserName,
+        });
+
+        // Insert placement
+        await supabase.from('ad_placements').insert({
+          zone: ad.zone,
+          campaign_id: campaignId,
+          is_active: ad.isActive,
+        });
+      }
+
+      return { success: true, campaignId };
+    } catch (err: any) {
+      console.error('Failed to save ad to Supabase DB:', err);
+      return { success: false, error: err?.message };
     }
   }
 

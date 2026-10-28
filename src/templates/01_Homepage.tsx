@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   TrendingUp, Video, Newspaper, ArrowRight, ShieldCheck, 
   ChevronRight, Sparkles, Flame, CheckCircle2, Clock 
@@ -6,6 +6,7 @@ import {
 import { WpPost, WpVideo } from '../types/wordpress';
 import { mockVideos, mockAuthors } from '../data/mockWpData';
 import { getStoredPosts, isPostPublished } from '../utils/newsStorage';
+import { getCategoryArticles } from '../services/articleService';
 import { HeroStory } from '../components/cards/HeroStory';
 import { LargeStoryCard } from '../components/cards/LargeStoryCard';
 import { MediumStoryCard } from '../components/cards/MediumStoryCard';
@@ -59,6 +60,8 @@ export const Homepage: React.FC<HomepageProps> = ({
   });
 
   const [visibleLatestCount, setVisibleLatestCount] = useState(4);
+  const [extraTechPosts, setExtraTechPosts] = useState<WpPost[]>([]);
+  const [extraWorldPosts, setExtraWorldPosts] = useState<WpPost[]>([]);
 
   // Hero Lead & Slider feeds (strictly latest 10 articles only)
   const latestTenPosts = sortedPosts.slice(0, 10);
@@ -70,6 +73,39 @@ export const Homepage: React.FC<HomepageProps> = ({
   const businessPosts = sortedPosts.filter((p) => p.category === 'business' || p.category === 'economy');
   const techWorldPosts = sortedPosts.filter((p) => p.category === 'technology' || p.category === 'world');
   const trendingRanking = [...allPosts].sort((a, b) => (b.viewsCount || 0) - (a.viewsCount || 0)).slice(0, 7);
+
+  // Fallback async fetch if homepage bundle doesn't have enough Technology or World news
+  useEffect(() => {
+    const existingTech = sortedPosts.filter((p) => p.category === 'technology');
+    if (existingTech.length < 2) {
+      getCategoryArticles('technology', 1, 4)
+        .then((posts) => {
+          if (posts && posts.length > 0) {
+            setExtraTechPosts(posts);
+          }
+        })
+        .catch(() => {});
+    }
+
+    const existingWorld = sortedPosts.filter((p) => p.category === 'world');
+    if (existingWorld.length < 2) {
+      getCategoryArticles('world', 1, 4)
+        .then((posts) => {
+          if (posts && posts.length > 0) {
+            setExtraWorldPosts(posts);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [allPosts.length]);
+
+  const displayTechPosts = sortedPosts.filter((p) => p.category === 'technology').length > 0
+    ? sortedPosts.filter((p) => p.category === 'technology')
+    : extraTechPosts;
+
+  const displayWorldPosts = sortedPosts.filter((p) => p.category === 'world').length > 0
+    ? sortedPosts.filter((p) => p.category === 'world')
+    : extraWorldPosts;
 
   if (!leadPost || allPosts.length === 0) {
     return (
@@ -359,7 +395,7 @@ export const Homepage: React.FC<HomepageProps> = ({
               </button>
             </div>
             <div className="space-y-4">
-              {techWorldPosts.filter((p) => p.category === 'technology').slice(0, 2).map((post) => (
+              {displayTechPosts.slice(0, 2).map((post) => (
                 <HorizontalStoryCard
                   key={post.id}
                   post={post}
@@ -388,7 +424,7 @@ export const Homepage: React.FC<HomepageProps> = ({
               </button>
             </div>
             <div className="space-y-4">
-              {techWorldPosts.filter((p) => p.category === 'world').slice(0, 2).map((post) => (
+              {displayWorldPosts.slice(0, 2).map((post) => (
                 <HorizontalStoryCard
                   key={post.id}
                   post={post}

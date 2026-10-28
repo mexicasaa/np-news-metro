@@ -67,11 +67,41 @@ const DIRECT_ADS_KEY = 'np_direct_ads_v2';
 const AD_METRICS_KEY = 'np_ad_metrics_cache_v2';
 const AD_BROADCAST_CHANNEL = 'np_ads_sync_channel';
 const ADS_VISIBILITY_KEY = 'np_ads_visibility_v2';
+const CLEARED_ZONES_KEY = 'np_cleared_ad_zones_v2';
 
 export interface AdsVisibilityConfig {
   masterEnabled: boolean;
   zones: Record<string, boolean>;
 }
+
+export const getClearedZones = (): Set<string> => {
+  if (typeof window === 'undefined') return new Set();
+  try {
+    const raw = localStorage.getItem(CLEARED_ZONES_KEY);
+    if (!raw) return new Set();
+    return new Set(JSON.parse(raw));
+  } catch {
+    return new Set();
+  }
+};
+
+export const markZoneCleared = (zone: string): void => {
+  if (typeof window === 'undefined' || !zone) return;
+  try {
+    const set = getClearedZones();
+    set.add(zone);
+    localStorage.setItem(CLEARED_ZONES_KEY, JSON.stringify(Array.from(set)));
+  } catch {}
+};
+
+export const unmarkZoneCleared = (zone: string): void => {
+  if (typeof window === 'undefined' || !zone) return;
+  try {
+    const set = getClearedZones();
+    set.delete(zone);
+    localStorage.setItem(CLEARED_ZONES_KEY, JSON.stringify(Array.from(set)));
+  } catch {}
+};
 
 export const DEFAULT_ADS_VISIBILITY: AdsVisibilityConfig = {
   masterEnabled: true,
@@ -249,20 +279,18 @@ export const getDirectAds = (): DirectAd[] => {
 
   try {
     const raw = localStorage.getItem(DIRECT_ADS_KEY);
-    if (!raw) {
+    if (raw === null) {
       const initial = getInitialDirectAds();
       localStorage.setItem(DIRECT_ADS_KEY, JSON.stringify(initial));
       return initial;
     }
     const parsed: DirectAd[] = JSON.parse(raw);
-    if (!Array.isArray(parsed) || parsed.length === 0) {
-      const initial = getInitialDirectAds();
-      localStorage.setItem(DIRECT_ADS_KEY, JSON.stringify(initial));
-      return initial;
+    if (!Array.isArray(parsed)) {
+      return [];
     }
     return parsed;
   } catch {
-    return getInitialDirectAds();
+    return [];
   }
 };
 
@@ -292,19 +320,41 @@ export const saveDirectAd = (ad: DirectAd): DirectAd => {
 
   if (typeof window !== 'undefined') {
     localStorage.setItem(DIRECT_ADS_KEY, JSON.stringify(newAds));
+    unmarkZoneCleared(ad.zone);
     notifyAdUpdate();
   }
+
+  // Synchronize to Supabase Database
+  AdRepository.getInstance().saveCampaignAndPlacement(updatedAd).catch((err) => {
+    console.warn('Supabase ad sync notice:', err);
+  });
 
   return updatedAd;
 };
 
-export const deleteDirectAd = (id: string): void => {
+export const deleteDirectAd = async (id: string, zone?: string): Promise<void> => {
   const ads = getDirectAds();
-  const filtered = ads.filter((a) => a.id !== id);
+  const matched = ads.find((a) => a.id === id);
+  const targetZone = zone || matched?.zone;
+
+  const filtered = ads.filter((a) => a.id !== id && (targetZone ? a.zone !== targetZone : true));
   if (typeof window !== 'undefined') {
     localStorage.setItem(DIRECT_ADS_KEY, JSON.stringify(filtered));
-    notifyAdUpdate();
   }
+
+  if (targetZone) {
+    markZoneCleared(targetZone);
+  }
+
+  // Purge from Supabase Database
+  try {
+    await AdRepository.getInstance().deleteCampaignAndPlacement(targetZone || '', id);
+  } catch (err) {
+    console.warn('Failed to delete ad from Supabase DB:', err);
+  }
+
+  adPlacementCache.clear();
+  notifyAdUpdate();
 };
 
 export const toggleDirectAdStatus = (id: string, isActive: boolean): void => {
@@ -314,12 +364,69 @@ export const toggleDirectAdStatus = (id: string, isActive: boolean): void => {
     localStorage.setItem(DIRECT_ADS_KEY, JSON.stringify(updated));
     notifyAdUpdate();
   }
+
+  const matched = updated.find((a) => a.id === id);
+  if (matched) {
+    AdRepository.getInstance().saveCampaignAndPlacement(matched).catch(() => {});
+  }
+};
+
+/**
+ * Toggle an ad OPEN (Show on Live Website) or CLOSED (Hide from Live Website).
+ * Synchronizes instantly across localStorage, Supabase Database, and active client tabs.
+ */
+export const toggleAdOpenClose = async (
+  zone: string,
+  id?: string,
+  forceState?: boolean
+): Promise<boolean> => {
+  const currentVisibility = isZoneVisible(zone);
+  const ads = getDirectAds();
+  const matchedAd = ads.find((a) => a.zone === zone || (id && a.id === id));
+
+  // Determine next state
+  const nextState = forceState !== undefined 
+    ? forceState 
+    : (matchedAd ? !matchedAd.isActive : !currentVisibility);
+
+  // 1. Update zone visibility config in localStorage
+  toggleZoneVisibility(zone, nextState);
+
+  // 2. Update direct ads in localStorage
+  if (matchedAd) {
+    matchedAd.isActive = nextState;
+    matchedAd.updatedAt = new Date().toISOString();
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(DIRECT_ADS_KEY, JSON.stringify(ads));
+    }
+  }
+
+  // If opening, unmark cleared; if closing, mark cleared so fallback doesn't trigger
+  if (nextState) {
+    unmarkZoneCleared(zone);
+  } else {
+    markZoneCleared(zone);
+  }
+
+  // 3. Update Supabase Database
+  try {
+    await AdRepository.getInstance().toggleZoneStatus(zone, nextState);
+  } catch (err) {
+    console.warn('Database toggle warning:', err);
+  }
+
+  // 4. Invalidate cache and broadcast to all open tabs and windows
+  adPlacementCache.clear();
+  notifyAdUpdate();
+
+  return nextState;
 };
 
 export const resetAdsToDefaults = (): void => {
   if (typeof window === 'undefined') return;
   const initial = getInitialDirectAds();
   localStorage.setItem(DIRECT_ADS_KEY, JSON.stringify(initial));
+  localStorage.removeItem(CLEARED_ZONES_KEY);
   localStorage.setItem(ADSENSE_CONFIG_KEY, JSON.stringify(DEFAULT_ADSENSE_SETTINGS));
   notifyAdUpdate();
 };
@@ -333,6 +440,11 @@ const AD_CACHE_TTL = 30 * 1000; // 30s cache for fast UI updates
 export const getAdPlacement = async (zone: string): Promise<ActiveAdPlacement | null> => {
   // If the zone or master is hidden by Admin, return null immediately
   if (!isZoneVisible(zone)) {
+    return null;
+  }
+
+  // If the zone was deleted by Admin, never show it
+  if (getClearedZones().has(zone)) {
     return null;
   }
 
@@ -367,16 +479,27 @@ export const getAdPlacement = async (zone: string): Promise<ActiveAdPlacement | 
     return null;
   }
 
+  // If direct ads have been managed by admin and this zone has no ad, it was deleted
+  if (typeof window !== 'undefined' && localStorage.getItem(DIRECT_ADS_KEY) !== null) {
+    adPlacementCache.set(zone, { data: null, timestamp: Date.now() });
+    return null;
+  }
+
   // 2. Try Supabase backend repository
   try {
     const repoPlacement = await AdRepository.getInstance().getActivePlacementForZone(zone);
     if (repoPlacement) {
+      if ((repoPlacement as any).isExplicitlyDisabled) {
+        // Admin explicitly CLOSED this ad in the database! Never fallback to mock ads
+        adPlacementCache.set(zone, { data: null, timestamp: Date.now() });
+        return null;
+      }
       adPlacementCache.set(zone, { data: repoPlacement, timestamp: Date.now() });
       return repoPlacement;
     }
   } catch {}
 
-  // 3. Fallback to mockAdSlots static definition
+  // 3. Fallback to mockAdSlots static definition ONLY on pristine unconfigured setup
   const mock = mockAdSlots[zone];
   if (mock && mock.isEnabled) {
     const mockPlacement: ActiveAdPlacement = {

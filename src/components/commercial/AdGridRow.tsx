@@ -37,8 +37,8 @@ export const AdGridRow: React.FC<AdGridRowProps> = ({
         'grid-cols-2 sm:grid-cols-2 lg:grid-cols-4'
       }`}>
         {visibleZones.map((zone) => (
-          <div key={zone} className="h-full flex flex-col">
-            <AdSlot zone={zone as any} variant="card" className="h-full" />
+          <div key={zone} className="h-full w-full flex flex-col items-stretch">
+            <AdSlot zone={zone as any} variant="card" className="h-full w-full" />
           </div>
         ))}
       </div>

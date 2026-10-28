@@ -29,7 +29,8 @@ import {
   Layout,
   Smartphone,
   Tablet,
-  Monitor
+  Monitor,
+  Power
 } from 'lucide-react';
 import { 
   DirectAd, 
@@ -39,6 +40,7 @@ import {
   saveDirectAd, 
   deleteDirectAd, 
   toggleDirectAdStatus, 
+  toggleAdOpenClose,
   resetAdsToDefaults, 
   getAdSenseSettings, 
   saveAdSenseSettings, 
@@ -194,14 +196,18 @@ export const AdManagerView: React.FC = () => {
     flashSuccess(next ? 'Commercial ads ENABLED across the website!' : 'All commercial ads PAUSED and hidden from website.');
   };
 
-  const handleToggleZoneVisibility = (zone: string) => {
-    const next = toggleZoneVisibility(zone);
-    const matchedDirect = directAds.find(a => a.zone === zone);
-    if (matchedDirect) {
-      toggleDirectAdStatus(matchedDirect.id, next);
-    }
+  const handleToggleOpenClose = async (zone: string, id?: string) => {
+    const next = await toggleAdOpenClose(zone, id);
     loadData();
-    flashSuccess(`Zone ${zone} is now ${next ? 'SHOWING on website' : 'HIDDEN from website'}.`);
+    flashSuccess(
+      next 
+        ? `Ad for Zone ${zone} is now OPEN (Live on Website & Database)!` 
+        : `Ad for Zone ${zone} is now CLOSED (Hidden from Website & Database).`
+    );
+  };
+
+  const handleToggleZoneVisibility = async (zone: string) => {
+    await handleToggleOpenClose(zone);
   };
 
   const handleRunDiagnostics = async () => {
@@ -255,11 +261,11 @@ export const AdManagerView: React.FC = () => {
     flashSuccess(`Ad for Zone ${editingAd.zone} saved successfully!`);
   };
 
-  const handleDelete = (id: string, zone: string) => {
-    if (confirm(`Are you sure you want to delete the direct ad for Zone ${zone}?`)) {
-      deleteDirectAd(id);
+  const handleDelete = async (id: string, zone: string) => {
+    if (confirm(`Are you sure you want to delete the direct ad for Zone ${zone}? This will permanently remove it from both the website and the database.`)) {
+      await deleteDirectAd(id, zone);
       loadData();
-      flashSuccess(`Deleted direct ad for Zone ${zone}.`);
+      flashSuccess(`Permanently deleted direct ad for Zone ${zone} from website and database.`);
     }
   };
 
@@ -562,25 +568,27 @@ export const AdManagerView: React.FC = () => {
                         </span>
                       </div>
 
-                      {/* Prominent Website Show/Hide Toggle Button */}
+                      {/* Prominent Open / Close Ad Toggle Button */}
                       <button
-                        onClick={() => handleToggleZoneVisibility(ad.zone)}
-                        className={`text-[10px] font-bold px-2.5 py-1 rounded-full transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs shrink-0 ${
+                        onClick={() => handleToggleOpenClose(ad.zone, ad.id)}
+                        className={`text-[11px] font-bold px-3 py-1.5 rounded-full transition-all flex items-center gap-1.5 cursor-pointer shadow-xs shrink-0 border ${
                           isSlotVisible
-                            ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
-                            : 'bg-slate-200 hover:bg-slate-300 text-slate-700'
+                            ? 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-500 shadow-emerald-600/20'
+                            : 'bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-300'
                         }`}
-                        title={isSlotVisible ? 'Click to hide this ad from the live website' : 'Click to show this ad on the live website'}
+                        title={isSlotVisible ? 'Click to CLOSE this ad (Hide from live website & database)' : 'Click to OPEN this ad (Show on live website & database)'}
                       >
                         {isSlotVisible ? (
                           <>
-                            <Eye className="w-3 h-3 text-emerald-200" />
-                            <span>SHOWING ON SITE</span>
+                            <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+                            <Eye className="w-3.5 h-3.5 text-emerald-100" />
+                            <span>AD OPEN (ACTIVE)</span>
                           </>
                         ) : (
                           <>
-                            <EyeOff className="w-3 h-3 text-slate-500" />
-                            <span>HIDDEN ON SITE</span>
+                            <span className="w-2 h-2 rounded-full bg-rose-500"></span>
+                            <EyeOff className="w-3.5 h-3.5 text-rose-500" />
+                            <span>AD CLOSED (OFF)</span>
                           </>
                         )}
                       </button>
@@ -639,6 +647,18 @@ export const AdManagerView: React.FC = () => {
                     </span>
 
                     <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => handleToggleOpenClose(ad.zone, ad.id)}
+                        className={`px-2.5 py-1 rounded text-[11px] font-bold flex items-center gap-1 transition-all cursor-pointer border ${
+                          isSlotVisible
+                            ? 'bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-200'
+                            : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200'
+                        }`}
+                        title={isSlotVisible ? 'Click to CLOSE this ad' : 'Click to OPEN this ad'}
+                      >
+                        <Power className="w-3 h-3" />
+                        <span>{isSlotVisible ? 'Close Ad' : 'Open Ad'}</span>
+                      </button>
                       <button
                         onClick={() => {
                           setPreviewZone(ad.zone);
@@ -1437,22 +1457,25 @@ export const AdManagerView: React.FC = () => {
                         </td>
                         <td className="p-3">
                           <button
-                            onClick={() => handleToggleZoneVisibility(zoneKey)}
-                            className={`text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5 cursor-pointer shadow-2xs transition-all ${
+                            onClick={() => handleToggleOpenClose(zoneKey)}
+                            className={`text-[11px] font-bold px-3 py-1 rounded-full flex items-center gap-1.5 cursor-pointer shadow-xs transition-all border ${
                               isVisible
-                                ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
-                                : 'bg-slate-200 hover:bg-slate-300 text-slate-700'
+                                ? 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-500'
+                                : 'bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-300'
                             }`}
+                            title={isVisible ? 'Click to CLOSE this ad' : 'Click to OPEN this ad'}
                           >
                             {isVisible ? (
                               <>
-                                <Eye className="w-3 h-3 text-emerald-200" />
-                                <span>SHOWING ON SITE</span>
+                                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                                <Eye className="w-3.5 h-3.5 text-emerald-100" />
+                                <span>AD OPEN (ACTIVE)</span>
                               </>
                             ) : (
                               <>
-                                <EyeOff className="w-3 h-3 text-slate-500" />
-                                <span>HIDDEN ON SITE</span>
+                                <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                <EyeOff className="w-3.5 h-3.5 text-rose-500" />
+                                <span>AD CLOSED (OFF)</span>
                               </>
                             )}
                           </button>
@@ -1581,22 +1604,23 @@ export const AdManagerView: React.FC = () => {
                 </div>
 
                 <button
-                  onClick={() => handleToggleZoneVisibility(previewZone)}
-                  className={`px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer self-start sm:self-auto shadow-2xs ${
+                  onClick={() => handleToggleOpenClose(previewZone)}
+                  className={`px-3.5 py-1.5 rounded text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer self-start sm:self-auto shadow-xs border ${
                     isVisible
-                      ? 'bg-slate-800 hover:bg-slate-900 text-white'
-                      : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                      ? 'bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-300'
+                      : 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-500'
                   }`}
+                  title={isVisible ? 'Click to CLOSE this ad' : 'Click to OPEN this ad'}
                 >
                   {isVisible ? (
                     <>
-                      <EyeOff className="w-3.5 h-3.5" />
-                      <span>Hide from Website</span>
+                      <Power className="w-3.5 h-3.5 text-rose-600" />
+                      <span>Close Ad (Hide from Website)</span>
                     </>
                   ) : (
                     <>
-                      <Eye className="w-3.5 h-3.5" />
-                      <span>Show on Website</span>
+                      <Power className="w-3.5 h-3.5 text-white" />
+                      <span>Open Ad (Show on Website)</span>
                     </>
                   )}
                 </button>
@@ -1755,15 +1779,21 @@ export const AdManagerView: React.FC = () => {
               </div>
 
               <div className="pt-2 flex items-center justify-between border-t border-border-subtle">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={editingAd.isActive}
-                    onChange={(e) => setEditingAd({ ...editingAd, isActive: e.target.checked })}
-                    className="accent-primary"
-                  />
-                  <span className="font-bold text-ink">Active Immediately</span>
-                </label>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-ink uppercase text-[11px]">Ad Status:</span>
+                  <button
+                    type="button"
+                    onClick={() => setEditingAd({ ...editingAd, isActive: !editingAd.isActive })}
+                    className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer border ${
+                      editingAd.isActive
+                        ? 'bg-emerald-600 text-white border-emerald-500'
+                        : 'bg-rose-50 text-rose-700 border-rose-300'
+                    }`}
+                  >
+                    <Power className="w-3 h-3" />
+                    <span>{editingAd.isActive ? 'OPEN (LIVE ON WEBSITE)' : 'CLOSED (HIDDEN)'}</span>
+                  </button>
+                </div>
 
                 <div className="flex items-center gap-2">
                   <button

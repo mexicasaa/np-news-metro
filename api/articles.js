@@ -545,20 +545,63 @@ export default async function handler(req, res) {
         }
       }
 
-      const { data, error } = await supabase
+      // 1. Fetch top general lead and chronological articles
+      const { data: generalData, error: generalError } = await supabase
         .from('articles')
         .select(CARD_PROJECTION_FIELDS)
         .eq('status', 'published')
         .not('published_at', 'is', null)
         .order('is_lead', { ascending: false })
         .order('published_at', { ascending: false, nullsFirst: false })
-        .limit(35);
+        .limit(45);
 
-      if (error) {
-        return res.status(500).json({ error: error.message });
+      if (generalError) {
+        return res.status(500).json({ error: generalError.message });
       }
 
-      const responsePayload = { posts: sanitizeCardPosts(data || []), timestamp: Date.now() };
+      let allHomepagePosts = generalData ? [...generalData] : [];
+
+      // 2. Guarantee dedicated homepage desks (Technology & World News) always have stories
+      const techCategoryId = CATEGORY_SLUG_TO_ID.technology;
+      const worldCategoryId = CATEGORY_SLUG_TO_ID.world;
+      const extraCategoriesToFetch = [];
+
+      const techCount = allHomepagePosts.filter(
+        (p) => p.category_id === techCategoryId || p.categories?.slug === 'technology'
+      ).length;
+      if (techCount < 2 && techCategoryId) {
+        extraCategoriesToFetch.push(techCategoryId);
+      }
+
+      const worldCount = allHomepagePosts.filter(
+        (p) => p.category_id === worldCategoryId || p.categories?.slug === 'world'
+      ).length;
+      if (worldCount < 2 && worldCategoryId) {
+        extraCategoriesToFetch.push(worldCategoryId);
+      }
+
+      if (extraCategoriesToFetch.length > 0) {
+        const { data: deskData } = await supabase
+          .from('articles')
+          .select(CARD_PROJECTION_FIELDS)
+          .eq('status', 'published')
+          .not('published_at', 'is', null)
+          .in('category_id', extraCategoriesToFetch)
+          .order('published_at', { ascending: false, nullsFirst: false })
+          .limit(8);
+
+        if (Array.isArray(deskData) && deskData.length > 0) {
+          const existingIds = new Set(allHomepagePosts.map((p) => p.id));
+          deskData.forEach((p) => {
+            if (!existingIds.has(p.id)) {
+              allHomepagePosts.push(p);
+              existingIds.add(p.id);
+            }
+          });
+        }
+      }
+
+      const responsePayload = { posts: sanitizeCardPosts(allHomepagePosts), timestamp: Date.now() };
       setInWarmCache(cacheKey, responsePayload);
 
       res.setHeader('Content-Type', 'application/json; charset=utf-8');

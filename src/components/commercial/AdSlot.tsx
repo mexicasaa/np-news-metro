@@ -178,13 +178,13 @@ export const AdSlot: React.FC<AdSlotProps> = ({
   if (variant === 'card') {
     return (
       <div
-        className={`bg-white dark:bg-surface-lowest border border-border-subtle hover:border-primary/50 rounded-md p-3 sm:p-4 lg:p-5 shadow-xs hover:shadow-subtle transition-all duration-200 flex flex-col justify-between h-full group ${className}`}
+        className={`bg-white dark:bg-surface-lowest border border-border-subtle hover:border-primary/50 rounded-md p-3 sm:p-4 lg:p-4 shadow-xs hover:shadow-subtle transition-all duration-200 flex flex-col justify-between h-full group ${className}`}
         data-slot={zone}
         aria-label={`Sponsored: ${advertiserName}`}
       >
         <div className="flex-1 flex flex-col">
           {/* Compliant Ad Header */}
-          <div className="flex items-center justify-between text-[9px] sm:text-[10px] lg:text-xs uppercase font-bold text-ink-muted tracking-wider pb-2 border-b border-border-subtle mb-2.5">
+          <div className="flex items-center justify-between text-[9px] sm:text-[10px] lg:text-xs uppercase font-bold text-ink-muted tracking-wider pb-2 border-b border-border-subtle mb-3 flex-shrink-0">
             <span className="text-secondary-gold font-sans font-bold flex items-center gap-1 sm:gap-1.5 truncate">
               <span className="w-1.5 h-1.5 rounded-full bg-secondary-gold inline-block flex-shrink-0"></span>
               <span className="truncate">{isHindi ? 'प्रायोजित साझेदार' : 'SPONSORED PARTNER'}</span>
@@ -195,80 +195,86 @@ export const AdSlot: React.FC<AdSlotProps> = ({
             </span>
           </div>
 
-          {/* Media Creative Image: Natural Responsive Sizing with Max Boundaries */}
-          {mediaUrl ? (
+          {/* Standardized Uniform Creative Container for Exact Card Alignment */}
+          <div className="w-full h-44 sm:h-48 md:h-52 bg-slate-50 dark:bg-surface-subtle/30 rounded-xs border border-border-subtle/80 overflow-hidden flex items-center justify-center mb-3 flex-shrink-0 group/media">
+            {mediaUrl ? (
+              <a
+                href={ctaUrl}
+                target={isExternalLink ? '_blank' : undefined}
+                rel={isExternalLink ? 'noopener noreferrer' : undefined}
+                onClick={handleClick}
+                className="w-full h-full flex items-center justify-center p-2"
+                title={advertiserName}
+              >
+                <img
+                  src={mediaUrl}
+                  alt={altText}
+                  className="max-h-full max-w-full object-contain block mx-auto transition-transform duration-300 group-hover/media:scale-105"
+                  loading="lazy"
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    if (zone === 'A3' && !target.src.endsWith('/uploads/ads/suresh-chand-agarwal-memorial.png')) {
+                      target.src = '/uploads/ads/suresh-chand-agarwal-memorial.png';
+                    } else if (zone === 'A4' && !target.src.endsWith('/uploads/ads/shastri-patanjali-chikitsalaya.jpg')) {
+                      target.src = '/uploads/ads/shastri-patanjali-chikitsalaya.jpg';
+                    } else if (target.src !== DEFAULT_FALLBACK_IMAGE) {
+                      target.src = DEFAULT_FALLBACK_IMAGE;
+                    }
+                  }}
+                />
+              </a>
+            ) : (
+              <div className="w-full h-full p-4 bg-gradient-to-br from-primary/5 via-surface-container to-secondary-gold/10 flex flex-col items-center justify-center text-center">
+                <div className="w-8 h-8 rounded-full bg-secondary-gold/20 flex items-center justify-center mb-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-secondary-gold inline-block"></span>
+                </div>
+                <span className="font-serif font-bold text-xs sm:text-sm text-primary uppercase tracking-wider line-clamp-2">
+                  {advertiserName}
+                </span>
+                <span className="text-[10px] sm:text-[11px] text-ink-muted mt-1 font-sans">Official Partner Initiative</span>
+              </div>
+            )}
+          </div>
+
+          {/* Content Details: Fixed min-heights for pixel-perfect row alignment */}
+          <div className="space-y-1 mb-2 flex-1 flex flex-col justify-start">
+            <h4 className="font-sans font-bold text-xs sm:text-sm lg:text-[15px] text-ink block leading-snug line-clamp-2 min-h-[2.4rem] hover:text-primary transition-colors">
+              {advertiserName}
+            </h4>
+            <p className="font-serif text-[11px] sm:text-xs text-ink-secondary leading-relaxed line-clamp-2 min-h-[2.1rem] mt-0.5">
+              {creativeText || (isHindi ? 'सत्यापित राष्ट्रीय पहल एवं भागीदार सेवाएं।' : 'Explore verified national initiative and partner services.')}
+            </p>
+          </div>
+        </div>
+
+        {/* Action Button Area: Bottom-pinned for clean baseline alignment across cards */}
+        <div className="mt-auto pt-2 border-t border-border-subtle/50 flex-shrink-0">
+          {ctaUrl && ctaUrl !== '#' ? (
             <a
               href={ctaUrl}
               target={isExternalLink ? '_blank' : undefined}
               rel={isExternalLink ? 'noopener noreferrer' : undefined}
               onClick={handleClick}
-              className="block group/img overflow-hidden rounded-xs bg-white border border-border-subtle/80 hover:border-primary/40 transition-all mb-2 flex-shrink-0"
-              title={advertiserName}
+              className="inline-flex items-center justify-center gap-1.5 w-full py-1.5 sm:py-2 px-3 bg-primary hover:bg-primary-container text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider rounded-xs shadow-2xs transition-colors cursor-pointer"
             >
-              <img
-                src={mediaUrl}
-                alt={altText}
-                className="w-full h-auto max-h-[220px] sm:max-h-[300px] md:max-h-[380px] lg:max-h-[460px] object-contain block mx-auto transition-transform duration-300 group-hover/img:scale-[1.02]"
-                loading="lazy"
-                onError={(e) => {
-                  const target = e.currentTarget;
-                  if (zone === 'A3' && !target.src.endsWith('/uploads/ads/suresh-chand-agarwal-memorial.png')) {
-                    target.src = '/uploads/ads/suresh-chand-agarwal-memorial.png';
-                  } else if (zone === 'A4' && !target.src.endsWith('/uploads/ads/shastri-patanjali-chikitsalaya.jpg')) {
-                    target.src = '/uploads/ads/shastri-patanjali-chikitsalaya.jpg';
-                  } else if (target.src !== DEFAULT_FALLBACK_IMAGE) {
-                    target.src = DEFAULT_FALLBACK_IMAGE;
-                  }
-                }}
-              />
+              {isPhoneCta ? (
+                <>
+                  <Phone className="w-3.5 h-3.5 text-secondary-gold" />
+                  <span>{isHindi ? 'कॉल करें' : 'Call to Order'}</span>
+                </>
+              ) : (
+                <>
+                  <span>{isHindi ? 'और जानें' : (directAd?.ctaText || 'Learn More')}</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </>
+              )}
             </a>
           ) : (
-            <div className="w-full py-5 px-3 bg-gradient-to-br from-primary/10 via-surface-container to-secondary-gold/15 rounded-xs border border-border-subtle/70 flex flex-col items-center justify-center mb-2 text-center flex-shrink-0">
-              <div className="w-7 h-7 rounded-full bg-secondary-gold/20 flex items-center justify-center mb-1.5">
-                <span className="w-2 h-2 rounded-full bg-secondary-gold inline-block"></span>
-              </div>
-              <span className="font-serif font-bold text-xs sm:text-sm text-primary uppercase tracking-wider line-clamp-2">
-                {advertiserName}
-              </span>
-              <span className="text-[10px] text-ink-muted mt-0.5 font-sans">Official Partner Initiative</span>
+            <div className="py-1.5 text-center text-[10px] sm:text-xs font-semibold text-ink-muted/60 uppercase tracking-wider select-none">
+              {isHindi ? 'प्रायोजित संदेश' : 'Official Notice'}
             </div>
           )}
-
-          {/* Content Details: Adjusts dynamically based on image height */}
-          <div className="space-y-1 mb-2 mt-1 flex-1 flex flex-col justify-start">
-            <h4 className="font-sans font-bold text-xs sm:text-sm lg:text-base text-ink block leading-snug line-clamp-2 hover:text-primary transition-colors">
-              {advertiserName}
-            </h4>
-            {creativeText && (
-              <p className="font-serif text-[11px] sm:text-xs lg:text-[13px] text-ink-secondary leading-relaxed line-clamp-2 mt-0.5">
-                {creativeText}
-              </p>
-            )}
-          </div>
         </div>
-
-        {/* CTA Button pinned to bottom */}
-        {ctaUrl && ctaUrl !== '#' && (
-          <a
-            href={ctaUrl}
-            target={isExternalLink ? '_blank' : undefined}
-            rel={isExternalLink ? 'noopener noreferrer' : undefined}
-            onClick={handleClick}
-            className="inline-flex items-center justify-center gap-1.5 w-full py-1.5 sm:py-2 px-2.5 sm:px-3.5 bg-primary hover:bg-primary-container text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider rounded-xs shadow-2xs transition-colors cursor-pointer mt-2.5 flex-shrink-0"
-          >
-            {isPhoneCta ? (
-              <>
-                <Phone className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-secondary-gold" />
-                <span>{isHindi ? 'कॉल करें' : 'Call to Order'}</span>
-              </>
-            ) : (
-              <>
-                <span>{isHindi ? 'और जानें' : (directAd?.ctaText || 'Learn More')}</span>
-                <ExternalLink className="w-3 h-3" />
-              </>
-            )}
-          </a>
-        )}
       </div>
     );
   }
