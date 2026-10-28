@@ -845,33 +845,53 @@ function AppContent() {
 
     const syncLiveContent = async () => {
       if (typeof document !== 'undefined' && document.hidden) return;
-      if (viewMode === 'admin') return;
 
       try {
-        const fresh = await getPublishedArticles(true);
-        if (!isSubscribed || !fresh || fresh.length === 0) return;
-
-        setPosts((currentPosts) => {
-          const currentPublished = currentPosts.filter(isPostPublished);
-          if (currentPublished.length === 0) return fresh;
-
-          const hasCountChange = fresh.length !== currentPublished.length;
-          const hasNewLead = fresh[0]?.id !== currentPublished[0]?.id;
-          const hasModified = fresh.some((f) => {
-            const match = currentPublished.find((c) => c.id === f.id);
-            return !match || match.updatedAt !== f.updatedAt || match.title !== f.title;
+        if (viewMode === 'admin') {
+          // Admin Mode: silently refresh editorial articles
+          const freshAdmin = await getEditorialArticles('all');
+          if (!isSubscribed || !freshAdmin || freshAdmin.length === 0) return;
+          setPosts((currentPosts) => {
+            const hasChange = freshAdmin.length !== currentPosts.length ||
+              freshAdmin.some((f, idx) => {
+                const c = currentPosts[idx];
+                return !c || c.id !== f.id || c.updatedAt !== f.updatedAt || c.status !== f.status;
+              });
+            return hasChange ? freshAdmin : currentPosts;
           });
+        } else {
+          // Public Reader Mode: silently refresh published articles
+          const fresh = await getPublishedArticles(true);
+          if (!isSubscribed || !fresh || fresh.length === 0) return;
 
-          if (hasCountChange || hasNewLead || hasModified) {
-            return fresh;
-          }
+          setPosts((currentPosts) => {
+            const currentPublished = currentPosts.filter(isPostPublished);
+            if (currentPublished.length === 0) return fresh;
 
-          return currentPosts;
-        });
+            const hasCountChange = fresh.length !== currentPublished.length;
+            const hasNewLead = fresh[0]?.id !== currentPublished[0]?.id;
+            const hasModified = fresh.some((f) => {
+              const match = currentPublished.find((c) => c.id === f.id);
+              return !match || match.updatedAt !== f.updatedAt || match.title !== f.title;
+            });
+
+            if (hasCountChange || hasNewLead || hasModified) {
+              return fresh;
+            }
+
+            return currentPosts;
+          });
+        }
+
+        // Silently sync videos
+        const freshVideos = await getPublishedVideos();
+        if (freshVideos && freshVideos.length > 0) {
+          setVideos(freshVideos);
+        }
       } catch {}
     };
 
-    timer = setInterval(syncLiveContent, 45000);
+    timer = setInterval(syncLiveContent, 20000);
 
     const handleVisibility = () => {
       if (document.visibilityState === 'visible') {
@@ -879,11 +899,21 @@ function AppContent() {
       }
     };
     document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('focus', handleVisibility);
+
+    // Silent background push & deployment synchronization listener
+    const handleVersionUpdate = () => {
+      syncLiveContent();
+      window.dispatchEvent(new Event('np_ads_synced'));
+    };
+    window.addEventListener('np_app_version_update', handleVersionUpdate);
 
     return () => {
       isSubscribed = false;
       if (timer) clearInterval(timer);
       document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('focus', handleVisibility);
+      window.removeEventListener('np_app_version_update', handleVersionUpdate);
     };
   }, [viewMode]);
 

@@ -158,17 +158,25 @@ class LiveUpdateService {
 
       if (isNewerBuild || isDifferentHash) {
         this.pendingManifest = remote;
+        this.currentManifest = remote;
+        if (typeof window !== 'undefined') {
+          try {
+            sessionStorage.setItem(STORAGE_KEYS.CURRENT_VERSION, JSON.stringify(remote));
+          } catch {}
+        }
 
         // Silently prefetch the main index document to prime the HTTP cache
         fetch('/', { method: 'GET', cache: 'no-cache' }).catch(() => {});
 
-        // Broadcast to listeners and dispatch window event
+        // Broadcast to listeners and dispatch window event without any reload or popup
         this.notifyListeners(remote);
-        window.dispatchEvent(
-          new CustomEvent('np_app_version_update', {
-            detail: remote,
-          })
-        );
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(
+            new CustomEvent('np_app_version_update', {
+              detail: remote,
+            })
+          );
+        }
 
         return remote;
       }
@@ -182,41 +190,23 @@ class LiveUpdateService {
   }
 
   /**
-   * Smoothly cross-fade and reload into the new version, preserving
-   * the user's scroll position and reading context.
+   * Silently applies new version and broadcasts updates without disruptive reloads.
    */
   public performSmoothTransition(): void {
     if (typeof window === 'undefined') return;
 
     try {
-      // 1. Save scroll position and route
-      sessionStorage.setItem(STORAGE_KEYS.RESTORE_SCROLL, window.scrollY.toString());
-      sessionStorage.setItem(STORAGE_KEYS.RESTORE_PATH, window.location.pathname + window.location.search);
-
       if (this.pendingManifest) {
+        this.currentManifest = this.pendingManifest;
         sessionStorage.setItem(STORAGE_KEYS.CURRENT_VERSION, JSON.stringify(this.pendingManifest));
       }
-
-      // 2. Add subtle smooth transition cross-fade effect to DOM
-      const overlay = document.createElement('div');
-      overlay.style.position = 'fixed';
-      overlay.style.inset = '0';
-      overlay.style.backgroundColor = '#162839'; // Editorial Primary Navy
-      overlay.style.opacity = '0';
-      overlay.style.transition = 'opacity 300ms ease-out';
-      overlay.style.zIndex = '999999';
-      overlay.style.pointerEvents = 'none';
-      document.body.appendChild(overlay);
-
-      requestAnimationFrame(() => {
-        overlay.style.opacity = '0.9';
-        setTimeout(() => {
-          window.location.reload();
-        }, 320);
-      });
-    } catch {
-      window.location.reload();
-    }
+      window.dispatchEvent(
+        new CustomEvent('np_app_version_update', {
+          detail: this.currentManifest,
+        })
+      );
+      window.dispatchEvent(new Event('np_ads_synced'));
+    } catch {}
   }
 
   /**
