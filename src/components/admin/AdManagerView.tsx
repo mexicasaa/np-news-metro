@@ -1,22 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   Upload, 
   Image as ImageIcon, 
   Trash2, 
   Edit3, 
-  Eye, 
-  EyeOff, 
   CheckCircle2, 
   AlertCircle, 
   RefreshCw, 
-  ExternalLink, 
-  Globe, 
   Database, 
-  Sparkles, 
   Plus, 
   X, 
   Link2,
-  Check,
   LayoutGrid,
   Settings2,
   Filter,
@@ -34,7 +29,6 @@ import {
   saveAdSenseSettings, 
   DEFAULT_ADSENSE_SETTINGS, 
   getAdsVisibility, 
-  saveAdsVisibility, 
   toggleZoneVisibility, 
   toggleMasterAds, 
   AdsVisibilityConfig 
@@ -42,79 +36,70 @@ import {
 import { AdRepository } from '../../repositories/supabase/AdRepository';
 import { uploadMedia } from '../../services/mediaService';
 
-export interface FriendlyZoneInfo {
+export interface PositionInfo {
   zone: string;
+  positionNumber: number;
   name: string;
-  subtitle: string;
-  location: string;
+  description: string;
   dimensions: string;
-  badge: string;
 }
 
-export const FRIENDLY_ZONE_MAP: Record<string, FriendlyZoneInfo> = {
+export const POSITION_MAP: Record<string, PositionInfo> = {
   A1: {
     zone: 'A1',
+    positionNumber: 1,
     name: 'Header Top Banner',
-    subtitle: 'Top of Homepage & Article Pages',
-    location: '4-Card Row 1 (Column 1)',
+    description: 'Top banner on all pages',
     dimensions: '728×90 or Responsive Card',
-    badge: 'Primary Banner',
   },
   A2: {
     zone: 'A2',
-    name: "Editor's Choice Banner",
-    subtitle: 'Below Curated Stories & Editor Picks',
-    location: '4-Card Row 1 (Column 2)',
+    positionNumber: 2,
+    name: "Below Editor's Picks",
+    description: 'Homepage main stories feed',
     dimensions: '728×90 or Responsive Card',
-    badge: 'Curated Strip',
   },
   A3: {
     zone: 'A3',
-    name: 'Article Sidebar (Top)',
-    subtitle: 'Sticky Right Rail next to headline',
-    location: 'Article Sidebar (Top position)',
+    positionNumber: 3,
+    name: 'Article Top Sidebar',
+    description: 'Top right sidebar next to headline',
     dimensions: '300×250 or 300×600 Poster',
-    badge: 'High Impact',
   },
   A4: {
     zone: 'A4',
-    name: 'In-Article Native Card',
-    subtitle: 'Inside Reading Flow & Middle Sidebar',
-    location: '4-Card Row 1 (Column 4)',
-    dimensions: '300×250 or Native Card',
-    badge: 'Native In-Feed',
+    positionNumber: 4,
+    name: 'Inside Article Story',
+    description: 'Native card inside article reading flow',
+    dimensions: '300×250 Native Card',
   },
   A5: {
     zone: 'A5',
-    name: 'Tech Desk Card',
-    subtitle: 'Directly below Technology News',
-    location: '4-Card Row 2 (Column 1)',
+    positionNumber: 5,
+    name: 'Tech News Section',
+    description: 'Below Technology news cards',
     dimensions: '300×250 Card',
-    badge: 'Tech Desk',
   },
   A6: {
     zone: 'A6',
-    name: 'World Desk Card',
-    subtitle: 'Directly below International Affairs',
-    location: '4-Card Row 2 (Column 2)',
+    positionNumber: 6,
+    name: 'World News Section',
+    description: 'Below International news cards',
     dimensions: '300×250 Card',
-    badge: 'World Affairs',
   },
   A7: {
     zone: 'A7',
+    positionNumber: 7,
     name: 'Article Lower Sidebar',
-    subtitle: 'Next to Reader Discussion & Comments',
-    location: '4-Card Row 2 (Column 3)',
+    description: 'Lower sidebar next to reader comments',
     dimensions: '300×250 Card',
-    badge: 'Sidebar Lower',
   },
   A8: {
     zone: 'A8',
-    name: 'Metromat Lead-in Card',
-    subtitle: 'Above Opinion Section & Today’s Poll',
-    location: '4-Card Row 2 (Column 4)',
+    positionNumber: 8,
+    name: 'Opinion & Poll Section',
+    description: 'Above editorial opinion & poll',
     dimensions: '300×250 Card',
-    badge: 'Editorial Poll',
   },
 };
 
@@ -139,9 +124,20 @@ export const AdManagerView: React.FC = () => {
   const [showUrlInput, setShowUrlInput] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  // Body Scroll Lock when modal is open to completely eliminate background sliders
+  useEffect(() => {
+    if (isModalOpen) {
+      const prevOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = prevOverflow;
+      };
+    }
+  }, [isModalOpen]);
+
   const showNotice = (message: string, type: 'success' | 'error' = 'success') => {
     setNotice({ message, type });
-    setTimeout(() => setNotice(null), 4000);
+    setTimeout(() => setNotice(null), 3500);
   };
 
   const loadAllData = async () => {
@@ -150,41 +146,18 @@ export const AdManagerView: React.FC = () => {
     setVisibilityConfig(getAdsVisibility());
 
     try {
+      const cached = getDirectAds();
+      setDirectAds(cached);
+
       const dbAds = await AdRepository.getInstance().getAllDirectAds();
-      const dbPlacements = await AdRepository.getInstance().getAllPlacements();
-      setIsDbSynced(true);
-
-      // Synchronize visibility switches from Supabase Database
-      if (dbPlacements && dbPlacements.length > 0) {
-        const currentVis = getAdsVisibility();
-        let changed = false;
-        const newZones = { ...currentVis.zones };
-
-        dbPlacements.forEach((p) => {
-          if (p.zone && typeof p.is_active === 'boolean') {
-            if (newZones[p.zone] !== p.is_active) {
-              newZones[p.zone] = p.is_active;
-              changed = true;
-            }
-          }
-        });
-
-        if (changed) {
-          saveAdsVisibility({ ...currentVis, zones: newZones });
-          setVisibilityConfig({ ...currentVis, zones: newZones });
-        }
-      }
-
-      // Supabase is authoritative single source of truth
       if (dbAds && dbAds.length > 0) {
-        setDirectAds(dbAds as any);
-        localStorage.setItem('np_direct_ads', JSON.stringify(dbAds));
+        setDirectAds(dbAds);
+        setIsDbSynced(true);
       } else {
-        setDirectAds(getDirectAds());
+        setIsDbSynced(true);
       }
     } catch {
       setIsDbSynced(false);
-      setDirectAds(getDirectAds());
     } finally {
       setIsLoading(false);
     }
@@ -192,12 +165,18 @@ export const AdManagerView: React.FC = () => {
 
   useEffect(() => {
     loadAllData();
-    const handleUpdate = () => loadAllData();
-    window.addEventListener('np_ads_updated', handleUpdate);
-    return () => window.removeEventListener('np_ads_updated', handleUpdate);
+
+    const handleSyncEvent = () => loadAllData();
+    window.addEventListener('np_ads_synced', handleSyncEvent);
+    window.addEventListener('storage', handleSyncEvent);
+
+    return () => {
+      window.removeEventListener('np_ads_synced', handleSyncEvent);
+      window.removeEventListener('storage', handleSyncEvent);
+    };
   }, []);
 
-  // Global Master Toggle: Show or Hide all commercial ads
+  // Global Master Toggle
   const handleToggleMaster = () => {
     const next = toggleMasterAds();
     loadAllData();
@@ -207,35 +186,37 @@ export const AdManagerView: React.FC = () => {
     );
   };
 
-  // Toggle individual zone active/paused
+  // Toggle individual position active/paused
   const handleToggleZone = async (zone: string, id?: string) => {
+    const info = POSITION_MAP[zone];
     try {
       const next = await toggleAdOpenClose(zone, id);
       await loadAllData();
       showNotice(
         next 
-          ? `Slot ${zone} is now LIVE on the website.` 
-          : `Slot ${zone} is now PAUSED (hidden).`
+          ? `${info?.name || 'Position'} is now LIVE on the website.` 
+          : `${info?.name || 'Position'} is now PAUSED (hidden).`
       );
     } catch (err: any) {
-      showNotice(`Error updating slot: ${err?.message || 'Failed'}`, 'error');
+      showNotice(`Error updating ad: ${err?.message || 'Failed'}`, 'error');
     }
   };
 
   // Delete ad permanently from Supabase & site
   const handleDeleteAd = async (id: string, zone: string) => {
-    if (confirm(`Remove advertisement from Slot ${zone}? This will delete it from both the website and the database.`)) {
+    const info = POSITION_MAP[zone];
+    if (confirm(`Remove advertisement from ${info?.name || 'this position'}? This will delete it from both the website and database.`)) {
       try {
         await deleteDirectAd(id, zone);
         await loadAllData();
-        showNotice(`Advertisement for Slot ${zone} has been deleted.`);
+        showNotice(`Advertisement for ${info?.name || 'Position'} has been deleted.`);
       } catch (err: any) {
         showNotice(`Delete error: ${err?.message || 'Failed'}`, 'error');
       }
     }
   };
 
-  // Open modal to add ad to a specific zone
+  // Open modal to add ad to a specific position
   const handleOpenAddModal = (zone: string = 'A1') => {
     setUploadError(null);
     setShowUrlInput(false);
@@ -282,14 +263,12 @@ export const AdManagerView: React.FC = () => {
     setUploadError(null);
 
     try {
-      // 1. Instant local preview
       const preview = URL.createObjectURL(file);
       setEditingAd((prev) => prev ? { ...prev, mediaUrl: preview } : null);
 
-      // 2. Upload to storage
       const res = await uploadMedia(
         file,
-        editingAd.advertiserName || `Ad ${editingAd.zone}`,
+        editingAd.advertiserName || `Banner ${editingAd.zone}`,
         'Commercial Media Desk'
       );
 
@@ -297,7 +276,7 @@ export const AdManagerView: React.FC = () => {
         setEditingAd((prev) => prev ? { ...prev, mediaUrl: res.asset!.url } : null);
       }
     } catch {
-      setUploadError('Upload failed. You can paste a direct image URL instead.');
+      setUploadError('Upload failed. You can paste an image URL instead.');
     } finally {
       setIsUploading(false);
     }
@@ -315,7 +294,6 @@ export const AdManagerView: React.FC = () => {
 
     setIsSaving(true);
     try {
-      // 1. Save directly into Supabase Database
       const dbResult = await AdRepository.getInstance().saveCampaignAndPlacement({
         id: editingAd.id || undefined,
         zone: editingAd.zone,
@@ -327,7 +305,6 @@ export const AdManagerView: React.FC = () => {
         isActive: editingAd.isActive,
       });
 
-      // 2. Save local & notify open tabs
       saveDirectAd({
         ...editingAd,
         id: dbResult.campaignId || editingAd.id,
@@ -341,7 +318,8 @@ export const AdManagerView: React.FC = () => {
 
       setIsModalOpen(false);
       await loadAllData();
-      showNotice(`Advertisement for Slot ${editingAd.zone} saved to Database and published live!`);
+      const posName = POSITION_MAP[editingAd.zone]?.name || 'Position';
+      showNotice(`${posName} saved to Database and published live!`);
     } catch (err: any) {
       alert(`Save error: ${err?.message || 'Database error'}`);
     } finally {
@@ -356,7 +334,6 @@ export const AdManagerView: React.FC = () => {
     showNotice('Google AdSense configuration saved successfully!');
   };
 
-  // Filter slots for view
   const filteredZones = ZONES_LIST.filter((zone) => {
     const ad = directAds.find((a) => a.zone === zone);
     const isShowing = visibilityConfig.masterEnabled && visibilityConfig.zones[zone] !== false && Boolean(ad && ad.isActive);
@@ -371,15 +348,15 @@ export const AdManagerView: React.FC = () => {
   }).length;
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
+    <div className="space-y-6 max-w-7xl mx-auto pb-8">
       {/* ======================================================================
-          1. CLEAN, MODERN HEADER
+          1. HEADER (SHORT & CLEAR)
           ====================================================================== */}
       <div className="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2.5">
-            <h1 className="font-serif text-2xl font-bold text-slate-900 tracking-tight">
-              Ad Management
+            <h1 className="font-serif text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+              Website Ad Placements
             </h1>
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -387,7 +364,7 @@ export const AdManagerView: React.FC = () => {
             </span>
           </div>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Manage banner images, links, and commercial availability across all 8 website slots.
+            Manage banner images, links, and commercial availability across all 8 website positions.
           </p>
         </div>
 
@@ -396,7 +373,7 @@ export const AdManagerView: React.FC = () => {
           {/* Master Visibility Switch */}
           <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl">
             <span className="text-xs font-medium text-slate-600">
-              Site Commercial Ads:
+              Commercial Ads:
             </span>
             <button
               onClick={handleToggleMaster}
@@ -444,7 +421,7 @@ export const AdManagerView: React.FC = () => {
             )}
             <span>{notice.message}</span>
           </div>
-          <button onClick={() => setNotice(null)} className="text-slate-400 hover:text-slate-600">
+          <button onClick={() => setNotice(null)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -465,7 +442,7 @@ export const AdManagerView: React.FC = () => {
             }`}
           >
             <LayoutGrid className="w-3.5 h-3.5" />
-            <span>Website Ad Slots (8)</span>
+            <span>Website Positions (8)</span>
             <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
               activeTab === 'slots' ? 'bg-slate-700 text-white' : 'bg-slate-200 text-slate-700'
             }`}>
@@ -486,7 +463,7 @@ export const AdManagerView: React.FC = () => {
           </button>
         </div>
 
-        {/* Slot Filters (When in Slots view) */}
+        {/* Filters */}
         {activeTab === 'slots' && (
           <div className="flex items-center gap-1 text-xs">
             <span className="text-slate-400 font-medium mr-1 flex items-center gap-1">
@@ -522,12 +499,12 @@ export const AdManagerView: React.FC = () => {
       </div>
 
       {/* ======================================================================
-          3. TAB 1: ALL 8 AD SLOTS (CLEAN VISUAL TILES)
+          3. TAB 1: ALL 8 POSITIONS (CLEAN CARDS WITH CLEAR POSITION NAMES)
           ====================================================================== */}
       {activeTab === 'slots' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {filteredZones.map((zone) => {
-            const info = FRIENDLY_ZONE_MAP[zone];
+            const info = POSITION_MAP[zone];
             const ad = directAds.find((a) => a.zone === zone);
             const isLive = 
               visibilityConfig.masterEnabled && 
@@ -541,15 +518,15 @@ export const AdManagerView: React.FC = () => {
                   isLive 
                     ? 'border-emerald-300/80 shadow-xs hover:shadow-md' 
                     : ad 
-                    ? 'border-slate-200 hover:border-slate-300 opacity-80' 
+                    ? 'border-slate-200 hover:border-slate-300 opacity-85' 
                     : 'border-dashed border-slate-300 hover:border-slate-400 bg-slate-50/40'
                 }`}
               >
-                {/* Card Top: Zone Badge, Human Title, and Live Toggle Switch */}
+                {/* Card Top: Position Number, Plain Name & Live Switch */}
                 <div className="p-4 pb-3 border-b border-slate-100">
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-800 text-[11px] font-mono font-bold tracking-tight">
-                      Slot {zone}
+                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-800 text-[11px] font-bold tracking-tight">
+                      Position {info.positionNumber}
                     </span>
 
                     {/* Smooth Toggle Switch (if ad exists) */}
@@ -582,12 +559,12 @@ export const AdManagerView: React.FC = () => {
                   <h3 className="font-serif font-bold text-sm text-slate-900 truncate" title={info.name}>
                     {info.name}
                   </h3>
-                  <p className="text-[11px] text-slate-500 truncate mt-0.5" title={info.subtitle}>
-                    {info.subtitle}
+                  <p className="text-[11px] text-slate-500 truncate mt-0.5" title={info.description}>
+                    {info.description}
                   </p>
                 </div>
 
-                {/* Card Middle: Creative Image or Single Upload Area */}
+                {/* Card Middle: Creative Image or Clean Add Box */}
                 <div className="p-4 flex-1 flex flex-col justify-center">
                   {ad ? (
                     <div className="space-y-3">
@@ -609,7 +586,6 @@ export const AdManagerView: React.FC = () => {
                           </div>
                         )}
 
-                        {/* Hover Overlay */}
                         <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                           <span className="px-2.5 py-1 bg-white text-slate-900 text-xs font-bold rounded-lg flex items-center gap-1 shadow-sm">
                             <Edit3 className="w-3 h-3" />
@@ -639,7 +615,7 @@ export const AdManagerView: React.FC = () => {
                       </div>
                     </div>
                   ) : (
-                    /* Single Clean Empty State Upload Area (NO duplicate buttons) */
+                    /* Clean Empty State Upload Area */
                     <div
                       onClick={() => handleOpenAddModal(zone)}
                       className="w-full h-36 rounded-xl border border-dashed border-slate-300 hover:border-slate-800 hover:bg-slate-50 transition-all flex flex-col items-center justify-center p-4 text-center cursor-pointer group"
@@ -657,7 +633,7 @@ export const AdManagerView: React.FC = () => {
                   )}
                 </div>
 
-                {/* Card Bottom: Quick Actions (Only when ad exists) */}
+                {/* Card Bottom: Quick Actions */}
                 {ad && (
                   <div className="px-4 py-2.5 bg-slate-50/70 border-t border-slate-100 flex items-center justify-between text-xs">
                     <button
@@ -684,7 +660,7 @@ export const AdManagerView: React.FC = () => {
       )}
 
       {/* ======================================================================
-          4. TAB 2: GOOGLE ADSENSE SETTINGS (CLEAN & MODERN)
+          4. TAB 2: GOOGLE ADSENSE SETTINGS
           ====================================================================== */}
       {activeTab === 'adsense' && (
         <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs max-w-2xl space-y-6">
@@ -697,7 +673,6 @@ export const AdManagerView: React.FC = () => {
             </p>
           </div>
 
-          {/* Master AdSense Switch */}
           <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200/80">
             <div>
               <div className="text-xs font-bold text-slate-900">Google AdSense Network</div>
@@ -717,7 +692,6 @@ export const AdManagerView: React.FC = () => {
             </button>
           </div>
 
-          {/* Publisher ID & Routing */}
           <div className="space-y-4 text-xs">
             <div>
               <label className="block font-bold text-slate-700 mb-1">
@@ -750,7 +724,6 @@ export const AdManagerView: React.FC = () => {
             </div>
           </div>
 
-          {/* Action Buttons */}
           <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
             <button
               onClick={() => {
@@ -775,117 +748,135 @@ export const AdManagerView: React.FC = () => {
       )}
 
       {/* ======================================================================
-          5. REDESIGNED USER-FRIENDLY MODAL (SIMPLE, FAST & SLEEK)
+          5. PERFECTLY CENTERED, COMPACT MODAL (PORTAL TO DOCUMENT.BODY)
+          - Fixed size (no sliding, no left-docking, no ugly slider)
+          - Rock-solid centered with React Portal
+          - Scrollbar hidden
           ====================================================================== */}
-      {isModalOpen && editingAd && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-lg w-full p-6 space-y-5 animate-in fade-in zoom-in-95 duration-200 my-8">
-            
-            {/* Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+      {isModalOpen && editingAd && createPortal(
+        <div 
+          className="fixed inset-0 z-[9999] bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-hidden"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsModalOpen(false);
+          }}
+        >
+          <div 
+            className="relative w-full max-w-md mx-auto bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh] animate-in fade-in zoom-in-95 duration-150"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between shrink-0 bg-white">
               <div>
-                <h3 className="font-serif text-lg font-bold text-slate-900">
+                <h3 className="font-serif text-base font-bold text-slate-900 leading-tight">
                   {editingAd.id ? 'Edit Advertisement' : 'Upload Advertisement'}
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Slot {editingAd.zone} • {FRIENDLY_ZONE_MAP[editingAd.zone]?.name}
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  Position {POSITION_MAP[editingAd.zone]?.positionNumber} • {POSITION_MAP[editingAd.zone]?.name}
                 </p>
               </div>
               <button
+                type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="p-1.5 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-600 cursor-pointer"
+                className="w-8 h-8 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors cursor-pointer"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <form onSubmit={handleSaveAd} className="space-y-4 text-xs">
+            {/* Modal Form Body (Scrollbar completely hidden, tight clean padding) */}
+            <form onSubmit={handleSaveAd} className="flex-1 overflow-y-auto hide-scrollbar p-5 space-y-3.5 text-xs">
               
-              {/* 1. Target Slot Selector */}
+              {/* 1. Target Position Selector */}
               <div>
                 <label className="block font-bold text-slate-700 mb-1">
-                  Website Placement Slot
+                  Ad Position on Website
                 </label>
                 <select
                   value={editingAd.zone}
                   onChange={(e) => setEditingAd({ ...editingAd, zone: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900"
+                  className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900 text-xs"
                 >
-                  {ZONES_LIST.map((z) => (
-                    <option key={z} value={z}>
-                      Slot {z} — {FRIENDLY_ZONE_MAP[z]?.name} ({FRIENDLY_ZONE_MAP[z]?.subtitle})
-                    </option>
-                  ))}
+                  {ZONES_LIST.map((z) => {
+                    const item = POSITION_MAP[z];
+                    return (
+                      <option key={z} value={z}>
+                        Position {item.positionNumber}: {item.name} ({item.description})
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
 
-              {/* 2. Visual Image Upload Box */}
+              {/* 2. Visual Image Upload Box (Compact & Clean) */}
               <div>
                 <label className="block font-bold text-slate-700 mb-1">
-                  Banner Creative Image
+                  Banner Image
                 </label>
 
                 {uploadError && (
-                  <div className="mb-2 p-2.5 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-[11px] flex items-center gap-1.5">
+                  <div className="mb-2 p-2 bg-rose-50 border border-rose-200 rounded-lg text-rose-800 text-[11px] flex items-center gap-1.5">
                     <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                     <span>{uploadError}</span>
                   </div>
                 )}
 
-                {/* If Image Loaded -> Show clean preview */}
+                {/* If Image Loaded -> Show clean thumbnail preview */}
                 {editingAd.mediaUrl ? (
-                  <div className="rounded-xl border border-slate-200 p-3 bg-slate-50 space-y-2">
-                    <div className="w-full h-36 bg-slate-200 rounded-lg overflow-hidden flex items-center justify-center relative">
+                  <div className="rounded-xl border border-slate-200 p-2.5 bg-slate-50 flex items-center justify-between gap-3">
+                    <div className="w-24 h-16 bg-slate-200 rounded-lg overflow-hidden shrink-0 flex items-center justify-center">
                       <img
                         src={editingAd.mediaUrl}
                         alt="Ad preview"
                         className="max-h-full max-w-full object-contain block mx-auto"
                       />
                     </div>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-emerald-700 font-bold flex items-center gap-1">
-                        <CheckCircle2 className="w-3.5 h-3.5" />
+                    <div className="flex-1 min-w-0">
+                      <span className="text-emerald-700 font-bold flex items-center gap-1 text-[11px]">
+                        <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
                         <span>Banner Image Ready</span>
                       </span>
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => fileInputRef.current?.click()}
-                          className="px-2.5 py-1 bg-white hover:bg-slate-100 border text-slate-700 font-semibold rounded-lg cursor-pointer"
-                        >
-                          Change
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setEditingAd({ ...editingAd, mediaUrl: '' })}
-                          className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold rounded-lg cursor-pointer"
-                        >
-                          Remove
-                        </button>
-                      </div>
+                      <span className="text-[10px] text-slate-400 block truncate mt-0.5">
+                        {POSITION_MAP[editingAd.zone]?.dimensions}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="px-2.5 py-1 bg-white hover:bg-slate-100 border text-slate-700 font-semibold rounded-lg text-[11px] cursor-pointer"
+                      >
+                        Change
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setEditingAd({ ...editingAd, mediaUrl: '' })}
+                        className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold rounded-lg text-[11px] cursor-pointer"
+                      >
+                        Remove
+                      </button>
                     </div>
                   </div>
                 ) : (
-                  /* Modern, Clean Drag & Drop Area */
+                  /* Compact Drag & Drop Area */
                   <div
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-full border-2 border-dashed border-slate-200 hover:border-slate-800 rounded-xl p-6 text-center cursor-pointer transition-colors bg-slate-50/50 hover:bg-slate-50 flex flex-col items-center justify-center group"
+                    className="w-full border-2 border-dashed border-slate-200 hover:border-slate-800 rounded-xl p-3.5 text-center cursor-pointer transition-colors bg-slate-50/50 hover:bg-slate-50 flex flex-col items-center justify-center group"
                   >
                     {isUploading ? (
-                      <div className="flex flex-col items-center justify-center space-y-2 py-2">
-                        <RefreshCw className="w-6 h-6 text-slate-800 animate-spin" />
+                      <div className="flex items-center gap-2 py-2">
+                        <RefreshCw className="w-4 h-4 text-slate-800 animate-spin" />
                         <span className="text-xs font-bold text-slate-800">Uploading to Media Storage...</span>
                       </div>
                     ) : (
                       <>
-                        <div className="w-10 h-10 rounded-full bg-slate-100 group-hover:bg-slate-200 flex items-center justify-center mb-2 transition-colors">
-                          <Upload className="w-5 h-5 text-slate-600 group-hover:text-slate-900" />
+                        <div className="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-slate-200 flex items-center justify-center mb-1.5 transition-colors">
+                          <Upload className="w-4 h-4 text-slate-600 group-hover:text-slate-900" />
                         </div>
                         <span className="text-xs font-bold text-slate-900">
-                          Click to browse image from your device
+                          Click to browse banner image
                         </span>
-                        <span className="text-[11px] text-slate-400 mt-0.5">
-                          PNG, JPG, or WebP ({FRIENDLY_ZONE_MAP[editingAd.zone]?.dimensions})
+                        <span className="text-[10px] text-slate-400 mt-0.5">
+                          PNG, JPG, or WebP ({POSITION_MAP[editingAd.zone]?.dimensions})
                         </span>
                       </>
                     )}
@@ -900,14 +891,13 @@ export const AdManagerView: React.FC = () => {
                   className="hidden"
                 />
 
-                {/* Optional Direct URL Toggle */}
-                <div className="mt-1.5 flex justify-end">
+                <div className="mt-1 flex justify-end">
                   <button
                     type="button"
                     onClick={() => setShowUrlInput(!showUrlInput)}
-                    className="text-[11px] text-slate-500 hover:text-slate-800 hover:underline cursor-pointer"
+                    className="text-[10px] text-slate-500 hover:text-slate-800 hover:underline cursor-pointer"
                   >
-                    {showUrlInput ? 'Hide manual URL input' : 'Or paste image URL instead'}
+                    {showUrlInput ? 'Hide URL input' : 'Or paste image URL instead'}
                   </button>
                 </div>
 
@@ -917,46 +907,31 @@ export const AdManagerView: React.FC = () => {
                     value={editingAd.mediaUrl || ''}
                     onChange={(e) => setEditingAd({ ...editingAd, mediaUrl: e.target.value })}
                     placeholder="https://example.com/banner.png"
-                    className="w-full mt-1.5 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg font-mono text-[11px] text-slate-900"
+                    className="w-full mt-1 bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-lg font-mono text-[11px] text-slate-900"
                   />
                 )}
               </div>
 
-              {/* 3. Advertiser Name & Headline */}
-              <div className="space-y-3">
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">
-                    Brand / Advertiser Name *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={editingAd.advertiserName}
-                    onChange={(e) => setEditingAd({ ...editingAd, advertiserName: e.target.value })}
-                    placeholder="e.g. Reserve Bank of India, Tata Motors, etc."
-                    className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-slate-900 font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">
-                    Headline or Ad Description (Optional)
-                  </label>
-                  <textarea
-                    rows={2}
-                    value={editingAd.creativeText}
-                    onChange={(e) => setEditingAd({ ...editingAd, creativeText: e.target.value })}
-                    placeholder="Short message or announcement..."
-                    className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900"
-                  />
-                </div>
+              {/* 3. Brand Name */}
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">
+                  Brand / Advertiser Name *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editingAd.advertiserName}
+                  onChange={(e) => setEditingAd({ ...editingAd, advertiserName: e.target.value })}
+                  placeholder="e.g. Reserve Bank of India, Tata Motors, etc."
+                  className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-slate-900 font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900 text-xs"
+                />
               </div>
 
-              {/* 4. Target Link / Phone */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* 4. Target Link & Button Label */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <div>
                   <label className="block font-bold text-slate-700 mb-1">
-                    Destination URL or Phone
+                    Website Link or Phone
                   </label>
                   <input
                     type="text"
@@ -976,7 +951,7 @@ export const AdManagerView: React.FC = () => {
                     value={editingAd.ctaText || 'Learn More'}
                     onChange={(e) => setEditingAd({ ...editingAd, ctaText: e.target.value })}
                     placeholder="Learn More / Call Now"
-                    className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900"
+                    className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900 text-xs"
                   />
                 </div>
               </div>
@@ -984,14 +959,14 @@ export const AdManagerView: React.FC = () => {
               {/* 5. Live Display Switch */}
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
                 <div>
-                  <div className="font-bold text-slate-800 text-xs">Live Display Status</div>
-                  <div className="text-[11px] text-slate-500">Make this banner live on the website immediately.</div>
+                  <div className="font-bold text-slate-800 text-xs">Show Ad Live on Website</div>
+                  <div className="text-[10px] text-slate-500">Enable to make this banner visible immediately.</div>
                 </div>
 
                 <button
                   type="button"
                   onClick={() => setEditingAd({ ...editingAd, isActive: !editingAd.isActive })}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer shrink-0 ${
                     editingAd.isActive ? 'bg-emerald-600' : 'bg-slate-300'
                   }`}
                 >
@@ -1003,12 +978,12 @@ export const AdManagerView: React.FC = () => {
                 </button>
               </div>
 
-              {/* Submit Buttons */}
+              {/* Modal Footer Buttons */}
               <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-3">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold rounded-xl cursor-pointer"
+                  className="px-4 py-2 border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold rounded-xl cursor-pointer text-xs"
                 >
                   Cancel
                 </button>
@@ -1016,16 +991,16 @@ export const AdManagerView: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl flex items-center gap-2 cursor-pointer shadow-md disabled:opacity-50 transition-all active:scale-98"
+                  className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl flex items-center gap-2 cursor-pointer shadow-md disabled:opacity-50 transition-all active:scale-98 text-xs"
                 >
                   {isSaving ? (
                     <>
-                      <RefreshCw className="w-4 h-4 animate-spin text-amber-400" />
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-400" />
                       <span>Saving to Database...</span>
                     </>
                   ) : (
                     <>
-                      <Database className="w-4 h-4 text-amber-400" />
+                      <Database className="w-3.5 h-3.5 text-amber-400" />
                       <span>Save & Publish Live</span>
                     </>
                   )}
@@ -1034,7 +1009,8 @@ export const AdManagerView: React.FC = () => {
 
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
