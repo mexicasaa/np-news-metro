@@ -295,7 +295,69 @@ export class AdRepository {
     try {
       const now = new Date().toISOString();
 
-      // Check for existing placement by zone
+      // 1. Link or create advertiser record in Supabase
+      let advertiserId: string | null = null;
+      if (ad.advertiserName && ad.advertiserName.trim()) {
+        try {
+          const { data: existingAdv } = await supabase
+            .from('advertisers')
+            .select('id')
+            .eq('name', ad.advertiserName.trim())
+            .limit(1);
+
+          if (existingAdv && existingAdv.length > 0) {
+            advertiserId = existingAdv[0].id;
+          } else {
+            const { data: newAdv } = await supabase
+              .from('advertisers')
+              .insert({
+                name: ad.advertiserName.trim(),
+                company: ad.advertiserName.trim(),
+                contact_email: 'commercial@npnewsmetro.com',
+                status: 'active',
+              })
+              .select('id')
+              .single();
+            if (newAdv) advertiserId = newAdv.id;
+          }
+        } catch (advErr) {
+          console.warn('Advertiser sync notice:', advErr);
+        }
+      }
+
+      // 2. Link or create media record in Supabase
+      let mediaId: string | null = null;
+      if (ad.mediaUrl && ad.mediaUrl.trim()) {
+        try {
+          const { data: existingMedia } = await supabase
+            .from('media')
+            .select('id')
+            .eq('public_url', ad.mediaUrl.trim())
+            .limit(1);
+
+          if (existingMedia && existingMedia.length > 0) {
+            mediaId = existingMedia[0].id;
+          } else {
+            const { data: newMedia } = await supabase
+              .from('media')
+              .insert({
+                public_url: ad.mediaUrl.trim(),
+                storage_path: `ads/${ad.zone.toLowerCase()}/${Date.now()}.png`,
+                file_name: `ad-${ad.zone.toLowerCase()}-${Date.now()}.png`,
+                mime_type: 'image/png',
+                content_hash: `hash-${ad.zone}-${Date.now()}`,
+                alt_text: ad.altText || ad.advertiserName,
+              } as any)
+              .select('id')
+              .single();
+            if (newMedia) mediaId = newMedia.id;
+          }
+        } catch (mediaErr) {
+          console.warn('Media sync notice:', mediaErr);
+        }
+      }
+
+      // 3. Check for existing placement by zone
       const { data: existingPlacements } = await supabase
         .from('ad_placements')
         .select('id, campaign_id')
@@ -307,12 +369,15 @@ export class AdRepository {
 
       if (campaignId) {
         // Update existing campaign
+        const campaignUpdate: any = {
+          name: ad.advertiserName || `Zone ${ad.zone} Campaign`,
+          status: ad.isActive ? 'active' : 'paused',
+        };
+        if (advertiserId) campaignUpdate.advertiser_id = advertiserId;
+
         await supabase
           .from('campaigns')
-          .update({
-            name: ad.advertiserName || `Zone ${ad.zone} Campaign`,
-            status: ad.isActive ? 'active' : 'paused',
-          })
+          .update(campaignUpdate)
           .eq('id', campaignId);
 
         // Update or insert creative
@@ -322,22 +387,23 @@ export class AdRepository {
           .eq('campaign_id', campaignId)
           .limit(1);
 
+        const creativePayload: any = {
+          headline: ad.creativeText,
+          destination_url: ad.destinationUrl || '#',
+          alt_text: ad.altText || ad.advertiserName,
+          media_id: mediaId || null,
+        };
+
         if (existingCreatives && existingCreatives.length > 0) {
           await supabase
             .from('ad_creatives')
-            .update({
-              headline: ad.creativeText,
-              destination_url: ad.destinationUrl || '#',
-              alt_text: ad.altText || ad.advertiserName,
-            })
+            .update(creativePayload)
             .eq('id', existingCreatives[0].id);
         } else {
           await supabase.from('ad_creatives').insert({
             campaign_id: campaignId,
             type: 'banner',
-            headline: ad.creativeText,
-            destination_url: ad.destinationUrl || '#',
-            alt_text: ad.altText || ad.advertiserName,
+            ...creativePayload,
           });
         }
 
@@ -352,13 +418,16 @@ export class AdRepository {
         }
       } else {
         // Create new campaign
+        const newCampPayload: any = {
+          name: ad.advertiserName || `Zone ${ad.zone} Campaign`,
+          status: ad.isActive ? 'active' : 'paused',
+          start_at: now,
+        };
+        if (advertiserId) newCampPayload.advertiser_id = advertiserId;
+
         const { data: newCampaign, error: campErr } = await supabase
           .from('campaigns')
-          .insert({
-            name: ad.advertiserName || `Zone ${ad.zone} Campaign`,
-            status: ad.isActive ? 'active' : 'paused',
-            start_at: now,
-          })
+          .insert(newCampPayload)
           .select('id')
           .single();
 
@@ -375,6 +444,7 @@ export class AdRepository {
           headline: ad.creativeText,
           destination_url: ad.destinationUrl || '#',
           alt_text: ad.altText || ad.advertiserName,
+          media_id: mediaId || null,
         });
 
         // Insert or update placement
