@@ -8,6 +8,10 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
 
   return {
+    define: {
+      __APP_BUILD_TIME__: JSON.stringify(Date.now()),
+      __APP_VERSION__: JSON.stringify('1.0.1'),
+    },
     plugins: [
       react(),
       {

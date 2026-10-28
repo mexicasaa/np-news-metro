@@ -42,6 +42,7 @@ import { NotFoundTemplate } from './templates/14_NotFoundTemplate';
 import { ArticleLoadingTemplate } from './templates/15_ArticleLoadingTemplate';
 
 import { FrontendLoadingScreen } from './components/common/FrontendLoadingScreen';
+import { LiveUpdateNotification } from './components/common/LiveUpdateNotification';
 
 // P0 Admin & Daily Publishing Center Suite
 import { AdminLayout, AdminSection } from './components/admin/AdminLayout';
@@ -832,6 +833,59 @@ function AppContent() {
       if (realtimeVideosChannel) supabase.removeChannel(realtimeVideosChannel);
     };
   }, [viewMode, isAdminAuthenticated]);
+
+  // --------------------------------------------------------------------------
+  // Live Content Background Synchronizer (Zero-Reload Realtime Feed Transition)
+  // Automatically detects newly published articles and breaking updates without
+  // disruptive full-page reloads, ensuring smooth reading continuity.
+  // --------------------------------------------------------------------------
+  React.useEffect(() => {
+    let timer: NodeJS.Timeout | null = null;
+    let isSubscribed = true;
+
+    const syncLiveContent = async () => {
+      if (typeof document !== 'undefined' && document.hidden) return;
+      if (viewMode === 'admin') return;
+
+      try {
+        const fresh = await getPublishedArticles(true);
+        if (!isSubscribed || !fresh || fresh.length === 0) return;
+
+        setPosts((currentPosts) => {
+          const currentPublished = currentPosts.filter(isPostPublished);
+          if (currentPublished.length === 0) return fresh;
+
+          const hasCountChange = fresh.length !== currentPublished.length;
+          const hasNewLead = fresh[0]?.id !== currentPublished[0]?.id;
+          const hasModified = fresh.some((f) => {
+            const match = currentPublished.find((c) => c.id === f.id);
+            return !match || match.updatedAt !== f.updatedAt || match.title !== f.title;
+          });
+
+          if (hasCountChange || hasNewLead || hasModified) {
+            return fresh;
+          }
+
+          return currentPosts;
+        });
+      } catch {}
+    };
+
+    timer = setInterval(syncLiveContent, 45000);
+
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        syncLiveContent();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      isSubscribed = false;
+      if (timer) clearInterval(timer);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, [viewMode]);
 
   // Live Cross-Tab Synchronization for Preview
   React.useEffect(() => {
@@ -2452,6 +2506,9 @@ function AppContent() {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
       />
+
+      {/* Seamless Live Version & Deployment Smooth Transition Notification */}
+      <LiveUpdateNotification />
     </div>
   );
 }

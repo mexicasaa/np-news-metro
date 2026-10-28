@@ -60,8 +60,17 @@ export const AdGridRow: React.FC<AdGridRowProps> = ({
     };
 
     window.addEventListener('np_ads_updated', handleUpdate);
+
+    // Periodic 45-second live sync across devices/readers without full reload
+    const pollInterval = setInterval(() => {
+      if (typeof document !== 'undefined' && !document.hidden) {
+        resolveActiveZones();
+      }
+    }, 45000);
+
     return () => {
       isSubscribed = false;
+      clearInterval(pollInterval);
       window.removeEventListener('np_ads_updated', handleUpdate);
     };
   }, [zones.join(',')]);

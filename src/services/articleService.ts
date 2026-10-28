@@ -238,15 +238,18 @@ export const invalidateArticleClientCache = () => {
   cachedArticleBySlug.clear();
 };
 
-export const getPublishedArticles = async (): Promise<WpPost[]> => {
-  if (cachedHomepageArticles && Date.now() - cachedHomepageArticles.timestamp < CLIENT_ARTICLE_TTL) {
+export const getPublishedArticles = async (forceRefresh: boolean = false): Promise<WpPost[]> => {
+  if (!forceRefresh && cachedHomepageArticles && Date.now() - cachedHomepageArticles.timestamp < CLIENT_ARTICLE_TTL) {
     return cachedHomepageArticles.data;
   }
 
   // 1. Fetch from Edge-cached public API (Zero direct DB connection from browser)
   try {
     if (typeof window !== 'undefined') {
-      const res = await fetch('/api/articles?view=homepage');
+      const url = forceRefresh ? `/api/articles?view=homepage&_t=${Date.now()}` : '/api/articles?view=homepage';
+      const res = await fetch(url, {
+        cache: forceRefresh ? 'no-cache' : 'default',
+      });
       if (res.ok) {
         const json = await res.json();
         if (json?.posts && Array.isArray(json.posts) && json.posts.length > 0) {

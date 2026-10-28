@@ -51,7 +51,16 @@ export const AdSlot: React.FC<AdSlotProps> = ({
     };
 
     window.addEventListener('np_ads_updated', handleUpdate);
+
+    // Periodic 45s live synchronization for public readers across tabs/devices
+    const pollInterval = setInterval(() => {
+      if (typeof document !== 'undefined' && !document.hidden) {
+        fetchPlacement();
+      }
+    }, 45000);
+
     return () => {
+      clearInterval(pollInterval);
       window.removeEventListener('np_ads_updated', handleUpdate);
     };
   }, [zone]);
