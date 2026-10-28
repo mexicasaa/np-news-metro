@@ -54,6 +54,7 @@ import {
   toggleMasterAds,
   AdsVisibilityConfig
 } from '../../services/adService';
+import { AdRepository } from '../../repositories/supabase/AdRepository';
 import { AdSlot } from '../commercial/AdSlot';
 
 export interface ZonePlacementInfo {
@@ -171,11 +172,34 @@ export const AdManagerView: React.FC = () => {
   const [previewDevice, setPreviewDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
   const [wireframeMode, setWireframeMode] = useState<'homepage' | 'article'>('homepage');
 
-  const loadData = () => {
+  const loadData = async () => {
     setDirectAds(getDirectAds());
     setAdSenseConfig(getAdSenseSettings());
     setVisibilityConfig(getAdsVisibility());
     setStats(getAggregatedAdStats());
+
+    try {
+      const dbPlacements = await AdRepository.getInstance().getAllPlacements();
+      if (dbPlacements && dbPlacements.length > 0) {
+        const currentVis = getAdsVisibility();
+        let changed = false;
+        const newZones = { ...currentVis.zones };
+
+        dbPlacements.forEach((p) => {
+          if (p.zone && typeof p.is_active === 'boolean') {
+            if (newZones[p.zone] !== p.is_active) {
+              newZones[p.zone] = p.is_active;
+              changed = true;
+            }
+          }
+        });
+
+        if (changed) {
+          saveAdsVisibility({ ...currentVis, zones: newZones });
+          setVisibilityConfig({ ...currentVis, zones: newZones });
+        }
+      }
+    } catch {}
   };
 
   useEffect(() => {

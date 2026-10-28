@@ -279,8 +279,9 @@ export const getDirectAds = (): DirectAd[] => {
 
   try {
     const raw = localStorage.getItem(DIRECT_ADS_KEY);
+    const cleared = getClearedZones();
     if (raw === null) {
-      const initial = getInitialDirectAds();
+      const initial = getInitialDirectAds().filter((a) => !cleared.has(a.zone));
       localStorage.setItem(DIRECT_ADS_KEY, JSON.stringify(initial));
       return initial;
     }
@@ -288,7 +289,7 @@ export const getDirectAds = (): DirectAd[] => {
     if (!Array.isArray(parsed)) {
       return [];
     }
-    return parsed;
+    return parsed.filter((a) => !cleared.has(a.zone));
   } catch {
     return [];
   }
@@ -344,6 +345,7 @@ export const deleteDirectAd = async (id: string, zone?: string): Promise<void> =
 
   if (targetZone) {
     markZoneCleared(targetZone);
+    toggleZoneVisibility(targetZone, false);
   }
 
   // Purge from Supabase Database
@@ -453,9 +455,23 @@ export const getAdPlacement = async (zone: string): Promise<ActiveAdPlacement | 
     return cached.data;
   }
 
-  // 1. Check local admin direct ad configuration
+  // 1. Try Supabase backend repository first (database is single source of truth across all visitors)
+  try {
+    const repoPlacement = await AdRepository.getInstance().getActivePlacementForZone(zone);
+    if (repoPlacement) {
+      if ((repoPlacement as any).isExplicitlyDisabled) {
+        // Admin explicitly CLOSED this ad in the database
+        adPlacementCache.set(zone, { data: null, timestamp: Date.now() });
+        return null;
+      }
+      adPlacementCache.set(zone, { data: repoPlacement, timestamp: Date.now() });
+      return repoPlacement;
+    }
+  } catch {}
+
+  // 2. Check local admin direct ad configuration
   const localDirect = getDirectAdForZone(zone);
-  if (localDirect) {
+  if (localDirect && localDirect.isActive) {
     const placement: ActiveAdPlacement = {
       campaignId: localDirect.id,
       placementId: `zone-${zone}`,
@@ -474,47 +490,12 @@ export const getAdPlacement = async (zone: string): Promise<ActiveAdPlacement | 
   const allDirectAds = getDirectAds();
   const zoneDirectAd = allDirectAds.find((a) => a.zone === zone);
   if (zoneDirectAd && !zoneDirectAd.isActive) {
-    // Admin deliberately paused this ad! Do not fallback to mockAdSlots!
     adPlacementCache.set(zone, { data: null, timestamp: Date.now() });
     return null;
   }
 
-  // If direct ads have been managed by admin and this zone has no ad, it was deleted
-  if (typeof window !== 'undefined' && localStorage.getItem(DIRECT_ADS_KEY) !== null) {
-    adPlacementCache.set(zone, { data: null, timestamp: Date.now() });
-    return null;
-  }
-
-  // 2. Try Supabase backend repository
-  try {
-    const repoPlacement = await AdRepository.getInstance().getActivePlacementForZone(zone);
-    if (repoPlacement) {
-      if ((repoPlacement as any).isExplicitlyDisabled) {
-        // Admin explicitly CLOSED this ad in the database! Never fallback to mock ads
-        adPlacementCache.set(zone, { data: null, timestamp: Date.now() });
-        return null;
-      }
-      adPlacementCache.set(zone, { data: repoPlacement, timestamp: Date.now() });
-      return repoPlacement;
-    }
-  } catch {}
-
-  // 3. Fallback to mockAdSlots static definition ONLY on pristine unconfigured setup
-  const mock = mockAdSlots[zone];
-  if (mock && mock.isEnabled) {
-    const mockPlacement: ActiveAdPlacement = {
-      campaignId: `mock-${zone}`,
-      placementId: `slot-${zone}`,
-      advertiserName: mock.advertiserName,
-      creativeText: mock.creativeText || '',
-      destinationUrl: mock.ctaUrl || '#',
-      mediaUrl: mock.creativeUrl,
-      altText: mock.advertiserName,
-    };
-    adPlacementCache.set(zone, { data: mockPlacement, timestamp: Date.now() });
-    return mockPlacement;
-  }
-
+  // Strictly return null if not in Supabase DB and not in active local direct ads.
+  // Never fallback to mock ads to prevent deleted ads from resurrecting!
   adPlacementCache.set(zone, { data: null, timestamp: Date.now() });
   return null;
 };

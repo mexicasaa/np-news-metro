@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ExternalLink, Info, Phone } from 'lucide-react';
-import { mockAdSlots } from '../../data/mockWpData';
 import { useLanguage } from '../../context/LanguageContext';
 import { 
   getAdPlacement, 
@@ -107,17 +106,16 @@ export const AdSlot: React.FC<AdSlotProps> = ({
     return null;
   }
 
-  // Active Direct Campaign Details
-  const adConfig = mockAdSlots[zone];
-  const isEnabled = shouldShowAdSense || (directAd ? true : (isZoneVisible(zone) && adConfig?.isEnabled));
-  if (!isEnabled) {
+  // Strictly enforce: if no AdSense and no active direct ad placement, do NOT render anything!
+  // Prevents deleted or removed ads from resurrecting via fallback definitions
+  if (!shouldShowAdSense && !directAd) {
     return null;
   }
 
-  const advertiserName = directAd ? directAd.advertiserName : adConfig?.advertiserName || 'Sponsored Partner';
-  const creativeText = directAd ? directAd.creativeText : adConfig?.creativeText || '';
-  const ctaUrl = directAd ? directAd.destinationUrl : (adConfig?.ctaUrl || '#');
-  const mediaUrl = directAd?.mediaUrl || adConfig?.creativeUrl;
+  const advertiserName = directAd ? directAd.advertiserName : 'Sponsored Partner';
+  const creativeText = directAd ? directAd.creativeText : '';
+  const ctaUrl = directAd ? directAd.destinationUrl : '#';
+  const mediaUrl = directAd?.mediaUrl;
   const altText = directAd?.altText || advertiserName;
 
   const isPhoneCta = typeof ctaUrl === 'string' && ctaUrl.startsWith('tel:');

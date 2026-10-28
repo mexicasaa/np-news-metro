@@ -123,6 +123,22 @@ export class AdRepository {
   }
 
   /**
+   * Get all ad placements currently configured in Supabase.
+   */
+  public async getAllPlacements(): Promise<Array<{ id: string; zone: string; is_active: boolean; campaign_id: string | null }>> {
+    try {
+      const { data, error } = await supabase
+        .from('ad_placements')
+        .select('id, zone, is_active, campaign_id');
+
+      if (error || !data) return [];
+      return data;
+    } catch {
+      return [];
+    }
+  }
+
+  /**
    * Delete ad campaign, placement, creatives, and analytics from Supabase Database.
    * Completely purges the ad from the database so it will never reappear.
    */
