@@ -12,7 +12,7 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 });
 
 const SITE_ORIGIN = "https://www.npnewsmetro.com";
-const DEFAULT_OG_IMAGE = "https://www.npnewsmetro.com/uploads/dr-deepak-goswami.jpg";
+const DEFAULT_OG_IMAGE = "https://www.npnewsmetro.com/uploads/logo-circle.png";
 const shareWarmCache = new Map();
 const SHARE_CACHE_TTL = 15 * 60 * 1000; // 15 minutes
 
@@ -558,6 +558,9 @@ const FALLBACK_SLUGS = {
 function buildCrawlerHtml({ title, description, canonicalUrl, shareUrl, ogType = "article", ogImage = DEFAULT_OG_IMAGE, jsonLd, bodyHtml }) {
   const imageExt = ogImage.split("?")[0].split(".").pop()?.toLowerCase();
   const imageMimeType = imageExt === "png" ? "image/png" : imageExt === "webp" ? "image/webp" : "image/jpeg";
+  const isSquareImage = ogImage.includes("logo-circle");
+  const imageWidth = isSquareImage ? "1024" : "1200";
+  const imageHeight = isSquareImage ? "1024" : "630";
   const finalShareUrl = shareUrl || canonicalUrl;
 
   return `<!DOCTYPE html>
@@ -600,8 +603,9 @@ function buildCrawlerHtml({ title, description, canonicalUrl, shareUrl, ogType =
   <meta property="og:image:url" content="${ogImage}" />
   <meta property="og:image:secure_url" content="${ogImage}" />
   <meta property="og:image:type" content="${imageMimeType}" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
+  <meta property="og:image:width" content="${imageWidth}" />
+  <meta property="og:image:height" content="${imageHeight}" />
+  <link rel="image_src" href="${ogImage}" />
   <meta property="og:image:alt" content="${escapeHtml(title)}" />
   <meta property="og:locale" content="hi_IN" />
 
@@ -846,7 +850,7 @@ export default async function handler(req, res) {
         description: "NP News Metro delivers real news, hard-hitting investigative journalism, politics, economy, technology, sports, and culture across India.",
         canonicalUrl: `${SITE_ORIGIN}/`,
         ogType: "website",
-        ogImage: leadImage,
+        ogImage: DEFAULT_OG_IMAGE,
         jsonLd: homeJsonLd,
         bodyHtml: homeBodyHtml
       });

@@ -3,7 +3,7 @@ import './_suppressWarnings.js';
 
 const SUPABASE_STORAGE_ORIGIN = process.env.VITE_SUPABASE_URL || 'https://bogjmdyolhazzvicjrjl.supabase.co';
 const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvZ2ptZHlvbGhhenp2aWNqcmpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0NDcxNDAsImV4cCI6MjEwNDAyMzE0MH0.taOdcGmN6pQ3sfuIC2UIVkSV-8j0Y_wuXS-7Un4xo_0';
-const FALLBACK_IMAGE_URL = 'https://www.npnewsmetro.com/uploads/dr-deepak-goswami.jpg';
+const FALLBACK_IMAGE_URL = 'https://www.npnewsmetro.com/uploads/logo-circle.png';
 
 export default async function handler(req, res) {
   const isHead = req.method === 'HEAD';
@@ -190,7 +190,7 @@ export default async function handler(req, res) {
       if (fbRes.ok) {
         const fbBuffer = Buffer.from(await fbRes.arrayBuffer());
         if (typeof res.setHeader === 'function') {
-          res.setHeader('Content-Type', 'image/jpeg');
+          res.setHeader('Content-Type', fbRes.headers.get('content-type') || 'image/png');
           res.setHeader('Content-Length', fbBuffer.length);
           res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=604800, stale-while-revalidate=86400');
           res.setHeader('Access-Control-Allow-Origin', '*');

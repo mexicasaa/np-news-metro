@@ -5,7 +5,7 @@
  */
 
 export const DEFAULT_SITE_ORIGIN = 'https://www.npnewsmetro.com';
-export const DEFAULT_OG_IMAGE = 'https://www.npnewsmetro.com/uploads/dr-deepak-goswami.jpg';
+export const DEFAULT_OG_IMAGE = 'https://www.npnewsmetro.com/uploads/logo-circle.png';
 
 /**
  * Returns the current site origin in browser or default production domain
@@ -61,7 +61,7 @@ export const getAbsoluteImageUrl = (imageUrl?: string, customOrigin?: string, sl
     if (slug) {
       return `${cleanOrigin}/api/image?slug=${encodeURIComponent(slug)}`;
     }
-    return `${cleanOrigin}/uploads/dr-deepak-goswami.jpg`;
+    return `${cleanOrigin}/uploads/logo-circle.png`;
   }
 
   // Already a full absolute HTTP/HTTPS URL

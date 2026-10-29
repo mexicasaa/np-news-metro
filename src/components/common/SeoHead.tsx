@@ -21,6 +21,9 @@ export const SeoHead: React.FC<SeoHeadProps> = ({ metadata, structuredData }) =>
     const finalImage = getAbsoluteImageUrl(metadata?.ogImage, 'https://www.npnewsmetro.com');
     const imageExt = finalImage.split('?')[0].split('.').pop()?.toLowerCase();
     const imageMime = imageExt === 'png' ? 'image/png' : imageExt === 'webp' ? 'image/webp' : imageExt === 'gif' ? 'image/gif' : 'image/jpeg';
+    const isSquareImage = finalImage.includes('logo-circle');
+    const imageWidth = isSquareImage ? '1024' : '1200';
+    const imageHeight = isSquareImage ? '1024' : '630';
     const robotsContent = metadata?.noIndex ? 'noindex, nofollow' : 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1';
     const googleNewsContent = metadata?.noIndex ? 'noindex, nofollow' : 'index, follow';
 
@@ -56,8 +59,8 @@ export const SeoHead: React.FC<SeoHeadProps> = ({ metadata, structuredData }) =>
     setMetaTag('meta[property="og:url"]', 'property', 'og:url', finalUrl);
     setMetaTag('meta[property="og:image"]', 'property', 'og:image', finalImage);
     setMetaTag('meta[property="og:image:secure_url"]', 'property', 'og:image:secure_url', finalImage);
-    setMetaTag('meta[property="og:image:width"]', 'property', 'og:image:width', '1200');
-    setMetaTag('meta[property="og:image:height"]', 'property', 'og:image:height', '630');
+    setMetaTag('meta[property="og:image:width"]', 'property', 'og:image:width', imageWidth);
+    setMetaTag('meta[property="og:image:height"]', 'property', 'og:image:height', imageHeight);
     setMetaTag('meta[property="og:image:type"]', 'property', 'og:image:type', imageMime);
     setMetaTag('meta[property="og:image:alt"]', 'property', 'og:image:alt', metadata?.title || 'NP News Metro');
     setMetaTag('meta[property="og:type"]', 'property', 'og:type', metadata?.ogType || 'website');

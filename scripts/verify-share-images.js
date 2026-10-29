@@ -1,7 +1,7 @@
 import assert from 'assert';
 
 const DEFAULT_SITE_ORIGIN = 'https://www.npnewsmetro.com';
-const DEFAULT_OG_IMAGE = 'https://www.npnewsmetro.com/uploads/dr-deepak-goswami.jpg';
+const DEFAULT_OG_IMAGE = 'https://www.npnewsmetro.com/uploads/logo-circle.png';
 
 function getAbsoluteImageUrl(imageUrl, customOrigin) {
   if (!imageUrl || typeof imageUrl !== 'string' || !imageUrl.trim()) {
