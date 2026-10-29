@@ -134,6 +134,84 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
   useEffect(() => {
     adjustDekHeight();
   }, [dek, adjustDekHeight]);
+
+  const [isBoldActive, setIsBoldActive] = useState(false);
+  const [isItalicActive, setIsItalicActive] = useState(false);
+
+  const updateToolbarActiveStates = useCallback(() => {
+    if (!editorRef.current) return;
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) {
+      setIsBoldActive(false);
+      setIsItalicActive(false);
+      return;
+    }
+
+    const range = selection.getRangeAt(0);
+    // Check if selection / caret is within our contentEditable editor
+    if (editorRef.current.contains(range.commonAncestorContainer) || editorRef.current.contains(range.startContainer)) {
+      let isBold = false;
+      let isItalic = false;
+
+      try {
+        isBold = Boolean(document.queryCommandState('bold'));
+        isItalic = Boolean(document.queryCommandState('italic'));
+      } catch {}
+
+      // Fallback DOM walk if queryCommandState is inconclusive
+      if (!isBold && range.startContainer) {
+        let node: Node | null = range.startContainer.nodeType === Node.TEXT_NODE
+          ? range.startContainer.parentElement
+          : (range.startContainer as HTMLElement);
+        while (node && node !== editorRef.current) {
+          if (node instanceof HTMLElement) {
+            const tag = node.tagName.toLowerCase();
+            const fw = window.getComputedStyle(node).fontWeight;
+            if (tag === 'b' || tag === 'strong' || fw === 'bold' || parseInt(fw, 10) >= 600) {
+              isBold = true;
+              break;
+            }
+          }
+          node = node.parentElement;
+        }
+      }
+
+      if (!isItalic && range.startContainer) {
+        let node: Node | null = range.startContainer.nodeType === Node.TEXT_NODE
+          ? range.startContainer.parentElement
+          : (range.startContainer as HTMLElement);
+        while (node && node !== editorRef.current) {
+          if (node instanceof HTMLElement) {
+            const tag = node.tagName.toLowerCase();
+            const fs = window.getComputedStyle(node).fontStyle;
+            if (tag === 'i' || tag === 'em' || fs === 'italic') {
+              isItalic = true;
+              break;
+            }
+          }
+          node = node.parentElement;
+        }
+      }
+
+      setIsBoldActive(isBold);
+      setIsItalicActive(isItalic);
+    } else {
+      setIsBoldActive(false);
+      setIsItalicActive(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const onSelectionChange = () => {
+      updateToolbarActiveStates();
+    };
+    document.addEventListener('selectionchange', onSelectionChange);
+    return () => {
+      document.removeEventListener('selectionchange', onSelectionChange);
+    };
+  }, [updateToolbarActiveStates]);
   
   const [content, setContent] = useState(() => {
     if (initialPost?.blocks && initialPost.blocks.length > 0) {
@@ -464,6 +542,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       e.preventDefault();
       document.execCommand('bold', false);
       syncContentFromDom();
+      setTimeout(updateToolbarActiveStates, 10);
       return;
     }
     // Italic: Ctrl+I or Cmd+I
@@ -471,6 +550,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       e.preventDefault();
       document.execCommand('italic', false);
       syncContentFromDom();
+      setTimeout(updateToolbarActiveStates, 10);
       return;
     }
   };
@@ -480,6 +560,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     editorRef.current.focus();
     document.execCommand('bold', false);
     syncContentFromDom();
+    setTimeout(updateToolbarActiveStates, 10);
   };
 
   const handleToolbarItalic = () => {
@@ -487,6 +568,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     editorRef.current.focus();
     document.execCommand('italic', false);
     syncContentFromDom();
+    setTimeout(updateToolbarActiveStates, 10);
   };
 
   const handleToolbarHeading = (level: 2 | 3) => {
@@ -1221,7 +1303,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] font-sans text-slate-800 pb-24 antialiased selection:bg-[#162839] selection:text-white">
+    <div className="min-h-screen bg-[#F8F9FA] font-sans text-slate-800 pb-24 antialiased selection:bg-blue-600 selection:text-white">
       {/* Hidden Upload Inputs */}
       <input type="file" ref={featuredImageInputRef} onChange={handleFeaturedImageUpload} accept="image/*" className="hidden" />
       <input type="file" ref={inlineImageInputRef} onChange={handleInlineImageSelected} accept="image/*" className="hidden" />
@@ -1354,7 +1436,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="Title"
                   style={{ outline: 'none', border: 'none', boxShadow: 'none' }}
-                  className="w-full text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-slate-900 placeholder:text-slate-300/80 border-none outline-none focus:outline-none focus:ring-0 ring-0 focus-visible:outline-none bg-transparent leading-tight tracking-tight selection:bg-slate-200"
+                  className="w-full text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-slate-900 placeholder:text-slate-300/80 border-none outline-none focus:outline-none focus:ring-0 ring-0 focus-visible:outline-none bg-transparent leading-tight tracking-tight selection:bg-blue-600 selection:text-white"
                 />
 
                 <div className="mt-3">
@@ -1373,7 +1455,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                     }}
                     placeholder="Add a subtitle or lead summary..."
                     style={{ outline: 'none', border: 'none', boxShadow: 'none' }}
-                    className="w-full text-lg sm:text-xl text-slate-500 font-serif italic placeholder:text-slate-300/80 border-none outline-none focus:outline-none focus:ring-0 ring-0 focus-visible:outline-none bg-transparent resize-none leading-relaxed selection:bg-slate-200 overflow-hidden"
+                    className="w-full text-lg sm:text-xl text-slate-500 font-serif italic placeholder:text-slate-300/80 border-none outline-none focus:outline-none focus:ring-0 ring-0 focus-visible:outline-none bg-transparent resize-none leading-relaxed selection:bg-blue-600 selection:text-white overflow-hidden"
                   />
                 </div>
 
@@ -1391,10 +1473,10 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                   <button
                     type="button"
                     onClick={handleStartInlineImage}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 hover:text-slate-950 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-900 hover:text-white rounded-lg transition-all cursor-pointer group"
                     title="Insert photo at cursor position"
                   >
-                    <ImagePlus className="w-3.5 h-3.5 text-slate-600" />
+                    <ImagePlus className="w-3.5 h-3.5 text-slate-600 group-hover:text-white transition-colors" />
                     <span>Photo</span>
                   </button>
 
@@ -1406,7 +1488,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                       e.preventDefault();
                       handleToolbarHeading(2);
                     }}
-                    className="px-2 py-1 text-xs font-serif font-bold text-slate-600 hover:text-slate-950 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
+                    className="px-2.5 py-1 text-xs font-serif font-bold text-slate-700 hover:bg-slate-900 hover:text-white rounded-md transition-all cursor-pointer"
                     title="Heading 2 (##)"
                   >
                     H2
@@ -1417,7 +1499,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                       e.preventDefault();
                       handleToolbarHeading(3);
                     }}
-                    className="px-2 py-1 text-xs font-serif font-bold text-slate-600 hover:text-slate-950 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
+                    className="px-2.5 py-1 text-xs font-serif font-bold text-slate-700 hover:bg-slate-900 hover:text-white rounded-md transition-all cursor-pointer"
                     title="Heading 3 (###)"
                   >
                     H3
@@ -1431,10 +1513,14 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                       e.preventDefault();
                       handleToolbarBold();
                     }}
-                    className="p-1.5 text-slate-600 hover:text-slate-950 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
-                    title="Bold (Ctrl+B / Cmd+B)"
+                    className={`p-1.5 rounded-md transition-all cursor-pointer flex items-center justify-center ${
+                      isBoldActive
+                        ? 'bg-slate-900 text-white shadow-xs ring-1 ring-slate-900 font-bold scale-[1.05]'
+                        : 'text-slate-700 hover:bg-slate-900 hover:text-white'
+                    }`}
+                    title={isBoldActive ? 'Bold is ON (Click or Ctrl+B to turn off)' : 'Bold (Ctrl+B / Cmd+B)'}
                   >
-                    <Bold className="w-3.5 h-3.5" />
+                    <Bold className="w-3.5 h-3.5 stroke-[2.5]" />
                   </button>
                   <button
                     type="button"
@@ -1442,8 +1528,12 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                       e.preventDefault();
                       handleToolbarItalic();
                     }}
-                    className="p-1.5 text-slate-600 hover:text-slate-950 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
-                    title="Italic (Ctrl+I / Cmd+I)"
+                    className={`p-1.5 rounded-md transition-all cursor-pointer flex items-center justify-center ${
+                      isItalicActive
+                        ? 'bg-slate-900 text-white shadow-xs ring-1 ring-slate-900 font-bold scale-[1.05]'
+                        : 'text-slate-700 hover:bg-slate-900 hover:text-white'
+                    }`}
+                    title={isItalicActive ? 'Italic is ON (Click or Ctrl+I to turn off)' : 'Italic (Ctrl+I / Cmd+I)'}
                   >
                     <Italic className="w-3.5 h-3.5" />
                   </button>
@@ -1453,7 +1543,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                       e.preventDefault();
                       handleToolbarQuote();
                     }}
-                    className="p-1.5 text-slate-600 hover:text-slate-950 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
+                    className="p-1.5 text-slate-700 hover:bg-slate-900 hover:text-white rounded-md transition-all cursor-pointer"
                     title="Pull Quote (>)"
                   >
                     <Quote className="w-3.5 h-3.5" />
@@ -1464,7 +1554,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                       e.preventDefault();
                       handleToolbarList();
                     }}
-                    className="p-1.5 text-slate-600 hover:text-slate-950 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
+                    className="p-1.5 text-slate-700 hover:bg-slate-900 hover:text-white rounded-md transition-all cursor-pointer"
                     title="Bullet List (-)"
                   >
                     <List className="w-3.5 h-3.5" />
@@ -1475,7 +1565,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                       e.preventDefault();
                       handleToolbarLink();
                     }}
-                    className="p-1.5 text-slate-600 hover:text-slate-950 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
+                    className="p-1.5 text-slate-700 hover:bg-slate-900 hover:text-white rounded-md transition-all cursor-pointer"
                     title="Add Link [Text](URL)"
                   >
                     <Link2 className="w-3.5 h-3.5" />
@@ -1486,11 +1576,11 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                   <button
                     type="button"
                     onClick={handleFormatParagraphSpacing}
-                    className="px-2 py-1 text-slate-600 hover:text-slate-950 hover:bg-slate-100 rounded-md transition-colors cursor-pointer flex items-center gap-1.5"
+                    className="px-2 py-1 text-slate-700 hover:bg-slate-900 hover:text-white rounded-md transition-all cursor-pointer flex items-center gap-1.5 group"
                     title="Format Paragraph Spacing (Add clean space between lines/paragraphs)"
                   >
-                    <WrapText className="w-3.5 h-3.5 text-slate-700" />
-                    <span className="text-[11px] font-semibold text-slate-600">Space Lines</span>
+                    <WrapText className="w-3.5 h-3.5 text-slate-600 group-hover:text-white transition-colors" />
+                    <span className="text-[11px] font-semibold text-slate-600 group-hover:text-white transition-colors">Space Lines</span>
                   </button>
                 </div>
 
@@ -1509,11 +1599,18 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                   ref={editorRef}
                   contentEditable
                   suppressContentEditableWarning
-                  onInput={syncContentFromDom}
+                  onInput={() => {
+                    syncContentFromDom();
+                    updateToolbarActiveStates();
+                  }}
                   onKeyDown={handleEditorKeyDown}
+                  onKeyUp={updateToolbarActiveStates}
+                  onMouseUp={updateToolbarActiveStates}
+                  onFocus={updateToolbarActiveStates}
+                  onSelect={updateToolbarActiveStates}
                   onPaste={handlePaste}
                   style={{ outline: 'none', border: 'none', boxShadow: 'none' }}
-                  className="w-full text-base sm:text-lg leading-relaxed text-slate-800 font-serif border-none outline-none focus:outline-none focus:ring-0 ring-0 focus-visible:outline-none min-h-[460px] bg-transparent selection:bg-slate-200 [&_b]:font-bold [&_b]:text-slate-950 [&_strong]:font-bold [&_strong]:text-slate-950 [&_em]:italic [&_i]:italic [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mt-6 [&_h2]:mb-2 [&_h2]:text-slate-900 [&_h3]:text-xl [&_h3]:font-bold [&_h3]:mt-4 [&_h3]:mb-2 [&_h3]:text-slate-900 [&_blockquote]:border-l-4 [&_blockquote]:border-slate-300 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-slate-600 [&_blockquote]:my-3 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-1 [&_ul]:my-3 [&_p]:mb-4"
+                  className="w-full text-base sm:text-lg leading-relaxed text-slate-800 font-serif border-none outline-none focus:outline-none focus:ring-0 ring-0 focus-visible:outline-none min-h-[460px] bg-transparent selection:bg-blue-600 selection:text-white [&_b]:font-bold [&_b]:text-slate-950 [&_strong]:font-bold [&_strong]:text-slate-950 [&_em]:italic [&_i]:italic [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mt-6 [&_h2]:mb-2 [&_h2]:text-slate-900 [&_h3]:text-xl [&_h3]:font-bold [&_h3]:mt-4 [&_h3]:mb-2 [&_h3]:text-slate-900 [&_blockquote]:border-l-4 [&_blockquote]:border-slate-300 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-slate-600 [&_blockquote]:my-3 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-1 [&_ul]:my-3 [&_p]:mb-4"
                 />
               </div>
 

@@ -39,6 +39,12 @@
     outline: 2px solid #162839;
     outline-offset: 2px;
   }
+
+  /* High-contrast accessible text selection across admin editor & inputs */
+  input::selection, textarea::selection, [contenteditable]::selection, [contenteditable] *::selection {
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+  }
 }
 
 /* Editorial Newspaper Lines & Decorative Elements */
