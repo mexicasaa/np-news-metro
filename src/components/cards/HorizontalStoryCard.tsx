@@ -7,6 +7,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { ShareModal } from '../article/ShareModal';
 import { getCanonicalArticleUrl } from '../../utils/shareUtils';
 import { formatRelativeTime } from '../../utils/dateUtils';
+import { renderInlineMarkdown } from '../article/ArticleBody';
 
 interface HorizontalStoryCardProps {
   post: WpPost;
@@ -96,8 +97,8 @@ export const HorizontalStoryCard: React.FC<HorizontalStoryCardProps> = ({
           </h3>
 
           {/* Dek */}
-          <p className="text-xs sm:text-[13px] text-slate-600 line-clamp-2 leading-relaxed mb-3">
-            {localized.dek}
+          <p className="text-xs sm:text-[13px] text-slate-600 line-clamp-2 leading-relaxed mb-3 whitespace-pre-line">
+            {renderInlineMarkdown(localized.dek)}
           </p>
         </div>
 

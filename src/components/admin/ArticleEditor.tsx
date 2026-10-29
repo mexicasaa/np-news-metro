@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   Camera, Link2, Quote, List, AlignLeft, AlignCenter, AlignRight, 
   Bold, Italic, Settings, X, ChevronDown, ChevronUp, Eye, FileText, Search,
@@ -21,7 +21,7 @@ import { slugifyText } from '../../utils/slugify';
 import { getAuthorAvatarUrl, DEFAULT_AUTHOR_AVATAR, handleAvatarError } from '../../utils/imageFallback';
 import { saveAutoSaveSession, clearAutoSaveSession, saveDraftPost, setRefreshSession, isPostPublished } from '../../utils/newsStorage';
 import { getNewsroomAuthors } from '../../services/authService';
-import { formatArticleText, formatPastedContent } from '../../utils/editorFormatting';
+import { formatArticleText, formatPastedContent, markdownToEditorHtml, htmlToEditorMarkdown } from '../../utils/editorFormatting';
 import { EDITORIAL_DESKS, EditorialDesk, getDeskByIdOrCategory, getSubcategoriesForDeskOrCategory } from '../../data/editorialTaxonomy';
 
 export interface EditorBlock {
@@ -79,6 +79,9 @@ export const DESIGNATION_ROLES = [
   'Editorial Desk',
   'Guest Columnist',
   'Special Contributor',
+  'Writer',
+  'Poet',
+  'Author',
   'PTI (Press Trust of India)',
   'ANI (Asian News International)',
   'Reuters / Global Wire',
@@ -114,9 +117,23 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
   const inlineImageInputRef = useRef<HTMLInputElement>(null);
   const authorAvatarInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const editorRef = useRef<HTMLDivElement>(null);
+  const dekTextareaRef = useRef<HTMLTextAreaElement>(null);
+  const isUserTypingRef = useRef(false);
 
   const [title, setTitle] = useState(initialPost?.title || '');
   const [dek, setDek] = useState(initialPost?.dek || '');
+
+  const adjustDekHeight = useCallback(() => {
+    const el = dekTextareaRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${Math.max(el.scrollHeight, 36)}px`;
+  }, []);
+
+  useEffect(() => {
+    adjustDekHeight();
+  }, [dek, adjustDekHeight]);
   
   const [content, setContent] = useState(() => {
     if (initialPost?.blocks && initialPost.blocks.length > 0) {
@@ -336,15 +353,17 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       setIsEditMode(true);
       setTitle(initialPost.title || '');
       setDek(initialPost.dek || '');
-      if (initialPost.blocks && initialPost.blocks.length > 0) {
-        setContent(initialPost.blocks.map(b => {
-          if (b.type === 'image') return `![${b.imageCaption || 'Image'}](${b.imageUrl || ''})`;
-          if (b.type === 'heading') return `## ${b.content}`;
-          if (b.type === 'pullquote') return `> "${b.content}"`;
-          return b.content;
-        }).join('\n\n'));
-      } else {
-        setContent(initialPost.dek || '');
+      const targetContent = (initialPost.blocks && initialPost.blocks.length > 0)
+        ? initialPost.blocks.map(b => {
+            if (b.type === 'image') return `![${b.imageCaption || 'Image'}](${b.imageUrl || ''})`;
+            if (b.type === 'heading') return `## ${b.content}`;
+            if (b.type === 'pullquote') return `> "${b.content}"`;
+            return b.content;
+          }).join('\n\n')
+        : (initialPost.content || initialPost.dek || '');
+      setContent(targetContent);
+      if (editorRef.current && document.activeElement !== editorRef.current) {
+        editorRef.current.innerHTML = markdownToEditorHtml(targetContent);
       }
       const loadedDesk = getDeskByIdOrCategory(initialPost.desk || initialPost.category || 'india');
       setDeskId(loadedDesk.id);
@@ -428,6 +447,87 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     }
   };
 
+  const syncContentFromDom = useCallback(() => {
+    if (!editorRef.current) return;
+    isUserTypingRef.current = true;
+    const currentHtml = editorRef.current.innerHTML;
+    const markdown = htmlToEditorMarkdown(currentHtml);
+    setContent(markdown);
+    setTimeout(() => {
+      isUserTypingRef.current = false;
+    }, 150);
+  }, []);
+
+  const handleEditorKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    // Bold: Ctrl+B or Cmd+B
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+      e.preventDefault();
+      document.execCommand('bold', false);
+      syncContentFromDom();
+      return;
+    }
+    // Italic: Ctrl+I or Cmd+I
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'i') {
+      e.preventDefault();
+      document.execCommand('italic', false);
+      syncContentFromDom();
+      return;
+    }
+  };
+
+  const handleToolbarBold = () => {
+    if (!editorRef.current) return;
+    editorRef.current.focus();
+    document.execCommand('bold', false);
+    syncContentFromDom();
+  };
+
+  const handleToolbarItalic = () => {
+    if (!editorRef.current) return;
+    editorRef.current.focus();
+    document.execCommand('italic', false);
+    syncContentFromDom();
+  };
+
+  const handleToolbarHeading = (level: 2 | 3) => {
+    if (!editorRef.current) return;
+    editorRef.current.focus();
+    const tag = level === 2 ? '<h2>' : '<h3>';
+    document.execCommand('formatBlock', false, tag);
+    syncContentFromDom();
+  };
+
+  const handleToolbarQuote = () => {
+    if (!editorRef.current) return;
+    editorRef.current.focus();
+    document.execCommand('formatBlock', false, '<blockquote>');
+    syncContentFromDom();
+  };
+
+  const handleToolbarList = () => {
+    if (!editorRef.current) return;
+    editorRef.current.focus();
+    document.execCommand('insertUnorderedList', false);
+    syncContentFromDom();
+  };
+
+  const handleToolbarLink = () => {
+    if (!editorRef.current) return;
+    editorRef.current.focus();
+    const selection = window.getSelection();
+    const selectedText = selection?.toString() || '';
+    const url = window.prompt('Enter URL:', 'https://');
+    if (url && url.trim() && url !== 'https://') {
+      const cleanUrl = url.trim();
+      if (!selectedText) {
+        document.execCommand('insertHTML', false, `<a href="${cleanUrl}" class="text-primary underline font-medium">${cleanUrl}</a>`);
+      } else {
+        document.execCommand('createLink', false, cleanUrl);
+      }
+      syncContentFromDom();
+    }
+  };
+
   const handleStartInlineImage = () => {
     if (textareaRef.current) {
       setCursorPos(textareaRef.current.selectionStart);
@@ -447,11 +547,17 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
           return;
         }
         const finalUrl = uploadRes.url;
-        const imageTag = `\n\n![${cleanCaption}](${finalUrl})\n\n`;
-        const pos = cursorPos !== null ? cursorPos : (textareaRef.current?.selectionStart ?? content.length);
-        const newContent = content.substring(0, pos) + imageTag + content.substring(pos);
-        setContent(newContent);
-        setCursorPos(null);
+        if (editorRef.current) {
+          editorRef.current.focus();
+          document.execCommand('insertHTML', false, `<p><img src="${finalUrl}" alt="${cleanCaption}" class="my-4 rounded-xl max-w-full" /></p><p><br></p>`);
+          syncContentFromDom();
+        } else {
+          const imageTag = `\n\n![${cleanCaption}](${finalUrl})\n\n`;
+          const pos = cursorPos !== null ? cursorPos : (textareaRef.current?.selectionStart ?? content.length);
+          const newContent = content.substring(0, pos) + imageTag + content.substring(pos);
+          setContent(newContent);
+          setCursorPos(null);
+        }
       } catch (err: any) {
         console.error('Error uploading inline image:', err);
         alert(`Inline image upload error: ${err?.message || 'Upload failed'}`);
@@ -461,6 +567,32 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
   };
 
   const insertTextFormatting = (before: string, after: string = '', defaultText: string = 'text') => {
+    if (editorRef.current) {
+      if (before === '**' && after === '**') {
+        handleToolbarBold();
+        return;
+      }
+      if (before === '*' && after === '*') {
+        handleToolbarItalic();
+        return;
+      }
+      if (before === '## ') {
+        handleToolbarHeading(2);
+        return;
+      }
+      if (before === '### ') {
+        handleToolbarHeading(3);
+        return;
+      }
+      if (before.includes('>')) {
+        handleToolbarQuote();
+        return;
+      }
+      if (before.includes('- ')) {
+        handleToolbarList();
+        return;
+      }
+    }
     const textarea = textareaRef.current;
     if (!textarea) return;
     const start = textarea.selectionStart;
@@ -478,6 +610,10 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
   };
 
   const handleInsertLink = () => {
+    if (editorRef.current) {
+      handleToolbarLink();
+      return;
+    }
     const textarea = textareaRef.current;
     if (!textarea) return;
     const start = textarea.selectionStart;
@@ -490,7 +626,6 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     setContent(newContent);
     setTimeout(() => {
       textarea.focus();
-      // Select the url placeholder 'https://'
       const urlStart = start + linkText.length + 3;
       textarea.setSelectionRange(urlStart, urlStart + 8);
     }, 50);
@@ -570,6 +705,9 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       `![${newCaption}](${oldUrl})`
     );
     setContent(updated);
+    if (editorRef.current) {
+      editorRef.current.innerHTML = markdownToEditorHtml(updated);
+    }
   };
 
   const handleRemoveInlineImage = (urlToRemove: string) => {
@@ -578,14 +716,35 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       ''
     );
     setContent(updated);
+    if (editorRef.current) {
+      editorRef.current.innerHTML = markdownToEditorHtml(updated);
+    }
   };
 
-  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+  const handlePaste = (e: React.ClipboardEvent<any>) => {
     const clipboardData = e.clipboardData;
     if (!clipboardData) return;
 
     const htmlData = clipboardData.getData('text/html');
     const plainData = clipboardData.getData('text/plain');
+
+    if (editorRef.current) {
+      if (htmlData && htmlData.trim()) {
+        e.preventDefault();
+        const markdown = htmlToEditorMarkdown(htmlData);
+        const cleanHtml = markdownToEditorHtml(markdown);
+        document.execCommand('insertHTML', false, cleanHtml);
+        syncContentFromDom();
+        return;
+      }
+      if (plainData) {
+        e.preventDefault();
+        const cleanHtml = markdownToEditorHtml(plainData);
+        document.execCommand('insertHTML', false, cleanHtml);
+        syncContentFromDom();
+        return;
+      }
+    }
 
     const formatted = formatPastedContent(htmlData, plainData);
     if (!formatted) return;
@@ -597,7 +756,6 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       return;
     }
 
-    // Use document.execCommand if available to preserve native Ctrl+Z undo history
     const success = document.execCommand?.('insertText', false, formatted);
     if (!success) {
       const start = textarea.selectionStart ?? 0;
@@ -613,6 +771,14 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
   };
 
   const handleFormatParagraphSpacing = () => {
+    if (editorRef.current) {
+      const currentMarkdown = htmlToEditorMarkdown(editorRef.current.innerHTML);
+      const formatted = formatArticleText(currentMarkdown);
+      editorRef.current.innerHTML = markdownToEditorHtml(formatted);
+      setContent(formatted);
+      return;
+    }
+
     const textarea = textareaRef.current;
     if (!textarea) {
       setContent(prev => formatArticleText(prev));
@@ -1193,12 +1359,21 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
 
                 <div className="mt-3">
                   <textarea
+                    ref={dekTextareaRef}
                     rows={1}
                     value={dek}
-                    onChange={(e) => setDek(e.target.value)}
+                    onChange={(e) => {
+                      setDek(e.target.value);
+                      adjustDekHeight();
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.stopPropagation();
+                      }
+                    }}
                     placeholder="Add a subtitle or lead summary..."
                     style={{ outline: 'none', border: 'none', boxShadow: 'none' }}
-                    className="w-full text-lg sm:text-xl text-slate-500 font-serif italic placeholder:text-slate-300/80 border-none outline-none focus:outline-none focus:ring-0 ring-0 focus-visible:outline-none bg-transparent resize-none leading-relaxed selection:bg-slate-200"
+                    className="w-full text-lg sm:text-xl text-slate-500 font-serif italic placeholder:text-slate-300/80 border-none outline-none focus:outline-none focus:ring-0 ring-0 focus-visible:outline-none bg-transparent resize-none leading-relaxed selection:bg-slate-200 overflow-hidden"
                   />
                 </div>
 
@@ -1227,7 +1402,10 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
 
                   <button
                     type="button"
-                    onClick={() => insertTextFormatting('## ', '')}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      handleToolbarHeading(2);
+                    }}
                     className="px-2 py-1 text-xs font-serif font-bold text-slate-600 hover:text-slate-950 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
                     title="Heading 2 (##)"
                   >
@@ -1235,7 +1413,10 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                   </button>
                   <button
                     type="button"
-                    onClick={() => insertTextFormatting('### ', '')}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      handleToolbarHeading(3);
+                    }}
                     className="px-2 py-1 text-xs font-serif font-bold text-slate-600 hover:text-slate-950 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
                     title="Heading 3 (###)"
                   >
@@ -1246,23 +1427,32 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
 
                   <button
                     type="button"
-                    onClick={() => insertTextFormatting('**', '**')}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      handleToolbarBold();
+                    }}
                     className="p-1.5 text-slate-600 hover:text-slate-950 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
-                    title="Bold (**text**)"
+                    title="Bold (Ctrl+B / Cmd+B)"
                   >
                     <Bold className="w-3.5 h-3.5" />
                   </button>
                   <button
                     type="button"
-                    onClick={() => insertTextFormatting('*', '*')}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      handleToolbarItalic();
+                    }}
                     className="p-1.5 text-slate-600 hover:text-slate-950 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
-                    title="Italic (*text*)"
+                    title="Italic (Ctrl+I / Cmd+I)"
                   >
                     <Italic className="w-3.5 h-3.5" />
                   </button>
                   <button
                     type="button"
-                    onClick={() => insertTextFormatting('> "', '"')}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      handleToolbarQuote();
+                    }}
                     className="p-1.5 text-slate-600 hover:text-slate-950 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
                     title="Pull Quote (>)"
                   >
@@ -1270,7 +1460,10 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                   </button>
                   <button
                     type="button"
-                    onClick={() => insertTextFormatting('\n- ', '', 'List item')}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      handleToolbarList();
+                    }}
                     className="p-1.5 text-slate-600 hover:text-slate-950 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
                     title="Bullet List (-)"
                   >
@@ -1278,7 +1471,10 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                   </button>
                   <button
                     type="button"
-                    onClick={handleInsertLink}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      handleToolbarLink();
+                    }}
                     className="p-1.5 text-slate-600 hover:text-slate-950 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
                     title="Add Link [Text](URL)"
                   >
@@ -1303,15 +1499,21 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                 </div>
               </div>
 
-              <div className="px-6 sm:px-10 py-6">
-                <textarea
-                  ref={textareaRef}
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
+              <div className="relative px-6 sm:px-10 py-6">
+                {(!content || !content.trim()) && (
+                  <div className="absolute top-6 left-6 sm:left-10 text-base sm:text-lg text-slate-300 font-serif pointer-events-none select-none">
+                    Tell your story...
+                  </div>
+                )}
+                <div
+                  ref={editorRef}
+                  contentEditable
+                  suppressContentEditableWarning
+                  onInput={syncContentFromDom}
+                  onKeyDown={handleEditorKeyDown}
                   onPaste={handlePaste}
-                  placeholder="Tell your story..."
                   style={{ outline: 'none', border: 'none', boxShadow: 'none' }}
-                  className="w-full text-base sm:text-lg leading-relaxed text-slate-800 font-serif border-none outline-none focus:outline-none focus:ring-0 ring-0 focus-visible:outline-none resize-none min-h-[460px] bg-transparent placeholder:text-slate-300 selection:bg-slate-200"
+                  className="w-full text-base sm:text-lg leading-relaxed text-slate-800 font-serif border-none outline-none focus:outline-none focus:ring-0 ring-0 focus-visible:outline-none min-h-[460px] bg-transparent selection:bg-slate-200 [&_b]:font-bold [&_b]:text-slate-950 [&_strong]:font-bold [&_strong]:text-slate-950 [&_em]:italic [&_i]:italic [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mt-6 [&_h2]:mb-2 [&_h2]:text-slate-900 [&_h3]:text-xl [&_h3]:font-bold [&_h3]:mt-4 [&_h3]:mb-2 [&_h3]:text-slate-900 [&_blockquote]:border-l-4 [&_blockquote]:border-slate-300 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-slate-600 [&_blockquote]:my-3 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-1 [&_ul]:my-3 [&_p]:mb-4"
                 />
               </div>
 

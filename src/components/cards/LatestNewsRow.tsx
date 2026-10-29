@@ -5,6 +5,7 @@ import { handleImageError, getAuthorAvatarUrl, handleAvatarError, getOptimizedIm
 import { useLanguage } from '../../context/LanguageContext';
 import { getLocalizedPost, mockAuthors } from '../../data/mockWpData';
 import { formatRelativeTime } from '../../utils/dateUtils';
+import { renderInlineMarkdown } from '../article/ArticleBody';
 
 interface LatestNewsRowProps {
   post: WpPost;
@@ -91,8 +92,8 @@ export const LatestNewsRow: React.FC<LatestNewsRowProps> = ({
 
           {/* Dek / Summary */}
           {localized.dek && (
-            <p className="text-xs sm:text-[13px] text-slate-600 line-clamp-2 leading-relaxed">
-              {localized.dek}
+            <p className="text-xs sm:text-[13px] text-slate-600 line-clamp-2 leading-relaxed whitespace-pre-line">
+              {renderInlineMarkdown(localized.dek)}
             </p>
           )}
         </div>

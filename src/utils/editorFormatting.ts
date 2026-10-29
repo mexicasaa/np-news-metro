@@ -52,13 +52,26 @@ export const convertHtmlToEditorMarkdown = (html: string): string => {
       const el = node as HTMLElement;
       const tag = el.tagName.toLowerCase();
 
-      if (tag === 'strong' || tag === 'b') {
+      const fontWeight = (el as any).style?.fontWeight;
+      const isBoldSpan = tag === 'span' && (fontWeight === 'bold' || fontWeight === '700' || parseInt(fontWeight, 10) >= 600);
+      if (tag === 'strong' || tag === 'b' || isBoldSpan) {
         const text = Array.from(el.childNodes).map(serializeNode).join('');
-        return text.trim() ? `**${text.trim()}**` : text;
+        const trimmed = text.trim();
+        if (!trimmed) return text;
+        const leading = text.match(/^\s*/)?.[0] || '';
+        const trailing = text.match(/\s*$/)?.[0] || '';
+        return `${leading}**${trimmed}**${trailing}`;
       }
-      if (tag === 'em' || tag === 'i') {
+
+      const fontStyle = (el as any).style?.fontStyle;
+      const isItalicSpan = tag === 'span' && fontStyle === 'italic';
+      if (tag === 'em' || tag === 'i' || isItalicSpan) {
         const text = Array.from(el.childNodes).map(serializeNode).join('');
-        return text.trim() ? `*${text.trim()}*` : text;
+        const trimmed = text.trim();
+        if (!trimmed) return text;
+        const leading = text.match(/^\s*/)?.[0] || '';
+        const trailing = text.match(/\s*$/)?.[0] || '';
+        return `${leading}*${trimmed}*${trailing}`;
       }
       if (tag === 'a') {
         const text = Array.from(el.childNodes).map(serializeNode).join('').trim();
@@ -168,4 +181,83 @@ export const formatPastedContent = (html?: string, plain?: string): string => {
   }
 
   return '';
+};
+
+/**
+ * Converts inline markdown syntax (bold, italic, links) into clean HTML tags
+ * for presentation inside the rich editor.
+ */
+export const formatInlineToEditorHtml = (text: string): string => {
+  if (!text) return '';
+  let res = text;
+  // Convert markdown bold **text** to <strong>text</strong>
+  res = res.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  // Convert markdown italic *text* to <em>$1</em> (excluding cases like bullets or wildcards)
+  res = res.replace(/(^|[^*])\*([^*]+)\*([^*]|$)/g, '$1<em>$2</em>$3');
+  // Convert markdown links [text](url) to <a href="url">text</a>
+  res = res.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-primary underline font-medium">$1</a>');
+  return res;
+};
+
+/**
+ * Converts editor markdown into rich HTML suitable for the contentEditable editor.
+ * Ensures existing articles with **bold**, *italic*, headings, lists, quotes, and newlines
+ * are displayed with actual visual formatting, NOT raw markdown symbols.
+ */
+export const markdownToEditorHtml = (markdown: string): string => {
+  if (!markdown) return '';
+
+  const normalized = markdown.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  const blocks = normalized.split(/\n\s*\n+/);
+
+  const htmlBlocks = blocks.map(block => {
+    const trimmed = block.trim();
+    if (!trimmed) return '';
+
+    // Check heading 2: ## ...
+    const h2Match = trimmed.match(/^##\s+([\s\S]*)$/);
+    if (h2Match) {
+      return `<h2>${formatInlineToEditorHtml(h2Match[1].trim())}</h2>`;
+    }
+
+    // Check heading 3: ### ...
+    const h3Match = trimmed.match(/^###\s+([\s\S]*)$/);
+    if (h3Match) {
+      return `<h3>${formatInlineToEditorHtml(h3Match[1].trim())}</h3>`;
+    }
+
+    // Check pullquote: > "..."
+    const quoteMatch = trimmed.match(/^>\s+"?([\s\S]*?)"?$/);
+    if (quoteMatch) {
+      return `<blockquote>"${formatInlineToEditorHtml(quoteMatch[1].trim())}"</blockquote>`;
+    }
+
+    // Check image: ![caption](url)
+    const imgMatch = trimmed.match(/^!\[([\s\S]*?)\]\(([\s\S]*?)\)$/);
+    if (imgMatch) {
+      return `<p><img src="${imgMatch[2].trim()}" alt="${imgMatch[1].trim()}" class="my-3 rounded-xl max-w-full" /></p>`;
+    }
+
+    // Check bullet list: lines starting with - or *
+    const lines = trimmed.split('\n').map(l => l.trim()).filter(Boolean);
+    if (lines.length > 0 && lines.every(l => /^[-*]\s+/.test(l))) {
+      const lis = lines.map(l => `<li>${formatInlineToEditorHtml(l.replace(/^[-*]\s+/, '').trim())}</li>`).join('');
+      return `<ul>${lis}</ul>`;
+    }
+
+    // Regular paragraph: preserve single newlines with <br>
+    const pLines = trimmed.split('\n');
+    const innerHtml = pLines.map(line => formatInlineToEditorHtml(line)).join('<br>');
+    return `<p>${innerHtml}</p>`;
+  });
+
+  return htmlBlocks.filter(Boolean).join('');
+};
+
+/**
+ * Converts contentEditable HTML back into clean editorial markdown for storage.
+ */
+export const htmlToEditorMarkdown = (html: string): string => {
+  if (!html || !html.trim()) return '';
+  return convertHtmlToEditorMarkdown(html);
 };

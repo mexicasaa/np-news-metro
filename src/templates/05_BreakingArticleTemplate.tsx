@@ -5,7 +5,7 @@ import { mockAuthors, mockLiveBlog, getLocalizedPost } from '../data/mockWpData'
 import { getStoredPosts } from '../utils/newsStorage';
 import { getArticleBySlug } from '../services/articleService';
 import { handleImageError, getOptimizedImageUrl } from '../utils/imageFallback';
-import { ArticleBody } from '../components/article/ArticleBody';
+import { ArticleBody, renderInlineMarkdown } from '../components/article/ArticleBody';
 import { ArticleShareBar } from '../components/article/ArticleShareBar';
 import { AuthorBioBox } from '../components/article/AuthorBioBox';
 import { LiveTimeline } from '../components/article/LiveTimeline';
@@ -141,8 +141,8 @@ export const BreakingArticleTemplate: React.FC<BreakingArticleTemplateProps> = (
                 {localized.title}
               </h1>
 
-              <p className="text-base sm:text-lg text-ink-secondary leading-relaxed font-normal mb-4">
-                {localized.dek}
+              <p className="text-base sm:text-lg text-ink-secondary leading-relaxed font-normal mb-4 whitespace-pre-line">
+                {renderInlineMarkdown(localized.dek)}
               </p>
 
               {/* Published Date & Time */}

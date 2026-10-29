@@ -9,6 +9,7 @@ import { mockAuthors, getLocalizedPost } from '../../data/mockWpData';
 import { handleImageError, getAuthorAvatarUrl, handleAvatarError, getOptimizedImageUrl } from '../../utils/imageFallback';
 import { useLanguage } from '../../context/LanguageContext';
 import { ShareModal } from '../article/ShareModal';
+import { renderInlineMarkdown } from '../article/ArticleBody';
 import { getCanonicalArticleUrl } from '../../utils/shareUtils';
 import { formatRelativeTime, isFreshStory } from '../../utils/dateUtils';
 
@@ -336,8 +337,8 @@ export const HeroStory: React.FC<HeroStoryProps> = ({
           </h1>
 
           {/* Dek / Executive Summary */}
-          <p className="text-sm sm:text-base md:text-[16px] text-ink-secondary font-normal leading-relaxed">
-            {currentStory.dek}
+          <p className="text-sm sm:text-base md:text-[16px] text-ink-secondary font-normal leading-relaxed whitespace-pre-line">
+            {renderInlineMarkdown(currentStory.dek)}
           </p>
         </div>
 

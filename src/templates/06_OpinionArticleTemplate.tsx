@@ -4,7 +4,7 @@ import { WpPost } from '../types/wordpress';
 import { mockAuthors, getLocalizedPost } from '../data/mockWpData';
 import { getStoredPosts } from '../utils/newsStorage';
 import { getArticleBySlug } from '../services/articleService';
-import { ArticleBody } from '../components/article/ArticleBody';
+import { ArticleBody, renderInlineMarkdown } from '../components/article/ArticleBody';
 import { ArticleShareBar } from '../components/article/ArticleShareBar';
 import { AuthorBioBox } from '../components/article/AuthorBioBox';
 import { RelatedStoriesBlock } from '../components/article/RelatedStoriesBlock';
@@ -101,8 +101,8 @@ export const OpinionArticleTemplate: React.FC<OpinionArticleTemplateProps> = ({
             “{localized.title}”
           </h1>
 
-          <p className="text-base sm:text-lg text-ink-secondary leading-relaxed max-w-xl mx-auto mb-8 font-serif italic">
-            {localized.dek}
+          <p className="text-base sm:text-lg text-ink-secondary leading-relaxed max-w-xl mx-auto mb-8 font-serif italic whitespace-pre-line">
+            {renderInlineMarkdown(localized.dek)}
           </p>
 
           {/* Author Prominent Portrait & Bylines */}

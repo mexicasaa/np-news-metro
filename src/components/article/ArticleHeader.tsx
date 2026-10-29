@@ -4,6 +4,7 @@ import { WpPost } from '../../types/wordpress';
 import { mockAuthors, getLocalizedPost } from '../../data/mockWpData';
 import { useLanguage } from '../../context/LanguageContext';
 import { getAuthorAvatarUrl, handleAvatarError } from '../../utils/imageFallback';
+import { renderInlineMarkdown } from './ArticleBody';
 
 interface ArticleHeaderProps {
   post: WpPost;
@@ -113,8 +114,8 @@ export const ArticleHeader: React.FC<ArticleHeaderProps> = ({
 
       {/* Subheadline / Dek */}
       {localized.dek && (
-        <p className="text-base sm:text-lg text-ink-secondary leading-relaxed font-normal mb-6">
-          {localized.dek}
+        <p className="text-base sm:text-lg text-ink-secondary leading-relaxed font-normal mb-6 whitespace-pre-line">
+          {renderInlineMarkdown(localized.dek)}
         </p>
       )}
 

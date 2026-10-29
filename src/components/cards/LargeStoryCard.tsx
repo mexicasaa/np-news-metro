@@ -7,6 +7,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { ShareModal } from '../article/ShareModal';
 import { getCanonicalArticleUrl } from '../../utils/shareUtils';
 import { formatRelativeTime } from '../../utils/dateUtils';
+import { renderInlineMarkdown } from '../article/ArticleBody';
 
 interface LargeStoryCardProps {
   post: WpPost;
@@ -95,8 +96,8 @@ export const LargeStoryCard: React.FC<LargeStoryCardProps> = ({
           </h3>
 
           {/* Dek Excerpt */}
-          <p className="text-xs sm:text-[13px] text-slate-600 leading-relaxed line-clamp-2">
-            {localized.dek}
+          <p className="text-xs sm:text-[13px] text-slate-600 leading-relaxed line-clamp-2 whitespace-pre-line">
+            {renderInlineMarkdown(localized.dek)}
           </p>
         </div>
       </div>

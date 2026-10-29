@@ -23,17 +23,18 @@ export const renderInlineMarkdown = (text?: string): React.ReactNode => {
   // 1. Links: [anchor text](url)
   // 2. Bold: **bold text**
   // 3. Italic: *italic text*
-  const pattern = /(\[[^\]]+\]\([^)]+\)|\*\*[^*]+\*\*|\*[^*]+\*)/g;
+  const pattern = /(\[[^\]]+\]\([^)]+\)|<a\s+[^>]*href=["'][^"']+["'][^>]*>[\s\S]*?<\/a>|\*\*[^*]+?\*\*|<strong>[\s\S]*?<\/strong>|<b>[\s\S]*?<\/b>|\*[^*]+?\*|<em>[\s\S]*?<\/em>|<i>[\s\S]*?<\/i>)/gi;
   const parts = text.split(pattern);
 
   return parts.map((part, index) => {
     if (!part) return null;
 
-    // Link: [text](url)
-    const linkMatch = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
-    if (linkMatch) {
-      const linkText = linkMatch[1];
-      const linkHref = linkMatch[2].trim();
+    // Link: [text](url) or <a href="...">text</a>
+    const mdLinkMatch = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+    const htmlLinkMatch = part.match(/^<a\s+[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>$/i);
+    if (mdLinkMatch || htmlLinkMatch) {
+      const linkText = mdLinkMatch ? mdLinkMatch[1] : htmlLinkMatch![2];
+      const linkHref = (mdLinkMatch ? mdLinkMatch[2] : htmlLinkMatch![1]).trim();
       const isInternal = linkHref.startsWith('/') || linkHref.startsWith('#');
       return (
         <a
@@ -48,8 +49,10 @@ export const renderInlineMarkdown = (text?: string): React.ReactNode => {
       );
     }
 
-    // Bold: **text**
-    const boldMatch = part.match(/^\*\*([^*]+)\*\*$/);
+    // Bold: **text** or <strong>text</strong> or <b>text</b>
+    const boldMatch = part.match(/^\*\*([^*]+)\*\*$/) ||
+                      part.match(/^<strong>([\s\S]*?)<\/strong>$/i) ||
+                      part.match(/^<b>([\s\S]*?)<\/b>$/i);
     if (boldMatch) {
       return (
         <strong key={index} className="font-bold text-ink">
@@ -58,8 +61,10 @@ export const renderInlineMarkdown = (text?: string): React.ReactNode => {
       );
     }
 
-    // Italic: *text*
-    const italicMatch = part.match(/^\*([^*]+)\*$/);
+    // Italic: *text* or <em>text</em> or <i>text</i>
+    const italicMatch = part.match(/^\*([^*]+)\*$/) ||
+                        part.match(/^<em>([\s\S]*?)<\/em>$/i) ||
+                        part.match(/^<i>([\s\S]*?)<\/i>$/i);
     if (italicMatch) {
       return (
         <em key={index} className="italic">
