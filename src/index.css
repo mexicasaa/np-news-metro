@@ -173,3 +173,57 @@
   -ms-overflow-style: none !important;
   scrollbar-width: none !important;
 }
+
+/* =========================================================================
+   Right-to-Left (RTL) Layout Enhancements for Arabic & Urdu
+   ========================================================================= */
+[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
+
+[dir="rtl"] body {
+  direction: rtl;
+  text-align: right;
+  font-family: 'Segoe UI', 'Noto Sans Arabic', 'Tahoma', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+[dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] h4, [dir="rtl"] h5, [dir="rtl"] h6 {
+  font-family: 'Segoe UI', 'Noto Sans Arabic', 'Tahoma', Georgia, serif;
+  text-align: right;
+}
+
+[dir="rtl"] .gutenberg-content {
+  direction: rtl;
+  text-align: right;
+}
+
+[dir="rtl"] .gutenberg-content p {
+  direction: rtl;
+  text-align: right;
+}
+
+[dir="rtl"] .gutenberg-content blockquote {
+  border-left: none;
+  border-right: 3px solid #162839;
+  padding-left: 0;
+  padding-right: 1.25rem;
+  text-align: right;
+}
+
+[dir="rtl"] .gutenberg-content ul,
+[dir="rtl"] .gutenberg-content ol {
+  padding-left: 0;
+  padding-right: 1.5rem;
+}
+
+[dir="rtl"] .newspaper-col-divider {
+  border-right: none;
+  border-left: 1px solid #E5E7EB;
+}
+
+[dir="rtl"] .first-letter\:float-left::first-letter {
+  float: right;
+  margin-left: 0.75rem;
+  margin-right: 0;
+}

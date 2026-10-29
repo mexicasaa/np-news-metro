@@ -2,6 +2,7 @@ import React from 'react';
 import { Quote, Feather, ShieldCheck, Flame, BookOpen, ArrowRight } from 'lucide-react';
 import { WpPost } from '../types/wordpress';
 import { mockAuthors, getLocalizedPost } from '../data/mockWpData';
+import { ensurePostTranslated } from '../services/translationService';
 import { getStoredPosts } from '../utils/newsStorage';
 import { getArticleBySlug } from '../services/articleService';
 import { ArticleBody, renderInlineMarkdown } from '../components/article/ArticleBody';
@@ -33,6 +34,12 @@ export const OpinionArticleTemplate: React.FC<OpinionArticleTemplateProps> = ({
   if (!post) return null;
   const { language, t, isHindi } = useLanguage();
   const localized = getLocalizedPost(post, language);
+
+  React.useEffect(() => {
+    if (post) {
+      ensurePostTranslated(post, language);
+    }
+  }, [post?.id, language]);
 
   // Self-healing: if the active post only has a single placeholder block, fetch full article on-demand
   React.useEffect(() => {

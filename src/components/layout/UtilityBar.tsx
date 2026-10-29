@@ -2,6 +2,7 @@ import React from 'react';
 import { Calendar, CloudSun, Globe, Newspaper, Mail, ShieldCheck, Languages } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { getFormattedTodayDate } from '../../i18n/translations';
+import { LanguageSelector } from './LanguageSelector';
 
 interface UtilityBarProps {
   onSelectEdition?: (edition: string) => void;
@@ -65,31 +66,8 @@ export const UtilityBar: React.FC<UtilityBarProps> = ({
 
         {/* Right: Language Switcher & Quick Editorial Links */}
         <div className="flex items-center gap-2 sm:gap-3 font-semibold flex-shrink-0">
-          {/* Prominent Language Switcher Button */}
-          <div className="flex items-center bg-surface-container border border-border-subtle rounded-md p-0.5 shadow-2xs">
-            <button
-              onClick={() => setLanguage('en')}
-              className={`px-2 py-0.5 rounded-sm text-[10px] font-bold tracking-wider transition-all flex items-center gap-1 ${
-                language === 'en'
-                  ? 'bg-primary text-white shadow-xs font-extrabold'
-                  : 'text-ink-secondary hover:text-primary'
-              }`}
-              title="Switch to English"
-            >
-              <span>EN</span>
-            </button>
-            <button
-              onClick={() => setLanguage('hi')}
-              className={`px-2 py-0.5 rounded-sm text-[11px] font-bold transition-all flex items-center gap-1 ${
-                language === 'hi'
-                  ? 'bg-primary text-white shadow-xs font-extrabold'
-                  : 'text-ink-secondary hover:text-primary'
-              }`}
-              title="हिंदी में बदलें"
-            >
-              <span>हिंदी</span>
-            </button>
-          </div>
+          {/* Multilingual Selector */}
+          <LanguageSelector variant="utility-bar" />
 
           <button
             onClick={() => onNavigate?.('static', { page: 'epaper' })}

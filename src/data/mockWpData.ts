@@ -1912,30 +1912,4 @@ export const mockAdSlots: Record<string, AdSlotConfig> = {
   },
 };
 
-export const getLocalizedPost = (post: WpPost, lang: 'en' | 'hi'): WpPost => {
-  if (lang === 'hi') {
-    return {
-      ...post,
-      title: post.titleHi || post.title,
-      dek: post.dekHi || post.dek,
-      category: (post.categoryHi || post.category) as any,
-      imageCaption: post.imageCaptionHi || post.imageCaption,
-      keyTakeaways: post.keyTakeawaysHi || post.keyTakeaways,
-      blocks: post.blocksHi || post.blocks,
-    };
-  }
-  return post;
-};
-
-export const getLocalizedVideo = (video: WpVideo, lang: 'en' | 'hi'): WpVideo => {
-  if (lang === 'hi') {
-    return {
-      ...video,
-      title: video.titleHi || video.title,
-      caption: video.captionHi || video.caption,
-      category: video.categoryHi || video.category,
-    };
-  }
-  return video;
-};
-
+export { getLocalizedPost, getLocalizedVideo } from '../services/translationService';

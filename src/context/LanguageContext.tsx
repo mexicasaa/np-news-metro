@@ -1,5 +1,16 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { Language, translations, Translations } from '../i18n/translations';
+import { 
+  detectInitialLanguage, 
+  recordManualLanguageSelection, 
+  isRtlLanguage, 
+  LANGUAGE_STORAGE_KEY 
+} from '../utils/geoDetection';
+import { 
+  SUPPORTED_LANGUAGES, 
+  SupportedLanguageInfo, 
+  subscribeTranslationUpdates 
+} from '../services/translationService';
 
 interface LanguageContextType {
   language: Language;
@@ -7,47 +18,69 @@ interface LanguageContextType {
   toggleLanguage: () => void;
   t: Translations;
   isHindi: boolean;
+  isRtl: boolean;
+  dir: 'ltr' | 'rtl';
+  supportedLanguages: SupportedLanguageInfo[];
+  translationTick: number;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-const STORAGE_KEY = 'np_news_language_preference_v2';
-
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Automatically select language on first visit based on region & browser,
+  // while strictly giving visitor's manual selection priority if previously saved.
   const [language, setLanguageState] = useState<Language>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved === 'hi' || saved === 'en') return saved;
-    } catch {
-      // ignore
-    }
-    return 'hi'; // Default permanent language is Hindi
+    return detectInitialLanguage();
   });
 
-  const setLanguage = (lang: Language) => {
+  const [translationTick, setTranslationTick] = useState(0);
+
+  // Subscribe to background translation resolutions
+  useEffect(() => {
+    const unsubscribe = subscribeTranslationUpdates(() => {
+      setTranslationTick((tick) => tick + 1);
+    });
+    return unsubscribe;
+  }, []);
+
+  const isRtl = isRtlLanguage(language);
+  const dir: 'ltr' | 'rtl' = isRtl ? 'rtl' : 'ltr';
+
+  const setLanguage = useCallback((lang: Language) => {
     setLanguageState(lang);
+    recordManualLanguageSelection(lang);
     try {
-      localStorage.setItem(STORAGE_KEY, lang);
       document.documentElement.lang = lang;
+      document.documentElement.dir = isRtlLanguage(lang) ? 'rtl' : 'ltr';
     } catch {
       // ignore
     }
-  };
+  }, []);
 
-  const toggleLanguage = () => {
+  const toggleLanguage = useCallback(() => {
     setLanguage(language === 'en' ? 'hi' : 'en');
-  };
+  }, [language, setLanguage]);
 
+  // Synchronize document attributes on language change
   useEffect(() => {
-    document.documentElement.lang = language;
-  }, [language]);
+    try {
+      document.documentElement.lang = language;
+      document.documentElement.dir = dir;
+    } catch {
+      // ignore
+    }
+  }, [language, dir]);
 
   const value: LanguageContextType = {
     language,
     setLanguage,
     toggleLanguage,
-    t: translations[language],
+    t: translations[language] || translations.en,
     isHindi: language === 'hi',
+    isRtl,
+    dir,
+    supportedLanguages: SUPPORTED_LANGUAGES,
+    translationTick,
   };
 
   return (

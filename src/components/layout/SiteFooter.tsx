@@ -2,6 +2,7 @@ import React from 'react';
 import { Mail, ArrowRight, ShieldCheck, Rss, Globe, Award, ExternalLink } from 'lucide-react';
 import { mockCategories } from '../../data/mockWpData';
 import { useLanguage } from '../../context/LanguageContext';
+import { LanguageSelector } from './LanguageSelector';
 
 interface SiteFooterProps {
   onNavigateCategory: (slug: string) => void;
@@ -174,6 +175,8 @@ export const SiteFooter: React.FC<SiteFooterProps> = ({
           </div>
 
           <div className="flex items-center gap-3 flex-wrap">
+            <LanguageSelector variant="footer" />
+            <span>•</span>
             <a href="/sitemap" onClick={(e) => { e.preventDefault(); onNavigateStatic('sitemap'); }} className="flex items-center gap-1 hover:text-white transition-colors font-bold text-slate-200 cursor-pointer">
               <Globe className="w-3.5 h-3.5 text-secondary-gold" />
               <span>{isHindi ? 'साइटमैप (Sitemap)' : 'Sitemap Directory'}</span>

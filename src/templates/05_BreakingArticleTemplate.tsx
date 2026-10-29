@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Radio, Clock, AlertTriangle, Flame, Share2, RefreshCw, Pin } from 'lucide-react';
 import { WpPost } from '../types/wordpress';
 import { mockAuthors, mockLiveBlog, getLocalizedPost } from '../data/mockWpData';
+import { ensurePostTranslated } from '../services/translationService';
 import { getStoredPosts } from '../utils/newsStorage';
 import { getArticleBySlug } from '../services/articleService';
 import { handleImageError, getOptimizedImageUrl } from '../utils/imageFallback';
@@ -35,6 +36,12 @@ export const BreakingArticleTemplate: React.FC<BreakingArticleTemplateProps> = (
   if (!post) return null;
   const { language, t, isHindi } = useLanguage();
   const localized = getLocalizedPost(post, language);
+
+  React.useEffect(() => {
+    if (post) {
+      ensurePostTranslated(post, language);
+    }
+  }, [post?.id, language]);
 
   // Self-healing: if the active post only has a single placeholder block, fetch full article on-demand
   React.useEffect(() => {

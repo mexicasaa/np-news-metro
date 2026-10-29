@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Clock, User, ShieldCheck, Flame, MessageSquare, AlertCircle, Share2, ExternalLink } from 'lucide-react';
 import { WpPost } from '../types/wordpress';
 import { mockAuthors, getLocalizedPost } from '../data/mockWpData';
+import { ensurePostTranslated } from '../services/translationService';
 import { getStoredPosts } from '../utils/newsStorage';
 import { getArticleBySlug } from '../services/articleService';
 import { handleImageError, getOptimizedImageUrl } from '../utils/imageFallback';
@@ -43,6 +44,13 @@ export const StandardArticleTemplate: React.FC<StandardArticleTemplateProps> = (
   const [commentsOpen, setCommentsOpen] = useState(false);
   const { language, t, isHindi } = useLanguage();
   const localized = getLocalizedPost(post, language);
+
+  // Ensure full post is translated dynamically into target language
+  React.useEffect(() => {
+    if (post) {
+      ensurePostTranslated(post, language);
+    }
+  }, [post?.id, language]);
 
   // Self-healing: if the active post only has a single placeholder block (e.g. from homepage cards), fetch full article on-demand
   React.useEffect(() => {

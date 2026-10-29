@@ -1,16 +1,50 @@
+import { Language } from '../i18n/translations';
+
 /**
- * High-precision, bilingual (Hindi/English) editorial date & relative time utilities
- * for NP News Metro. Ensures all articles display genuine, clear publication timestamps.
+ * High-precision, multilingual editorial date & relative time utilities
+ * for NP News Metro. Ensures all articles display genuine, clear publication timestamps
+ * in the visitor's selected language.
  */
+
+const LOCALE_MAP: Record<string, string> = {
+  hi: 'hi-IN',
+  en: 'en-US',
+  es: 'es-ES',
+  fr: 'fr-FR',
+  de: 'de-DE',
+  zh: 'zh-CN',
+  ja: 'ja-JP',
+  ar: 'ar-SA',
+  ru: 'ru-RU',
+  pt: 'pt-BR',
+  it: 'it-IT',
+  bn: 'bn-IN',
+  mr: 'mr-IN',
+  ta: 'ta-IN',
+  te: 'te-IN',
+  gu: 'gu-IN',
+  ur: 'ur-PK',
+};
 
 export const formatRelativeTime = (
   dateInput?: string | number | Date | null,
-  lang: 'hi' | 'en' = 'hi'
+  lang: Language = 'hi'
 ): string => {
-  if (!dateInput) return lang === 'hi' ? 'हाल ही में' : 'Recently';
+  if (!dateInput) {
+    if (lang === 'hi') return 'हाल ही में';
+    if (lang === 'ar') return 'مؤخراً';
+    if (lang === 'fr') return 'Récemment';
+    if (lang === 'es') return 'Recientemente';
+    if (lang === 'de') return 'Kürzlich';
+    if (lang === 'ja') return '最近';
+    if (lang === 'zh') return '近期';
+    return 'Recently';
+  }
 
   const date = new Date(dateInput);
-  if (isNaN(date.getTime())) return lang === 'hi' ? 'हाल ही में' : 'Recently';
+  if (isNaN(date.getTime())) {
+    return lang === 'hi' ? 'हाल ही में' : 'Recently';
+  }
 
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
@@ -18,41 +52,70 @@ export const formatRelativeTime = (
   const diffHours = Math.floor(diffMs / (60 * 60 * 1000));
   const diffDays = Math.floor(diffMs / (24 * 60 * 60 * 1000));
 
-  // If timestamp is slightly in future due to server clock drift
+  const locale = LOCALE_MAP[lang] || 'en-US';
+
+  // If timestamp is slightly in future or <1 min
   if (diffMinutes < 1) {
-    return lang === 'hi' ? 'अभी-अभी' : 'Just now';
+    if (lang === 'hi') return 'अभी-अभी';
+    if (lang === 'ar') return 'الآن';
+    if (lang === 'fr') return 'À l\'instant';
+    if (lang === 'es') return 'Ahora mismo';
+    if (lang === 'de') return 'Gerade eben';
+    if (lang === 'ja') return 'たった今';
+    if (lang === 'zh') return '刚刚';
+    return 'Just now';
   }
 
   // Under 60 minutes
   if (diffMinutes < 60) {
-    return lang === 'hi' ? `${diffMinutes} मिनट पहले` : `${diffMinutes}m ago`;
+    try {
+      const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'always' });
+      return rtf.format(-diffMinutes, 'minute');
+    } catch {
+      return lang === 'hi' ? `${diffMinutes} मिनट पहले` : `${diffMinutes}m ago`;
+    }
   }
 
   // Under 24 hours
   if (diffHours < 24) {
-    return lang === 'hi' ? `${diffHours} घंटे पहले` : `${diffHours}h ago`;
+    try {
+      const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'always' });
+      return rtf.format(-diffHours, 'hour');
+    } catch {
+      return lang === 'hi' ? `${diffHours} घंटे पहले` : `${diffHours}h ago`;
+    }
   }
 
   // Yesterday
   if (diffDays === 1) {
-    const timeStr = date.toLocaleTimeString(lang === 'hi' ? 'hi-IN' : 'en-US', {
+    const timeStr = date.toLocaleTimeString(locale, {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false,
       timeZone: 'Asia/Kolkata',
     });
-    return lang === 'hi' ? `कल, ${timeStr} IST` : `Yesterday, ${timeStr} IST`;
+    if (lang === 'hi') return `कल, ${timeStr} IST`;
+    if (lang === 'ar') return `أمس، ${timeStr} IST`;
+    if (lang === 'fr') return `Hier, ${timeStr} IST`;
+    if (lang === 'es') return `Ayer, ${timeStr} IST`;
+    if (lang === 'de') return `Gestern, ${timeStr} IST`;
+    return `Yesterday, ${timeStr} IST`;
   }
 
   // Under 7 days
   if (diffDays < 7) {
-    return lang === 'hi' ? `${diffDays} दिन पहले` : `${diffDays}d ago`;
+    try {
+      const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'always' });
+      return rtf.format(-diffDays, 'day');
+    } catch {
+      return lang === 'hi' ? `${diffDays} दिन पहले` : `${diffDays}d ago`;
+    }
   }
 
   // Same year
   const isSameYear = date.getFullYear() === now.getFullYear();
   if (isSameYear) {
-    return date.toLocaleDateString(lang === 'hi' ? 'hi-IN' : 'en-IN', {
+    return date.toLocaleDateString(locale, {
       day: 'numeric',
       month: 'short',
       timeZone: 'Asia/Kolkata',
@@ -60,7 +123,7 @@ export const formatRelativeTime = (
   }
 
   // Full calendar date
-  return date.toLocaleDateString(lang === 'hi' ? 'hi-IN' : 'en-IN', {
+  return date.toLocaleDateString(locale, {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
@@ -70,20 +133,22 @@ export const formatRelativeTime = (
 
 export const formatFullArticleDate = (
   dateInput?: string | number | Date | null,
-  lang: 'hi' | 'en' = 'hi'
+  lang: Language = 'hi'
 ): string => {
   if (!dateInput) return '';
   const date = new Date(dateInput);
   if (isNaN(date.getTime())) return '';
 
-  const datePart = date.toLocaleDateString(lang === 'hi' ? 'hi-IN' : 'en-IN', {
+  const locale = LOCALE_MAP[lang] || 'en-US';
+
+  const datePart = date.toLocaleDateString(locale, {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
     timeZone: 'Asia/Kolkata',
   });
 
-  const timePart = date.toLocaleTimeString(lang === 'hi' ? 'hi-IN' : 'en-IN', {
+  const timePart = date.toLocaleTimeString(locale, {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,

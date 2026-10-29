@@ -2,6 +2,7 @@ import React from 'react';
 import { X, Search, ChevronRight, Newspaper, Mail, ShieldCheck, TrendingUp, Video, Camera, Globe, Languages } from 'lucide-react';
 import { mockCategories } from '../../data/mockWpData';
 import { useLanguage } from '../../context/LanguageContext';
+import { LanguageSelector } from './LanguageSelector';
 
 interface MobileDrawerProps {
   isOpen: boolean;
@@ -54,34 +55,8 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
         </div>
 
         {/* Mobile Language Switcher Bar */}
-        <div className="px-4 py-2.5 bg-surface-container border-b border-border-subtle flex items-center justify-between">
-          <span className="text-xs font-bold text-ink flex items-center gap-1.5">
-            <Languages className="w-4 h-4 text-primary" />
-            <span>{isHindi ? 'भाषा चुनें (Language)' : 'Select Language'}</span>
-          </span>
-
-          <div className="flex items-center bg-white border border-border-subtle rounded-md p-0.5 shadow-2xs">
-            <button
-              onClick={() => setLanguage('en')}
-              className={`px-2.5 py-1 rounded-sm text-[11px] font-bold uppercase transition-all ${
-                language === 'en'
-                  ? 'bg-primary text-white shadow-xs'
-                  : 'text-ink-secondary hover:text-primary'
-              }`}
-            >
-              English
-            </button>
-            <button
-              onClick={() => setLanguage('hi')}
-              className={`px-2.5 py-1 rounded-sm text-[11px] font-bold transition-all ${
-                language === 'hi'
-                  ? 'bg-primary text-white shadow-xs'
-                  : 'text-ink-secondary hover:text-primary'
-              }`}
-            >
-              हिंदी
-            </button>
-          </div>
+        <div className="p-4 bg-surface-container border-b border-border-subtle">
+          <LanguageSelector variant="mobile-drawer" />
         </div>
 
         {/* Search Input Bar */}
