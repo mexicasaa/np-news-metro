@@ -34,12 +34,15 @@ export default defineConfig(({ mode }) => {
               });
               req.on('end', async () => {
                 try {
-                  const { default: translateHandler } = await import('./api/translate.js');
+                  const { default: engagementHandler } = await import('./api/engagement.js');
                   const parsedBody = bodyStr ? JSON.parse(bodyStr) : {};
                   const mockReq = {
                     method: req.method,
                     body: parsedBody,
-                    query: Object.fromEntries(new URL(req.url || '', 'http://localhost').searchParams.entries()),
+                    query: {
+                      ...Object.fromEntries(new URL(req.url || '', 'http://localhost').searchParams.entries()),
+                      action: 'translate',
+                    },
                   };
                   let statusCode = 200;
                   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
@@ -56,7 +59,7 @@ export default defineConfig(({ mode }) => {
                       res.end();
                     }
                   };
-                  await translateHandler(mockReq, mockRes);
+                  await engagementHandler(mockReq, mockRes);
                 } catch (err: any) {
                   res.statusCode = 500;
                   res.setHeader('Content-Type', 'application/json');

@@ -97,6 +97,10 @@
       "destination": "/api/engagement?action=ads"
     },
     {
+      "source": "/api/translate",
+      "destination": "/api/engagement?action=translate"
+    },
+    {
       "source": "/api/markets",
       "destination": "/api/markets.js"
     },

@@ -12,7 +12,123 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 const adWarmCache = new Map();
 const AD_CACHE_TTL = 15 * 60 * 1000; // 15 minutes
 
+// In-memory warm RAM cache for translation (strictly NON-database)
+const translationWarmCache = new Map();
+const MAX_TRANSLATION_CACHE = 5000;
+
+function getCacheKey(text, targetLang, sourceLang = 'auto') {
+  return `${sourceLang}:${targetLang}:${text.trim()}`;
+}
+
+function getFromCache(text, targetLang, sourceLang = 'auto') {
+  const key = getCacheKey(text, targetLang, sourceLang);
+  return translationWarmCache.get(key) || null;
+}
+
+function setToCache(text, targetLang, translated, sourceLang = 'auto') {
+  if (!text || !translated) return;
+  if (translationWarmCache.size >= MAX_TRANSLATION_CACHE) {
+    const oldest = translationWarmCache.keys().next().value;
+    translationWarmCache.delete(oldest);
+  }
+  const key = getCacheKey(text, targetLang, sourceLang);
+  translationWarmCache.set(key, translated);
+}
+
+// Single text translation via Google Translate client endpoint
+async function translateWithGoogle(text, targetLang, sourceLang = 'auto') {
+  const clean = text.trim();
+  if (!clean) return clean;
+
+  const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${encodeURIComponent(sourceLang)}&tl=${encodeURIComponent(targetLang)}&dt=t&q=${encodeURIComponent(clean)}`;
+
+  const res = await fetch(url, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)',
+      'Accept': '*/*',
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error(`Google translate returned status ${res.status}`);
+  }
+
+  const data = await res.json();
+  if (Array.isArray(data) && Array.isArray(data[0])) {
+    const translated = data[0].map((item) => (item && item[0]) || '').join('');
+    return translated || clean;
+  }
+
+  return clean;
+}
+
+// Fallback translation via MyMemory API
+async function translateWithMyMemory(text, targetLang, sourceLang = 'auto') {
+  const clean = text.trim();
+  if (!clean) return clean;
+
+  const src = sourceLang === 'auto' ? 'en' : sourceLang;
+  const langpair = `${src}|${targetLang}`;
+  const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(clean)}&langpair=${encodeURIComponent(langpair)}`;
+
+  const res = await fetch(url, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0',
+      'Accept': 'application/json',
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error(`MyMemory returned status ${res.status}`);
+  }
+
+  const data = await res.json();
+  if (data?.responseData?.translatedText) {
+    return data.responseData.translatedText;
+  }
+
+  return clean;
+}
+
+async function translateSingle(text, targetLang, sourceLang = 'auto') {
+  const clean = text?.trim();
+  if (!clean) return text;
+
+  // Check cache first
+  const cached = getFromCache(clean, targetLang, sourceLang);
+  if (cached) return cached;
+
+  // 1. Try Google Translate gtx
+  try {
+    const result = await translateWithGoogle(clean, targetLang, sourceLang);
+    if (result && result !== clean) {
+      setToCache(clean, targetLang, result, sourceLang);
+      return result;
+    }
+  } catch (err) {}
+
+  // 2. Try MyMemory fallback
+  try {
+    const result = await translateWithMyMemory(clean, targetLang, sourceLang);
+    if (result && result !== clean) {
+      setToCache(clean, targetLang, result, sourceLang);
+      return result;
+    }
+  } catch (err) {}
+
+  return text;
+}
+
 export default async function handler(req, res) {
+  // CORS support
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   const action = req.query?.action || 'likes';
   const method = req.method;
 
@@ -376,6 +492,52 @@ export default async function handler(req, res) {
       } catch (err) {
         return res.status(200).json({ success: false, error: err.message });
       }
+    }
+  }
+
+  // ==========================================
+  // 6. TRANSLATE HANDLER (Dynamic Multilingual)
+  // ==========================================
+  if (action === 'translate') {
+    const payload = {
+      ...(req.query || {}),
+      ...body,
+    };
+    const { text, texts, targetLang, sourceLang = 'auto' } = payload;
+
+    if (!targetLang) {
+      return res.status(400).json({ error: 'Missing targetLang parameter' });
+    }
+
+    try {
+      // Batch translation
+      if (Array.isArray(texts)) {
+        const results = await Promise.all(
+          texts.map(async (t) => {
+            if (typeof t !== 'string' || !t.trim()) return t;
+            return translateSingle(t, targetLang, sourceLang);
+          })
+        );
+        res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800');
+        return res.status(200).json({ translations: results, targetLang, sourceLang });
+      }
+
+      // Single translation
+      if (typeof text === 'string') {
+        const result = await translateSingle(text, targetLang, sourceLang);
+        res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800');
+        return res.status(200).json({ translation: result, targetLang, sourceLang });
+      }
+
+      return res.status(400).json({ error: 'Missing text or texts in request body' });
+    } catch (err) {
+      console.error('Translation error in engagement handler:', err);
+      return res.status(200).json({
+        translation: text || '',
+        translations: Array.isArray(texts) ? texts : [],
+        fallback: true,
+        error: err?.message || 'Translation failed',
+      });
     }
   }
 
