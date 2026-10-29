@@ -121,21 +121,39 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    if (typeof res.status === 'function') {
+      return res.status(200).end();
+    }
+    res.statusCode = 200;
+    return res.end();
   }
+
+  const sendJson = (statusCode, data) => {
+    if (typeof res.status === 'function' && typeof res.json === 'function') {
+      return res.status(statusCode).json(data);
+    }
+    res.statusCode = statusCode;
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    return res.end(JSON.stringify(data));
+  };
 
   try {
     let body = {};
     if (req.method === 'POST') {
       body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
     } else {
-      body = req.query || {};
+      let queryParams = {};
+      try {
+        const parsedUrl = new URL(req.url || '', 'https://www.npnewsmetro.com');
+        queryParams = Object.fromEntries(parsedUrl.searchParams.entries());
+      } catch (e) {}
+      body = { ...queryParams, ...(req.query || {}) };
     }
 
     const { text, texts, targetLang, sourceLang = 'auto' } = body;
 
     if (!targetLang) {
-      return res.status(400).json({ error: 'Missing targetLang parameter' });
+      return sendJson(400, { error: 'Missing targetLang parameter' });
     }
 
     // Batch translation
@@ -147,21 +165,21 @@ export default async function handler(req, res) {
         })
       );
       res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800');
-      return res.status(200).json({ translations: results, targetLang, sourceLang });
+      return sendJson(200, { translations: results, targetLang, sourceLang });
     }
 
     // Single translation
     if (typeof text === 'string') {
       const result = await translateSingle(text, targetLang, sourceLang);
       res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800');
-      return res.status(200).json({ translation: result, targetLang, sourceLang });
+      return sendJson(200, { translation: result, targetLang, sourceLang });
     }
 
-    return res.status(400).json({ error: 'Missing text or texts in request body' });
+    return sendJson(400, { error: 'Missing text or texts in request body' });
   } catch (err) {
     console.error('Translation handler error:', err);
     // Return original input as fallback so nothing breaks
-    return res.status(200).json({
+    return sendJson(200, {
       translation: req.body?.text || '',
       translations: Array.isArray(req.body?.texts) ? req.body.texts : [],
       fallback: true,

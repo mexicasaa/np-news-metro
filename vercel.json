@@ -101,10 +101,6 @@
       "destination": "/api/markets.js"
     },
     {
-      "source": "/api/translate",
-      "destination": "/api/translate.js"
-    },
-    {
       "source": "/sitemap_index.xml",
       "destination": "/api/feeds?type=index"
     },

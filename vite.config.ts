@@ -2,7 +2,6 @@ import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import { generateRobotsTxt, generateAdsTxt } from './src/services/sitemapService';
 import { processR2Upload } from './api/r2-upload.js';
-import translateHandler from './api/translate.js';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -35,6 +34,7 @@ export default defineConfig(({ mode }) => {
               });
               req.on('end', async () => {
                 try {
+                  const { default: translateHandler } = await import('./api/translate.js');
                   const parsedBody = bodyStr ? JSON.parse(bodyStr) : {};
                   const mockReq = {
                     method: req.method,
