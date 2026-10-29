@@ -212,6 +212,33 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       document.removeEventListener('selectionchange', onSelectionChange);
     };
   }, [updateToolbarActiveStates]);
+
+  const [isEditorEmpty, setIsEditorEmpty] = useState(() => {
+    if (initialPost?.blocks && initialPost.blocks.length > 0) return false;
+    if (initialPost?.content && initialPost.content.trim()) return false;
+    return true;
+  });
+
+  useEffect(() => {
+    try {
+      document.execCommand('defaultParagraphSeparator', false, 'p');
+    } catch {}
+
+    if (editorRef.current) {
+      if (!editorRef.current.innerHTML || editorRef.current.innerHTML.trim() === '') {
+        const initialBody = (initialPost?.blocks && initialPost.blocks.length > 0)
+          ? initialPost.blocks.map(b => b.content || '').join('\n\n')
+          : (initialPost?.content || '');
+        if (initialBody.trim()) {
+          editorRef.current.innerHTML = markdownToEditorHtml(initialBody);
+          setIsEditorEmpty(false);
+        } else {
+          editorRef.current.innerHTML = '<p><br></p>';
+          setIsEditorEmpty(true);
+        }
+      }
+    }
+  }, []);
   
   const [content, setContent] = useState(() => {
     if (initialPost?.blocks && initialPost.blocks.length > 0) {
@@ -440,6 +467,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
           }).join('\n\n')
         : (initialPost.content || initialPost.dek || '');
       setContent(targetContent);
+      setIsEditorEmpty(!targetContent.trim());
       if (editorRef.current && document.activeElement !== editorRef.current) {
         editorRef.current.innerHTML = markdownToEditorHtml(targetContent);
       }
@@ -470,6 +498,10 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       setTitle('');
       setDek('');
       setContent('');
+      setIsEditorEmpty(true);
+      if (editorRef.current) {
+        editorRef.current.innerHTML = '<p><br></p>';
+      }
       setSlug('');
       setDeskId('india');
       setCategory('india');
@@ -531,17 +563,28 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     const currentHtml = editorRef.current.innerHTML;
     const markdown = htmlToEditorMarkdown(currentHtml);
     setContent(markdown);
+
+    const textLen = (editorRef.current.textContent || '').trim().length;
+    const hasMedia = Boolean(editorRef.current.querySelector('img, iframe, blockquote, ul, ol, h2, h3'));
+    setIsEditorEmpty(textLen === 0 && !hasMedia);
+
     setTimeout(() => {
       isUserTypingRef.current = false;
     }, 150);
   }, []);
 
   const handleEditorKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    // If typing a printable character into empty editor, hide placeholder immediately
+    if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      setIsEditorEmpty(false);
+    }
+
     // Bold: Ctrl+B or Cmd+B
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
       e.preventDefault();
       document.execCommand('bold', false);
       syncContentFromDom();
+      updateToolbarActiveStates();
       setTimeout(updateToolbarActiveStates, 10);
       return;
     }
@@ -550,6 +593,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       e.preventDefault();
       document.execCommand('italic', false);
       syncContentFromDom();
+      updateToolbarActiveStates();
       setTimeout(updateToolbarActiveStates, 10);
       return;
     }
@@ -558,16 +602,40 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
   const handleToolbarBold = () => {
     if (!editorRef.current) return;
     editorRef.current.focus();
+
+    // Ensure selection/range is inside editor
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0 || !editorRef.current.contains(sel.anchorNode)) {
+      const range = document.createRange();
+      range.selectNodeContents(editorRef.current);
+      range.collapse(false);
+      sel?.removeAllRanges();
+      sel?.addRange(range);
+    }
+
     document.execCommand('bold', false);
     syncContentFromDom();
+    updateToolbarActiveStates();
     setTimeout(updateToolbarActiveStates, 10);
   };
 
   const handleToolbarItalic = () => {
     if (!editorRef.current) return;
     editorRef.current.focus();
+
+    // Ensure selection/range is inside editor
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0 || !editorRef.current.contains(sel.anchorNode)) {
+      const range = document.createRange();
+      range.selectNodeContents(editorRef.current);
+      range.collapse(false);
+      sel?.removeAllRanges();
+      sel?.addRange(range);
+    }
+
     document.execCommand('italic', false);
     syncContentFromDom();
+    updateToolbarActiveStates();
     setTimeout(updateToolbarActiveStates, 10);
   };
 
@@ -575,15 +643,27 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     if (!editorRef.current) return;
     editorRef.current.focus();
     const tag = level === 2 ? '<h2>' : '<h3>';
-    document.execCommand('formatBlock', false, tag);
+    const currentBlock = document.queryCommandValue('formatBlock');
+    if (currentBlock && currentBlock.toLowerCase() === (level === 2 ? 'h2' : 'h3')) {
+      document.execCommand('formatBlock', false, '<p>');
+    } else {
+      document.execCommand('formatBlock', false, tag);
+    }
     syncContentFromDom();
+    updateToolbarActiveStates();
   };
 
   const handleToolbarQuote = () => {
     if (!editorRef.current) return;
     editorRef.current.focus();
-    document.execCommand('formatBlock', false, '<blockquote>');
+    const currentBlock = document.queryCommandValue('formatBlock');
+    if (currentBlock && currentBlock.toLowerCase() === 'blockquote') {
+      document.execCommand('formatBlock', false, '<p>');
+    } else {
+      document.execCommand('formatBlock', false, '<blockquote>');
+    }
     syncContentFromDom();
+    updateToolbarActiveStates();
   };
 
   const handleToolbarList = () => {
@@ -1513,6 +1593,12 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                       e.preventDefault();
                       handleToolbarBold();
                     }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleToolbarBold();
+                      }
+                    }}
                     className={`p-1.5 rounded-md transition-all cursor-pointer flex items-center justify-center ${
                       isBoldActive
                         ? 'bg-slate-900 text-white shadow-xs ring-1 ring-slate-900 font-bold scale-[1.05]'
@@ -1527,6 +1613,12 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                     onMouseDown={(e) => {
                       e.preventDefault();
                       handleToolbarItalic();
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleToolbarItalic();
+                      }
                     }}
                     className={`p-1.5 rounded-md transition-all cursor-pointer flex items-center justify-center ${
                       isItalicActive
@@ -1590,8 +1682,8 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
               </div>
 
               <div className="relative px-6 sm:px-10 py-6">
-                {(!content || !content.trim()) && (
-                  <div className="absolute top-6 left-6 sm:left-10 text-base sm:text-lg text-slate-300 font-serif pointer-events-none select-none">
+                {isEditorEmpty && (
+                  <div className="absolute top-6 left-6 sm:left-10 text-base sm:text-lg text-slate-300 font-serif italic pointer-events-none select-none">
                     Tell your story...
                   </div>
                 )}
@@ -1600,6 +1692,9 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                   contentEditable
                   suppressContentEditableWarning
                   onInput={() => {
+                    const textLen = (editorRef.current?.textContent || '').trim().length;
+                    const hasMedia = Boolean(editorRef.current?.querySelector('img, iframe, blockquote, ul, ol, h2, h3'));
+                    setIsEditorEmpty(textLen === 0 && !hasMedia);
                     syncContentFromDom();
                     updateToolbarActiveStates();
                   }}

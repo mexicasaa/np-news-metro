@@ -28,6 +28,7 @@ export const formatArticleText = (text: string): string => {
 /**
  * Safely converts rich HTML into clean text/markdown while strictly preserving paragraph
  * integrity and preventing broken asterisk clusters or unwanted line gaps.
+ * Properly walks child nodes so root-level text nodes and inline elements are never discarded.
  */
 export const convertHtmlToEditorMarkdown = (html: string): string => {
   if (!html || !html.trim()) return '';
@@ -41,7 +42,11 @@ export const convertHtmlToEditorMarkdown = (html: string): string => {
       'script, style, noscript, iframe, svg, button, form, nav, header, footer, [aria-hidden="true"]'
     ).forEach(el => el.remove());
 
-    const serializeNode = (node: Node): string => {
+    const isBlockTag = (tag: string): boolean => {
+      return ['p', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'ul', 'ol', 'article', 'section', 'hr'].includes(tag);
+    };
+
+    const serializeInline = (node: Node): string => {
       if (node.nodeType === Node.TEXT_NODE) {
         return node.textContent || '';
       }
@@ -52,10 +57,11 @@ export const convertHtmlToEditorMarkdown = (html: string): string => {
       const el = node as HTMLElement;
       const tag = el.tagName.toLowerCase();
 
-      const fontWeight = (el as any).style?.fontWeight;
+      // Bold detection (b, strong, or style fontWeight)
+      const fontWeight = el.style?.fontWeight;
       const isBoldSpan = tag === 'span' && (fontWeight === 'bold' || fontWeight === '700' || parseInt(fontWeight, 10) >= 600);
       if (tag === 'strong' || tag === 'b' || isBoldSpan) {
-        const text = Array.from(el.childNodes).map(serializeNode).join('');
+        const text = Array.from(el.childNodes).map(serializeInline).join('');
         const trimmed = text.trim();
         if (!trimmed) return text;
         const leading = text.match(/^\s*/)?.[0] || '';
@@ -63,27 +69,34 @@ export const convertHtmlToEditorMarkdown = (html: string): string => {
         return `${leading}**${trimmed}**${trailing}`;
       }
 
-      const fontStyle = (el as any).style?.fontStyle;
+      // Italic detection (em, i, or style fontStyle)
+      const fontStyle = el.style?.fontStyle;
       const isItalicSpan = tag === 'span' && fontStyle === 'italic';
       if (tag === 'em' || tag === 'i' || isItalicSpan) {
-        const text = Array.from(el.childNodes).map(serializeNode).join('');
+        const text = Array.from(el.childNodes).map(serializeInline).join('');
         const trimmed = text.trim();
         if (!trimmed) return text;
         const leading = text.match(/^\s*/)?.[0] || '';
         const trailing = text.match(/\s*$/)?.[0] || '';
         return `${leading}*${trimmed}*${trailing}`;
       }
+
+      // Links
       if (tag === 'a') {
-        const text = Array.from(el.childNodes).map(serializeNode).join('').trim();
+        const text = Array.from(el.childNodes).map(serializeInline).join('').trim();
         const href = el.getAttribute('href');
         if (text && href && !href.startsWith('javascript:')) {
           return `[${text}](${href})`;
         }
         return text;
       }
+
+      // Line breaks within a block
       if (tag === 'br') {
         return '\n';
       }
+
+      // Images
       if (tag === 'img') {
         const src = el.getAttribute('src');
         const alt = el.getAttribute('alt') || 'Photo';
@@ -93,33 +106,63 @@ export const convertHtmlToEditorMarkdown = (html: string): string => {
         return '';
       }
 
-      return Array.from(el.childNodes).map(serializeNode).join('');
+      return Array.from(el.childNodes).map(serializeInline).join('');
     };
 
     const blocks: string[] = [];
+    let inlineBuffer = '';
 
-    const processBlockElement = (el: HTMLElement) => {
+    const flushInlineBuffer = () => {
+      const trimmed = inlineBuffer.trim();
+      if (trimmed) {
+        blocks.push(trimmed);
+      }
+      inlineBuffer = '';
+    };
+
+    const processNode = (node: Node) => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        inlineBuffer += node.textContent || '';
+        return;
+      }
+
+      if (node.nodeType !== Node.ELEMENT_NODE) {
+        return;
+      }
+
+      const el = node as HTMLElement;
       const tag = el.tagName.toLowerCase();
 
+      // Heading 1 / 2
       if (tag === 'h1' || tag === 'h2') {
-        const text = serializeNode(el).trim();
+        flushInlineBuffer();
+        const text = Array.from(el.childNodes).map(serializeInline).join('').trim();
         if (text) blocks.push(`## ${text}`);
         return;
       }
+
+      // Heading 3-6
       if (tag === 'h3' || tag === 'h4' || tag === 'h5' || tag === 'h6') {
-        const text = serializeNode(el).trim();
+        flushInlineBuffer();
+        const text = Array.from(el.childNodes).map(serializeInline).join('').trim();
         if (text) blocks.push(`### ${text}`);
         return;
       }
+
+      // Pullquote
       if (tag === 'blockquote') {
-        const text = serializeNode(el).trim();
+        flushInlineBuffer();
+        const text = Array.from(el.childNodes).map(serializeInline).join('').trim();
         if (text) blocks.push(`> "${text.replace(/^["']|["']$/g, '')}"`);
         return;
       }
+
+      // Unordered or Ordered lists
       if (tag === 'ul' || tag === 'ol') {
+        flushInlineBuffer();
         const items: string[] = [];
         el.querySelectorAll('li').forEach(li => {
-          const itemText = serializeNode(li).trim();
+          const itemText = Array.from(li.childNodes).map(serializeInline).join('').trim();
           if (itemText) items.push(`- ${itemText}`);
         });
         if (items.length > 0) {
@@ -127,31 +170,40 @@ export const convertHtmlToEditorMarkdown = (html: string): string => {
         }
         return;
       }
+
+      // Paragraph
       if (tag === 'p') {
-        const text = serializeNode(el).trim();
+        flushInlineBuffer();
+        const text = Array.from(el.childNodes).map(serializeInline).join('').trim();
         if (text) blocks.push(text);
         return;
       }
 
-      // For containers like div, section, article
-      const hasBlockChildren = el.querySelector('p, h1, h2, h3, h4, h5, h6, ul, ol, blockquote');
-      if (hasBlockChildren) {
-        Array.from(el.children).forEach(child => {
-          if (child instanceof HTMLElement) {
-            processBlockElement(child);
-          }
-        });
-      } else {
-        const text = serializeNode(el).trim();
-        if (text) blocks.push(text);
+      // Div or Container
+      if (tag === 'div' || tag === 'section' || tag === 'article') {
+        const hasBlockChildren = Array.from(el.childNodes).some(child => 
+          child.nodeType === Node.ELEMENT_NODE && isBlockTag((child as HTMLElement).tagName.toLowerCase())
+        );
+
+        if (hasBlockChildren) {
+          flushInlineBuffer();
+          Array.from(el.childNodes).forEach(processNode);
+          flushInlineBuffer();
+        } else {
+          flushInlineBuffer();
+          const text = Array.from(el.childNodes).map(serializeInline).join('').trim();
+          if (text) blocks.push(text);
+        }
+        return;
       }
+
+      // Otherwise, inline element (span, b, strong, i, em, a, br, etc.)
+      inlineBuffer += serializeInline(el);
     };
 
-    Array.from(doc.body.children).forEach(child => {
-      if (child instanceof HTMLElement) {
-        processBlockElement(child);
-      }
-    });
+    // Iterate through all child nodes (including text nodes) in doc.body
+    Array.from(doc.body.childNodes).forEach(processNode);
+    flushInlineBuffer();
 
     if (blocks.length > 0) {
       return blocks.filter(b => b && b.trim()).join('\n\n');
@@ -205,7 +257,7 @@ export const formatInlineToEditorHtml = (text: string): string => {
  * are displayed with actual visual formatting, NOT raw markdown symbols.
  */
 export const markdownToEditorHtml = (markdown: string): string => {
-  if (!markdown) return '';
+  if (!markdown || !markdown.trim()) return '<p><br></p>';
 
   const normalized = markdown.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
   const blocks = normalized.split(/\n\s*\n+/);
@@ -213,6 +265,11 @@ export const markdownToEditorHtml = (markdown: string): string => {
   const htmlBlocks = blocks.map(block => {
     const trimmed = block.trim();
     if (!trimmed) return '';
+
+    // If block is already HTML block tag, do not wrap in extra <p>
+    if (/^<(p|div|h[1-6]|ul|ol|blockquote)[\s>]/i.test(trimmed)) {
+      return formatInlineToEditorHtml(trimmed);
+    }
 
     // Check heading 2: ## ...
     const h2Match = trimmed.match(/^##\s+([\s\S]*)$/);
