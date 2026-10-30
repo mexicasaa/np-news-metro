@@ -146,7 +146,7 @@ export const StandardArticleTemplate: React.FC<StandardArticleTemplateProps> = (
                 />
               </div>
               <figcaption className="text-xs text-ink-muted mt-2 px-1 flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                <span className="italic leading-snug">{isHindi && post.imageCaptionHi ? post.imageCaptionHi : post.imageCaption}</span>
+                <span className="italic leading-snug">{localized.imageCaption || post.imageCaption}</span>
                 <span className="font-semibold text-ink-secondary flex-shrink-0">
                   {post.imageCredit}
                 </span>

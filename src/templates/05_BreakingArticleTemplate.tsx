@@ -163,7 +163,7 @@ export const BreakingArticleTemplate: React.FC<BreakingArticleTemplateProps> = (
                 />
               </div>
               <figcaption className="text-xs text-ink-muted mt-2 flex items-center justify-between">
-                <span>{isHindi && post.imageCaptionHi ? post.imageCaptionHi : post.imageCaption}</span>
+                <span>{localized.imageCaption || post.imageCaption}</span>
                 <span className="font-semibold text-ink-secondary">{post.imageCredit}</span>
               </figcaption>
             </figure>

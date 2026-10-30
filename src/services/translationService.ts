@@ -39,15 +39,26 @@ function hashKey(str: string): string {
   return hash.toString(36);
 }
 
+function getEffectiveCacheKey(text: string, targetLang: string, sourceLang = 'auto'): string {
+  const clean = text.trim();
+  const src = sourceLang === 'auto' ? (targetLang === 'hi' ? 'en' : 'hi') : sourceLang;
+  return `${src}:${targetLang}:${clean}`;
+}
+
 export function getCachedTranslation(text: string, targetLang: string, sourceLang = 'auto'): string | null {
   if (!text || !text.trim()) return text;
-  const key = `${sourceLang}:${targetLang}:${text.trim()}`;
+  const key = getEffectiveCacheKey(text, targetLang, sourceLang);
   if (memoryCache.has(key)) {
     return memoryCache.get(key)!;
   }
+  const autoKey = `auto:${targetLang}:${text.trim()}`;
+  if (memoryCache.has(autoKey)) {
+    return memoryCache.get(autoKey)!;
+  }
   try {
     if (typeof sessionStorage !== 'undefined') {
-      const stored = sessionStorage.getItem(SESSION_CACHE_PREFIX + hashKey(key));
+      const stored = sessionStorage.getItem(SESSION_CACHE_PREFIX + hashKey(key)) ||
+                     sessionStorage.getItem(SESSION_CACHE_PREFIX + hashKey(autoKey));
       if (stored) {
         memoryCache.set(key, stored);
         return stored;
@@ -58,8 +69,12 @@ export function getCachedTranslation(text: string, targetLang: string, sourceLan
 }
 
 export function setCachedTranslation(text: string, targetLang: string, translated: string, sourceLang = 'auto'): void {
-  if (!text || !translated || text === translated) return;
-  const key = `${sourceLang}:${targetLang}:${text.trim()}`;
+  if (!text || !translated || text.trim() === translated.trim()) return;
+  // Safety: Never cache failure into wrong language
+  if (targetLang === 'hi' && !isHindiText(translated)) return;
+  if (targetLang === 'en' && isHindiText(translated)) return;
+
+  const key = getEffectiveCacheKey(text, targetLang, sourceLang);
   memoryCache.set(key, translated);
   try {
     if (typeof sessionStorage !== 'undefined') {
@@ -347,13 +362,35 @@ export async function translateTexts(
     if (response.ok) {
       const json = await response.json();
       if (Array.isArray(json?.translations)) {
+        const stillMissingIndices: number[] = [];
+        const stillMissingTexts: string[] = [];
+
         json.translations.forEach((translated: string, idx: number) => {
           const origIndex = missingIndices[idx];
           const originalText = missingTexts[idx];
-          const finalResult = translated || originalText;
-          setCachedTranslation(originalText, targetLang, finalResult, sourceLang);
-          results[origIndex] = finalResult;
+          const isTargetHindi = targetLang === 'hi';
+          const isValid = isTargetHindi ? isHindiText(translated) : (!isHindiText(translated) && !!translated?.trim());
+
+          if (isValid) {
+            setCachedTranslation(originalText, targetLang, translated, sourceLang);
+            results[origIndex] = translated;
+          } else {
+            stillMissingIndices.push(origIndex);
+            stillMissingTexts.push(originalText);
+          }
         });
+
+        if (stillMissingIndices.length === 0) {
+          return results;
+        }
+
+        // Try parallel client fallback for any that failed or came back untranslated
+        await Promise.all(
+          stillMissingIndices.map(async (origIdx, i) => {
+            const origText = stillMissingTexts[i];
+            results[origIdx] = await translateText(origText, targetLang, sourceLang);
+          })
+        );
         return results;
       }
     }
@@ -599,9 +636,11 @@ export const getLocalizedPost = (post: WpPost, lang: Language): WpPost => {
 
   // 1. Target is Hindi ('hi')
   if (lang === 'hi') {
-    const hasPreHindiTitle = !!post.titleHi?.trim();
-    const hasPreHindiDek = !!post.dekHi?.trim();
-    const hasPreHindiBlocks = Array.isArray(post.blocksHi) && post.blocksHi.length > 0;
+    const hasPreHindiTitle = !!post.titleHi?.trim() && isHindiText(post.titleHi);
+    const hasPreHindiDek = !!post.dekHi?.trim() && isHindiText(post.dekHi);
+    const hasPreHindiBlocks = Array.isArray(post.blocksHi) && post.blocksHi.length > 0 && post.blocksHi.some(b => b.content && isHindiText(b.content));
+    const hasPreHindiTakeaways = Array.isArray(post.keyTakeawaysHi) && post.keyTakeawaysHi.length > 0 && post.keyTakeawaysHi.some(isHindiText);
+    const hasPreHindiCaption = !!post.imageCaptionHi?.trim() && isHindiText(post.imageCaptionHi);
     const isOriginalHindiTitle = isHindiText(post.title);
     const isOriginalHindiDek = isHindiText(post.dek);
 
@@ -617,7 +656,7 @@ export const getLocalizedPost = (post: WpPost, lang: Language): WpPost => {
         ? post.dek
         : getCachedTranslation(post.dek, 'hi', 'en') || (enqueueTranslation(post.dek, 'hi', 'en'), post.dek);
 
-    const keyTakeaways = (post.keyTakeawaysHi && post.keyTakeawaysHi.length > 0)
+    const keyTakeaways = hasPreHindiTakeaways
       ? post.keyTakeawaysHi
       : post.keyTakeaways?.map((item) => {
           if (isHindiText(item)) return item;
@@ -630,16 +669,29 @@ export const getLocalizedPost = (post: WpPost, lang: Language): WpPost => {
     let blocks = hasPreHindiBlocks ? post.blocksHi! : post.blocks;
     if (!hasPreHindiBlocks && Array.isArray(post.blocks) && post.blocks.length > 0) {
       blocks = post.blocks.map((block) => {
+        let updatedBlock = block;
         if (block.type === 'paragraph' || block.type === 'heading' || block.type === 'pullquote') {
           if (block.content && !isHindiText(block.content)) {
             const cached = getCachedTranslation(block.content, 'hi', 'en');
             if (cached) {
-              return { ...block, content: cached };
+              updatedBlock = { ...updatedBlock, content: cached };
+            } else {
+              enqueueTranslation(block.content, 'hi', 'en');
             }
-            enqueueTranslation(block.content, 'hi', 'en');
           }
         }
-        return block;
+        if (Array.isArray(block.items)) {
+          const translatedItems = block.items.map((item) => {
+            if (!isHindiText(item)) {
+              const cached = getCachedTranslation(item, 'hi', 'en');
+              if (cached) return cached;
+              enqueueTranslation(item, 'hi', 'en');
+            }
+            return item;
+          });
+          updatedBlock = { ...updatedBlock, items: translatedItems };
+        }
+        return updatedBlock;
       });
     } else if (!hasPreHindiBlocks && post.content && typeof post.content === 'string') {
       const paragraphs = post.content.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
@@ -655,9 +707,13 @@ export const getLocalizedPost = (post: WpPost, lang: Language): WpPost => {
       }
     }
 
-    const imageCaption = post.imageCaptionHi || (post.imageCaption && !isHindiText(post.imageCaption)
-      ? getCachedTranslation(post.imageCaption, 'hi', 'en') || (enqueueTranslation(post.imageCaption, 'hi', 'en'), post.imageCaption)
-      : post.imageCaption);
+    const imageCaption = hasPreHindiCaption
+      ? post.imageCaptionHi!
+      : (post.imageCaption
+        ? (isHindiText(post.imageCaption)
+          ? post.imageCaption
+          : getCachedTranslation(post.imageCaption, 'hi', 'en') || (enqueueTranslation(post.imageCaption, 'hi', 'en'), post.imageCaption))
+        : undefined);
 
     const categoryName = post.categoryHi || HINDI_CATEGORY_NAMES[post.category] || post.category;
 
@@ -706,16 +762,29 @@ export const getLocalizedPost = (post: WpPost, lang: Language): WpPost => {
   let blocks = post.blocks;
   if (Array.isArray(post.blocks) && post.blocks.length > 0) {
     blocks = post.blocks.map((block) => {
+      let updatedBlock = block;
       if (block.type === 'paragraph' || block.type === 'heading' || block.type === 'pullquote') {
         if (block.content && isHindiText(block.content)) {
           const cached = getCachedTranslation(block.content, 'en', 'hi');
           if (cached) {
-            return { ...block, content: cached };
+            updatedBlock = { ...updatedBlock, content: cached };
+          } else {
+            enqueueTranslation(block.content, 'en', 'hi');
           }
-          enqueueTranslation(block.content, 'en', 'hi');
         }
       }
-      return block;
+      if (Array.isArray(block.items)) {
+        const translatedItems = block.items.map((item) => {
+          if (isHindiText(item)) {
+            const cached = getCachedTranslation(item, 'en', 'hi');
+            if (cached) return cached;
+            enqueueTranslation(item, 'en', 'hi');
+          }
+          return item;
+        });
+        updatedBlock = { ...updatedBlock, items: translatedItems };
+      }
+      return updatedBlock;
     });
   } else if (post.content && typeof post.content === 'string') {
     const paragraphs = post.content.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
@@ -766,13 +835,20 @@ export const getLocalizedVideo = (video: WpVideo, lang: Language): WpVideo => {
   if (!video) return video;
 
   if (lang === 'hi') {
-    const title = video.titleHi || (isHindiText(video.title)
-      ? video.title
-      : getCachedTranslation(video.title, 'hi', 'en') || (enqueueTranslation(video.title, 'hi', 'en'), video.title));
+    const hasPreHindiTitle = !!video.titleHi?.trim() && isHindiText(video.titleHi);
+    const hasPreHindiCaption = !!video.captionHi?.trim() && isHindiText(video.captionHi);
 
-    const caption = video.captionHi || (isHindiText(video.caption)
-      ? video.caption
-      : getCachedTranslation(video.caption, 'hi', 'en') || (enqueueTranslation(video.caption, 'hi', 'en'), video.caption));
+    const title = hasPreHindiTitle
+      ? video.titleHi!
+      : (isHindiText(video.title)
+        ? video.title
+        : getCachedTranslation(video.title, 'hi', 'en') || (enqueueTranslation(video.title, 'hi', 'en'), video.title));
+
+    const caption = hasPreHindiCaption
+      ? video.captionHi!
+      : (isHindiText(video.caption)
+        ? video.caption
+        : getCachedTranslation(video.caption, 'hi', 'en') || (enqueueTranslation(video.caption, 'hi', 'en'), video.caption));
 
     const category = video.categoryHi || HINDI_CATEGORY_NAMES[video.category.toLowerCase()] || video.category;
 
@@ -843,6 +919,13 @@ export async function ensurePostTranslated(post: WpPost, targetLang: Language): 
         if (b.content && isHindiText(b.content) && !getCachedTranslation(b.content, 'en', 'hi')) {
           textsToTranslate.push(b.content);
         }
+        if (Array.isArray(b.items)) {
+          b.items.forEach((item) => {
+            if (isHindiText(item) && !getCachedTranslation(item, 'en', 'hi')) {
+              textsToTranslate.push(item);
+            }
+          });
+        }
       });
     }
     if (post.content && typeof post.content === 'string') {
@@ -862,13 +945,19 @@ export async function ensurePostTranslated(post: WpPost, targetLang: Language): 
   }
 
   // targetLang === 'hi'
-  if (!post.titleHi && post.title && !isHindiText(post.title) && !getCachedTranslation(post.title, 'hi', 'en')) {
+  const hasPreHindiTitle = !!post.titleHi?.trim() && isHindiText(post.titleHi);
+  const hasPreHindiDek = !!post.dekHi?.trim() && isHindiText(post.dekHi);
+  const hasPreHindiCaption = !!post.imageCaptionHi?.trim() && isHindiText(post.imageCaptionHi);
+  const hasPreHindiTakeaways = Array.isArray(post.keyTakeawaysHi) && post.keyTakeawaysHi.length > 0 && post.keyTakeawaysHi.some(isHindiText);
+  const hasPreHindiBlocks = Array.isArray(post.blocksHi) && post.blocksHi.length > 0 && post.blocksHi.some((b) => b.content && isHindiText(b.content));
+
+  if (!hasPreHindiTitle && post.title && !isHindiText(post.title) && !getCachedTranslation(post.title, 'hi', 'en')) {
     textsToTranslate.push(post.title);
   }
-  if (!post.dekHi && post.dek && !isHindiText(post.dek) && !getCachedTranslation(post.dek, 'hi', 'en')) {
+  if (!hasPreHindiDek && post.dek && !isHindiText(post.dek) && !getCachedTranslation(post.dek, 'hi', 'en')) {
     textsToTranslate.push(post.dek);
   }
-  if (!post.imageCaptionHi && post.imageCaption && !isHindiText(post.imageCaption) && !getCachedTranslation(post.imageCaption, 'hi', 'en')) {
+  if (!hasPreHindiCaption && post.imageCaption && !isHindiText(post.imageCaption) && !getCachedTranslation(post.imageCaption, 'hi', 'en')) {
     textsToTranslate.push(post.imageCaption);
   }
   if (post.customAuthor?.name && !isHindiText(post.customAuthor.name) && !AUTHOR_TRANSLATIONS[post.customAuthor.name]) {
@@ -880,21 +969,28 @@ export async function ensurePostTranslated(post: WpPost, targetLang: Language): 
   if (post.customAuthor?.bio && !isHindiText(post.customAuthor.bio)) {
     textsToTranslate.push(post.customAuthor.bio);
   }
-  if (!post.keyTakeawaysHi && Array.isArray(post.keyTakeaways)) {
+  if (!hasPreHindiTakeaways && Array.isArray(post.keyTakeaways)) {
     post.keyTakeaways.forEach((k) => {
       if (!isHindiText(k) && !getCachedTranslation(k, 'hi', 'en')) {
         textsToTranslate.push(k);
       }
     });
   }
-  if ((!post.blocksHi || post.blocksHi.length === 0) && Array.isArray(post.blocks)) {
+  if (!hasPreHindiBlocks && Array.isArray(post.blocks)) {
     post.blocks.forEach((b) => {
       if (b.content && !isHindiText(b.content) && !getCachedTranslation(b.content, 'hi', 'en')) {
         textsToTranslate.push(b.content);
       }
+      if (Array.isArray(b.items)) {
+        b.items.forEach((item) => {
+          if (!isHindiText(item) && !getCachedTranslation(item, 'hi', 'en')) {
+            textsToTranslate.push(item);
+          }
+        });
+      }
     });
   }
-  if ((!post.blocksHi || post.blocksHi.length === 0) && post.content && typeof post.content === 'string') {
+  if (!hasPreHindiBlocks && post.content && typeof post.content === 'string') {
     const paragraphs = post.content.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
     paragraphs.forEach((p) => {
       if (!isHindiText(p) && !getCachedTranslation(p, 'hi', 'en')) {
