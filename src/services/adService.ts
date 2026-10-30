@@ -165,6 +165,7 @@ export const getInitialDirectAds = (): DirectAd[] => {
    ====================================================================== */
 const notifyAdUpdate = () => {
   adPlacementCache.clear();
+  AdRepository.getInstance().clearPlacementCache();
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new CustomEvent('np_ads_updated'));
     try {
@@ -457,7 +458,7 @@ export const resetAdsToDefaults = (): void => {
    Unified Active Placement Resolver (Frontend Slot Consumer)
    ====================================================================== */
 const adPlacementCache = new Map<string, { data: ActiveAdPlacement | null; timestamp: number }>();
-const AD_CACHE_TTL = 30 * 1000; // 30s cache for fast UI updates
+const AD_CACHE_TTL = 5 * 60 * 1000; // 5m cache (instantly invalidated on admin update)
 
 export const getAdPlacement = async (zone: string): Promise<ActiveAdPlacement | null> => {
   // If the zone or master is hidden by Admin, return null immediately

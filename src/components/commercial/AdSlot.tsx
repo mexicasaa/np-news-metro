@@ -52,15 +52,19 @@ export const AdSlot: React.FC<AdSlotProps> = ({
 
     window.addEventListener('np_ads_updated', handleUpdate);
 
-    // Periodic 45s live synchronization for public readers across tabs/devices
-    const pollInterval = setInterval(() => {
-      if (typeof document !== 'undefined' && !document.hidden) {
-        fetchPlacement();
-      }
-    }, 45000);
+    // Periodic live synchronization for active readers (5m fallback, disabled for crawlers/headless)
+    const isBot = typeof navigator !== 'undefined' && (/bot|crawler|spider|headless|ahrefs|semrush|lighthouse/i.test(navigator.userAgent) || navigator.webdriver);
+    let pollInterval = null;
+    if (!isBot) {
+      pollInterval = setInterval(() => {
+        if (typeof document !== 'undefined' && !document.hidden) {
+          fetchPlacement();
+        }
+      }, 5 * 60 * 1000);
+    }
 
     return () => {
-      clearInterval(pollInterval);
+      if (pollInterval) clearInterval(pollInterval);
       window.removeEventListener('np_ads_updated', handleUpdate);
     };
   }, [zone]);

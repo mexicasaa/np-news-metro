@@ -3,6 +3,12 @@ import { AdvertiserRecord, AdCampaignRecord, AdPlacementRecord } from '../types'
 
 export class AdRepository {
   private static instance: AdRepository;
+  private placementCache = new Map<string, { data: any; timestamp: number }>();
+  private static CACHE_TTL = 5 * 60 * 1000; // 5 minutes in-memory cache
+
+  public clearPlacementCache(): void {
+    this.placementCache.clear();
+  }
 
   public static getInstance(): AdRepository {
     if (!AdRepository.instance) {
@@ -25,6 +31,10 @@ export class AdRepository {
     altText?: string;
     isExplicitlyDisabled?: boolean;
   } | null> {
+    const cached = this.placementCache.get(zone);
+    if (cached && Date.now() - cached.timestamp < AdRepository.CACHE_TTL) {
+      return cached.data;
+    }
     try {
       const now = new Date().toISOString();
       const { data, error } = await supabase
@@ -41,11 +51,16 @@ export class AdRepository {
         .limit(1)
         .maybeSingle();
 
-      if (error || !data) return null;
+      if (error || !data) {
+        this.placementCache.set(zone, { data: null, timestamp: Date.now() });
+        return null;
+      }
 
       // If placement is explicitly closed/disabled in DB
       if (data.is_active === false) {
-        return { isExplicitlyDisabled: true } as any;
+        const disabled = { isExplicitlyDisabled: true } as any;
+        this.placementCache.set(zone, { data: disabled, timestamp: Date.now() });
+        return disabled;
       }
 
       if (!data.campaigns) return null;
@@ -61,9 +76,12 @@ export class AdRepository {
         ? campaign.ad_creatives[0]
         : null;
 
-      if (!creative) return null;
+      if (!creative) {
+        this.placementCache.set(zone, { data: null, timestamp: Date.now() });
+        return null;
+      }
 
-      return {
+      const activePlacement = {
         campaignId: campaign.id,
         placementId: data.id,
         advertiserName: campaign.advertisers?.name || 'Sponsored Partner',
@@ -72,6 +90,8 @@ export class AdRepository {
         mediaUrl: creative.media?.public_url,
         altText: creative.alt_text || 'Sponsored advertisement',
       };
+      this.placementCache.set(zone, { data: activePlacement, timestamp: Date.now() });
+      return activePlacement;
     } catch {
       return null;
     }
@@ -115,6 +135,7 @@ export class AdRepository {
         });
       }
 
+      this.placementCache.clear();
       return { success: true };
     } catch (err: any) {
       console.error('Failed to toggle zone status in Supabase:', err);
@@ -271,6 +292,7 @@ export class AdRepository {
         await supabase.from('campaigns').delete().eq('id', cId);
       }
 
+      this.placementCache.clear();
       return { success: true };
     } catch (err: any) {
       console.error('Failed to delete ad from Supabase DB:', err);

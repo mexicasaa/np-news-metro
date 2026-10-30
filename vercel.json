@@ -150,7 +150,7 @@
         {
           "type": "header",
           "key": "user-agent",
-          "value": ".*(?i)(google|bingbot|yandex|duckduckbot|baiduspider|facebookexternalhit|facebot|facebookcatalog|whatsapp|twitterbot|twitter|xbot|telegrambot|telegram|linkedinbot|linkedin|discordbot|slackbot|applebot|skypeuripreview|snapchat|pinterest|quora-link-preview|redditbot|lighthouse|gptbot|chatgpt|oai-searchbot|claudebot|anthropic|petalbot|semrush|ahrefs).*"
+          "value": ".*(?i)(google|bingbot|yandex|duckduckbot|baiduspider|facebookexternalhit|facebot|facebookcatalog|whatsapp|twitterbot|twitter|xbot|telegrambot|telegram|linkedinbot|linkedin|discordbot|slackbot|applebot|skypeuripreview|snapchat|pinterest|quora-link-preview|redditbot|lighthouse|gptbot|chatgpt|oai-searchbot|claudebot|anthropic|petalbot|semrush|ahrefs|bytespider|dotbot|feedly).*"
         }
       ],
       "destination": "/api/share?homepage=true"
@@ -161,7 +161,7 @@
         {
           "type": "header",
           "key": "user-agent",
-          "value": ".*(?i)(google|bingbot|yandex|duckduckbot|baiduspider|facebookexternalhit|facebot|facebookcatalog|whatsapp|twitterbot|twitter|xbot|telegrambot|telegram|linkedinbot|linkedin|discordbot|slackbot|applebot|skypeuripreview|snapchat|pinterest|quora-link-preview|redditbot|lighthouse).*"
+          "value": ".*(?i)(google|bingbot|yandex|duckduckbot|baiduspider|facebookexternalhit|facebot|facebookcatalog|whatsapp|twitterbot|twitter|xbot|telegrambot|telegram|linkedinbot|linkedin|discordbot|slackbot|applebot|skypeuripreview|snapchat|pinterest|quora-link-preview|redditbot|lighthouse|gptbot|chatgpt|oai-searchbot|claudebot|anthropic|petalbot|semrush|ahrefs|bytespider|dotbot|feedly).*"
         }
       ],
       "destination": "/api/share?category=:category"
@@ -172,7 +172,7 @@
         {
           "type": "header",
           "key": "user-agent",
-          "value": ".*(?i)(google|bingbot|yandex|duckduckbot|baiduspider|facebookexternalhit|facebot|facebookcatalog|whatsapp|twitterbot|twitter|xbot|telegrambot|telegram|linkedinbot|linkedin|discordbot|slackbot|applebot|skypeuripreview|snapchat|pinterest|quora-link-preview|redditbot|lighthouse).*"
+          "value": ".*(?i)(google|bingbot|yandex|duckduckbot|baiduspider|facebookexternalhit|facebot|facebookcatalog|whatsapp|twitterbot|twitter|xbot|telegrambot|telegram|linkedinbot|linkedin|discordbot|slackbot|applebot|skypeuripreview|snapchat|pinterest|quora-link-preview|redditbot|lighthouse|gptbot|chatgpt|oai-searchbot|claudebot|anthropic|petalbot|semrush|ahrefs|bytespider|dotbot|feedly).*"
         }
       ],
       "destination": "/api/share?category=:category"
@@ -183,7 +183,7 @@
         {
           "type": "header",
           "key": "user-agent",
-          "value": ".*(?i)(google|bingbot|yandex|duckduckbot|baiduspider|facebookexternalhit|facebot|facebookcatalog|whatsapp|twitterbot|twitter|xbot|telegrambot|telegram|linkedinbot|linkedin|discordbot|slackbot|applebot|skypeuripreview|snapchat|pinterest|quora-link-preview|redditbot|lighthouse).*"
+          "value": ".*(?i)(google|bingbot|yandex|duckduckbot|baiduspider|facebookexternalhit|facebot|facebookcatalog|whatsapp|twitterbot|twitter|xbot|telegrambot|telegram|linkedinbot|linkedin|discordbot|slackbot|applebot|skypeuripreview|snapchat|pinterest|quora-link-preview|redditbot|lighthouse|gptbot|chatgpt|oai-searchbot|claudebot|anthropic|petalbot|semrush|ahrefs|bytespider|dotbot|feedly).*"
         }
       ],
       "destination": "/api/share?category=videos&slug=:slug"
@@ -194,7 +194,7 @@
         {
           "type": "header",
           "key": "user-agent",
-          "value": ".*(?i)(google|bingbot|yandex|duckduckbot|baiduspider|facebookexternalhit|facebot|facebookcatalog|whatsapp|twitterbot|twitter|xbot|telegrambot|telegram|linkedinbot|linkedin|discordbot|slackbot|applebot|skypeuripreview|snapchat|pinterest|quora-link-preview|redditbot|lighthouse).*"
+          "value": ".*(?i)(google|bingbot|yandex|duckduckbot|baiduspider|facebookexternalhit|facebot|facebookcatalog|whatsapp|twitterbot|twitter|xbot|telegrambot|telegram|linkedinbot|linkedin|discordbot|slackbot|applebot|skypeuripreview|snapchat|pinterest|quora-link-preview|redditbot|lighthouse|gptbot|chatgpt|oai-searchbot|claudebot|anthropic|petalbot|semrush|ahrefs|bytespider|dotbot|feedly).*"
         }
       ],
       "destination": "/api/share?category=videos&slug=:slug"
@@ -205,7 +205,7 @@
         {
           "type": "header",
           "key": "user-agent",
-          "value": ".*(?i)(google|bingbot|yandex|duckduckbot|baiduspider|facebookexternalhit|facebot|facebookcatalog|whatsapp|twitterbot|twitter|xbot|telegrambot|telegram|linkedinbot|linkedin|discordbot|slackbot|applebot|skypeuripreview|snapchat|pinterest|quora-link-preview|redditbot|lighthouse).*"
+          "value": ".*(?i)(google|bingbot|yandex|duckduckbot|baiduspider|facebookexternalhit|facebot|facebookcatalog|whatsapp|twitterbot|twitter|xbot|telegrambot|telegram|linkedinbot|linkedin|discordbot|slackbot|applebot|skypeuripreview|snapchat|pinterest|quora-link-preview|redditbot|lighthouse|gptbot|chatgpt|oai-searchbot|claudebot|anthropic|petalbot|semrush|ahrefs|bytespider|dotbot|feedly).*"
         }
       ],
       "destination": "/api/share?category=:category&slug=:slug"
@@ -216,7 +216,7 @@
         {
           "type": "header",
           "key": "user-agent",
-          "value": ".*(?i)(google|bingbot|yandex|duckduckbot|baiduspider|facebookexternalhit|facebot|facebookcatalog|whatsapp|twitterbot|twitter|xbot|telegrambot|telegram|linkedinbot|linkedin|discordbot|slackbot|applebot|skypeuripreview|snapchat|pinterest|quora-link-preview|redditbot|lighthouse).*"
+          "value": ".*(?i)(google|bingbot|yandex|duckduckbot|baiduspider|facebookexternalhit|facebot|facebookcatalog|whatsapp|twitterbot|twitter|xbot|telegrambot|telegram|linkedinbot|linkedin|discordbot|slackbot|applebot|skypeuripreview|snapchat|pinterest|quora-link-preview|redditbot|lighthouse|gptbot|chatgpt|oai-searchbot|claudebot|anthropic|petalbot|semrush|ahrefs|bytespider|dotbot|feedly).*"
         }
       ],
       "destination": "/api/share?category=:category&slug=:slug"
@@ -227,7 +227,7 @@
         {
           "type": "header",
           "key": "user-agent",
-          "value": ".*(?i)(google|bingbot|yandex|duckduckbot|baiduspider|facebookexternalhit|facebot|facebookcatalog|whatsapp|twitterbot|twitter|xbot|telegrambot|telegram|linkedinbot|linkedin|discordbot|slackbot|applebot|skypeuripreview|snapchat|pinterest|quora-link-preview|redditbot|lighthouse).*"
+          "value": ".*(?i)(google|bingbot|yandex|duckduckbot|baiduspider|facebookexternalhit|facebot|facebookcatalog|whatsapp|twitterbot|twitter|xbot|telegrambot|telegram|linkedinbot|linkedin|discordbot|slackbot|applebot|skypeuripreview|snapchat|pinterest|quora-link-preview|redditbot|lighthouse|gptbot|chatgpt|oai-searchbot|claudebot|anthropic|petalbot|semrush|ahrefs|bytespider|dotbot|feedly).*"
         }
       ],
       "destination": "/api/share?slug=:slug"
@@ -238,7 +238,7 @@
         {
           "type": "header",
           "key": "user-agent",
-          "value": ".*(?i)(google|bingbot|yandex|duckduckbot|baiduspider|facebookexternalhit|facebot|facebookcatalog|whatsapp|twitterbot|twitter|xbot|telegrambot|telegram|linkedinbot|linkedin|discordbot|slackbot|applebot|skypeuripreview|snapchat|pinterest|quora-link-preview|redditbot|lighthouse).*"
+          "value": ".*(?i)(google|bingbot|yandex|duckduckbot|baiduspider|facebookexternalhit|facebot|facebookcatalog|whatsapp|twitterbot|twitter|xbot|telegrambot|telegram|linkedinbot|linkedin|discordbot|slackbot|applebot|skypeuripreview|snapchat|pinterest|quora-link-preview|redditbot|lighthouse|gptbot|chatgpt|oai-searchbot|claudebot|anthropic|petalbot|semrush|ahrefs|bytespider|dotbot|feedly).*"
         }
       ],
       "destination": "/api/share?slug=:slug"

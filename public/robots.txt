@@ -38,9 +38,28 @@ Allow: /
 User-agent: Pinterest
 Allow: /
 
-# Googlebot News Directives
+# Search Engine Primary Directives (Fast indexing, zero delay)
+User-agent: Googlebot
+Allow: /
+
 User-agent: Googlebot-News
 Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# Commercial SEO Crawlers (Rate Throttled to protect bandwidth)
+User-agent: AhrefsBot
+Crawl-delay: 2
+
+User-agent: SemrushBot
+Crawl-delay: 2
+
+User-agent: PetalBot
+Crawl-delay: 3
+
+User-agent: Bytespider
+Crawl-delay: 3
 
 # XML Sitemaps (Canonical Domain)
 Sitemap: https://www.npnewsmetro.com/sitemap_index.xml

@@ -16,6 +16,39 @@ const DEFAULT_OG_IMAGE = "https://www.npnewsmetro.com/uploads/logo-circle.png";
 const shareWarmCache = new Map();
 const SHARE_CACHE_TTL = 15 * 60 * 1000; // 15 minutes
 
+// Shared related articles pool to eliminate repetitive DB queries across crawler requests
+let cachedRelatedPool = null;
+let cachedRelatedPoolTime = 0;
+const RELATED_POOL_TTL = 15 * 60 * 1000; // 15 minutes
+
+async function getRelatedArticlesPool() {
+  if (cachedRelatedPool && (Date.now() - cachedRelatedPoolTime < RELATED_POOL_TTL)) {
+    return cachedRelatedPool;
+  }
+  try {
+    const { data } = await supabase
+      .from("articles")
+      .select("title, title_hi, slug, excerpt, dek_hi, categories(slug, name)")
+      .eq("status", "published")
+      .order("published_at", { ascending: false })
+      .limit(15);
+    if (data && data.length > 0) {
+      cachedRelatedPool = data;
+      cachedRelatedPoolTime = Date.now();
+      return data;
+    }
+  } catch (e) {}
+  return cachedRelatedPool || [];
+}
+
+function setShareCache(key, html) {
+  if (shareWarmCache.size > 500) {
+    const oldestKey = shareWarmCache.keys().next().value;
+    if (oldestKey) shareWarmCache.delete(oldestKey);
+  }
+  shareWarmCache.set(key, { html, timestamp: Date.now() });
+}
+
 function getAbsoluteUrl(img, slug) {
   if (!img || typeof img !== "string" || !img.trim()) return DEFAULT_OG_IMAGE;
   const trimmed = img.trim();
@@ -855,7 +888,7 @@ export default async function handler(req, res) {
         bodyHtml: homeBodyHtml
       });
 
-      shareWarmCache.set(homeCacheKey, { html: homeHtml, timestamp: Date.now() });
+      setShareCache(homeCacheKey, { html: homeHtml, timestamp: Date.now() });
       return sendResponse(res, 200, "text/html; charset=utf-8", homeHtml);
     }
 
@@ -925,7 +958,7 @@ export default async function handler(req, res) {
         bodyHtml: staticBodyHtml
       });
 
-      shareWarmCache.set(pageCacheKey, { html: staticHtml, timestamp: Date.now() });
+      setShareCache(pageCacheKey, { html: staticHtml, timestamp: Date.now() });
       return sendResponse(res, 200, "text/html; charset=utf-8", staticHtml);
     }
 
@@ -998,7 +1031,7 @@ export default async function handler(req, res) {
         bodyHtml: vidBodyHtml
       });
 
-      shareWarmCache.set(vidHubCacheKey, { html: vidHtml, timestamp: Date.now() });
+      setShareCache(vidHubCacheKey, { html: vidHtml, timestamp: Date.now() });
       return sendResponse(res, 200, "text/html; charset=utf-8", vidHtml);
     }
 
@@ -1081,7 +1114,7 @@ export default async function handler(req, res) {
         bodyHtml: photoBodyHtml
       });
 
-      shareWarmCache.set(photoHubKey, { html: photoHtml, timestamp: Date.now() });
+      setShareCache(photoHubKey, { html: photoHtml, timestamp: Date.now() });
       return sendResponse(res, 200, "text/html; charset=utf-8", photoHtml);
     }
 
@@ -1155,7 +1188,7 @@ export default async function handler(req, res) {
         bodyHtml: authorBodyHtml
       });
 
-      shareWarmCache.set(authorCacheKey, { html: authorHtml, timestamp: Date.now() });
+      setShareCache(authorCacheKey, { html: authorHtml, timestamp: Date.now() });
       return sendResponse(res, 200, "text/html; charset=utf-8", authorHtml);
     }
 
@@ -1296,7 +1329,7 @@ export default async function handler(req, res) {
         bodyHtml: catBodyHtml
       });
 
-      shareWarmCache.set(catCacheKey, { html: catHtml, timestamp: Date.now() });
+      setShareCache(catCacheKey, { html: catHtml, timestamp: Date.now() });
       return sendResponse(res, 200, "text/html; charset=utf-8", catHtml);
     }
 
@@ -1364,7 +1397,6 @@ export default async function handler(req, res) {
           excerpt, 
           dek_hi,
           content,
-          blocks,
           meta_description, 
           featured_image_url, 
           featured_image_caption,
@@ -1400,17 +1432,7 @@ export default async function handler(req, res) {
           const resolvedCat = (Array.isArray(rawCat) ? rawCat[0]?.slug : rawCat?.slug) || cleanCategory;
 
           let bodyParagraphs = [];
-          let rawBlocks = data.blocks;
-          if (typeof rawBlocks === "string") {
-            try { rawBlocks = JSON.parse(rawBlocks); } catch (e) {}
-          }
-          if (Array.isArray(rawBlocks) && rawBlocks.length > 0) {
-            bodyParagraphs = rawBlocks
-              .filter(b => b && (b.type === "paragraph" || b.type === "heading" || !b.type) && b.content)
-              .map(b => String(b.content).trim())
-              .filter(Boolean);
-          }
-          if (bodyParagraphs.length === 0 && typeof data.content === "string" && data.content.trim()) {
+          if (typeof data.content === "string" && data.content.trim()) {
             bodyParagraphs = data.content.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
           }
           if (bodyParagraphs.length === 0) {
@@ -1503,14 +1525,10 @@ export default async function handler(req, res) {
 
     let relatedArticles = [];
     try {
-      const { data: relData } = await supabase
-        .from("articles")
-        .select("title, title_hi, slug, excerpt, dek_hi, categories(slug, name)")
-        .eq("status", "published")
-        .neq("slug", slug)
-        .order("published_at", { ascending: false })
-        .limit(6);
-      if (relData && relData.length > 0) relatedArticles = relData;
+      const pool = await getRelatedArticlesPool();
+      if (pool && pool.length > 0) {
+        relatedArticles = pool.filter(a => a.slug !== slug).slice(0, 6);
+      }
     } catch (e) {}
 
     if (relatedArticles.length === 0) {
@@ -1752,7 +1770,7 @@ export default async function handler(req, res) {
       bodyHtml: articleBodyHtml
     });
 
-    shareWarmCache.set(articleCacheKey, { html: articleHtml, timestamp: Date.now() });
+    setShareCache(articleCacheKey, { html: articleHtml, timestamp: Date.now() });
     return sendResponse(res, 200, "text/html; charset=utf-8", articleHtml);
   } catch (err) {
     console.error("Crawler share pre-renderer error:", err);
