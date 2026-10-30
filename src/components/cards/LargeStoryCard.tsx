@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Clock, ArrowRight, Share2 } from 'lucide-react';
 import { WpPost } from '../../types/wordpress';
-import { mockAuthors, getLocalizedPost } from '../../data/mockWpData';
+import { mockAuthors, getLocalizedPost, getLocalizedAuthor } from '../../data/mockWpData';
 import { handleImageError, getAuthorAvatarUrl, getOptimizedImageUrl } from '../../utils/imageFallback';
 import { useLanguage } from '../../context/LanguageContext';
 import { ShareModal } from '../article/ShareModal';
@@ -25,15 +25,7 @@ export const LargeStoryCard: React.FC<LargeStoryCardProps> = ({
   const { language, t, isHindi } = useLanguage();
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const localized = getLocalizedPost(post, language);
-  const author = post.customAuthor?.name ? {
-    id: 'guest',
-    name: post.customAuthor.name,
-    role: post.customAuthor.role || 'Guest Contributor',
-    avatar: getAuthorAvatarUrl(post.customAuthor.avatar)
-  } : (post.authorId && mockAuthors[post.authorId] ? {
-    ...mockAuthors[post.authorId],
-    avatar: getAuthorAvatarUrl(mockAuthors[post.authorId].avatar)
-  } : null);
+  const author = getLocalizedAuthor(post, language);
 
   return (
     <article 

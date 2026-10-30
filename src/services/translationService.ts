@@ -1,47 +1,30 @@
-import { WpPost, WpVideo, GutenbergBlock } from '../types/wordpress';
+import { WpPost, WpVideo, WpAuthor, GutenbergBlock } from '../types/wordpress';
 import { Language } from '../i18n/translations';
+import { mockAuthors } from '../data/mockWpData';
 
 export interface SupportedLanguageInfo {
   code: Language;
   name: string;
   nativeName: string;
   dir: 'ltr' | 'rtl';
-  flag?: string;
 }
 
 export const SUPPORTED_LANGUAGES: SupportedLanguageInfo[] = [
-  { code: 'hi', name: 'Hindi', nativeName: 'हिन्दी', dir: 'ltr' },
   { code: 'en', name: 'English', nativeName: 'English', dir: 'ltr' },
-  { code: 'es', name: 'Spanish', nativeName: 'Español', dir: 'ltr' },
-  { code: 'fr', name: 'French', nativeName: 'Français', dir: 'ltr' },
-  { code: 'de', name: 'German', nativeName: 'Deutsch', dir: 'ltr' },
-  { code: 'zh', name: 'Simplified Chinese', nativeName: '简体中文', dir: 'ltr' },
-  { code: 'ja', name: 'Japanese', nativeName: '日本語', dir: 'ltr' },
-  { code: 'ar', name: 'Arabic', nativeName: 'العربية', dir: 'rtl' },
-  { code: 'ru', name: 'Russian', nativeName: 'Русский', dir: 'ltr' },
-  { code: 'pt', name: 'Portuguese', nativeName: 'Português', dir: 'ltr' },
-  { code: 'it', name: 'Italian', nativeName: 'Italiano', dir: 'ltr' },
-  { code: 'bn', name: 'Bengali', nativeName: 'বাংলা', dir: 'ltr' },
-  { code: 'mr', name: 'Marathi', nativeName: 'मराठी', dir: 'ltr' },
-  { code: 'ta', name: 'Tamil', nativeName: 'தமிழ்', dir: 'ltr' },
-  { code: 'te', name: 'Telugu', nativeName: 'తెలుగు', dir: 'ltr' },
-  { code: 'gu', name: 'Gujarati', nativeName: 'ગુજરાતી', dir: 'ltr' },
-  { code: 'ur', name: 'Urdu', nativeName: 'اردو', dir: 'rtl' },
+  { code: 'hi', name: 'Hindi', nativeName: 'हिन्दी', dir: 'ltr' },
 ];
 
 /**
- * Detects if a text string is written in Hindi (Devanagari script).
+ * Checks whether a string contains Devanagari (Hindi) script characters.
  */
-export const isHindiText = (text?: string): boolean => {
-  if (!text || typeof text !== 'string') return false;
-  const devanagariMatches = text.match(/[\u0900-\u097F]/g);
-  if (!devanagariMatches) return false;
-  return devanagariMatches.length >= 2;
-};
+export function isHindiText(text?: string | null): boolean {
+  if (!text) return false;
+  return /[\u0900-\u097F]/.test(text);
+}
 
 // =========================================================================
-// STRICT NON-DATABASE CACHING ENGINE (Memory + SessionStorage)
-// Zero database writes, zero duplicate rows, zero schema alterations
+// NON-DATABASE CACHING SYSTEM (Memory + SessionStorage only)
+// STRICT REQUIREMENT: No database tables, no schema changes, no DB caching.
 // =========================================================================
 
 const memoryCache = new Map<string, string>();
@@ -105,22 +88,113 @@ export function notifyTranslationUpdates(): void {
 }
 
 // =========================================================================
+// PRE-DEFINED INSTANT DICTIONARY FOR KNOWN AUTHORS & EDITORIAL DESKS
+// =========================================================================
+
+const AUTHOR_TRANSLATIONS: Record<string, string> = {
+  // English -> Hindi
+  'Umang Pandey': 'उमंग पाण्डेय',
+  'Dr. Neelima Pandey': 'डॉ. नीलिमा पाण्डेय',
+  'Diwan Chand Arya (D. C. Arya)': 'दीवान चंद आर्य (डी. सी. आर्य)',
+  'Diwan Chand Arya': 'दीवान चंद आर्य',
+  'Raj Kumar Agarwal': 'राज कुमार अग्रवाल',
+  'Pt. Krishna Nand Shastri (Advocate)': 'पं. कृष्ण नंद शास्त्री (अधिवक्ता)',
+  'Pt. Krishna Nand Shastri': 'पं. कृष्ण नंद शास्त्री',
+  'Bholeshwar Upmanyu': 'भोलेश्वर उपमन्यु',
+  'Neeraj Pandey': 'नीरज पाण्डेय',
+  'NP News Metro Bureau': 'एनपी न्यूज़ मेट्रो ब्यूरो',
+  'NP News Desk': 'एनपी न्यूज़ डेस्क',
+  'NP Bureau': 'एनपी ब्यूरो',
+  'Editorial Desk': 'संपादकीय डेस्क',
+  'Staff Reporter': 'स्टाफ रिपोर्टर',
+  'Staff Journalist & Reporter': 'विशेष संवाददाता एवं पत्रकार',
+  'Guest Contributor': 'अतिथि लेखक',
+  'Guest Contributor / Wire Reporter': 'अतिथि लेखक / विशेष संवाददाता',
+  'Founder & Chief Technology Officer (CTO)': 'संस्थापक एवं मुख्य प्रौद्योगिकी अधिकारी (CTO)',
+  'Chief Mentor & Advisor (Educator, Literary Scholar & Poet)': 'मार्गदर्शक (शिक्षिका, साहित्यकार एवं कवयित्री)',
+  'Advisory Board Member': 'सलाहकार मंडल सदस्य',
+  'Financial and Law Advisory Board Member': 'वित्तीय एवं विधि सलाहकार मंडल सदस्य',
+
+  // Hindi -> English
+  'उमंग पाण्डेय': 'Umang Pandey',
+  'डॉ. नीलिमा पाण्डेय': 'Dr. Neelima Pandey',
+  'दीवान चंद आर्य (डी. सी. आर्य)': 'Diwan Chand Arya (D. C. Arya)',
+  'दीवान चंद आर्य': 'Diwan Chand Arya',
+  'राज कुमार अग्रवाल': 'Raj Kumar Agarwal',
+  'पं. कृष्ण नंद शास्त्री (अधिवक्ता)': 'Pt. Krishna Nand Shastri (Advocate)',
+  'पं. कृष्ण नंद शास्त्री': 'Pt. Krishna Nand Shastri',
+  'भोलेश्वर उपमन्यु': 'Bholeshwar Upmanyu',
+  'नीरज पाण्डेय': 'Neeraj Pandey',
+  'एनपी न्यूज़ मेट्रो ब्यूरो': 'NP News Metro Bureau',
+  'एनपी न्यूज़ डेस्क': 'NP News Desk',
+  'एनपी ब्यूरो': 'NP Bureau',
+  'संपादकीय डेस्क': 'Editorial Desk',
+  'स्टाफ रिपोर्टर': 'Staff Reporter',
+  'विशेष संवाददाता एवं पत्रकार': 'Staff Journalist & Reporter',
+  'अतिथि लेखक': 'Guest Contributor',
+  'अतिथि लेखक / विशेष संवाददाता': 'Guest Contributor / Wire Reporter',
+  'संस्थापक एवं मुख्य प्रौद्योगिकी अधिकारी (CTO)': 'Founder & Chief Technology Officer (CTO)',
+  'मार्गदर्शक (शिक्षिका, साहित्यकार एवं कवयित्री)': 'Chief Mentor & Advisor (Educator, Literary Scholar & Poet)',
+  'सलाहकार मंडल सदस्य': 'Advisory Board Member',
+  'वित्तीय एवं विधि सलाहकार मंडल सदस्य': 'Financial and Law Advisory Board Member',
+};
+
+export const HINDI_CATEGORY_NAMES: Record<string, string> = {
+  india: 'भारत',
+  politics: 'राजनीति',
+  business: 'व्यापार',
+  economy: 'अर्थव्यवस्था',
+  technology: 'तकनीक',
+  world: 'विदेश',
+  sports: 'खेल',
+  entertainment: 'मनोरंजन',
+  lifestyle: 'जीवनशैली',
+  opinion: 'विचार',
+  crime: 'अपराध एवं कानून',
+  social: 'सामाजिक सरोकार',
+  astrology: 'ज्योतिष',
+  religion: 'धर्म एवं संस्कृति',
+  videos: 'वीडियो',
+  photos: 'फोटो',
+  latest: 'ताज़ा ख़बरें',
+  trending: 'ट्रेंडिंग',
+};
+
+export const ENGLISH_CATEGORY_NAMES: Record<string, string> = {
+  india: 'India',
+  politics: 'Politics',
+  business: 'Business',
+  economy: 'Economy',
+  technology: 'Technology',
+  world: 'World',
+  sports: 'Sports',
+  entertainment: 'Entertainment',
+  lifestyle: 'Lifestyle',
+  opinion: 'Opinion',
+  crime: 'Crime & Legal',
+  social: 'Social Issues',
+  astrology: 'Astrology',
+  religion: 'Religion & Culture',
+  videos: 'Videos',
+  photos: 'Photos',
+  latest: 'Latest',
+  trending: 'Trending',
+};
+
+// =========================================================================
 // FORMATTING PRESERVATION ENGINE
-// Protects URLs, bold syntax, italic syntax, line breaks and paragraph breaks
+// Protects markdown links, HTML links, and bold tokens
 // =========================================================================
 
 interface ProtectedTokenMap {
   [placeholder: string]: string;
 }
 
-/**
- * Protects markdown links, bold tags, and formatting before sending to translation service.
- */
 function protectFormatting(text: string): { protectedText: string; tokens: ProtectedTokenMap } {
   const tokens: ProtectedTokenMap = {};
   let tokenCounter = 0;
 
-  // 1. Protect Markdown Links: [text](url) -> keep url safe
+  // 1. Protect Markdown Links: [text](url)
   let protectedText = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_match, anchor, url) => {
     const placeholder = `⟦LNK_${tokenCounter++}⟧`;
     tokens[placeholder] = `[${anchor}](${url})`;
@@ -144,16 +218,11 @@ function protectFormatting(text: string): { protectedText: string; tokens: Prote
   return { protectedText, tokens };
 }
 
-/**
- * Restores protected formatting tokens after translation.
- */
 function restoreFormatting(translatedText: string, tokens: ProtectedTokenMap): string {
   let restored = translatedText;
   for (const [placeholder, original] of Object.entries(tokens)) {
-    // Escape brackets for regex
     const escaped = placeholder.replace(/⟦/g, '⟦').replace(/⟧/g, '⟧');
     restored = restored.replace(new RegExp(escaped, 'g'), original);
-    // Also handle case where translation engine converted ⟦...⟧ to [...]
     const altPlaceholder = placeholder.replace('⟦', '[').replace('⟧', ']');
     if (restored.includes(altPlaceholder)) {
       restored = restored.replace(altPlaceholder, original);
@@ -166,10 +235,6 @@ function restoreFormatting(translatedText: string, tokens: ProtectedTokenMap): s
 // TRANSLATION API NETWORK CALLS WITH GRACEFUL FALLBACK
 // =========================================================================
 
-/**
- * Translates a single text string dynamically with caching, formatting preservation,
- * and resilient fallbacks so the UI never crashes or displays blank content.
- */
 export async function translateText(
   text: string,
   targetLang: Language,
@@ -178,10 +243,14 @@ export async function translateText(
   const clean = text?.trim();
   if (!clean) return text;
 
-  // If already in target language or identical
   if (sourceLang === targetLang) return text;
 
-  // Check cache first
+  // Check known author dictionary first
+  if (AUTHOR_TRANSLATIONS[clean]) {
+    return AUTHOR_TRANSLATIONS[clean];
+  }
+
+  // Check cache
   const cached = getCachedTranslation(clean, targetLang, sourceLang);
   if (cached) return cached;
 
@@ -207,9 +276,7 @@ export async function translateText(
         return restored;
       }
     }
-  } catch (err) {
-    // continue to client-side fallback
-  }
+  } catch (err) {}
 
   // 2. Client-side fallback via Google Translate client endpoint
   try {
@@ -226,17 +293,11 @@ export async function translateText(
         }
       }
     }
-  } catch (err) {
-    // continue to fallback
-  }
+  } catch (err) {}
 
-  // 3. Fallback: return original text without breaking
   return text;
 }
 
-/**
- * Translates an array of texts in batch.
- */
 export async function translateTexts(
   texts: string[],
   targetLang: Language,
@@ -244,7 +305,6 @@ export async function translateTexts(
 ): Promise<string[]> {
   if (!Array.isArray(texts) || texts.length === 0) return [];
 
-  // Check which texts are already in cache
   const missingIndices: number[] = [];
   const missingTexts: string[] = [];
   const results = new Array(texts.length);
@@ -254,7 +314,12 @@ export async function translateTexts(
       results[i] = t;
       return;
     }
-    const cached = getCachedTranslation(t, targetLang, sourceLang);
+    const clean = t.trim();
+    if (AUTHOR_TRANSLATIONS[clean]) {
+      results[i] = AUTHOR_TRANSLATIONS[clean];
+      return;
+    }
+    const cached = getCachedTranslation(clean, targetLang, sourceLang);
     if (cached) {
       results[i] = cached;
     } else {
@@ -267,7 +332,7 @@ export async function translateTexts(
     return results;
   }
 
-  // Fetch missing translations
+  // Fetch missing translations via API
   try {
     const response = await fetch('/api/translate', {
       method: 'POST',
@@ -292,9 +357,7 @@ export async function translateTexts(
         return results;
       }
     }
-  } catch (err) {
-    // fallback to translating individually
-  }
+  } catch (err) {}
 
   // Fallback to parallel single translations
   await Promise.all(
@@ -308,7 +371,7 @@ export async function translateTexts(
 }
 
 // =========================================================================
-// ASYNC BATCH QUEUE & PREFETCHING
+// ASYNC BATCH QUEUE
 // =========================================================================
 
 interface QueueItem {
@@ -328,7 +391,7 @@ function enqueueTranslation(text: string, targetLang: Language, sourceLang: stri
   queueMap.set(key, { text, targetLang, sourceLang });
 
   if (!queueTimer) {
-    queueTimer = setTimeout(flushTranslationQueue, 60);
+    queueTimer = setTimeout(flushTranslationQueue, 50);
   }
 }
 
@@ -339,7 +402,6 @@ async function flushTranslationQueue(): Promise<void> {
   const items = Array.from(queueMap.values());
   queueMap.clear();
 
-  // Group by targetLang and sourceLang
   const groups = new Map<string, QueueItem[]>();
   items.forEach((item) => {
     const groupKey = `${item.sourceLang}:${item.targetLang}`;
@@ -359,9 +421,7 @@ async function flushTranslationQueue(): Promise<void> {
       try {
         await translateTexts(texts, targetLang, sourceLang);
         anyResolved = true;
-      } catch (e) {
-        // ignore
-      }
+      } catch (e) {}
     })
   );
 
@@ -371,19 +431,171 @@ async function flushTranslationQueue(): Promise<void> {
 }
 
 // =========================================================================
-// TWO-WAY ARTICLE & VIDEO DYNAMIC LOCALIZATION
+// TWO-WAY AUTHOR LOCALIZATION
+// When English: name, role, bio in English
+// When Hindi: name, role, bio in Hindi
 // =========================================================================
 
-/**
- * Returns a localized WpPost dynamically translated in both directions:
- * - When visitor selects Hindi, English content is displayed in Hindi.
- * - When visitor selects English, Hindi content is displayed in English.
- * - When visitor selects another supported language, content is translated into that language.
- *
- * STRICT REQUIREMENT: Zero database records created, original content untouched.
- */
+export function getLocalizedAuthor(
+  authorInput: WpAuthor | WpPost | Record<string, any> | null | undefined,
+  targetLang: Language
+): WpAuthor {
+  const isTargetHindi = targetLang === 'hi';
+
+  // 1. Extract base data from WpPost or WpAuthor
+  let id = 'staff-author';
+  let rawName = '';
+  let rawNameHi = '';
+  let rawRole = '';
+  let rawRoleHi = '';
+  let avatar = '/logo-circle.png';
+  let rawBio = '';
+  let rawBioHi = '';
+  let verified = true;
+  let beats: string[] = ['National News'];
+  let social: Record<string, string> = {};
+  let slug = 'author';
+
+  if (authorInput) {
+    // If input is WpPost
+    if ('title' in authorInput || 'category' in authorInput) {
+      const post = authorInput as WpPost;
+      id = post.authorId || 'staff-author';
+      const mock = id && mockAuthors[id] ? mockAuthors[id] : null;
+
+      if (post.customAuthor?.name) {
+        rawName = post.customAuthor.name;
+        rawRole = post.customAuthor.role || 'Staff Reporter';
+        avatar = post.customAuthor.avatar || avatar;
+        rawBio = post.customAuthor.bio || '';
+        verified = false;
+        slug = 'author';
+      } else if (mock) {
+        rawName = mock.name;
+        rawNameHi = mock.nameHi || '';
+        rawRole = mock.role;
+        rawRoleHi = mock.roleHi || '';
+        avatar = mock.avatar;
+        rawBio = mock.bio;
+        rawBioHi = mock.bioHi || '';
+        verified = mock.verified;
+        beats = mock.beats;
+        social = (mock.social as any) || {};
+        slug = mock.slug;
+      } else {
+        rawName = (post as any).authorName || 'NP News Metro Bureau';
+        rawRole = (post as any).authorRole || 'Editorial Desk';
+        avatar = (post as any).authorAvatar || avatar;
+      }
+    } else {
+      // Input is WpAuthor
+      const a = authorInput as WpAuthor;
+      id = a.id || 'staff-author';
+      const mock = id && mockAuthors[id] ? mockAuthors[id] : null;
+
+      rawName = a.name || (mock ? mock.name : 'NP News Metro Bureau');
+      rawNameHi = a.nameHi || (mock ? mock.nameHi || '' : '');
+      rawRole = a.role || (mock ? mock.role : 'Editorial Desk');
+      rawRoleHi = a.roleHi || (mock ? mock.roleHi || '' : '');
+      avatar = a.avatar || (mock ? mock.avatar : avatar);
+      rawBio = a.bio || (mock ? mock.bio : '');
+      rawBioHi = a.bioHi || (mock ? mock.bioHi || '' : '');
+      verified = a.verified ?? (mock ? mock.verified : true);
+      beats = a.beats || (mock ? mock.beats : ['National News']);
+      social = (a.social as any) || (mock ? (mock.social as any) : {});
+      slug = a.slug || (mock ? mock.slug : 'author');
+    }
+  }
+
+  // 2. Localize to Target Language
+  let name = rawName;
+  let role = rawRole;
+  let bio = rawBio;
+
+  if (isTargetHindi) {
+    // Target is Hindi:
+    // Name
+    if (rawNameHi && rawNameHi.trim()) {
+      name = rawNameHi;
+    } else if (AUTHOR_TRANSLATIONS[rawName]) {
+      name = AUTHOR_TRANSLATIONS[rawName];
+    } else if (!isHindiText(rawName)) {
+      name = getCachedTranslation(rawName, 'hi', 'en') || (enqueueTranslation(rawName, 'hi', 'en'), rawName);
+    } else {
+      name = rawName;
+    }
+
+    // Role
+    if (rawRoleHi && rawRoleHi.trim()) {
+      role = rawRoleHi;
+    } else if (AUTHOR_TRANSLATIONS[rawRole]) {
+      role = AUTHOR_TRANSLATIONS[rawRole];
+    } else if (!isHindiText(rawRole)) {
+      role = getCachedTranslation(rawRole, 'hi', 'en') || (enqueueTranslation(rawRole, 'hi', 'en'), 'संपादकीय डेस्क');
+    } else {
+      role = rawRole;
+    }
+
+    // Bio
+    if (rawBioHi && rawBioHi.trim()) {
+      bio = rawBioHi;
+    } else if (rawBio && !isHindiText(rawBio)) {
+      bio = getCachedTranslation(rawBio, 'hi', 'en') || (enqueueTranslation(rawBio, 'hi', 'en'), rawBio);
+    } else {
+      bio = rawBio;
+    }
+  } else {
+    // Target is English:
+    // Name
+    if (AUTHOR_TRANSLATIONS[rawName]) {
+      name = AUTHOR_TRANSLATIONS[rawName];
+    } else if (isHindiText(rawName)) {
+      name = getCachedTranslation(rawName, 'en', 'hi') || (enqueueTranslation(rawName, 'en', 'hi'), rawName);
+    } else {
+      name = rawName;
+    }
+
+    // Role
+    if (AUTHOR_TRANSLATIONS[rawRole]) {
+      role = AUTHOR_TRANSLATIONS[rawRole];
+    } else if (isHindiText(rawRole)) {
+      role = getCachedTranslation(rawRole, 'en', 'hi') || (enqueueTranslation(rawRole, 'en', 'hi'), 'Editorial Desk');
+    } else {
+      role = rawRole;
+    }
+
+    // Bio
+    if (rawBio && isHindiText(rawBio)) {
+      bio = getCachedTranslation(rawBio, 'en', 'hi') || (enqueueTranslation(rawBio, 'en', 'hi'), rawBio);
+    } else {
+      bio = rawBio;
+    }
+  }
+
+  return {
+    id,
+    name,
+    nameHi: rawNameHi,
+    slug,
+    role,
+    roleHi: rawRoleHi,
+    avatar,
+    bio,
+    bioHi: rawBioHi,
+    verified,
+    beats,
+    social: social as any,
+  };
+}
+
+// =========================================================================
+// TWO-WAY DYNAMIC ARTICLE LOCALIZATION (English & Hindi)
+// =========================================================================
+
 export const getLocalizedPost = (post: WpPost, lang: Language): WpPost => {
   if (!post) return post;
+
+  const localizedAuthor = getLocalizedAuthor(post, lang);
 
   // 1. Target is Hindi ('hi')
   if (lang === 'hi') {
@@ -416,7 +628,7 @@ export const getLocalizedPost = (post: WpPost, lang: Language): WpPost => {
         });
 
     let blocks = hasPreHindiBlocks ? post.blocksHi! : post.blocks;
-    if (!hasPreHindiBlocks && Array.isArray(post.blocks)) {
+    if (!hasPreHindiBlocks && Array.isArray(post.blocks) && post.blocks.length > 0) {
       blocks = post.blocks.map((block) => {
         if (block.type === 'paragraph' || block.type === 'heading' || block.type === 'pullquote') {
           if (block.content && !isHindiText(block.content)) {
@@ -429,120 +641,127 @@ export const getLocalizedPost = (post: WpPost, lang: Language): WpPost => {
         }
         return block;
       });
+    } else if (!hasPreHindiBlocks && post.content && typeof post.content === 'string') {
+      const paragraphs = post.content.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+      if (paragraphs.length > 0) {
+        blocks = paragraphs.map((p, idx) => {
+          if (!isHindiText(p)) {
+            const cached = getCachedTranslation(p, 'hi', 'en');
+            if (cached) return { id: `hi-p-${idx}`, type: 'paragraph' as const, content: cached };
+            enqueueTranslation(p, 'hi', 'en');
+          }
+          return { id: `hi-p-${idx}`, type: 'paragraph' as const, content: p };
+        });
+      }
     }
+
+    const imageCaption = post.imageCaptionHi || (post.imageCaption && !isHindiText(post.imageCaption)
+      ? getCachedTranslation(post.imageCaption, 'hi', 'en') || (enqueueTranslation(post.imageCaption, 'hi', 'en'), post.imageCaption)
+      : post.imageCaption);
+
+    const categoryName = post.categoryHi || HINDI_CATEGORY_NAMES[post.category] || post.category;
 
     return {
       ...post,
       title,
       dek,
-      category: (post.categoryHi || post.category) as any,
-      imageCaption: post.imageCaptionHi || post.imageCaption,
+      category: categoryName as any,
+      categoryHi: categoryName,
+      imageCaption,
       keyTakeaways,
       blocks,
-    };
+      readTime: post.readTime ? post.readTime.replace('min read', 'मिनट') : '3 मिनट',
+      author: localizedAuthor,
+      authorName: localizedAuthor.name,
+      authorRole: localizedAuthor.role,
+      customAuthor: post.customAuthor ? {
+        ...post.customAuthor,
+        name: localizedAuthor.name,
+        role: localizedAuthor.role,
+        bio: localizedAuthor.bio,
+      } : undefined,
+    } as WpPost;
   }
 
   // 2. Target is English ('en')
-  if (lang === 'en') {
-    const isHindiTitle = isHindiText(post.title);
-    const isHindiDek = isHindiText(post.dek);
+  const isHindiTitle = isHindiText(post.title);
+  const isHindiDek = isHindiText(post.dek);
 
-    const title = !isHindiTitle
-      ? post.title
-      : getCachedTranslation(post.title, 'en', 'hi') || (enqueueTranslation(post.title, 'en', 'hi'), post.title);
+  const title = !isHindiTitle
+    ? post.title
+    : getCachedTranslation(post.title, 'en', 'hi') || (enqueueTranslation(post.title, 'en', 'hi'), post.title);
 
-    const dek = !isHindiDek
-      ? post.dek
-      : getCachedTranslation(post.dek, 'en', 'hi') || (enqueueTranslation(post.dek, 'en', 'hi'), post.dek);
-
-    const keyTakeaways = post.keyTakeaways?.map((item) => {
-      if (!isHindiText(item)) return item;
-      const cached = getCachedTranslation(item, 'en', 'hi');
-      if (cached) return cached;
-      enqueueTranslation(item, 'en', 'hi');
-      return item;
-    });
-
-    let blocks = post.blocks;
-    if (Array.isArray(post.blocks)) {
-      blocks = post.blocks.map((block) => {
-        if (block.type === 'paragraph' || block.type === 'heading' || block.type === 'pullquote') {
-          if (block.content && isHindiText(block.content)) {
-            const cached = getCachedTranslation(block.content, 'en', 'hi');
-            if (cached) {
-              return { ...block, content: cached };
-            }
-            enqueueTranslation(block.content, 'en', 'hi');
-          }
-        }
-        return block;
-      });
-    }
-
-    return {
-      ...post,
-      title,
-      dek,
-      keyTakeaways,
-      blocks,
-    };
-  }
-
-  // 3. Target is another supported language ('es', 'fr', 'de', 'zh', 'ja', 'ar', etc.)
-  const sourceTitle = post.title || post.titleHi || '';
-  const sourceDek = post.dek || post.dekHi || '';
-  const sourceLang = isHindiText(sourceTitle) ? 'hi' : 'en';
-
-  const title = getCachedTranslation(sourceTitle, lang, sourceLang) ||
-    (enqueueTranslation(sourceTitle, lang, sourceLang), sourceTitle);
-
-  const dek = getCachedTranslation(sourceDek, lang, sourceLang) ||
-    (enqueueTranslation(sourceDek, lang, sourceLang), sourceDek);
-
-  const imageCaption = post.imageCaption
-    ? getCachedTranslation(post.imageCaption, lang, sourceLang) ||
-      (enqueueTranslation(post.imageCaption, lang, sourceLang), post.imageCaption)
-    : post.imageCaption;
+  const dek = !isHindiDek
+    ? post.dek
+    : getCachedTranslation(post.dek, 'en', 'hi') || (enqueueTranslation(post.dek, 'en', 'hi'), post.dek);
 
   const keyTakeaways = post.keyTakeaways?.map((item) => {
-    const itemSourceLang = isHindiText(item) ? 'hi' : 'en';
-    const cached = getCachedTranslation(item, lang, itemSourceLang);
+    if (!isHindiText(item)) return item;
+    const cached = getCachedTranslation(item, 'en', 'hi');
     if (cached) return cached;
-    enqueueTranslation(item, lang, itemSourceLang);
+    enqueueTranslation(item, 'en', 'hi');
     return item;
   });
 
-  const blocks = Array.isArray(post.blocks)
-    ? post.blocks.map((block) => {
-        if (block.type === 'paragraph' || block.type === 'heading' || block.type === 'pullquote') {
-          if (block.content) {
-            const blockSourceLang = isHindiText(block.content) ? 'hi' : 'en';
-            const cached = getCachedTranslation(block.content, lang, blockSourceLang);
-            if (cached) {
-              return { ...block, content: cached };
-            }
-            enqueueTranslation(block.content, lang, blockSourceLang);
+  let blocks = post.blocks;
+  if (Array.isArray(post.blocks) && post.blocks.length > 0) {
+    blocks = post.blocks.map((block) => {
+      if (block.type === 'paragraph' || block.type === 'heading' || block.type === 'pullquote') {
+        if (block.content && isHindiText(block.content)) {
+          const cached = getCachedTranslation(block.content, 'en', 'hi');
+          if (cached) {
+            return { ...block, content: cached };
           }
+          enqueueTranslation(block.content, 'en', 'hi');
         }
-        return block;
-      })
-    : post.blocks;
+      }
+      return block;
+    });
+  } else if (post.content && typeof post.content === 'string') {
+    const paragraphs = post.content.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+    if (paragraphs.length > 0) {
+      blocks = paragraphs.map((p, idx) => {
+        if (isHindiText(p)) {
+          const cached = getCachedTranslation(p, 'en', 'hi');
+          if (cached) return { id: `en-p-${idx}`, type: 'paragraph' as const, content: cached };
+          enqueueTranslation(p, 'en', 'hi');
+        }
+        return { id: `en-p-${idx}`, type: 'paragraph' as const, content: p };
+      });
+    }
+  }
+
+  const imageCaption = post.imageCaption && isHindiText(post.imageCaption)
+    ? getCachedTranslation(post.imageCaption, 'en', 'hi') || (enqueueTranslation(post.imageCaption, 'en', 'hi'), post.imageCaption)
+    : post.imageCaption;
+
+  const categoryName = ENGLISH_CATEGORY_NAMES[post.category] || (post.category.charAt(0).toUpperCase() + post.category.slice(1));
 
   return {
     ...post,
     title,
     dek,
+    category: categoryName as any,
     imageCaption,
     keyTakeaways,
     blocks,
-  };
+    readTime: post.readTime ? post.readTime.replace('मिनट', 'min read') : '3 min read',
+    author: localizedAuthor,
+    authorName: localizedAuthor.name,
+    authorRole: localizedAuthor.role,
+    customAuthor: post.customAuthor ? {
+      ...post.customAuthor,
+      name: localizedAuthor.name,
+      role: localizedAuthor.role,
+      bio: localizedAuthor.bio,
+    } : undefined,
+  } as WpPost;
 };
 
-/**
- * Returns a localized WpVideo dynamically translated in both directions:
- * - Translates title and caption/description into target language.
- * - Preserves videoUrl, posterUrl, duration, presenter, and media unchanged.
- */
+// =========================================================================
+// TWO-WAY VIDEO LOCALIZATION
+// =========================================================================
+
 export const getLocalizedVideo = (video: WpVideo, lang: Language): WpVideo => {
   if (!video) return video;
 
@@ -555,75 +774,137 @@ export const getLocalizedVideo = (video: WpVideo, lang: Language): WpVideo => {
       ? video.caption
       : getCachedTranslation(video.caption, 'hi', 'en') || (enqueueTranslation(video.caption, 'hi', 'en'), video.caption));
 
-    return {
-      ...video,
-      title,
-      caption,
-      category: video.categoryHi || video.category,
-    };
-  }
-
-  if (lang === 'en') {
-    const title = !isHindiText(video.title)
-      ? video.title
-      : getCachedTranslation(video.title, 'en', 'hi') || (enqueueTranslation(video.title, 'en', 'hi'), video.title);
-
-    const caption = !isHindiText(video.caption)
-      ? video.caption
-      : getCachedTranslation(video.caption, 'en', 'hi') || (enqueueTranslation(video.caption, 'en', 'hi'), video.caption);
+    const category = video.categoryHi || HINDI_CATEGORY_NAMES[video.category.toLowerCase()] || video.category;
 
     return {
       ...video,
       title,
       caption,
+      category,
     };
   }
 
-  // Other languages ('es', 'fr', 'de', 'zh', 'ja', 'ar', etc.)
-  const sourceTitle = video.title || video.titleHi || '';
-  const sourceCaption = video.caption || video.captionHi || '';
-  const sourceLang = isHindiText(sourceTitle) ? 'hi' : 'en';
+  // English
+  const title = !isHindiText(video.title)
+    ? video.title
+    : getCachedTranslation(video.title, 'en', 'hi') || (enqueueTranslation(video.title, 'en', 'hi'), video.title);
 
-  const title = getCachedTranslation(sourceTitle, lang, sourceLang) ||
-    (enqueueTranslation(sourceTitle, lang, sourceLang), sourceTitle);
+  const caption = !isHindiText(video.caption)
+    ? video.caption
+    : getCachedTranslation(video.caption, 'en', 'hi') || (enqueueTranslation(video.caption, 'en', 'hi'), video.caption);
 
-  const caption = getCachedTranslation(sourceCaption, lang, sourceLang) ||
-    (enqueueTranslation(sourceCaption, lang, sourceLang), sourceCaption);
+  const category = ENGLISH_CATEGORY_NAMES[video.category.toLowerCase()] || video.category;
 
   return {
     ...video,
     title,
     caption,
+    category,
   };
 };
 
-/**
- * High-priority prefetch for the active full article page.
- */
+// =========================================================================
+// FULL ARTICLE PREFETCHING ENGINE
+// =========================================================================
+
 export async function ensurePostTranslated(post: WpPost, targetLang: Language): Promise<void> {
-  if (!post || targetLang === 'en' && !isHindiText(post.title) && !isHindiText(post.dek)) {
-    return;
-  }
-  if (targetLang === 'hi' && post.titleHi && post.dekHi && post.blocksHi && post.blocksHi.length > 0) {
+  if (!post) return;
+
+  const textsToTranslate: string[] = [];
+
+  if (targetLang === 'en') {
+    if (post.title && isHindiText(post.title) && !getCachedTranslation(post.title, 'en', 'hi')) {
+      textsToTranslate.push(post.title);
+    }
+    if (post.dek && isHindiText(post.dek) && !getCachedTranslation(post.dek, 'en', 'hi')) {
+      textsToTranslate.push(post.dek);
+    }
+    if (post.imageCaption && isHindiText(post.imageCaption) && !getCachedTranslation(post.imageCaption, 'en', 'hi')) {
+      textsToTranslate.push(post.imageCaption);
+    }
+    if (post.customAuthor?.name && isHindiText(post.customAuthor.name) && !AUTHOR_TRANSLATIONS[post.customAuthor.name]) {
+      textsToTranslate.push(post.customAuthor.name);
+    }
+    if (post.customAuthor?.role && isHindiText(post.customAuthor.role) && !AUTHOR_TRANSLATIONS[post.customAuthor.role]) {
+      textsToTranslate.push(post.customAuthor.role);
+    }
+    if (post.customAuthor?.bio && isHindiText(post.customAuthor.bio)) {
+      textsToTranslate.push(post.customAuthor.bio);
+    }
+    if (Array.isArray(post.keyTakeaways)) {
+      post.keyTakeaways.forEach((k) => {
+        if (isHindiText(k) && !getCachedTranslation(k, 'en', 'hi')) {
+          textsToTranslate.push(k);
+        }
+      });
+    }
+    if (Array.isArray(post.blocks)) {
+      post.blocks.forEach((b) => {
+        if (b.content && isHindiText(b.content) && !getCachedTranslation(b.content, 'en', 'hi')) {
+          textsToTranslate.push(b.content);
+        }
+      });
+    }
+    if (post.content && typeof post.content === 'string') {
+      const paragraphs = post.content.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+      paragraphs.forEach((p) => {
+        if (isHindiText(p) && !getCachedTranslation(p, 'en', 'hi')) {
+          textsToTranslate.push(p);
+        }
+      });
+    }
+
+    if (textsToTranslate.length > 0) {
+      await translateTexts(textsToTranslate, 'en', 'hi');
+      notifyTranslationUpdates();
+    }
     return;
   }
 
-  const textsToTranslate: string[] = [];
-  if (post.title) textsToTranslate.push(post.title);
-  if (post.dek) textsToTranslate.push(post.dek);
-  if (post.imageCaption) textsToTranslate.push(post.imageCaption);
-  if (Array.isArray(post.keyTakeaways)) {
-    post.keyTakeaways.forEach((k) => textsToTranslate.push(k));
+  // targetLang === 'hi'
+  if (!post.titleHi && post.title && !isHindiText(post.title) && !getCachedTranslation(post.title, 'hi', 'en')) {
+    textsToTranslate.push(post.title);
   }
-  if (Array.isArray(post.blocks)) {
+  if (!post.dekHi && post.dek && !isHindiText(post.dek) && !getCachedTranslation(post.dek, 'hi', 'en')) {
+    textsToTranslate.push(post.dek);
+  }
+  if (!post.imageCaptionHi && post.imageCaption && !isHindiText(post.imageCaption) && !getCachedTranslation(post.imageCaption, 'hi', 'en')) {
+    textsToTranslate.push(post.imageCaption);
+  }
+  if (post.customAuthor?.name && !isHindiText(post.customAuthor.name) && !AUTHOR_TRANSLATIONS[post.customAuthor.name]) {
+    textsToTranslate.push(post.customAuthor.name);
+  }
+  if (post.customAuthor?.role && !isHindiText(post.customAuthor.role) && !AUTHOR_TRANSLATIONS[post.customAuthor.role]) {
+    textsToTranslate.push(post.customAuthor.role);
+  }
+  if (post.customAuthor?.bio && !isHindiText(post.customAuthor.bio)) {
+    textsToTranslate.push(post.customAuthor.bio);
+  }
+  if (!post.keyTakeawaysHi && Array.isArray(post.keyTakeaways)) {
+    post.keyTakeaways.forEach((k) => {
+      if (!isHindiText(k) && !getCachedTranslation(k, 'hi', 'en')) {
+        textsToTranslate.push(k);
+      }
+    });
+  }
+  if ((!post.blocksHi || post.blocksHi.length === 0) && Array.isArray(post.blocks)) {
     post.blocks.forEach((b) => {
-      if (b.content && (b.type === 'paragraph' || b.type === 'heading' || b.type === 'pullquote')) {
+      if (b.content && !isHindiText(b.content) && !getCachedTranslation(b.content, 'hi', 'en')) {
         textsToTranslate.push(b.content);
       }
     });
   }
+  if ((!post.blocksHi || post.blocksHi.length === 0) && post.content && typeof post.content === 'string') {
+    const paragraphs = post.content.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+    paragraphs.forEach((p) => {
+      if (!isHindiText(p) && !getCachedTranslation(p, 'hi', 'en')) {
+        textsToTranslate.push(p);
+      }
+    });
+  }
 
-  const sourceLang = isHindiText(post.title) ? 'hi' : 'en';
-  await translateTexts(textsToTranslate, targetLang, sourceLang);
-  notifyTranslationUpdates();
+  if (textsToTranslate.length > 0) {
+    await translateTexts(textsToTranslate, 'hi', 'en');
+    notifyTranslationUpdates();
+  }
 }

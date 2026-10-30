@@ -3,7 +3,7 @@ import { Clock, Share2, ArrowRight } from 'lucide-react';
 import { WpPost } from '../../types/wordpress';
 import { handleImageError, getAuthorAvatarUrl, handleAvatarError, getOptimizedImageUrl } from '../../utils/imageFallback';
 import { useLanguage } from '../../context/LanguageContext';
-import { getLocalizedPost, mockAuthors } from '../../data/mockWpData';
+import { getLocalizedPost, mockAuthors, getLocalizedAuthor } from '../../data/mockWpData';
 import { formatRelativeTime } from '../../utils/dateUtils';
 import { renderInlineMarkdown } from '../article/ArticleBody';
 
@@ -21,16 +21,7 @@ export const LatestNewsRow: React.FC<LatestNewsRowProps> = ({
   const { language, isHindi } = useLanguage();
   const localized = getLocalizedPost(post, language);
 
-  const author = post.customAuthor?.name ? {
-    name: post.customAuthor.name,
-    avatar: getAuthorAvatarUrl(post.customAuthor.avatar),
-  } : (post.authorId && mockAuthors[post.authorId] ? {
-    name: mockAuthors[post.authorId].name,
-    avatar: getAuthorAvatarUrl(mockAuthors[post.authorId].avatar),
-  } : {
-    name: isHindi ? 'एनपी ब्यूरो' : 'NP Bureau',
-    avatar: '/logo-circle.png',
-  });
+  const author = getLocalizedAuthor(post, language);
 
   return (
     <article

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Play, Eye, Clock, User, ShieldCheck, Flame, Share2, FileText, ArrowRight } from 'lucide-react';
 import { WpVideo, WpPost } from '../types/wordpress';
-import { mockVideos, mockAuthors, getLocalizedVideo } from '../data/mockWpData';
+import { mockVideos, mockAuthors, getLocalizedVideo, getLocalizedAuthor } from '../data/mockWpData';
 import { getStoredPosts } from '../utils/newsStorage';
 import { VideoPlayer } from '../components/media/VideoPlayer';
 import { ArticleShareBar } from '../components/article/ArticleShareBar';
@@ -33,7 +33,7 @@ export const VideoDetailTemplate: React.FC<VideoDetailTemplateProps> = ({
   if (!video) return null;
   const { language, t, isHindi } = useLanguage();
   const localized = getLocalizedVideo(video, language);
-  const author = mockAuthors[video.authorId];
+  const author = getLocalizedAuthor(mockAuthors[video.authorId], language);
   const relatedVideos = mockVideos.filter((v) => v.id !== video.id);
   const storedPosts = getStoredPosts();
   const relatedPosts = storedPosts.slice(0, 3);

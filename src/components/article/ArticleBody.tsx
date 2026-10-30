@@ -6,6 +6,7 @@ import { AdSlot } from '../commercial/AdSlot';
 import { handleImageError, getOptimizedImageUrl } from '../../utils/imageFallback';
 import { useLanguage } from '../../context/LanguageContext';
 import { getLocalizedPost } from '../../data/mockWpData';
+import { isHindiText, getCachedTranslation } from '../../services/translationService';
 
 interface ArticleBodyProps {
   post: WpPost;
@@ -99,11 +100,19 @@ export const ArticleBody: React.FC<ArticleBodyProps> = ({
   if ((rawBlocks.length === 0 || isOnlyPlaceholder) && hasFullContent && post.content) {
     const paragraphs = post.content.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
     if (paragraphs.length > 0) {
-      activeBlocks = paragraphs.map((p, idx) => ({
-        id: `content-p-${idx}`,
-        type: 'paragraph' as const,
-        content: p,
-      }));
+      activeBlocks = paragraphs.map((p, idx) => {
+        let content = p;
+        if (language === 'en' && isHindiText(p)) {
+          content = getCachedTranslation(p, 'en', 'hi') || p;
+        } else if (language === 'hi' && !isHindiText(p)) {
+          content = getCachedTranslation(p, 'hi', 'en') || p;
+        }
+        return {
+          id: `content-p-${idx}`,
+          type: 'paragraph' as const,
+          content,
+        };
+      });
     }
   }
 

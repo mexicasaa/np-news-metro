@@ -1,29 +1,13 @@
 import { Language } from '../i18n/translations';
 
 /**
- * High-precision, multilingual editorial date & relative time utilities
- * for NP News Metro. Ensures all articles display genuine, clear publication timestamps
- * in the visitor's selected language.
+ * High-precision editorial date & relative time utilities
+ * for NP News Metro (English & Hindi).
  */
 
-const LOCALE_MAP: Record<string, string> = {
-  hi: 'hi-IN',
+const LOCALE_MAP: Record<Language, string> = {
   en: 'en-US',
-  es: 'es-ES',
-  fr: 'fr-FR',
-  de: 'de-DE',
-  zh: 'zh-CN',
-  ja: 'ja-JP',
-  ar: 'ar-SA',
-  ru: 'ru-RU',
-  pt: 'pt-BR',
-  it: 'it-IT',
-  bn: 'bn-IN',
-  mr: 'mr-IN',
-  ta: 'ta-IN',
-  te: 'te-IN',
-  gu: 'gu-IN',
-  ur: 'ur-PK',
+  hi: 'hi-IN',
 };
 
 export const formatRelativeTime = (
@@ -31,14 +15,7 @@ export const formatRelativeTime = (
   lang: Language = 'hi'
 ): string => {
   if (!dateInput) {
-    if (lang === 'hi') return 'हाल ही में';
-    if (lang === 'ar') return 'مؤخراً';
-    if (lang === 'fr') return 'Récemment';
-    if (lang === 'es') return 'Recientemente';
-    if (lang === 'de') return 'Kürzlich';
-    if (lang === 'ja') return '最近';
-    if (lang === 'zh') return '近期';
-    return 'Recently';
+    return lang === 'hi' ? 'हाल ही में' : 'Recently';
   }
 
   const date = new Date(dateInput);
@@ -56,14 +33,7 @@ export const formatRelativeTime = (
 
   // If timestamp is slightly in future or <1 min
   if (diffMinutes < 1) {
-    if (lang === 'hi') return 'अभी-अभी';
-    if (lang === 'ar') return 'الآن';
-    if (lang === 'fr') return 'À l\'instant';
-    if (lang === 'es') return 'Ahora mismo';
-    if (lang === 'de') return 'Gerade eben';
-    if (lang === 'ja') return 'たった今';
-    if (lang === 'zh') return '刚刚';
-    return 'Just now';
+    return lang === 'hi' ? 'अभी-अभी' : 'Just now';
   }
 
   // Under 60 minutes
@@ -94,12 +64,7 @@ export const formatRelativeTime = (
       hour12: false,
       timeZone: 'Asia/Kolkata',
     });
-    if (lang === 'hi') return `कल, ${timeStr} IST`;
-    if (lang === 'ar') return `أمس، ${timeStr} IST`;
-    if (lang === 'fr') return `Hier, ${timeStr} IST`;
-    if (lang === 'es') return `Ayer, ${timeStr} IST`;
-    if (lang === 'de') return `Gestern, ${timeStr} IST`;
-    return `Yesterday, ${timeStr} IST`;
+    return lang === 'hi' ? `कल, ${timeStr} IST` : `Yesterday, ${timeStr} IST`;
   }
 
   // Under 7 days

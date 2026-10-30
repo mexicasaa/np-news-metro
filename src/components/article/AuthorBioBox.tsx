@@ -3,6 +3,7 @@ import { ShieldCheck, ArrowRight, Mail, Twitter, Linkedin } from 'lucide-react';
 import { WpAuthor } from '../../types/wordpress';
 import { useLanguage } from '../../context/LanguageContext';
 import { getAuthorAvatarUrl, handleAvatarError } from '../../utils/imageFallback';
+import { getLocalizedAuthor } from '../../data/mockWpData';
 
 interface AuthorBioBoxProps {
   author: WpAuthor;
@@ -13,13 +14,14 @@ export const AuthorBioBox: React.FC<AuthorBioBoxProps> = ({
   author,
   onViewAuthorProfile,
 }) => {
-  const { t, isHindi } = useLanguage();
+  const { isHindi, language } = useLanguage();
+  const localizedAuthor = getLocalizedAuthor(author, language);
 
   return (
     <div className="my-10 p-6 bg-surface-lowest border border-border-subtle rounded-sm shadow-subtle flex flex-col sm:flex-row gap-5 items-start">
       <img
-        src={getAuthorAvatarUrl(author.avatar)}
-        alt={author.name}
+        src={getAuthorAvatarUrl(localizedAuthor.avatar)}
+        alt={localizedAuthor.name}
         className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-border-subtle flex-shrink-0"
         onError={handleAvatarError}
       />
@@ -30,12 +32,12 @@ export const AuthorBioBox: React.FC<AuthorBioBoxProps> = ({
             {isHindi ? 'लेखक:' : 'Written by'}
           </span>
           <h3
-            onClick={() => onViewAuthorProfile(author.id)}
+            onClick={() => onViewAuthorProfile(localizedAuthor.id)}
             className="font-serif text-lg font-bold text-ink hover:text-primary cursor-pointer transition-colors"
           >
-            {author.name}
+            {localizedAuthor.name}
           </h3>
-          {author.verified && (
+          {localizedAuthor.verified && (
             <span title={isHindi ? 'सत्यापित संपादकीय सदस्य' : 'Verified Editorial Staff'}>
               <ShieldCheck className="w-4 h-4 text-emerald-700" />
             </span>
@@ -43,11 +45,11 @@ export const AuthorBioBox: React.FC<AuthorBioBoxProps> = ({
         </div>
 
         <p className="text-xs font-semibold text-secondary mb-2">
-          {author.role}
+          {localizedAuthor.role}
         </p>
 
         <p className="text-xs sm:text-sm text-ink-secondary leading-relaxed mb-4">
-          {author.bio}
+          {localizedAuthor.bio}
         </p>
 
         <div className="flex items-center justify-between gap-3 pt-3 border-t border-border-subtle text-xs">

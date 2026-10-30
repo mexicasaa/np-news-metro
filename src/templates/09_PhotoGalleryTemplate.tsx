@@ -1,7 +1,7 @@
 import React from 'react';
 import { Camera, Eye, Share2, Flame, ArrowRight, User } from 'lucide-react';
 import { WpGallery, WpPost } from '../types/wordpress';
-import { mockGalleries, mockAuthors } from '../data/mockWpData';
+import { mockGalleries, mockAuthors, getLocalizedAuthor } from '../data/mockWpData';
 import { getStoredPosts } from '../utils/newsStorage';
 import { GalleryViewer } from '../components/media/GalleryViewer';
 import { ArticleShareBar } from '../components/article/ArticleShareBar';
@@ -27,7 +27,7 @@ export const PhotoGalleryTemplate: React.FC<PhotoGalleryTemplateProps> = ({
   showAds = true,
 }) => {
   const { language, t, isHindi } = useLanguage();
-  const author = mockAuthors[gallery.authorId];
+  const author = getLocalizedAuthor(mockAuthors[gallery.authorId], language);
   const storedPosts = getStoredPosts();
   const relatedPosts = storedPosts.slice(0, 3);
   const trendingRanking = [...storedPosts].sort((a, b) => (b.viewsCount || 0) - (a.viewsCount || 0)).slice(0, 5);

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Quote, Feather, ShieldCheck, Flame, BookOpen, ArrowRight } from 'lucide-react';
 import { WpPost } from '../types/wordpress';
-import { mockAuthors, getLocalizedPost } from '../data/mockWpData';
+import { mockAuthors, getLocalizedPost, getLocalizedAuthor } from '../data/mockWpData';
 import { ensurePostTranslated } from '../services/translationService';
 import { getStoredPosts } from '../utils/newsStorage';
 import { getArticleBySlug } from '../services/articleService';
@@ -53,35 +53,7 @@ export const OpinionArticleTemplate: React.FC<OpinionArticleTemplateProps> = ({
       }).catch(() => {});
     }
   }, [post?.slug, post?.blocks?.[0]?.id, (post as any)?.content]);
-  const author = post.customAuthor?.name ? {
-    id: 'guest',
-    name: post.customAuthor.name,
-    role: post.customAuthor.role || 'Columnist & Contributor',
-    avatar: getAuthorAvatarUrl(post.customAuthor.avatar),
-    bio: `${post.customAuthor.name} writes opinions and analytical columns for NP News Metro.`,
-    twitter: '',
-    email: '',
-    beats: ['Opinion & Analysis'],
-    social: {},
-    verified: false,
-    slug: 'guest'
-  } : (post.authorId && mockAuthors[post.authorId] ? {
-    ...mockAuthors[post.authorId],
-    avatar: getAuthorAvatarUrl(mockAuthors[post.authorId].avatar),
-  } : (mockAuthors['author-4'] ? {
-    ...mockAuthors['author-4'],
-    avatar: getAuthorAvatarUrl(mockAuthors['author-4'].avatar),
-  } : {
-    id: 'staff-author',
-    name: isHindi ? 'संपादकीय विचार मंच' : 'NP Editorial Board',
-    slug: 'author',
-    role: isHindi ? 'संपादकीय लेखक' : 'Opinion Columnist',
-    avatar: getAuthorAvatarUrl(null),
-    bio: 'NP News Metro Opinion Desk.',
-    verified: true,
-    beats: ['Opinion & Analysis'],
-    social: {}
-  }));
+  const author = getLocalizedAuthor(post, language);
   const storedPosts = getStoredPosts();
   const otherOpinions = storedPosts.filter((p) => p.id !== post.id && (p.isOpinion || p.category === 'opinion'));
   const trendingRanking = [...storedPosts].sort((a, b) => (b.viewsCount || 0) - (a.viewsCount || 0)).slice(0, 5);

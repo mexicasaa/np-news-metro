@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ShieldCheck, Twitter, Linkedin, Mail, ArrowRight, BookOpen, Flame, Newspaper } from 'lucide-react';
 import { WpAuthor, WpPost } from '../types/wordpress';
-import { mockAuthors } from '../data/mockWpData';
+import { mockAuthors, getLocalizedAuthor } from '../data/mockWpData';
 import { getStoredPosts } from '../utils/newsStorage';
 import { HorizontalStoryCard } from '../components/cards/HorizontalStoryCard';
 import { RankingItem } from '../components/cards/RankingItem';
@@ -24,12 +24,13 @@ export const AuthorProfileTemplate: React.FC<AuthorProfileTemplateProps> = ({
   onSelectCategory,
 }) => {
   const [activeTab, setActiveTab] = useState<'latest' | 'popular'>('latest');
-  const { t, isHindi } = useLanguage();
+  const { t, isHindi, language } = useLanguage();
 
-  const author = mockAuthors[authorId] || Object.values(mockAuthors).find(a => a.slug === authorId || a.id === authorId) || mockAuthors['author-1'];
-  const displayName = isHindi && author.nameHi ? author.nameHi : author.name;
-  const displayRole = isHindi && author.roleHi ? author.roleHi : author.role;
-  const displayBio = isHindi && author.bioHi ? author.bioHi : author.bio;
+  const rawAuthor = mockAuthors[authorId] || Object.values(mockAuthors).find(a => a.slug === authorId || a.id === authorId) || mockAuthors['author-1'];
+  const author = getLocalizedAuthor(rawAuthor, language);
+  const displayName = author.name;
+  const displayRole = author.role;
+  const displayBio = author.bio;
   const storedPosts = getStoredPosts();
   const authorPosts = storedPosts.filter((p) => p.authorId === author.id);
   const displayPosts = authorPosts.length > 0 ? authorPosts : storedPosts.slice(0, 3);

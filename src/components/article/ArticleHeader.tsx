@@ -1,7 +1,7 @@
 import React from 'react';
 import { Clock, Calendar, ShieldCheck, Share2, Bookmark, Printer, MessageSquare, AlertCircle, MapPin } from 'lucide-react';
 import { WpPost } from '../../types/wordpress';
-import { mockAuthors, getLocalizedPost } from '../../data/mockWpData';
+import { mockAuthors, getLocalizedPost, getLocalizedAuthor } from '../../data/mockWpData';
 import { useLanguage } from '../../context/LanguageContext';
 import { getAuthorAvatarUrl, handleAvatarError } from '../../utils/imageFallback';
 import { renderInlineMarkdown } from './ArticleBody';
@@ -21,30 +21,7 @@ export const ArticleHeader: React.FC<ArticleHeaderProps> = ({
 }) => {
   const { language, t, isHindi } = useLanguage();
   const localized = getLocalizedPost(post, language);
-  const author = post.customAuthor?.name ? {
-    id: post.authorId || 'staff-author',
-    name: post.customAuthor.name,
-    slug: 'author',
-    role: post.customAuthor.role || (isHindi ? 'विशेष संवाददाता एवं पत्रकार' : 'Staff Journalist & Reporter'),
-    avatar: getAuthorAvatarUrl(post.customAuthor.avatar),
-    bio: post.customAuthor.bio || `${post.customAuthor.name} serves as ${post.customAuthor.role || 'Staff Journalist'} at NP News Metro.`,
-    verified: true,
-    beats: ['National News', 'Editorial Reporting'],
-    social: {}
-  } : (post.authorId && mockAuthors[post.authorId] ? {
-    ...mockAuthors[post.authorId],
-    avatar: getAuthorAvatarUrl(mockAuthors[post.authorId].avatar),
-  } : {
-    id: 'staff-author',
-    name: isHindi ? 'एनपी न्यूज़ मेट्रो ब्यूरो' : 'NP News Metro Bureau',
-    slug: 'author',
-    role: isHindi ? 'संपादकीय डेस्क' : 'Editorial Desk',
-    avatar: getAuthorAvatarUrl(null),
-    bio: 'NP News Metro Bureau reporting team.',
-    verified: true,
-    beats: ['National News'],
-    social: {}
-  });
+  const author = getLocalizedAuthor(post, language);
 
   const formatDateTime = (dateStr: string) => {
     try {

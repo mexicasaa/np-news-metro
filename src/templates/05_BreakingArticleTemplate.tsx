@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Radio, Clock, AlertTriangle, Flame, Share2, RefreshCw, Pin } from 'lucide-react';
 import { WpPost } from '../types/wordpress';
-import { mockAuthors, mockLiveBlog, getLocalizedPost } from '../data/mockWpData';
+import { mockAuthors, mockLiveBlog, getLocalizedPost, getLocalizedAuthor } from '../data/mockWpData';
 import { ensurePostTranslated } from '../services/translationService';
 import { getStoredPosts } from '../utils/newsStorage';
 import { getArticleBySlug } from '../services/articleService';
@@ -55,32 +55,7 @@ export const BreakingArticleTemplate: React.FC<BreakingArticleTemplateProps> = (
       }).catch(() => {});
     }
   }, [post?.slug, post?.blocks?.[0]?.id, (post as any)?.content]);
-  const author = post.customAuthor?.name ? {
-    id: 'guest',
-    name: post.customAuthor.name,
-    role: post.customAuthor.role || 'Guest Contributor',
-    avatar: getAuthorAvatarUrl(post.customAuthor.avatar),
-    bio: '',
-    twitter: '',
-    email: '',
-    beats: ['National News'],
-    social: {},
-    verified: false,
-    slug: 'guest'
-  } : (post.authorId && mockAuthors[post.authorId] ? {
-    ...mockAuthors[post.authorId],
-    avatar: getAuthorAvatarUrl(mockAuthors[post.authorId].avatar),
-  } : {
-    id: 'staff-author',
-    name: isHindi ? 'एनपी न्यूज़ मेट्रो ब्यूरो' : 'NP News Metro Bureau',
-    slug: 'author',
-    role: isHindi ? 'संपादकीय डेस्क' : 'Editorial Desk',
-    avatar: getAuthorAvatarUrl(null),
-    bio: 'NP News Metro Bureau reporting team.',
-    verified: true,
-    beats: ['National News'],
-    social: {}
-  });
+  const author = getLocalizedAuthor(post, language);
   const storedPosts = getStoredPosts();
   const relatedBreaking = storedPosts.filter((p) => p.id !== post.id && p.isBreaking);
   const trendingRanking = [...storedPosts].sort((a, b) => (b.viewsCount || 0) - (a.viewsCount || 0)).slice(0, 5);

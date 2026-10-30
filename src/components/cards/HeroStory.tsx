@@ -5,7 +5,7 @@ import {
   Maximize2, X, Sparkles, Flame, Headphones, Check, Eye, MessageSquare 
 } from 'lucide-react';
 import { WpPost } from '../../types/wordpress';
-import { mockAuthors, getLocalizedPost } from '../../data/mockWpData';
+import { mockAuthors, getLocalizedPost, getLocalizedAuthor } from '../../data/mockWpData';
 import { handleImageError, getAuthorAvatarUrl, handleAvatarError, getOptimizedImageUrl } from '../../utils/imageFallback';
 import { useLanguage } from '../../context/LanguageContext';
 import { ShareModal } from '../article/ShareModal';
@@ -50,28 +50,7 @@ export const HeroStory: React.FC<HeroStoryProps> = ({
   if (!rawStory) return null;
 
   const currentStory = getLocalizedPost(rawStory, language);
-  const author = rawStory.customAuthor?.name ? {
-    id: 'custom-author',
-    name: rawStory.customAuthor.name,
-    role: rawStory.customAuthor.role || 'Guest Contributor',
-    avatar: getAuthorAvatarUrl(rawStory.customAuthor.avatar),
-    bio: '',
-    twitter: '',
-    email: ''
-  } : (currentStory.authorId && mockAuthors[currentStory.authorId] ? {
-    ...mockAuthors[currentStory.authorId],
-    avatar: getAuthorAvatarUrl(mockAuthors[currentStory.authorId].avatar),
-  } : {
-    id: 'staff-author',
-    name: isHindi ? 'एनपी न्यूज़ मेट्रो ब्यूरो' : 'NP News Metro Bureau',
-    slug: 'author',
-    role: isHindi ? 'संपादकीय डेस्क' : 'Editorial Desk',
-    avatar: getAuthorAvatarUrl(null),
-    bio: 'NP News Metro Bureau reporting team.',
-    verified: true,
-    beats: ['National News'],
-    social: {}
-  });
+  const author = getLocalizedAuthor(currentStory, language);
 
   // Auto-slide carousel when not hovered
   useEffect(() => {

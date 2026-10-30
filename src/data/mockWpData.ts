@@ -1912,4 +1912,4 @@ export const mockAdSlots: Record<string, AdSlotConfig> = {
   },
 };
 
-export { getLocalizedPost, getLocalizedVideo } from '../services/translationService';
+export { getLocalizedPost, getLocalizedVideo, getLocalizedAuthor } from '../services/translationService';
