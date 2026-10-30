@@ -226,6 +226,7 @@ export const EDITORIAL_SELECT = EDITORIAL_LIST_SELECT;
 let cachedHomepageArticles: { data: WpPost[]; timestamp: number } | null = null;
 const cachedCategoryArticles = new Map<string, { data: WpPost[]; timestamp: number }>();
 const cachedLatestArticles = new Map<string, { data: WpPost[]; timestamp: number }>();
+const cachedAuthorArticles = new Map<string, { data: WpPost[]; timestamp: number }>();
 const cachedArticleBySlug = new Map<string, { data: WpPost; timestamp: number }>();
 
 const CLIENT_ARTICLE_TTL = 2 * 60 * 1000; // 2 minutes
@@ -235,6 +236,7 @@ export const invalidateArticleClientCache = () => {
   cachedHomepageArticles = null;
   cachedCategoryArticles.clear();
   cachedLatestArticles.clear();
+  cachedAuthorArticles.clear();
   cachedArticleBySlug.clear();
 };
 
@@ -331,6 +333,38 @@ export const getLatestArticles = async (
   } catch (apiErr) {}
 
   return cachedLatestArticles.get(cacheKey)?.data || [];
+};
+
+export const getAuthorArticles = async (
+  authorNameOrId: string,
+  page: number = 1,
+  limit: number = 30
+): Promise<WpPost[]> => {
+  if (!authorNameOrId || !authorNameOrId.trim()) return [];
+
+  const cleanAuthor = authorNameOrId.trim().toLowerCase();
+  const cacheKey = `${cleanAuthor}:${page}:${limit}`;
+  const cached = cachedAuthorArticles.get(cacheKey);
+  if (cached && Date.now() - cached.timestamp < CLIENT_ARTICLE_TTL) {
+    return cached.data;
+  }
+
+  // Fetch from Edge-cached public API (Zero direct DB connection from browser)
+  try {
+    if (typeof window !== 'undefined') {
+      const res = await fetch(`/api/articles?author=${encodeURIComponent(authorNameOrId.trim())}&page=${page}&limit=${limit}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json?.posts && Array.isArray(json.posts)) {
+          const mapped = json.posts.map((row: any) => mapDbToWpPost(row)).filter(isPostPublished);
+          cachedAuthorArticles.set(cacheKey, { data: mapped, timestamp: Date.now() });
+          return mapped;
+        }
+      }
+    }
+  } catch (apiErr) {}
+
+  return cachedAuthorArticles.get(cacheKey)?.data || [];
 };
 
 export const searchArticles = async (

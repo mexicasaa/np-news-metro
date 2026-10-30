@@ -93,11 +93,11 @@ export const DESIGNATION_ROLES = [
 ];
 
 const DEFAULT_AUTHORS_LIST = [
-  { id: 'author-1', name: 'नीरज पाण्डेय', role: 'वरिष्ठ संवाददाता', designation: 'वरिष्ठ संवाददाता', avatar: '/uploads/neeraj-pandey.jpg', email: 'neeraj.pandey@npnewsmetro.com' },
-  { id: 'author-2', name: 'डॉ. दीपक गोस्वामी', role: 'मानवीय व्यवहार वैज्ञानिक व लेखक', designation: 'मानवीय व्यवहार वैज्ञानिक व लेखक', avatar: '/uploads/dr-deepak-goswami.jpg', email: 'deepak.goswami@npnewsmetro.com' },
-  { id: 'author-3', name: 'Siddharth Varma', role: 'Senior National Affairs Editor', designation: 'Senior Political Editor', avatar: DEFAULT_AUTHOR_AVATAR, email: 'siddharth.admin@npnewsmetro.com' },
-  { id: 'author-4', name: 'Ananya Deshmukh', role: 'Chief Economics Correspondent', designation: 'Chief Copy Editor', avatar: DEFAULT_AUTHOR_AVATAR, email: 'ananya.copy@npnewsmetro.com' },
-  { id: 'author-5', name: 'Rohan Sen', role: 'Technology & Geopolitics Lead', designation: 'National Policy Correspondent', avatar: DEFAULT_AUTHOR_AVATAR, email: 'rohan.tech@npnewsmetro.com' },
+  { id: 'author-neeraj-pandey', name: 'नीरज पाण्डेय', role: 'वरिष्ठ संवाददाता', designation: 'वरिष्ठ संवाददाता', avatar: '/uploads/neeraj-pandey.jpg', email: 'neeraj.pandey@npnewsmetro.com' },
+  { id: 'author-deepak-goswami', name: 'डॉ. दीपक गोस्वामी', role: 'मानवीय व्यवहार वैज्ञानिक व लेखक', designation: 'मानवीय व्यवहार वैज्ञानिक व लेखक', avatar: '/uploads/dr-deepak-goswami.jpg', email: 'deepak.goswami@npnewsmetro.com' },
+  { id: 'author-siddharth-varma', name: 'Siddharth Varma', role: 'Senior National Affairs Editor', designation: 'Senior Political Editor', avatar: DEFAULT_AUTHOR_AVATAR, email: 'siddharth.admin@npnewsmetro.com' },
+  { id: 'author-ananya-deshmukh', name: 'Ananya Deshmukh', role: 'Chief Economics Correspondent', designation: 'Chief Copy Editor', avatar: DEFAULT_AUTHOR_AVATAR, email: 'ananya.copy@npnewsmetro.com' },
+  { id: 'author-rohan-sen', name: 'Rohan Sen', role: 'Technology & Geopolitics Lead', designation: 'National Policy Correspondent', avatar: DEFAULT_AUTHOR_AVATAR, email: 'rohan.tech@npnewsmetro.com' },
   { id: 'author-desk', name: 'NP News Metro Desk', role: 'Editorial Staff Dispatch', designation: 'Editorial Staff Dispatch', avatar: DEFAULT_AUTHOR_AVATAR, email: 'desk@npnewsmetro.com' },
 ];
 

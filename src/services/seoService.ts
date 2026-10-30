@@ -41,7 +41,31 @@ export const generateArticleStructuredData = (
   const canonicalUrl = `${siteUrl}/${post.category}/${post.slug}`;
   const authorName = post.customAuthor?.name || 'NP News Metro Bureau';
   const authorRole = post.customAuthor?.role || 'Staff Journalist';
-  const authorSlug = (authorName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')) || 'editorial';
+  let authorSlug = 'editorial';
+  const authorNameLower = authorName.toLowerCase();
+  if (authorNameLower.includes('neeraj') || authorName.includes('नीरज')) {
+    authorSlug = 'neeraj-kumar-pandey';
+  } else if (authorNameLower.includes('deepak') || authorName.includes('दीपक')) {
+    authorSlug = 'dr-deepak-goswami';
+  } else if (authorNameLower.includes('bholeshwar') || authorName.includes('भोलेश्वर')) {
+    authorSlug = 'bholeshwar-upmanyu';
+  } else if (authorNameLower.includes('chetan') || authorName.includes('चेतन')) {
+    authorSlug = 'chetan-sharma';
+  } else if (authorNameLower.includes('umang') || authorName.includes('उमंग')) {
+    authorSlug = 'umang-pandey';
+  } else if (authorNameLower.includes('bhawana') || authorName.includes('भावना')) {
+    authorSlug = 'bhawana-pandey';
+  } else if (authorNameLower.includes('purnima') || authorName.includes('पूर्णिमा') || authorName.includes('पुर्णिमा')) {
+    authorSlug = 'purnima-mishra';
+  } else if (authorNameLower.includes('laxmi') || authorName.includes('लक्ष्मी')) {
+    authorSlug = 'laxmi-kant-mishra';
+  } else if (authorNameLower.includes('tripathi') || authorName.includes('त्रिपाठी')) {
+    authorSlug = 'cl-tripathi';
+  } else if (authorNameLower.includes('siddharth') || authorName.includes('सिद्धार्थ')) {
+    authorSlug = 'siddharth-varma';
+  } else {
+    authorSlug = (authorName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')) || 'editorial';
+  }
   const absoluteImage = getAbsoluteImageUrl(post.featuredImage, siteUrl);
   const isHindi = !!(post.titleHi || /[\u0900-\u097F]/.test(post.title));
   const categoryUpper = post.category?.toUpperCase() || 'NATIONAL';

@@ -1120,37 +1120,106 @@ export default async function handler(req, res) {
 
     // 3C. AUTHOR PROFILE PRE-RENDERER (/author/:id)
     if (cleanCategory === "author" && cleanSlug) {
-      const authorCacheKey = `author:${cleanSlug}`;
+      const authorCacheKey = `author:${cleanSlug.toLowerCase()}`;
       const cachedAuthor = shareWarmCache.get(authorCacheKey);
       if (cachedAuthor && Date.now() - cachedAuthor.timestamp < SHARE_CACHE_TTL) {
         return sendResponse(res, 200, "text/html; charset=utf-8", cachedAuthor.html);
       }
 
+      const slugLower = cleanSlug.toLowerCase();
       let authorArticles = [];
+      let authorName = "NP News Metro Correspondent";
+      let authorNameHi = "संवाददाता";
+      let authorRole = "Staff Correspondent • NP News Metro";
+      let authorAvatar = DEFAULT_OG_IMAGE;
+      let authorBio = "Journalist and contributor for NP News Metro.";
+
       try {
-        const { data: aList } = await supabase
+        let query = supabase
           .from("articles")
           .select("title, title_hi, slug, excerpt, dek_hi, featured_image_url, published_at, categories(slug, name)")
           .eq("status", "published")
-          .order("published_at", { ascending: false })
+          .not("published_at", "is", null);
+
+        if (
+          slugLower.includes("neeraj") || 
+          slugLower.includes("नीरज") || 
+          slugLower === "author-1" || 
+          slugLower === "author-neeraj-pandey" || 
+          slugLower === "neeraj-kumar-pandey" || 
+          slugLower === "neeraj-pandey" || 
+          slugLower === "04ad79d9-d871-4099-a633-bcb7a1e35055"
+        ) {
+          authorName = "Neeraj Kumar Pandey";
+          authorNameHi = "नीरज पाण्डेय";
+          authorRole = "Editor-in-Chief & Senior Correspondent • NP News Metro";
+          authorAvatar = "https://www.npnewsmetro.com/uploads/neeraj-pandey.jpg";
+          authorBio = "Editor-in-Chief at NP News Metro, leading national reporting, field investigations, parliamentary coverage, and newsroom editorial standards.";
+          query = query.or("author_name.ilike.%नीरज%,author_name.ilike.%Neeraj%");
+        } else if (
+          slugLower.includes("deepak") || 
+          slugLower.includes("दीपक") || 
+          slugLower === "author-2" || 
+          slugLower === "author-deepak-goswami" || 
+          slugLower === "dr-deepak-goswami"
+        ) {
+          authorName = "Dr. Deepak Goswami";
+          authorNameHi = "डॉ. दीपक गोस्वामी";
+          authorRole = "मानवीय व्यवहार वैज्ञानिक व लेखक • NP News Metro";
+          authorAvatar = "https://www.npnewsmetro.com/uploads/dr-deepak-goswami.jpg";
+          authorBio = "डॉ. दीपक गोस्वामी मानवीय व्यवहार वैज्ञानिक तथा आदर्श संस्कार शाला (भारत) के राष्ट्रीय समन्वयक हैं।";
+          query = query.or("author_name.ilike.%दीपक गोस्वामी%,author_name.ilike.%Deepak Goswami%,author_name.ilike.%दीपक%");
+        } else if (slugLower.includes("bholeshwar") || slugLower.includes("भोलेश्वर")) {
+          authorName = "Bholeshwar Upmanyu";
+          authorNameHi = "भोलेश्वर उपमन्यु";
+          authorRole = "Advisory Board Member • NP News Metro";
+          authorAvatar = "https://www.npnewsmetro.com/uploads/bholeshwar-upmanyu.jpg";
+          query = query.or("author_name.ilike.%भोलेश्वर%,author_name.ilike.%Bholeshwar%");
+        } else if (slugLower.includes("chetan") || slugLower.includes("चेतन")) {
+          authorName = "Chetan Sharma";
+          authorNameHi = "चेतन शर्मा";
+          authorRole = "Editor-in-Chief • NP News Metro";
+          authorAvatar = "https://www.npnewsmetro.com/uploads/chetan-sharma.jpg";
+          query = query.or("author_name.ilike.%चेतन%,author_name.ilike.%Chetan%");
+        } else if (slugLower.includes("umang") || slugLower.includes("उमंग")) {
+          authorName = "Umang Pandey";
+          authorNameHi = "उमंग पाण्डेय";
+          authorRole = "Founder & Chief Technology Officer • NP News Metro";
+          authorAvatar = "https://www.npnewsmetro.com/uploads/umang-pandey.jpg";
+          query = query.or("author_name.ilike.%उमंग%,author_name.ilike.%Umang%");
+        } else {
+          authorName = decodeURIComponent(cleanSlug).replace(/^author-/, "").replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase());
+          query = query.or(`author_name.ilike.%${authorName}%`);
+        }
+
+        const { data: aList } = await query
+          .order("published_at", { ascending: false, nullsFirst: false })
           .limit(20);
+
         if (aList && aList.length > 0) authorArticles = aList;
       } catch (e) {}
 
-      const authorName = decodeURIComponent(cleanSlug).replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase());
       const authorCanonical = `${SITE_ORIGIN}/author/${cleanSlug}`;
 
       const authorBodyHtml = `
         <div class="breadcrumbs">
           <a href="${SITE_ORIGIN}/">Home</a> &rsaquo; <span>Journalist Profile</span>
         </div>
-        <div style="margin-bottom: 24px; background: #fff; padding: 24px; border: 1px solid var(--border); border-radius: 4px;">
-          <h1 style="margin: 0 0 8px 0;">${escapeHtml(authorName)}</h1>
-          <p class="dek" style="margin: 0;">Staff Correspondent &bull; NP News Metro Bureau</p>
+        <div style="margin-bottom: 24px; background: #fff; padding: 24px; border: 1px solid var(--border); border-radius: 4px; display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+          <img src="${escapeHtml(authorAvatar)}" alt="${escapeHtml(authorName)}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary);" onerror="this.src='${DEFAULT_OG_IMAGE}'" />
+          <div style="flex: 1; min-width: 250px;">
+            <h1 style="margin: 0 0 6px 0; font-size: 26px;">${escapeHtml(authorName)} ${authorNameHi && authorNameHi !== authorName ? `<span style="font-size: 20px; color: var(--ink-muted); font-weight: normal;">(${escapeHtml(authorNameHi)})</span>` : ""}</h1>
+            <p class="dek" style="margin: 0 0 8px 0; color: var(--secondary); font-weight: 600;">${escapeHtml(authorRole)}</p>
+            <p style="margin: 0; font-size: 14px; color: var(--ink-secondary); line-height: 1.5;">${escapeHtml(authorBio)}</p>
+          </div>
         </div>
-        <h2>Published Dispatches &amp; Articles</h2>
+        <h2>Published Dispatches &amp; Articles (${authorArticles.length})</h2>
         <div class="stories-grid">
-          ${authorArticles.map(a => {
+          ${authorArticles.length === 0 ? `
+            <div style="padding: 30px; text-align: center; color: var(--ink-muted); background: #fff; border: 1px solid var(--border); border-radius: 4px;">
+              No published dispatches found for this journalist at present.
+            </div>
+          ` : authorArticles.map(a => {
             const aCat = a.categories?.slug || "india";
             const aTitle = a.title_hi || a.title;
             const aDate = new Date(a.published_at || Date.now()).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
@@ -1174,6 +1243,8 @@ export default async function handler(req, res) {
         "mainEntity": {
           "@type": "Person",
           "name": authorName,
+          "image": authorAvatar,
+          "jobTitle": authorRole,
           "worksFor": { "@type": "NewsMediaOrganization", "name": "NP News Metro", "url": SITE_ORIGIN }
         }
       };
@@ -1183,7 +1254,7 @@ export default async function handler(req, res) {
         description: `Read investigative reports, ground dispatches, and analysis authored by ${authorName} at NP News Metro.`,
         canonicalUrl: authorCanonical,
         ogType: "profile",
-        ogImage: DEFAULT_OG_IMAGE,
+        ogImage: authorAvatar || DEFAULT_OG_IMAGE,
         jsonLd: authorJsonLd,
         bodyHtml: authorBodyHtml
       });
@@ -1539,7 +1610,31 @@ export default async function handler(req, res) {
       }));
     }
 
-    const authorSlug = (authorName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")) || "editorial";
+    let authorSlug = "editorial";
+    const authorNameLower = authorName.toLowerCase();
+    if (authorNameLower.includes("neeraj") || authorName.includes("नीरज")) {
+      authorSlug = "neeraj-kumar-pandey";
+    } else if (authorNameLower.includes("deepak") || authorName.includes("दीपक")) {
+      authorSlug = "dr-deepak-goswami";
+    } else if (authorNameLower.includes("bholeshwar") || authorName.includes("भोलेश्वर")) {
+      authorSlug = "bholeshwar-upmanyu";
+    } else if (authorNameLower.includes("chetan") || authorName.includes("चेतन")) {
+      authorSlug = "chetan-sharma";
+    } else if (authorNameLower.includes("umang") || authorName.includes("उमंग")) {
+      authorSlug = "umang-pandey";
+    } else if (authorNameLower.includes("bhawana") || authorName.includes("भावना")) {
+      authorSlug = "bhawana-pandey";
+    } else if (authorNameLower.includes("purnima") || authorName.includes("पूर्णिमा") || authorName.includes("पुर्णिमा")) {
+      authorSlug = "purnima-mishra";
+    } else if (authorNameLower.includes("laxmi") || authorName.includes("लक्ष्मी")) {
+      authorSlug = "laxmi-kant-mishra";
+    } else if (authorNameLower.includes("tripathi") || authorName.includes("त्रिपाठी")) {
+      authorSlug = "cl-tripathi";
+    } else if (authorNameLower.includes("siddharth") || authorName.includes("सिद्धार्थ")) {
+      authorSlug = "siddharth-varma";
+    } else {
+      authorSlug = (authorName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")) || "editorial";
+    }
     const categoryName = CATEGORY_NAMES[category] || category.toUpperCase();
     const isHindiArticle = !!(mediaItem.title_hi || /[\u0900-\u097F]/.test(title));
     const langCode = isHindiArticle ? "hi-IN" : "en-IN";

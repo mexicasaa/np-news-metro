@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ShieldCheck, Twitter, Linkedin, Mail, ArrowRight, BookOpen, Flame, Newspaper } from 'lucide-react';
 import { WpAuthor, WpPost } from '../types/wordpress';
-import { mockAuthors, getLocalizedAuthor } from '../data/mockWpData';
+import { mockAuthors } from '../data/mockWpData';
 import { getStoredPosts } from '../utils/newsStorage';
 import { HorizontalStoryCard } from '../components/cards/HorizontalStoryCard';
 import { RankingItem } from '../components/cards/RankingItem';
@@ -9,6 +9,9 @@ import { AdSlot } from '../components/commercial/AdSlot';
 import { Breadcrumbs } from '../components/layout/Breadcrumbs';
 import { useLanguage } from '../context/LanguageContext';
 import { getAuthorAvatarUrl, handleAvatarError } from '../utils/imageFallback';
+import { getAuthorArticles } from '../services/articleService';
+import { matchEditorialAuthor, getLocalizedAuthor } from '../services/translationService';
+import { slugifyText } from '../utils/slugify';
 
 interface AuthorProfileTemplateProps {
   authorId?: string;
@@ -18,7 +21,7 @@ interface AuthorProfileTemplateProps {
 }
 
 export const AuthorProfileTemplate: React.FC<AuthorProfileTemplateProps> = ({
-  authorId = 'author-1',
+  authorId = 'author-neeraj-pandey',
   onSelectPost,
   onNavigateHome,
   onSelectCategory,
@@ -26,16 +29,95 @@ export const AuthorProfileTemplate: React.FC<AuthorProfileTemplateProps> = ({
   const [activeTab, setActiveTab] = useState<'latest' | 'popular'>('latest');
   const { t, isHindi, language } = useLanguage();
 
-  const rawAuthor = mockAuthors[authorId] || Object.values(mockAuthors).find(a => a.slug === authorId || a.id === authorId) || mockAuthors['author-1'];
+  const matchedAuthor = matchEditorialAuthor(authorId);
+  const rawAuthor: WpAuthor = matchedAuthor || (() => {
+    // Check if stored posts contain this author
+    const stored = getStoredPosts();
+    const found = stored.find(
+      (p) =>
+        p.authorId === authorId ||
+        p.customAuthor?.name?.toLowerCase() === authorId.toLowerCase() ||
+        (p as any).authorName?.toLowerCase() === authorId.toLowerCase()
+    );
+    if (found?.customAuthor) {
+      const ca = found.customAuthor;
+      return {
+        id: `author-${slugifyText(ca.name, 40)}`,
+        name: ca.name,
+        nameHi: ca.name,
+        slug: slugifyText(ca.name, 40),
+        role: ca.role || 'विशेष संवाददाता',
+        roleHi: ca.role || 'विशेष संवाददाता',
+        avatar: ca.avatar || '/np-author-default.png',
+        bio: ca.bio || `${ca.name} एनपी न्यूज़ मेट्रो के लिए विशेष रिपोर्टिंग और समसामयिक आलेख प्रस्तुत करते हैं।`,
+        bioHi: ca.bio || `${ca.name} एनपी न्यूज़ मेट्रो के लिए विशेष रिपोर्टिंग और समसामयिक आलेख प्रस्तुत करते हैं।`,
+        verified: false,
+        beats: ['Regional Affairs', 'Special Dispatch'],
+        social: {},
+      };
+    }
+    // Dynamic contributor
+    const cleanName = authorId.replace(/^author-/, '').replace(/-/g, ' ');
+    return {
+      id: authorId.startsWith('author-') ? authorId : `author-${authorId}`,
+      name: cleanName,
+      nameHi: cleanName,
+      slug: slugifyText(cleanName, 40),
+      role: 'विशेष संवाददाता',
+      roleHi: 'विशेष संवाददाता',
+      avatar: '/np-author-default.png',
+      bio: `${cleanName} एनपी न्यूज़ मेट्रो के लिए विशेष रिपोर्टिंग और समसामयिक आलेख प्रस्तुत करते हैं।`,
+      bioHi: `${cleanName} एनपी न्यूज़ मेट्रो के लिए विशेष रिपोर्टिंग और समसामयिक आलेख प्रस्तुत करते हैं।`,
+      verified: false,
+      beats: ['Regional Affairs', 'Special Dispatch'],
+      social: {},
+    };
+  })();
+
   const author = getLocalizedAuthor(rawAuthor, language);
   const displayName = author.name;
   const displayRole = author.role;
   const displayBio = author.bio;
-  const storedPosts = getStoredPosts();
-  const authorPosts = storedPosts.filter((p) => p.authorId === author.id);
-  const displayPosts = authorPosts.length > 0 ? authorPosts : storedPosts.slice(0, 3);
+
+  const [authorPosts, setAuthorPosts] = useState<WpPost[]>(() => {
+    const stored = getStoredPosts();
+    return stored.filter(
+      (p) =>
+        p.authorId === author.id ||
+        p.customAuthor?.name === author.name ||
+        p.customAuthor?.name === author.nameHi ||
+        (p as any).authorName === author.name ||
+        (p as any).authorName === author.nameHi
+    );
+  });
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    setIsLoading(true);
+
+    const queryKey = author.nameHi || author.name || author.slug || author.id;
+    getAuthorArticles(queryKey)
+      .then((fetched) => {
+        if (isMounted) {
+          if (fetched && fetched.length > 0) {
+            setAuthorPosts(fetched);
+          }
+          setIsLoading(false);
+        }
+      })
+      .catch(() => {
+        if (isMounted) setIsLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [author.id, author.slug, author.name, author.nameHi]);
+
+  const displayPosts = authorPosts;
   const popularPosts = [...displayPosts].sort((a, b) => (b.viewsCount || 0) - (a.viewsCount || 0));
-  const trendingRanking = [...storedPosts].sort((a, b) => (b.viewsCount || 0) - (a.viewsCount || 0)).slice(0, 5);
+  const trendingRanking = [...getStoredPosts()].sort((a, b) => (b.viewsCount || 0) - (a.viewsCount || 0)).slice(0, 5);
 
   return (
     <div className="bg-canvas min-h-screen">
@@ -152,14 +234,30 @@ export const AuthorProfileTemplate: React.FC<AuthorProfileTemplateProps> = ({
 
             {/* List */}
             <div className="space-y-4">
-              {(activeTab === 'latest' ? displayPosts : popularPosts).map((post) => (
-                <HorizontalStoryCard
-                  key={post.id}
-                  post={post}
-                  onSelect={onSelectPost}
-                  onSelectCategory={onSelectCategory}
-                />
-              ))}
+              {isLoading && displayPosts.length === 0 ? (
+                <div className="py-16 text-center text-ink-muted bg-surface-lowest border border-border-subtle rounded-sm">
+                  <div className="inline-block w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin mb-2"></div>
+                  <p className="text-sm">{isHindi ? 'लेख लोड हो रहे हैं...' : 'Loading published stories...'}</p>
+                </div>
+              ) : displayPosts.length === 0 ? (
+                <div className="py-16 text-center bg-surface-lowest border border-border-subtle rounded-sm p-8 text-ink-muted">
+                  <Newspaper className="w-8 h-8 mx-auto mb-2 opacity-40 text-primary" />
+                  <p className="text-sm font-medium text-ink">
+                    {isHindi
+                      ? 'इस लेखक के लिए अभी कोई प्रकाशित लेख उपलब्ध नहीं हैं।'
+                      : 'No published stories found for this author yet.'}
+                  </p>
+                </div>
+              ) : (
+                (activeTab === 'latest' ? displayPosts : popularPosts).map((post) => (
+                  <HorizontalStoryCard
+                    key={post.id}
+                    post={post}
+                    onSelect={onSelectPost}
+                    onSelectCategory={onSelectCategory}
+                  />
+                ))
+              )}
             </div>
           </div>
 

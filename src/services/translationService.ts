@@ -1,6 +1,7 @@
 import { WpPost, WpVideo, WpAuthor, GutenbergBlock } from '../types/wordpress';
 import { Language } from '../i18n/translations';
 import { mockAuthors } from '../data/mockWpData';
+import { slugifyText } from '../utils/slugify';
 
 export interface SupportedLanguageInfo {
   code: Language;
@@ -473,6 +474,139 @@ async function flushTranslationQueue(): Promise<void> {
 // When Hindi: name, role, bio in Hindi
 // =========================================================================
 
+export function matchEditorialAuthor(nameOrId: string | null | undefined): WpAuthor | null {
+  if (!nameOrId) return null;
+  const raw = nameOrId.trim();
+  const lower = raw.toLowerCase();
+
+  // 1. Direct key match in mockAuthors
+  if (mockAuthors[raw]) return mockAuthors[raw];
+
+  // 2. Neeraj Pandey aliases & Supabase Admin UUID
+  if (
+    lower === 'author-1' ||
+    lower === 'author-neeraj-pandey' ||
+    lower === 'neeraj-kumar-pandey' ||
+    lower === 'neeraj-pandey' ||
+    lower === '04ad79d9-d871-4099-a633-bcb7a1e35055' ||
+    lower.includes('neeraj') ||
+    raw.includes('नीरज')
+  ) {
+    return mockAuthors['author-neeraj-pandey'] || mockAuthors['author-1'];
+  }
+
+  // 3. Deepak Goswami aliases
+  if (
+    lower === 'author-2' ||
+    lower === 'author-deepak-goswami' ||
+    lower === 'dr-deepak-goswami' ||
+    lower.includes('deepak') ||
+    raw.includes('दीपक')
+  ) {
+    return mockAuthors['author-deepak-goswami'] || mockAuthors['author-2'];
+  }
+
+  // 4. Bholeshwar Upmanyu
+  if (
+    lower === 'author-bholeshwar-upmanyu' ||
+    lower === 'bholeshwar-upmanyu' ||
+    lower.includes('bholeshwar') ||
+    raw.includes('भोलेश्वर')
+  ) {
+    return mockAuthors['author-bholeshwar-upmanyu'];
+  }
+
+  // 5. Chetan Sharma
+  if (
+    lower === 'author-chetan-sharma' ||
+    lower === 'chetan-sharma' ||
+    lower.includes('chetan') ||
+    raw.includes('चेतन')
+  ) {
+    return mockAuthors['author-chetan-sharma'];
+  }
+
+  // 6. Umang Pandey
+  if (
+    lower === 'author-umang-pandey' ||
+    lower === 'umang-pandey' ||
+    lower.includes('umang') ||
+    raw.includes('उमंग')
+  ) {
+    return mockAuthors['author-umang-pandey'];
+  }
+
+  // 7. Dr. Neelima Pandey
+  if (
+    lower === 'author-dr-neelima-pandey' ||
+    lower === 'dr-neelima-pandey' ||
+    lower.includes('neelima') ||
+    raw.includes('नीलिमा')
+  ) {
+    return mockAuthors['author-dr-neelima-pandey'];
+  }
+
+  // 8. Bhawana Pandey
+  if (
+    lower === 'author-bhawana-pandey' ||
+    lower === 'bhawana-pandey' ||
+    lower.includes('bhawana') ||
+    raw.includes('भावना')
+  ) {
+    return mockAuthors['author-bhawana-pandey'];
+  }
+
+  // 9. Purnima Mishra
+  if (
+    lower === 'author-purnima-mishra' ||
+    lower === 'purnima-mishra' ||
+    lower.includes('purnima') ||
+    raw.includes('पूर्णिमा') ||
+    raw.includes('पुर्णिमा')
+  ) {
+    return mockAuthors['author-purnima-mishra'];
+  }
+
+  // 10. Laxmi Kant Mishra
+  if (
+    lower === 'author-laxmi-kant-mishra' ||
+    lower === 'laxmi-kant-mishra' ||
+    lower.includes('laxmi') ||
+    raw.includes('लक्ष्मी')
+  ) {
+    return mockAuthors['author-laxmi-kant-mishra'];
+  }
+
+  // 11. C.L. Tripathi
+  if (
+    lower === 'author-cl-tripathi' ||
+    lower === 'cl-tripathi' ||
+    lower.includes('tripathi') ||
+    raw.includes('त्रिपाठी')
+  ) {
+    return mockAuthors['author-cl-tripathi'];
+  }
+
+  // 12. Siddharth Varma
+  if (
+    lower === 'author-siddharth-varma' ||
+    lower === 'siddharth-varma' ||
+    lower.includes('siddharth') ||
+    raw.includes('सिद्धार्थ')
+  ) {
+    return mockAuthors['author-siddharth-varma'];
+  }
+
+  // 13. General lookup in mockAuthors by slug, id, name, nameHi
+  return Object.values(mockAuthors).find((a) => {
+    if (a.id && a.id.toLowerCase() === lower) return true;
+    if (a.slug && a.slug.toLowerCase() === lower) return true;
+    if (a.name && a.name.toLowerCase() === lower) return true;
+    if (a.nameHi && a.nameHi.trim() === raw) return true;
+    return false;
+  }) || null;
+}
+
 export function getLocalizedAuthor(
   authorInput: WpAuthor | WpPost | Record<string, any> | null | undefined,
   targetLang: Language
@@ -497,50 +631,90 @@ export function getLocalizedAuthor(
     // If input is WpPost
     if ('title' in authorInput || 'category' in authorInput) {
       const post = authorInput as WpPost;
-      id = post.authorId || 'staff-author';
-      const mock = id && mockAuthors[id] ? mockAuthors[id] : null;
+      const candidateName = post.customAuthor?.name || (post as any).authorName || '';
+      const candidateRole = post.customAuthor?.role || (post as any).authorRole || '';
+      const candidateAvatar = post.customAuthor?.avatar || (post as any).authorAvatar || '';
+      const candidateBio = post.customAuthor?.bio || (post as any).authorBio || '';
+      const candidateId = post.authorId || '';
 
-      if (post.customAuthor?.name) {
-        rawName = post.customAuthor.name;
-        rawRole = post.customAuthor.role || 'Staff Reporter';
-        avatar = post.customAuthor.avatar || avatar;
-        rawBio = post.customAuthor.bio || '';
+      const matchedMock = matchEditorialAuthor(candidateName) || matchEditorialAuthor(candidateId);
+
+      if (matchedMock) {
+        id = matchedMock.id;
+        slug = matchedMock.slug;
+        rawName = matchedMock.name;
+        rawNameHi = candidateName && isHindiText(candidateName) ? candidateName : (matchedMock.nameHi || matchedMock.name);
+        rawRole = matchedMock.role;
+        rawRoleHi = candidateRole || matchedMock.roleHi || matchedMock.role;
+        avatar = candidateAvatar || matchedMock.avatar;
+        rawBio = candidateBio || matchedMock.bio;
+        rawBioHi = candidateBio || matchedMock.bioHi || matchedMock.bio;
+        verified = matchedMock.verified;
+        beats = matchedMock.beats || ['National Politics', 'Investigations'];
+        social = (matchedMock.social as any) || {};
+      } else if (candidateName) {
+        // Dynamic guest contributor / reporter (NEVER default to Siddharth Varma!)
+        const safeSlug = slugifyText(candidateName, 40) || 'contributor';
+        id = `author-${safeSlug}`;
+        slug = safeSlug;
+        rawName = candidateName;
+        rawNameHi = candidateName;
+        rawRole = candidateRole || 'विशेष संवाददाता';
+        rawRoleHi = candidateRole || 'विशेष संवाददाता';
+        avatar = candidateAvatar || '/np-author-default.png';
+        rawBio = candidateBio || `${candidateName} एनपी न्यूज़ मेट्रो के लिए विशेष रिपोर्टिंग और समसामयिक आलेख प्रस्तुत करते हैं।`;
+        rawBioHi = candidateBio || `${candidateName} एनपी न्यूज़ मेट्रो के लिए विशेष रिपोर्टिंग और समसामयिक आलेख प्रस्तुत करते हैं।`;
         verified = false;
-        slug = 'author';
-      } else if (mock) {
-        rawName = mock.name;
-        rawNameHi = mock.nameHi || '';
-        rawRole = mock.role;
-        rawRoleHi = mock.roleHi || '';
-        avatar = mock.avatar;
-        rawBio = mock.bio;
-        rawBioHi = mock.bioHi || '';
-        verified = mock.verified;
-        beats = mock.beats;
-        social = (mock.social as any) || {};
-        slug = mock.slug;
+        beats = ['Regional Affairs', 'Special Dispatch'];
+        social = {};
       } else {
-        rawName = (post as any).authorName || 'NP News Metro Bureau';
-        rawRole = (post as any).authorRole || 'Editorial Desk';
-        avatar = (post as any).authorAvatar || avatar;
+        rawName = 'NP News Metro Bureau';
+        rawNameHi = 'एनपी न्यूज़ मेट्रो ब्यूरो';
+        rawRole = 'Editorial Desk';
+        rawRoleHi = 'संपादकीय डेस्क';
+        avatar = '/logo-circle.png';
       }
     } else {
-      // Input is WpAuthor
+      // Input is WpAuthor or partial object
       const a = authorInput as WpAuthor;
-      id = a.id || 'staff-author';
-      const mock = id && mockAuthors[id] ? mockAuthors[id] : null;
+      const candidateName = a.name || a.nameHi || '';
+      const candidateId = a.id || a.slug || '';
+      const matchedMock = matchEditorialAuthor(candidateName) || matchEditorialAuthor(candidateId);
 
-      rawName = a.name || (mock ? mock.name : 'NP News Metro Bureau');
-      rawNameHi = a.nameHi || (mock ? mock.nameHi || '' : '');
-      rawRole = a.role || (mock ? mock.role : 'Editorial Desk');
-      rawRoleHi = a.roleHi || (mock ? mock.roleHi || '' : '');
-      avatar = a.avatar || (mock ? mock.avatar : avatar);
-      rawBio = a.bio || (mock ? mock.bio : '');
-      rawBioHi = a.bioHi || (mock ? mock.bioHi || '' : '');
-      verified = a.verified ?? (mock ? mock.verified : true);
-      beats = a.beats || (mock ? mock.beats : ['National News']);
-      social = (a.social as any) || (mock ? (mock.social as any) : {});
-      slug = a.slug || (mock ? mock.slug : 'author');
+      if (matchedMock) {
+        id = matchedMock.id;
+        slug = matchedMock.slug;
+        rawName = a.name || matchedMock.name;
+        rawNameHi = a.nameHi || matchedMock.nameHi || matchedMock.name;
+        rawRole = a.role || matchedMock.role;
+        rawRoleHi = a.roleHi || matchedMock.roleHi || matchedMock.role;
+        avatar = a.avatar || matchedMock.avatar;
+        rawBio = a.bio || matchedMock.bio;
+        rawBioHi = a.bioHi || matchedMock.bioHi || matchedMock.bio;
+        verified = matchedMock.verified;
+        beats = matchedMock.beats || ['National Politics', 'Investigations'];
+        social = (matchedMock.social as any) || {};
+      } else if (candidateName) {
+        const safeSlug = a.slug || slugifyText(candidateName, 40) || 'contributor';
+        id = a.id || `author-${safeSlug}`;
+        slug = safeSlug;
+        rawName = candidateName;
+        rawNameHi = a.nameHi || candidateName;
+        rawRole = a.role || 'संपादकीय डेस्क';
+        rawRoleHi = a.roleHi || 'संपादकीय डेस्क';
+        avatar = a.avatar || '/np-author-default.png';
+        rawBio = a.bio || '';
+        rawBioHi = a.bioHi || '';
+        verified = a.verified ?? false;
+        beats = a.beats || ['Editorial'];
+        social = (a.social as any) || {};
+      } else {
+        rawName = 'NP News Metro Bureau';
+        rawNameHi = 'एनपी न्यूज़ मेट्रो ब्यूरो';
+        rawRole = 'Editorial Desk';
+        rawRoleHi = 'संपादकीय डेस्क';
+        avatar = '/logo-circle.png';
+      }
     }
   }
 

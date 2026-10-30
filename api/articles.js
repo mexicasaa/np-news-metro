@@ -55,7 +55,7 @@ export function invalidateWarmCache(pattern) {
 const CARD_PROJECTION_FIELDS = `
   id, slug, title, title_hi, excerpt, dek_hi, category_id,
   categories (id, name, slug),
-  author_id, author_name, author_role, author_avatar,
+  author_id, author_name, author_role, author_avatar, custom_author,
   published_at, updated_at,
   is_breaking_news, is_lead, is_featured, is_opinion, is_sponsored,
   reading_time_minutes, view_count,
@@ -393,6 +393,7 @@ export default async function handler(req, res) {
   const url = new URL(req.url || '/', 'https://www.npnewsmetro.com');
   const slug = (req.query?.slug || url.searchParams.get('slug') || '').trim();
   const category = (req.query?.category || url.searchParams.get('category') || '').trim();
+  const author = (req.query?.author || url.searchParams.get('author') || '').trim();
   const view = (req.query?.view || url.searchParams.get('view') || '').trim();
   const search = (req.query?.search || url.searchParams.get('search') || '').trim();
   const versionParam = (req.query?.v || url.searchParams.get('v') || '').trim();
@@ -478,6 +479,129 @@ export default async function handler(req, res) {
 
       res.setHeader('Content-Type', 'application/json; charset=utf-8');
       res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600');
+      res.setHeader('X-Cache', 'MISS');
+      return res.status(200).json(responsePayload);
+    }
+
+    // -------------------------------------------------------------
+    // 3. AUTHOR FEED (articles by reporter, paginated lightweight cards)
+    // -------------------------------------------------------------
+    if (author) {
+      const cacheKey = `author:${author.toLowerCase()}:${page}:${limit}`;
+      if (!bypassCache) {
+        const cached = getFromWarmCache(cacheKey, CACHE_TTL.category);
+        if (cached) {
+          res.setHeader('Content-Type', 'application/json; charset=utf-8');
+          res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=600, stale-while-revalidate=86400');
+          res.setHeader('X-Cache', 'WARM-HIT');
+          return res.status(200).json(cached);
+        }
+      }
+
+      let query = supabase
+        .from('articles')
+        .select(CARD_PROJECTION_FIELDS)
+        .eq('status', 'published')
+        .not('published_at', 'is', null);
+
+      const authorLower = author.toLowerCase().trim();
+
+      // Check known author mapping or query terms
+      if (
+        authorLower.includes('neeraj') || 
+        authorLower.includes('नीरज') || 
+        authorLower === 'author-1' || 
+        authorLower === 'author-neeraj-pandey' || 
+        authorLower === 'neeraj-kumar-pandey' || 
+        authorLower === 'neeraj-pandey' || 
+        authorLower === '04ad79d9-d871-4099-a633-bcb7a1e35055'
+      ) {
+        query = query.or('author_name.ilike.%नीरज%,author_name.ilike.%Neeraj%');
+      } else if (
+        authorLower.includes('deepak') || 
+        authorLower.includes('दीपक') || 
+        authorLower === 'author-2' || 
+        authorLower === 'author-deepak-goswami' || 
+        authorLower === 'dr-deepak-goswami'
+      ) {
+        query = query.or('author_name.ilike.%दीपक गोस्वामी%,author_name.ilike.%Deepak Goswami%,author_name.ilike.%दीपक%');
+      } else if (
+        authorLower.includes('bholeshwar') || 
+        authorLower.includes('भोलेश्वर') || 
+        authorLower === 'author-bholeshwar-upmanyu' || 
+        authorLower === 'bholeshwar-upmanyu'
+      ) {
+        query = query.or('author_name.ilike.%भोलेश्वर%,author_name.ilike.%Bholeshwar%');
+      } else if (
+        authorLower.includes('chetan') || 
+        authorLower.includes('चेतन') || 
+        authorLower === 'author-chetan-sharma' || 
+        authorLower === 'chetan-sharma'
+      ) {
+        query = query.or('author_name.ilike.%चेतन%,author_name.ilike.%Chetan%');
+      } else if (
+        authorLower.includes('umang') || 
+        authorLower.includes('उमंग') || 
+        authorLower === 'author-umang-pandey' || 
+        authorLower === 'umang-pandey'
+      ) {
+        query = query.or('author_name.ilike.%उमंग%,author_name.ilike.%Umang%');
+      } else if (
+        authorLower.includes('purnima') || 
+        authorLower.includes('पूर्णिमा') || 
+        authorLower.includes('पुर्णिमा') || 
+        authorLower === 'author-purnima-mishra' || 
+        authorLower === 'purnima-mishra'
+      ) {
+        query = query.or('author_name.ilike.%पूर्णिमा%,author_name.ilike.%पुर्णिमा%,author_name.ilike.%Purnima%');
+      } else if (
+        authorLower.includes('bhawana') || 
+        authorLower.includes('भावना') || 
+        authorLower === 'author-bhawana-pandey' || 
+        authorLower === 'bhawana-pandey'
+      ) {
+        query = query.or('author_name.ilike.%भावना%,author_name.ilike.%Bhawana%');
+      } else if (
+        authorLower.includes('laxmi') || 
+        authorLower.includes('लक्ष्मी') || 
+        authorLower === 'author-laxmi-kant-mishra' || 
+        authorLower === 'laxmi-kant-mishra'
+      ) {
+        query = query.or('author_name.ilike.%लक्ष्मी कांत%,author_name.ilike.%Laxmi%');
+      } else if (
+        authorLower.includes('tripathi') || 
+        authorLower.includes('त्रिपाठी') || 
+        authorLower === 'author-cl-tripathi' || 
+        authorLower === 'cl-tripathi'
+      ) {
+        query = query.or('author_name.ilike.%त्रिपाठी%,author_name.ilike.%Tripathi%');
+      } else if (
+        authorLower.includes('siddharth') || 
+        authorLower.includes('सिद्धार्थ') || 
+        authorLower === 'author-siddharth-varma' || 
+        authorLower === 'siddharth-varma'
+      ) {
+        query = query.or('author_name.ilike.%सिद्धार्थ%,author_name.ilike.%Siddharth%');
+      } else if (isValidUUID(author)) {
+        query = query.eq('author_id', author);
+      } else {
+        const cleanAuthor = author.replace(/[%_]/g, '').replace(/^author-/, '').replace(/-/g, ' ').trim();
+        query = query.or(`author_name.ilike.%${cleanAuthor}%,author_name.ilike.%${author}%`);
+      }
+
+      const { data, error } = await query
+        .order('published_at', { ascending: false, nullsFirst: false })
+        .range(offset, offset + limit - 1);
+
+      if (error) {
+        return res.status(500).json({ error: error.message });
+      }
+
+      const responsePayload = { posts: sanitizeCardPosts(data || []), page, limit };
+      setInWarmCache(cacheKey, responsePayload);
+
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=600, stale-while-revalidate=86400');
       res.setHeader('X-Cache', 'MISS');
       return res.status(200).json(responsePayload);
     }
