@@ -6,7 +6,6 @@ import { getStoredPosts, isPostPublished } from '../utils/newsStorage';
 import { RankingItem } from '../components/cards/RankingItem';
 import { LargeStoryCard } from '../components/cards/LargeStoryCard';
 import { AdSlot } from '../components/commercial/AdSlot';
-import { AdGridRow } from '../components/commercial/AdGridRow';
 import { Breadcrumbs } from '../components/layout/Breadcrumbs';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -195,20 +194,10 @@ export const TrendingTemplate: React.FC<TrendingTemplateProps> = ({
               </p>
             </div>
 
-            {/* Sidebar Ad Slot */}
-            {showAds && <AdSlot zone="A4" variant="card" />}
+            {/* Sidebar Ad Slot (Lower) */}
+            {showAds && <AdSlot zone="A7" variant="card" />}
           </aside>
         </div>
-
-        {/* Bottom 4-Ad Grid Strip */}
-        {showAds && (
-          <div className="mt-12 pt-8 border-t border-border-subtle">
-            <AdGridRow
-              zones={['A1', 'A2', 'A7', 'A8']}
-              id="trending-bottom-ads"
-            />
-          </div>
-        )}
       </main>
     </div>
   );

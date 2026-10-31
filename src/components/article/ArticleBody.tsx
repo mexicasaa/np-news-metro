@@ -126,9 +126,25 @@ export const ArticleBody: React.FC<ArticleBodyProps> = ({
     ];
   }
 
+  // Insert Inside Article Story ad (Zone A4) natively in reading flow between paragraphs
+  let finalBlocks = activeBlocks;
+  const hasExplicitAd = activeBlocks.some((b) => b.type === 'ad_slot');
+  if (showAds && !hasExplicitAd && activeBlocks.length >= 2) {
+    const insertIdx = Math.min(2, activeBlocks.length - 1);
+    finalBlocks = [
+      ...activeBlocks.slice(0, insertIdx),
+      {
+        id: 'native-inside-article-ad-a4',
+        type: 'ad_slot' as const,
+        adZone: 'A4',
+      },
+      ...activeBlocks.slice(insertIdx),
+    ];
+  }
+
   return (
     <div className="gutenberg-content font-body text-ink leading-relaxed">
-      {activeBlocks.map((block, index) => {
+      {finalBlocks.map((block, index) => {
         switch (block.type) {
           case 'paragraph': {
             const isFirstParagraph = index === 0;
@@ -268,8 +284,8 @@ export const ArticleBody: React.FC<ArticleBodyProps> = ({
           case 'ad_slot': {
             if (!showAds) return null;
             return (
-              <div key={block.id} className="my-6">
-                <AdSlot zone={block.adZone || 'A4'} />
+              <div key={block.id} className="my-6 max-w-xl mx-auto w-full">
+                <AdSlot zone={block.adZone || 'A4'} variant="card" />
               </div>
             );
           }

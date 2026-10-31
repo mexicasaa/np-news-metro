@@ -9,7 +9,6 @@ import { VideoCard } from '../components/cards/VideoCard';
 import { MediumStoryCard } from '../components/cards/MediumStoryCard';
 import { RankingItem } from '../components/cards/RankingItem';
 import { AdSlot } from '../components/commercial/AdSlot';
-import { AdGridRow } from '../components/commercial/AdGridRow';
 import { Breadcrumbs } from '../components/layout/Breadcrumbs';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -176,20 +175,10 @@ export const VideoDetailTemplate: React.FC<VideoDetailTemplateProps> = ({
               </div>
             </div>
 
-            {/* Sidebar Ad Slot */}
-            {showAds && <AdSlot zone="A4" variant="card" />}
+            {/* Sidebar Ad Slot (Lower) */}
+            {showAds && <AdSlot zone="A7" variant="card" />}
           </aside>
         </div>
-
-        {/* Bottom 4-Ad Grid Strip */}
-        {showAds && (
-          <div className="mt-12 pt-8 border-t border-border-subtle">
-            <AdGridRow
-              zones={['A5', 'A6', 'A7', 'A8']}
-              id="video-detail-bottom-ads"
-            />
-          </div>
-        )}
       </main>
     </div>
   );

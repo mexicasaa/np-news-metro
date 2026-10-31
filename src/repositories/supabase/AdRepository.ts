@@ -66,9 +66,7 @@ export class AdRepository {
       if (!data.campaigns) return null;
 
       const campaign: any = data.campaigns;
-      if (campaign.status !== 'active') {
-        return { isExplicitlyDisabled: true } as any;
-      }
+      // Placement is active; ensure campaign is not outside scheduling bounds
       if (campaign.start_at && campaign.start_at > now) return null;
       if (campaign.end_at && campaign.end_at < now) return null;
 
@@ -112,19 +110,22 @@ export class AdRepository {
         .eq('zone', zone);
 
       if (existing && existing.length > 0) {
-        // Update all placements for this zone
+        // Update all placements for THIS SPECIFIC zone ONLY.
+        // We do NOT mutate the global campaign status when disabling, so other zones are never affected.
         await supabase
           .from('ad_placements')
           .update({ is_active: isActive })
           .eq('zone', zone);
 
-        // Update corresponding campaigns
-        for (const p of existing) {
-          if (p.campaign_id) {
-            await supabase
-              .from('campaigns')
-              .update({ status: isActive ? 'active' : 'paused' })
-              .eq('id', p.campaign_id);
+        // If activating, ensure the associated campaign is unpaused
+        if (isActive) {
+          for (const p of existing) {
+            if (p.campaign_id) {
+              await supabase
+                .from('campaigns')
+                .update({ status: 'active' })
+                .eq('id', p.campaign_id);
+            }
           }
         }
       } else {
@@ -135,7 +136,7 @@ export class AdRepository {
         });
       }
 
-      this.placementCache.clear();
+      this.placementCache.delete(zone);
       return { success: true };
     } catch (err: any) {
       console.error('Failed to toggle zone status in Supabase:', err);
@@ -206,7 +207,7 @@ export class AdRepository {
           mediaUrl: cr?.media?.public_url || '',
           altText: cr?.alt_text || c.name,
           ctaText: cr?.destination_url?.startsWith('tel:') ? 'Call Now' : 'Learn More',
-          isActive: Boolean(item.is_active && c.status === 'active'),
+          isActive: Boolean(item.is_active !== false && c.status !== 'archived'),
           createdAt: c.created_at || item.created_at,
           updatedAt: c.created_at || item.created_at,
           impressionsCount: 0,
@@ -228,71 +229,48 @@ export class AdRepository {
     campaignId?: string
   ): Promise<{ success: boolean; error?: string }> {
     try {
-      const targetCampaignIds: string[] = [];
-      const targetPlacementIds: string[] = [];
-
-      // 1. Find all placements matching the zone
+      // 1. Find placement matching THIS SPECIFIC zone only
+      let targetPlacementId: string | null = null;
+      let targetCampaignId: string | null = null;
       if (zone) {
         const { data: placementsByZone } = await supabase
           .from('ad_placements')
           .select('id, campaign_id')
-          .eq('zone', zone);
+          .eq('zone', zone)
+          .limit(1);
 
-        if (Array.isArray(placementsByZone)) {
-          placementsByZone.forEach((p) => {
-            if (p.id) targetPlacementIds.push(p.id);
-            if (p.campaign_id) targetCampaignIds.push(p.campaign_id);
-          });
+        if (placementsByZone && placementsByZone.length > 0) {
+          targetPlacementId = placementsByZone[0].id;
+          targetCampaignId = placementsByZone[0].campaign_id;
         }
       }
 
-      // 2. If a specific campaignId was passed, include it
-      if (campaignId && !campaignId.startsWith('direct-ad-') && !campaignId.startsWith('mock-')) {
-        targetCampaignIds.push(campaignId);
-
-        // Also check if any placements reference this campaignId
-        const { data: placementsByCampaign } = await supabase
-          .from('ad_placements')
-          .select('id')
-          .eq('campaign_id', campaignId);
-
-        if (Array.isArray(placementsByCampaign)) {
-          placementsByCampaign.forEach((p) => {
-            if (p.id) targetPlacementIds.push(p.id);
-          });
-        }
-      }
-
-      const uniqueCampaignIds = Array.from(new Set(targetCampaignIds.filter(Boolean)));
-      const uniquePlacementIds = Array.from(new Set(targetPlacementIds.filter(Boolean)));
-
-      // 3. Delete from ad_analytics_daily
-      for (const pId of uniquePlacementIds) {
-        await supabase.from('ad_analytics_daily').delete().eq('placement_id', pId);
-      }
-      for (const cId of uniqueCampaignIds) {
-        await supabase.from('ad_analytics_daily').delete().eq('campaign_id', cId);
-      }
-
-      // 4. Delete placements
-      if (zone) {
+      // 2. Delete analytics for this placement only
+      if (targetPlacementId) {
+        await supabase.from('ad_analytics_daily').delete().eq('placement_id', targetPlacementId);
+        await supabase.from('ad_placements').delete().eq('id', targetPlacementId);
+      } else if (zone) {
         await supabase.from('ad_placements').delete().eq('zone', zone);
       }
-      for (const pId of uniquePlacementIds) {
-        await supabase.from('ad_placements').delete().eq('id', pId);
+
+      // 3. Check if any OTHER zone is still using this campaign before removing campaign
+      const cId = targetCampaignId || (campaignId && !campaignId.startsWith('direct-ad-') && !campaignId.startsWith('mock-') ? campaignId : null);
+      if (cId) {
+        const { data: otherPlacements } = await supabase
+          .from('ad_placements')
+          .select('id')
+          .eq('campaign_id', cId)
+          .neq('zone', zone);
+
+        // Only delete campaign and creatives if NO other placement uses it
+        if (!otherPlacements || otherPlacements.length === 0) {
+          await supabase.from('ad_analytics_daily').delete().eq('campaign_id', cId);
+          await supabase.from('ad_creatives').delete().eq('campaign_id', cId);
+          await supabase.from('campaigns').delete().eq('id', cId);
+        }
       }
 
-      // 5. Delete creatives
-      for (const cId of uniqueCampaignIds) {
-        await supabase.from('ad_creatives').delete().eq('campaign_id', cId);
-      }
-
-      // 6. Delete campaigns
-      for (const cId of uniqueCampaignIds) {
-        await supabase.from('campaigns').delete().eq('id', cId);
-      }
-
-      this.placementCache.clear();
+      this.placementCache.delete(zone);
       return { success: true };
     } catch (err: any) {
       console.error('Failed to delete ad from Supabase DB:', err);

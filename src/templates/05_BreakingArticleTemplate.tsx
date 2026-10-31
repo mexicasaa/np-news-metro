@@ -13,7 +13,6 @@ import { LiveTimeline } from '../components/article/LiveTimeline';
 import { RelatedStoriesBlock } from '../components/article/RelatedStoriesBlock';
 import { RankingItem } from '../components/cards/RankingItem';
 import { AdSlot } from '../components/commercial/AdSlot';
-import { AdGridRow } from '../components/commercial/AdGridRow';
 import { Breadcrumbs } from '../components/layout/Breadcrumbs';
 import { useLanguage } from '../context/LanguageContext';
 import { getAuthorAvatarUrl } from '../utils/imageFallback';
@@ -202,9 +201,6 @@ export const BreakingArticleTemplate: React.FC<BreakingArticleTemplateProps> = (
                   ))}
                 </div>
               </div>
-
-              {/* Mobile Ad A4: Moves down below trending breaking */}
-              <AdSlot zone="A4" variant="card" />
             </div>
 
             {/* Author */}
@@ -252,20 +248,9 @@ export const BreakingArticleTemplate: React.FC<BreakingArticleTemplateProps> = (
               </div>
             </div>
 
-            {/* Sidebar Middle Ad */}
-            <AdSlot zone="A4" variant="card" />
-
             {/* Sidebar Lower Ad */}
             <AdSlot zone="A7" variant="card" />
           </aside>
-        </div>
-
-        {/* Bottom 4-Ad Grid Strip */}
-        <div className="mt-12 pt-8 border-t border-border-subtle">
-          <AdGridRow
-            zones={['A1', 'A2', 'A5', 'A6']}
-            id="breaking-bottom-ads"
-          />
         </div>
       </main>
     </div>

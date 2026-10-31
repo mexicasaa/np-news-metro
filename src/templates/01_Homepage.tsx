@@ -189,12 +189,11 @@ export const Homepage: React.FC<HomepageProps> = ({
         </div>
       </section>
 
-      {/* 4-Ad Grid Row 1: Placed below Feature Section and Editor’s Picks */}
+      {/* Position 2: Placed below Feature Section and Editor’s Picks */}
       {showAds && (
-        <AdGridRow
-          zones={['A1', 'A2', 'A3', 'A4']}
-          id="ads-feature-strip"
-        />
+        <div className="my-6 max-w-4xl mx-auto px-2">
+          <AdSlot zone="A2" variant="card" />
+        </div>
       )}
 
       {/* 3. Latest News Chronological Stream & Editorial Wire */}
@@ -437,12 +436,19 @@ export const Homepage: React.FC<HomepageProps> = ({
         </div>
       </section>
 
-      {/* 4-Ad Grid Row 2: Placed below Technology & Deep Tech and World & Diplomacy */}
+      {/* Positions 5 & 6: Technology & World News Section Ads */}
       {showAds && (
         <AdGridRow
-          zones={['A5', 'A6', 'A7', 'A8']}
+          zones={['A5', 'A6']}
           id="ads-tech-world-strip"
         />
+      )}
+
+      {/* Position 8: Above Metromat Editorial & Public Poll */}
+      {showAds && (
+        <div className="my-6 max-w-4xl mx-auto px-2">
+          <AdSlot zone="A8" variant="card" />
+        </div>
       )}
 
       {/* 9. Metromat: Editorial Voice & Today's Public Poll */}

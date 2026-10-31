@@ -348,7 +348,10 @@ export const deleteDirectAd = async (id: string, zone?: string): Promise<void> =
   const matched = ads.find((a) => a.id === id);
   const targetZone = zone || matched?.zone;
 
-  const filtered = ads.filter((a) => a.id !== id && (targetZone ? a.zone !== targetZone : true));
+  const filtered = ads.filter((a) => {
+    if (targetZone) return a.zone !== targetZone;
+    return a.id !== id;
+  });
   if (typeof window !== 'undefined') {
     localStorage.setItem(DIRECT_ADS_KEY, JSON.stringify(filtered));
   }
@@ -358,14 +361,18 @@ export const deleteDirectAd = async (id: string, zone?: string): Promise<void> =
     toggleZoneVisibility(targetZone, false);
   }
 
-  // Purge from Supabase Database
+  // Purge from Supabase Database for targetZone only
   try {
     await AdRepository.getInstance().deleteCampaignAndPlacement(targetZone || '', id);
   } catch (err) {
     console.warn('Failed to delete ad from Supabase DB:', err);
   }
 
-  adPlacementCache.clear();
+  if (targetZone) {
+    adPlacementCache.delete(targetZone);
+  } else {
+    adPlacementCache.clear();
+  }
   notifyAdUpdate();
 };
 
@@ -394,23 +401,34 @@ export const toggleAdOpenClose = async (
 ): Promise<boolean> => {
   const currentVisibility = isZoneVisible(zone);
   const ads = getDirectAds();
-  const matchedAd = ads.find((a) => a.zone === zone || (id && a.id === id));
+  // Strictly isolate matching to the requested zone
+  const matchedAd = ads.find((a) => a.zone === zone);
 
   // Determine next state
   const nextState = forceState !== undefined 
     ? forceState 
     : (matchedAd ? !matchedAd.isActive : !currentVisibility);
 
-  // 1. Update zone visibility config in localStorage
+  // 1. Update zone visibility config in localStorage for THIS zone only
   toggleZoneVisibility(zone, nextState);
 
-  // 2. Update direct ads in localStorage
-  if (matchedAd) {
+  // 2. Update direct ads in localStorage for THIS zone only
+  let updatedAny = false;
+  ads.forEach((a) => {
+    if (a.zone === zone) {
+      a.isActive = nextState;
+      a.updatedAt = new Date().toISOString();
+      updatedAny = true;
+    }
+  });
+
+  if (!updatedAny && matchedAd) {
     matchedAd.isActive = nextState;
     matchedAd.updatedAt = new Date().toISOString();
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(DIRECT_ADS_KEY, JSON.stringify(ads));
-    }
+  }
+
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(DIRECT_ADS_KEY, JSON.stringify(ads));
   }
 
   // If opening, unmark cleared; if closing, mark cleared so fallback doesn't trigger
@@ -420,15 +438,15 @@ export const toggleAdOpenClose = async (
     markZoneCleared(zone);
   }
 
-  // 3. Update Supabase Database
+  // 3. Update Supabase Database for THIS zone only
   try {
     await AdRepository.getInstance().toggleZoneStatus(zone, nextState);
   } catch (err) {
     console.warn('Database toggle warning:', err);
   }
 
-  // 4. Invalidate cache and broadcast to all open tabs and windows
-  adPlacementCache.clear();
+  // 4. Invalidate cache for THIS zone and broadcast to all open tabs and windows
+  adPlacementCache.delete(zone);
   notifyAdUpdate();
 
   return nextState;

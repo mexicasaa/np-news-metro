@@ -15,7 +15,6 @@ import { CorrectionNotice } from '../components/article/CorrectionNotice';
 import { RelatedStoriesBlock } from '../components/article/RelatedStoriesBlock';
 import { RankingItem } from '../components/cards/RankingItem';
 import { AdSlot } from '../components/commercial/AdSlot';
-import { AdGridRow } from '../components/commercial/AdGridRow';
 import { Breadcrumbs } from '../components/layout/Breadcrumbs';
 import { NewsletterModule } from '../components/common/NewsletterModule';
 import { useLanguage } from '../context/LanguageContext';
@@ -229,9 +228,6 @@ export const StandardArticleTemplate: React.FC<StandardArticleTemplateProps> = (
                   {t.newsletterBtn}
                 </button>
               </div>
-
-              {/* Mobile Ad Slot A4: Moves down below Most Read & Newsletter */}
-              {showAds && <AdSlot zone="A4" variant="card" />}
             </div>
 
             {/* Author Biography Box */}
@@ -313,23 +309,10 @@ export const StandardArticleTemplate: React.FC<StandardArticleTemplateProps> = (
               </button>
             </div>
 
-            {/* Sidebar Middle Ad (Below Most Read & Newsletter) */}
-            {showAds && <AdSlot zone="A4" variant="card" />}
-
-            {/* Sidebar Lower Ad */}
+            {/* Sidebar Lower Ad (Position 7: Article Lower Sidebar) */}
             {showAds && <AdSlot zone="A7" variant="card" />}
           </aside>
         </div>
-
-        {/* Bottom 4-Ad Grid Strip: Placed below Related Coverage & Analysis */}
-        {showAds && (
-          <div className="mt-12 pt-8 border-t border-border-subtle">
-            <AdGridRow
-              zones={['A1', 'A2', 'A5', 'A6']}
-              id="article-bottom-ads"
-            />
-          </div>
-        )}
       </main>
     </div>
   );
