@@ -16,12 +16,14 @@ export interface AdSlotProps {
   zone: 'A1' | 'A2' | 'A3' | 'A4' | 'A5' | 'A6' | 'A7' | 'A8' | string;
   className?: string;
   variant?: 'banner' | 'card' | 'sidebar' | 'inline';
+  onUnavailable?: () => void;
 }
 
 export const AdSlot: React.FC<AdSlotProps> = ({
   zone,
   className = '',
   variant,
+  onUnavailable,
 }) => {
   const { isHindi } = useLanguage();
   const [directAd, setDirectAd] = useState<ActiveAdPlacement | null>(null);
@@ -114,6 +116,13 @@ export const AdSlot: React.FC<AdSlotProps> = ({
     }
   }, [shouldShowAdSense, zone]);
 
+  // Notify parent grid/layout if zone has no active ad to eliminate phantom blanks
+  useEffect(() => {
+    if (!isZoneVisible(zone) || (!shouldShowAdSense && !directAd)) {
+      onUnavailable?.();
+    }
+  }, [zone, shouldShowAdSense, directAd, onUnavailable]);
+
   // Check if zone is visible (Admin toggle)
   if (!isZoneVisible(zone)) {
     return null;
@@ -130,6 +139,26 @@ export const AdSlot: React.FC<AdSlotProps> = ({
   const ctaUrl = directAd ? directAd.destinationUrl : '#';
   const mediaUrl = directAd?.mediaUrl;
   const altText = directAd?.altText || advertiserName;
+
+  // Check if creativeText is distinct and not just repeating the advertiser/brand name
+  const isDuplicateBrand = (): boolean => {
+    if (!creativeText || !creativeText.trim()) return true;
+    const normAdv = advertiserName.trim().toLowerCase();
+    const normCr = creativeText.trim().toLowerCase();
+    if (normAdv === normCr) return true;
+
+    // Clean non-alphanumeric chars (including unicode devanagari letters and numbers)
+    const cleanAdv = normAdv.replace(/[^\p{L}\p{N}]/gu, '');
+    const cleanCr = normCr.replace(/[^\p{L}\p{N}]/gu, '');
+    if (!cleanCr || cleanCr === cleanAdv) return true;
+
+    // If one contains the other and length difference is very small (e.g. omitting "LLP" or "Pvt Ltd")
+    if (cleanAdv.includes(cleanCr) && cleanAdv.length - cleanCr.length < 5) return true;
+    if (cleanCr.includes(cleanAdv) && cleanCr.length - cleanAdv.length < 5) return true;
+
+    return false;
+  };
+  const hasDistinctDescription = !isDuplicateBrand();
 
   const isPhoneCta = typeof ctaUrl === 'string' && ctaUrl.startsWith('tel:');
   const isExternalLink = typeof ctaUrl === 'string' && ctaUrl.startsWith('http');
@@ -189,13 +218,13 @@ export const AdSlot: React.FC<AdSlotProps> = ({
   if (variant === 'card') {
     return (
       <div
-        className={`bg-white dark:bg-surface-lowest border border-border-subtle hover:border-primary/50 rounded-md p-3 sm:p-4 lg:p-4 shadow-xs hover:shadow-subtle transition-all duration-200 flex flex-col justify-between h-full group ${className}`}
+        className={`bg-white dark:bg-surface-lowest border border-border-subtle hover:border-primary/50 rounded-md p-3 sm:p-4 shadow-xs hover:shadow-subtle transition-all duration-200 flex flex-col justify-between group ${className}`}
         data-slot={zone}
         aria-label={`Sponsored: ${advertiserName}`}
       >
         <div className="flex-1 flex flex-col">
           {/* Compliant Ad Header */}
-          <div className="flex items-center justify-between text-[9px] sm:text-[10px] lg:text-xs uppercase font-bold text-ink-muted tracking-wider pb-2 border-b border-border-subtle mb-3 flex-shrink-0">
+          <div className="flex items-center justify-between text-[9px] sm:text-[10px] lg:text-xs uppercase font-bold text-ink-muted tracking-wider pb-2 border-b border-border-subtle mb-2.5 flex-shrink-0">
             <span className="text-secondary-gold font-sans font-bold flex items-center gap-1 sm:gap-1.5 truncate">
               <span className="w-1.5 h-1.5 rounded-full bg-secondary-gold inline-block flex-shrink-0"></span>
               <span className="truncate">{isHindi ? 'प्रायोजित साझेदार' : 'SPONSORED PARTNER'}</span>
@@ -206,21 +235,21 @@ export const AdSlot: React.FC<AdSlotProps> = ({
             </span>
           </div>
 
-          {/* Standardized Uniform Creative Container for Exact Card Alignment */}
-          <div className="w-full h-44 sm:h-48 md:h-52 bg-slate-50 dark:bg-surface-subtle/30 rounded-xs border border-border-subtle/80 overflow-hidden flex items-center justify-center mb-3 flex-shrink-0 group/media">
+          {/* Dynamic Creative Container: Sizes dynamically to the image's aspect ratio without oversized frames */}
+          <div className="w-full flex items-center justify-center overflow-hidden rounded-xs mb-2.5 group/media">
             {mediaUrl ? (
               <a
                 href={ctaUrl}
                 target={isExternalLink ? '_blank' : undefined}
                 rel={isExternalLink ? 'noopener noreferrer' : undefined}
                 onClick={handleClick}
-                className="w-full h-full flex items-center justify-center p-2"
+                className="w-full flex items-center justify-center"
                 title={advertiserName}
               >
                 <img
                   src={mediaUrl}
                   alt={altText}
-                  className="max-h-full max-w-full object-contain block mx-auto transition-transform duration-300 group-hover/media:scale-105"
+                  className="w-full h-auto max-h-[460px] sm:max-h-[500px] object-contain rounded-xs block mx-auto transition-transform duration-300 group-hover/media:scale-[1.01]"
                   loading="lazy"
                   onError={(e) => {
                     const target = e.currentTarget;
@@ -231,7 +260,7 @@ export const AdSlot: React.FC<AdSlotProps> = ({
                 />
               </a>
             ) : (
-              <div className="w-full h-full p-4 bg-gradient-to-br from-primary/5 via-surface-container to-secondary-gold/10 flex flex-col items-center justify-center text-center">
+              <div className="w-full min-h-[140px] p-4 bg-gradient-to-br from-primary/5 via-surface-container to-secondary-gold/10 rounded-xs flex flex-col items-center justify-center text-center">
                 <div className="w-8 h-8 rounded-full bg-secondary-gold/20 flex items-center justify-center mb-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-secondary-gold inline-block"></span>
                 </div>
@@ -243,14 +272,16 @@ export const AdSlot: React.FC<AdSlotProps> = ({
             )}
           </div>
 
-          {/* Content Details: Fixed min-heights for pixel-perfect row alignment */}
-          <div className="space-y-1 mb-2 flex-1 flex flex-col justify-start">
-            <h4 className="font-sans font-bold text-xs sm:text-sm lg:text-[15px] text-ink block leading-snug line-clamp-2 min-h-[2.4rem] hover:text-primary transition-colors">
+          {/* Content Details: Cleanly positioned without artificial min-height blank gaps */}
+          <div className="space-y-1 mb-2.5">
+            <h4 className="font-sans font-bold text-xs sm:text-sm lg:text-[15px] text-ink block leading-snug hover:text-primary transition-colors">
               {advertiserName}
             </h4>
-            <p className="font-serif text-[11px] sm:text-xs text-ink-secondary leading-relaxed line-clamp-2 min-h-[2.1rem] mt-0.5">
-              {creativeText || (isHindi ? 'सत्यापित राष्ट्रीय पहल एवं भागीदार सेवाएं।' : 'Explore verified national initiative and partner services.')}
-            </p>
+            {hasDistinctDescription && (
+              <p className="font-serif text-[11px] sm:text-xs text-ink-secondary leading-relaxed line-clamp-2 mt-0.5">
+                {creativeText}
+              </p>
+            )}
           </div>
         </div>
 
@@ -277,7 +308,7 @@ export const AdSlot: React.FC<AdSlotProps> = ({
               )}
             </a>
           ) : (
-            <div className="py-1.5 text-center text-[10px] sm:text-xs font-semibold text-ink-muted/60 uppercase tracking-wider select-none">
+            <div className="py-1 text-center text-[10px] sm:text-xs font-semibold text-ink-muted/60 uppercase tracking-wider select-none">
               {isHindi ? 'प्रायोजित संदेश' : 'Official Notice'}
             </div>
           )}
@@ -336,7 +367,7 @@ export const AdSlot: React.FC<AdSlotProps> = ({
             <h4 className="font-sans font-bold text-sm sm:text-base text-ink block leading-snug">
               {advertiserName}
             </h4>
-            {creativeText && (
+            {hasDistinctDescription && (
               <p className="font-serif text-xs sm:text-[13px] text-ink-secondary leading-relaxed">
                 {creativeText}
               </p>
@@ -405,9 +436,7 @@ export const AdSlot: React.FC<AdSlotProps> = ({
               loading="lazy"
               onError={(e) => {
                 const target = e.currentTarget;
-                if (!target.src.endsWith('/uploads/ads/shastri-patanjali-chikitsalaya.jpg')) {
-                  target.src = '/uploads/ads/shastri-patanjali-chikitsalaya.jpg';
-                } else if (target.src !== DEFAULT_FALLBACK_IMAGE) {
+                if (target.src !== DEFAULT_FALLBACK_IMAGE) {
                   target.src = DEFAULT_FALLBACK_IMAGE;
                 }
               }}
@@ -419,9 +448,11 @@ export const AdSlot: React.FC<AdSlotProps> = ({
               <h4 className="font-sans font-bold text-sm sm:text-base text-ink block mb-1">
                 {advertiserName}
               </h4>
-              <p className="font-serif text-xs sm:text-sm font-semibold text-ink leading-relaxed">
-                {creativeText}
-              </p>
+              {hasDistinctDescription && (
+                <p className="font-serif text-xs sm:text-sm font-semibold text-ink leading-relaxed">
+                  {creativeText}
+                </p>
+              )}
             </div>
 
             {ctaUrl && ctaUrl !== '#' && (
@@ -468,11 +499,13 @@ export const AdSlot: React.FC<AdSlotProps> = ({
           </span>
           <div className="min-w-0 text-left">
             <span className="text-xs font-bold text-primary mr-1.5 inline">
-              {advertiserName}:
+              {advertiserName}{hasDistinctDescription ? ':' : ''}
             </span>
-            <span className="text-xs sm:text-sm font-serif font-bold text-ink leading-tight">
-              {creativeText}
-            </span>
+            {hasDistinctDescription && (
+              <span className="text-xs sm:text-sm font-serif font-bold text-ink leading-tight">
+                {creativeText}
+              </span>
+            )}
           </div>
         </div>
 

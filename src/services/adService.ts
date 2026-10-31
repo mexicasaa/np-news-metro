@@ -293,17 +293,6 @@ export const getDirectAds = (): DirectAd[] => {
     const sanitized = parsed.filter((a) => {
       if (!a || !a.zone) return false;
       if (cleared.has(a.zone)) return false;
-      const adv = `${a.advertiserName || ''} ${a.creativeText || ''} ${a.mediaUrl || ''}`.toLowerCase();
-      if (
-        adv.includes('गिरिराज') ||
-        adv.includes('girraj') ||
-        adv.includes('supari') ||
-        adv.includes('पतंजलि') ||
-        adv.includes('patanjali') ||
-        adv.includes('suresh-chand-agarwal')
-      ) {
-        return false;
-      }
       return true;
     });
 

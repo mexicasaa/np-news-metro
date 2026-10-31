@@ -19,9 +19,7 @@ export const AdGridRow: React.FC<AdGridRowProps> = ({
   className = '',
   id,
 }) => {
-  const [activeZones, setActiveZones] = useState<string[]>(() =>
-    zones.filter((z) => isZoneVisible(z))
-  );
+  const [activeZones, setActiveZones] = useState<string[]>([]);
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
@@ -41,7 +39,8 @@ export const AdGridRow: React.FC<AdGridRowProps> = ({
         }
 
         const zoneConfig = adsense.zones[zone];
-        const canShowAdSense = adsense.enabled && (zoneConfig ? zoneConfig.enabled : true);
+        const isZoneAdSenseEnabled = zoneConfig ? zoneConfig.enabled : true;
+        const canShowAdSense = adsense.enabled && isZoneAdSenseEnabled && adsense.priority !== 'direct_only';
         if (canShowAdSense) {
           valid.push(zone);
         }
@@ -75,11 +74,11 @@ export const AdGridRow: React.FC<AdGridRowProps> = ({
     };
   }, [zones.join(',')]);
 
-  if (!isReady && activeZones.length === 0) {
-    return null;
-  }
+  const handleUnavailableZone = (zone: string) => {
+    setActiveZones((prev) => prev.filter((z) => z !== zone));
+  };
 
-  if (activeZones.length === 0) {
+  if (!isReady || activeZones.length === 0) {
     return null;
   }
 
@@ -92,18 +91,22 @@ export const AdGridRow: React.FC<AdGridRowProps> = ({
       <div
         className={`grid gap-3 sm:gap-4 lg:gap-5 items-stretch ${
           activeZones.length === 1
-            ? 'grid-cols-1 max-w-sm mx-auto'
+            ? 'grid-cols-1 max-w-md mx-auto'
             : activeZones.length === 2
             ? 'grid-cols-1 sm:grid-cols-2 max-w-2xl mx-auto'
             : activeZones.length === 3
             ? 'grid-cols-1 sm:grid-cols-3 max-w-5xl mx-auto'
-            : 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-4'
+            : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 max-w-7xl mx-auto'
         }`}
       >
         {activeZones.map((zone) => (
-          <div key={zone} className="h-full w-full flex flex-col items-stretch">
-            <AdSlot zone={zone as any} variant="card" className="h-full w-full" />
-          </div>
+          <AdSlot
+            key={zone}
+            zone={zone as any}
+            variant="card"
+            className="h-full w-full"
+            onUnavailable={() => handleUnavailableZone(zone)}
+          />
         ))}
       </div>
     </section>
