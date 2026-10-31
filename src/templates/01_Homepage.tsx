@@ -191,9 +191,7 @@ export const Homepage: React.FC<HomepageProps> = ({
 
       {/* Position 2: Placed below Feature Section and Editor’s Picks */}
       {showAds && (
-        <div className="my-6 max-w-4xl mx-auto px-2">
-          <AdSlot zone="A2" variant="card" />
-        </div>
+        <AdSlot zone="A2" variant="card" className="my-6 max-w-4xl mx-auto px-2" />
       )}
 
       {/* 3. Latest News Chronological Stream & Editorial Wire */}
@@ -446,9 +444,7 @@ export const Homepage: React.FC<HomepageProps> = ({
 
       {/* Position 8: Above Metromat Editorial & Public Poll */}
       {showAds && (
-        <div className="my-6 max-w-4xl mx-auto px-2">
-          <AdSlot zone="A8" variant="card" />
-        </div>
+        <AdSlot zone="A8" variant="card" className="my-6 max-w-4xl mx-auto px-2" />
       )}
 
       {/* 9. Metromat: Editorial Voice & Today's Public Poll */}

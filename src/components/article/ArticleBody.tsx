@@ -143,7 +143,7 @@ export const ArticleBody: React.FC<ArticleBodyProps> = ({
   }
 
   return (
-    <div className="gutenberg-content font-body text-ink leading-relaxed">
+    <div className="gutenberg-content font-body text-ink leading-relaxed break-words">
       {finalBlocks.map((block, index) => {
         switch (block.type) {
           case 'paragraph': {
@@ -284,9 +284,7 @@ export const ArticleBody: React.FC<ArticleBodyProps> = ({
           case 'ad_slot': {
             if (!showAds) return null;
             return (
-              <div key={block.id} className="my-6 max-w-xl mx-auto w-full">
-                <AdSlot zone={block.adZone || 'A4'} variant="card" />
-              </div>
+              <AdSlot key={block.id} zone={block.adZone || 'A4'} variant="card" className="my-6 max-w-xl mx-auto w-full" />
             );
           }
 

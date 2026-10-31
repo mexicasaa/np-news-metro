@@ -139,9 +139,7 @@ export const OpinionArticleTemplate: React.FC<OpinionArticleTemplateProps> = ({
             <ArticleBody post={post} />
 
             {/* Mobile Ad A3: Dynamically moves down below article body */}
-            <div className="block lg:hidden my-6">
-              <AdSlot zone="A3" variant="card" />
-            </div>
+            <AdSlot zone="A3" variant="card" className="block lg:hidden my-6" />
 
             {/* Mobile Popular Columns Block */}
             <div className="block lg:hidden my-6 space-y-6">
@@ -172,9 +170,7 @@ export const OpinionArticleTemplate: React.FC<OpinionArticleTemplateProps> = ({
             />
 
             {/* Mobile Ad A7: Moves down below author bio */}
-            <div className="block lg:hidden my-6">
-              <AdSlot zone="A7" variant="card" />
-            </div>
+            <AdSlot zone="A7" variant="card" className="block lg:hidden my-6" />
 
             {/* Related Opinion Stories */}
             <RelatedStoriesBlock

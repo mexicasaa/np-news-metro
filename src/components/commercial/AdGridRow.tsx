@@ -33,8 +33,13 @@ export const AdGridRow: React.FC<AdGridRowProps> = ({
         if (!isZoneVisible(zone)) continue;
 
         const placement = await getAdPlacement(zone);
-        if (placement) {
+        if (placement && !(placement as any).isExplicitlyDisabled) {
           valid.push(zone);
+          continue;
+        }
+
+        // If explicitly disabled in database, strictly skip
+        if (placement && (placement as any).isExplicitlyDisabled) {
           continue;
         }
 

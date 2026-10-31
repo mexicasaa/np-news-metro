@@ -2216,9 +2216,7 @@ function AppContent() {
 
           {/* Leaderboard Ad (A1) */}
           {showAds && (
-            <div className="max-w-site mx-auto px-4 pt-1">
-              <AdSlot zone="A1" />
-            </div>
+            <AdSlot zone="A1" className="max-w-site mx-auto px-4 pt-1" />
           )}
 
           {/* MAIN TEMPLATE CONTENT RENDERER */}

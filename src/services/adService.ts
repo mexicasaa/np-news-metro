@@ -119,7 +119,7 @@ export const DEFAULT_ADS_VISIBILITY: AdsVisibilityConfig = {
 
 // Default Google AdSense Configuration
 export const DEFAULT_ADSENSE_SETTINGS: AdSenseSettings = {
-  enabled: true,
+  enabled: false, // Disabled by default until publisher activates it in Admin
   clientId: 'ca-pub-6758961188222479',
   priority: 'direct_first',
   testMode: false,
@@ -135,29 +135,9 @@ export const DEFAULT_ADSENSE_SETTINGS: AdSenseSettings = {
   },
 };
 
-// Initial Seed Direct Ads from mockAdSlots
+// Initial Direct Ads: Strictly returns empty list to prevent phantom mock ads on new devices/IPs
 export const getInitialDirectAds = (): DirectAd[] => {
-  const zones = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8'];
-  const now = new Date().toISOString();
-
-  return zones.map((zone) => {
-    const mock = mockAdSlots[zone];
-    return {
-      id: `direct-ad-${zone.toLowerCase()}`,
-      zone,
-      advertiserName: mock?.advertiserName || `Sponsored Partner ${zone}`,
-      creativeText: mock?.creativeText || 'Explore verified national initiative and partner services.',
-      destinationUrl: mock?.ctaUrl || '#',
-      mediaUrl: mock?.creativeUrl || '',
-      altText: mock?.advertiserName || 'Sponsored Partner',
-      ctaText: mock?.ctaUrl?.startsWith('tel:') ? 'Call Now' : 'Learn More',
-      isActive: mock?.isEnabled ?? true,
-      createdAt: now,
-      updatedAt: now,
-      impressionsCount: Math.floor(Math.random() * 1200) + 300,
-      clicksCount: Math.floor(Math.random() * 45) + 8,
-    };
-  });
+  return [];
 };
 
 /* ======================================================================
@@ -468,14 +448,14 @@ const adPlacementCache = new Map<string, { data: ActiveAdPlacement | null; times
 const AD_CACHE_TTL = 5 * 60 * 1000; // 5m cache (instantly invalidated on admin update)
 
 export const getAdPlacement = async (zone: string): Promise<ActiveAdPlacement | null> => {
-  // If the zone or master is hidden by Admin, return null immediately
+  // If the zone or master is hidden by Admin, return disabled indicator immediately
   if (!isZoneVisible(zone)) {
-    return null;
+    return { isExplicitlyDisabled: true } as any;
   }
 
   // If the zone was deleted by Admin, never show it
   if (getClearedZones().has(zone)) {
-    return null;
+    return { isExplicitlyDisabled: true } as any;
   }
 
   const cached = adPlacementCache.get(zone);
@@ -488,9 +468,10 @@ export const getAdPlacement = async (zone: string): Promise<ActiveAdPlacement | 
     const repoPlacement = await AdRepository.getInstance().getActivePlacementForZone(zone);
     if (repoPlacement) {
       if ((repoPlacement as any).isExplicitlyDisabled) {
-        // Admin explicitly CLOSED this ad in the database
-        adPlacementCache.set(zone, { data: null, timestamp: Date.now() });
-        return null;
+        // Admin explicitly CLOSED this ad in the database - preserve disabled indicator
+        const disabledObj = { isExplicitlyDisabled: true } as any;
+        adPlacementCache.set(zone, { data: disabledObj, timestamp: Date.now() });
+        return disabledObj;
       }
       adPlacementCache.set(zone, { data: repoPlacement, timestamp: Date.now() });
       return repoPlacement;
@@ -523,12 +504,12 @@ export const getAdPlacement = async (zone: string): Promise<ActiveAdPlacement | 
   const allDirectAds = getDirectAds();
   const zoneDirectAd = allDirectAds.find((a) => a.zone === zone);
   if (zoneDirectAd && !zoneDirectAd.isActive) {
-    adPlacementCache.set(zone, { data: null, timestamp: Date.now() });
-    return null;
+    const disabledObj = { isExplicitlyDisabled: true } as any;
+    adPlacementCache.set(zone, { data: disabledObj, timestamp: Date.now() });
+    return disabledObj;
   }
 
   // Strictly return null if not in Supabase DB and not in active local direct ads.
-  // Never fallback to mock ads to prevent deleted ads from resurrecting!
   adPlacementCache.set(zone, { data: null, timestamp: Date.now() });
   return null;
 };

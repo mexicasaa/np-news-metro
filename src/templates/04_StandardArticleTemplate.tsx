@@ -165,9 +165,7 @@ export const StandardArticleTemplate: React.FC<StandardArticleTemplateProps> = (
 
             {/* Mobile / Responsive Ad A3: Dynamically moves down below article body on mobile & tablet */}
             {showAds && (
-              <div className="block lg:hidden my-6">
-                <AdSlot zone="A3" variant="card" />
-              </div>
+              <AdSlot zone="A3" variant="card" className="block lg:hidden my-6" />
             )}
 
             {/* Tags / Topics Pill Bar */}
@@ -247,9 +245,7 @@ export const StandardArticleTemplate: React.FC<StandardArticleTemplateProps> = (
 
             {/* Mobile Ad Slot A7: Moves down below Reader Perspectives & Comments */}
             {showAds && (
-              <div className="block lg:hidden my-6">
-                <AdSlot zone="A7" variant="card" />
-              </div>
+              <AdSlot zone="A7" variant="card" className="block lg:hidden my-6" />
             )}
 
             {/* Related Coverage Block */}

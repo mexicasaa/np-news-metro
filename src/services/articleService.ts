@@ -269,10 +269,33 @@ export const getPublishedArticles = async (forceRefresh: boolean = false): Promi
     console.warn('Edge API fetch note:', apiErr);
   }
 
-  // Return existing memory cache or stored live cache (Never call Supabase DB directly from public browser)
+  // Return existing memory cache or stored live cache (Never call Supabase DB directly from public browser unless empty)
   const stored = getStoredPosts();
   if (stored && stored.length > 0) {
     return stored;
+  }
+
+  // Fallback to Supabase database directly if Edge API was unavailable and no stored cache exists
+  try {
+    const { data: dbData } = await supabase
+      .from('articles')
+      .select(EDITORIAL_LIST_SELECT)
+      .eq('status', 'published')
+      .not('published_at', 'is', null)
+      .order('is_lead', { ascending: false })
+      .order('published_at', { ascending: false, nullsFirst: false })
+      .limit(45);
+
+    if (dbData && dbData.length > 0) {
+      const livePosts = dbData.map((row: any) => mapDbToWpPost(row)).filter(isPostPublished);
+      if (livePosts.length > 0) {
+        cachedHomepageArticles = { data: livePosts, timestamp: Date.now() };
+        saveLiveArticlesCache(livePosts);
+        return livePosts;
+      }
+    }
+  } catch (dbErr) {
+    console.warn('Direct Supabase articles query note:', dbErr);
   }
 
   return [];
@@ -304,6 +327,35 @@ export const getCategoryArticles = async (
     }
   } catch (apiErr) {}
 
+  // Direct Supabase fallback if edge API was temporarily warming or unavailable
+  try {
+    let query = supabase
+      .from('articles')
+      .select(EDITORIAL_LIST_SELECT)
+      .eq('status', 'published')
+      .not('published_at', 'is', null);
+
+    const { data: catRow } = await supabase
+      .from('categories')
+      .select('id')
+      .eq('slug', categorySlug.toLowerCase())
+      .maybeSingle();
+
+    if (catRow?.id) {
+      query = query.eq('category_id', catRow.id);
+    }
+
+    const { data: catData } = await query
+      .order('published_at', { ascending: false, nullsFirst: false })
+      .range((page - 1) * limit, page * limit - 1);
+
+    if (catData && catData.length > 0) {
+      const mapped = catData.map((row: any) => mapDbToWpPost(row)).filter(isPostPublished);
+      cachedCategoryArticles.set(cacheKey, { data: mapped, timestamp: Date.now() });
+      return mapped;
+    }
+  } catch {}
+
   return cachedCategoryArticles.get(cacheKey)?.data || [];
 };
 
@@ -331,6 +383,23 @@ export const getLatestArticles = async (
       }
     }
   } catch (apiErr) {}
+
+  // Direct Supabase fallback if edge API was temporarily warming or unavailable
+  try {
+    const { data: latestData } = await supabase
+      .from('articles')
+      .select(EDITORIAL_LIST_SELECT)
+      .eq('status', 'published')
+      .not('published_at', 'is', null)
+      .order('published_at', { ascending: false, nullsFirst: false })
+      .range((page - 1) * limit, page * limit - 1);
+
+    if (latestData && latestData.length > 0) {
+      const mapped = latestData.map((row: any) => mapDbToWpPost(row)).filter(isPostPublished);
+      cachedLatestArticles.set(cacheKey, { data: mapped, timestamp: Date.now() });
+      return mapped;
+    }
+  } catch {}
 
   return cachedLatestArticles.get(cacheKey)?.data || [];
 };

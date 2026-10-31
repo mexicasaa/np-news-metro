@@ -71,22 +71,27 @@ export const AdSlot: React.FC<AdSlotProps> = ({
     };
   }, [zone]);
 
+  // Check if slot was explicitly closed/disabled in database or admin
+  const isExplicitlyDisabled = Boolean((directAd as any)?.isExplicitlyDisabled) || !isZoneVisible(zone);
+
   // Determine AdSense vs Direct priority
   const zoneConfig = adSenseSettings.zones[zone];
   const isAdSenseGloballyEnabled = adSenseSettings.enabled;
   const isAdSenseZoneEnabled = zoneConfig ? zoneConfig.enabled : true;
-  const canShowAdSense = isAdSenseGloballyEnabled && isAdSenseZoneEnabled && !adSenseFailed;
+  const canShowAdSense = !isExplicitlyDisabled && isAdSenseGloballyEnabled && isAdSenseZoneEnabled && !adSenseFailed;
 
   let shouldShowAdSense = false;
-  if (adSenseSettings.priority === 'adsense_only') {
-    shouldShowAdSense = canShowAdSense;
-  } else if (adSenseSettings.priority === 'adsense_first') {
-    shouldShowAdSense = canShowAdSense;
-  } else if (adSenseSettings.priority === 'direct_only') {
-    shouldShowAdSense = false;
-  } else {
-    // direct_first (default recommended)
-    shouldShowAdSense = !directAd && canShowAdSense;
+  if (!isExplicitlyDisabled) {
+    if (adSenseSettings.priority === 'adsense_only') {
+      shouldShowAdSense = canShowAdSense;
+    } else if (adSenseSettings.priority === 'adsense_first') {
+      shouldShowAdSense = canShowAdSense;
+    } else if (adSenseSettings.priority === 'direct_only') {
+      shouldShowAdSense = false;
+    } else {
+      // direct_first (default recommended): only show AdSense if no direct ad exists and slot is not disabled
+      shouldShowAdSense = !directAd && canShowAdSense;
+    }
   }
 
   // Google AdSense Push Effect with React 18 Double-Push Protection
@@ -118,19 +123,18 @@ export const AdSlot: React.FC<AdSlotProps> = ({
 
   // Notify parent grid/layout if zone has no active ad to eliminate phantom blanks
   useEffect(() => {
-    if (!isZoneVisible(zone) || (!shouldShowAdSense && !directAd)) {
+    if (isExplicitlyDisabled || (!shouldShowAdSense && !directAd)) {
       onUnavailable?.();
     }
-  }, [zone, shouldShowAdSense, directAd, onUnavailable]);
+  }, [isExplicitlyDisabled, shouldShowAdSense, directAd, onUnavailable]);
 
-  // Check if zone is visible (Admin toggle)
-  if (!isZoneVisible(zone)) {
+  // Strictly enforce: if slot is explicitly disabled or no active ad exists, collapse completely!
+  if (isExplicitlyDisabled) {
     return null;
   }
 
   // Strictly enforce: if no AdSense and no active direct ad placement, do NOT render anything!
-  // Prevents deleted or removed ads from resurrecting via fallback definitions
-  if (!shouldShowAdSense && !directAd) {
+  if (!shouldShowAdSense && (!directAd || (directAd as any)?.isExplicitlyDisabled)) {
     return null;
   }
 
@@ -345,7 +349,7 @@ export const AdSlot: React.FC<AdSlotProps> = ({
               target={isExternalLink ? '_blank' : undefined}
               rel={isExternalLink ? 'noopener noreferrer' : undefined}
               onClick={handleClick}
-              className="block group overflow-hidden rounded-xs bg-white border border-border-subtle/80 hover:border-primary/50 transition-all shadow-2xs"
+              className="w-full flex items-center justify-center overflow-hidden rounded-xs group"
               title={advertiserName}
             >
               <img
@@ -487,47 +491,85 @@ export const AdSlot: React.FC<AdSlotProps> = ({
      ====================================================================== */
   return (
     <div
-      className={`my-3 sm:my-3.5 flex flex-col items-center justify-center ${className}`}
+      className={`my-2 sm:my-3 flex flex-col items-center justify-center w-full ${className}`}
       data-slot={zone}
     >
       <div
-        className="w-full bg-white dark:bg-surface-lowest border border-border-subtle rounded-md py-2 px-3 sm:py-2.5 sm:px-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left transition-all hover:border-primary/40 shadow-xs max-w-[970px]"
+        className="w-full bg-white dark:bg-surface-lowest border border-border-subtle rounded-md p-2.5 sm:p-3 flex flex-col items-center justify-between gap-2.5 text-center sm:text-left transition-all hover:border-primary/40 shadow-xs max-w-[970px]"
       >
-        <div className="flex items-center gap-2.5 min-w-0 flex-1 flex-wrap sm:flex-nowrap">
-          <span className="text-[10px] uppercase font-bold text-secondary-gold bg-secondary-gold/10 px-2 py-0.5 rounded-xs tracking-wider flex-shrink-0">
-            {isHindi ? 'प्रायोजित' : 'SPONSORED'}
-          </span>
-          <div className="min-w-0 text-left">
-            <span className="text-xs font-bold text-primary mr-1.5 inline">
-              {advertiserName}{hasDistinctDescription ? ':' : ''}
-            </span>
-            {hasDistinctDescription && (
-              <span className="text-xs sm:text-sm font-serif font-bold text-ink leading-tight">
-                {creativeText}
+        {mediaUrl ? (
+          <div className="w-full flex flex-col items-center">
+            <div className="w-full flex items-center justify-between text-[9px] sm:text-[10px] uppercase font-bold text-ink-muted tracking-wider pb-1.5 border-b border-border-subtle mb-2">
+              <span className="text-secondary-gold font-sans font-bold flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-secondary-gold inline-block"></span>
+                <span>{isHindi ? 'प्रायोजित साझेदार' : 'SPONSORED PARTNER'}</span>
               </span>
-            )}
+              <span className="flex items-center gap-1 text-ink-muted/70 font-mono text-[9px] sm:text-[10px]">
+                <Info className="w-3 h-3" />
+                <span>{isHindi ? 'विज्ञापन' : 'AD'}</span>
+              </span>
+            </div>
+            <a
+              href={ctaUrl}
+              target={isExternalLink ? '_blank' : undefined}
+              rel={isExternalLink ? 'noopener noreferrer' : undefined}
+              onClick={handleClick}
+              className="w-full flex items-center justify-center overflow-hidden rounded-xs group"
+              title={advertiserName}
+            >
+              <img
+                src={mediaUrl}
+                alt={altText}
+                className="w-full h-auto max-h-[140px] sm:max-h-[180px] md:max-h-[220px] object-contain block mx-auto transition-transform duration-300 group-hover:scale-[1.01]"
+                loading="lazy"
+                onError={(e) => {
+                  const target = e.currentTarget;
+                  if (target.src !== DEFAULT_FALLBACK_IMAGE) {
+                    target.src = DEFAULT_FALLBACK_IMAGE;
+                  }
+                }}
+              />
+            </a>
           </div>
-        </div>
+        ) : (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 w-full">
+            <div className="flex items-center gap-2.5 min-w-0 flex-1 flex-wrap sm:flex-nowrap">
+              <span className="text-[10px] uppercase font-bold text-secondary-gold bg-secondary-gold/10 px-2 py-0.5 rounded-xs tracking-wider flex-shrink-0">
+                {isHindi ? 'प्रायोजित' : 'SPONSORED'}
+              </span>
+              <div className="min-w-0 text-left">
+                <span className="text-xs font-bold text-primary mr-1.5 inline">
+                  {advertiserName}{hasDistinctDescription ? ':' : ''}
+                </span>
+                {hasDistinctDescription && (
+                  <span className="text-xs sm:text-sm font-serif font-bold text-ink leading-tight">
+                    {creativeText}
+                  </span>
+                )}
+              </div>
+            </div>
 
-        <a
-          href={ctaUrl}
-          target={isExternalLink ? '_blank' : undefined}
-          rel={isExternalLink ? 'noopener noreferrer' : undefined}
-          onClick={handleClick}
-          className="bg-primary hover:bg-primary-container text-white px-3 py-1.5 rounded-xs text-xs font-bold uppercase tracking-wider flex-shrink-0 flex items-center gap-1 transition-colors"
-        >
-          {isPhoneCta ? (
-            <>
-              <Phone className="w-3 h-3" />
-              <span>{isHindi ? 'कॉल करें' : 'Call Now'}</span>
-            </>
-          ) : (
-            <>
-              <span>{isHindi ? 'और जानें' : (directAd?.ctaText || 'Learn More')}</span>
-              <ExternalLink className="w-3 h-3" />
-            </>
-          )}
-        </a>
+            <a
+              href={ctaUrl}
+              target={isExternalLink ? '_blank' : undefined}
+              rel={isExternalLink ? 'noopener noreferrer' : undefined}
+              onClick={handleClick}
+              className="bg-primary hover:bg-primary-container text-white px-3 py-1.5 rounded-xs text-xs font-bold uppercase tracking-wider flex-shrink-0 flex items-center gap-1 transition-colors"
+            >
+              {isPhoneCta ? (
+                <>
+                  <Phone className="w-3 h-3" />
+                  <span>{isHindi ? 'कॉल करें' : 'Call Now'}</span>
+                </>
+              ) : (
+                <>
+                  <span>{isHindi ? 'और जानें' : (directAd?.ctaText || 'Learn More')}</span>
+                  <ExternalLink className="w-3 h-3" />
+                </>
+              )}
+            </a>
+          </div>
+        )}
       </div>
     </div>
   );
