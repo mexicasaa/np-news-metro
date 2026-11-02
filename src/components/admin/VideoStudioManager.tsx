@@ -309,20 +309,6 @@ export const VideoStudioManager: React.FC<VideoStudioManagerProps> = ({
             </button>
           )}
         </div>
-
-        <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
-          <span className="text-xs font-semibold text-slate-500 whitespace-nowrap">Filter Desk:</span>
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="text-xs bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none font-medium cursor-pointer"
-          >
-            <option value="all">All Categories ({videos.length})</option>
-            {VIDEO_CATEGORIES.map((cat) => (
-              <option key={cat} value={cat}>{cat}</option>
-            ))}
-          </select>
-        </div>
       </div>
 
       {/* Video Grid */}
@@ -355,10 +341,6 @@ export const VideoStudioManager: React.FC<VideoStudioManagerProps> = ({
                     </div>
                   </div>
 
-                  <span className="absolute bottom-2 right-2 bg-black/85 text-white font-mono font-bold text-[11px] px-2 py-0.5 rounded-sm">
-                    {v.duration || '5:00'}
-                  </span>
-
                   {isTopFour && (
                     <span className="absolute top-2 left-2 bg-emerald-600 text-white text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-sm shadow-sm flex items-center gap-1">
                       <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
@@ -370,10 +352,6 @@ export const VideoStudioManager: React.FC<VideoStudioManagerProps> = ({
                 {/* Content */}
                 <div className="p-4">
                   <div className="flex items-center gap-2 text-xs text-slate-400 mb-1.5">
-                    <span className="text-red-700 font-semibold uppercase tracking-wider text-[11px]">
-                      {v.category}
-                    </span>
-                    <span>•</span>
                     <span className="truncate">{v.presenter}</span>
                   </div>
 
@@ -606,38 +584,7 @@ export const VideoStudioManager: React.FC<VideoStudioManagerProps> = ({
                 />
               </div>
 
-              {/* 5. Category & Duration Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Desk / Show Format
-                  </label>
-                  <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:bg-white"
-                  >
-                    {VIDEO_CATEGORIES.map((cat) => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Duration (e.g. 5:30)
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="MM:SS (e.g., 6:45)"
-                    value={duration}
-                    onChange={(e) => setDuration(e.target.value)}
-                    className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:bg-white"
-                  />
-                </div>
-              </div>
-
-              {/* 6. Presenter / Bureau */}
+              {/* 5. Presenter / Bureau */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                   Presenter / Channel Accreditation
@@ -684,7 +631,7 @@ export const VideoStudioManager: React.FC<VideoStudioManagerProps> = ({
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-300">
-                  {previewModalVideo.category}
+                  Video Preview
                 </span>
               </div>
               <button

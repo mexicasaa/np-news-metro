@@ -172,7 +172,6 @@ export const mapDbToWpVideo = (row: any): WpVideo => {
     presenter: row.channel_name || 'NP News Metro Staff',
     authorId: row.created_by || 'author-1',
     publishedAt: row.published_at || row.created_at || new Date().toISOString(),
-    viewsCount: '18.2K',
   };
 };
 

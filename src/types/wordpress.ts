@@ -135,7 +135,7 @@ export interface WpVideo {
   presenter: string;
   authorId: string;
   publishedAt: string;
-  viewsCount: string;
+  viewsCount?: string;
   relatedPostIds?: string[];
 }
 

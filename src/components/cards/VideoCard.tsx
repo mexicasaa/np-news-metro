@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, Eye, Clock } from 'lucide-react';
+import { Play } from 'lucide-react';
 import { WpVideo } from '../../types/wordpress';
 import { handleImageError, getOptimizedImageUrl } from '../../utils/imageFallback';
 import { useLanguage } from '../../context/LanguageContext';
@@ -48,16 +48,6 @@ export const VideoCard: React.FC<VideoCardProps> = ({
               <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-current ml-0.5" />
             </div>
           </div>
-
-          {/* Duration Badge */}
-          <span className="absolute bottom-2 right-2 bg-black/80 backdrop-blur-md text-white px-2 py-0.5 text-[10px] sm:text-[11px] font-bold font-mono rounded-xs border border-white/10">
-            {localized.duration}
-          </span>
-
-          {/* Category Tag */}
-          <span className="absolute top-2 left-2 bg-slate-950/80 backdrop-blur-md text-slate-200 border border-slate-700 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider rounded-xs">
-            {localized.category}
-          </span>
         </a>
 
         {/* Video Title */}
@@ -80,14 +70,10 @@ export const VideoCard: React.FC<VideoCardProps> = ({
         </p>
       </div>
 
-      {/* Footer: Presenter & Views */}
+      {/* Footer: Presenter */}
       <div className="pt-2.5 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 font-mono mt-auto">
         <span className="truncate max-w-[130px] font-sans font-medium text-slate-300">
           {isHindi ? 'प्रस्तोता: ' : 'With '}{localized.presenter}
-        </span>
-        <span className="flex items-center gap-1 text-slate-400">
-          <Eye className="w-3 h-3 text-slate-500" />
-          <span>{localized.viewsCount}</span>
         </span>
       </div>
     </article>

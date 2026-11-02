@@ -708,14 +708,6 @@ export const PublishingCenter: React.FC<PublishingCenterProps> = ({
 
                             <div className="flex items-center gap-3 text-[11px] text-slate-400 mt-1 font-sans">
                               <span className="flex items-center gap-1">
-                                <Eye className="w-3 h-3 text-slate-400" />
-                                <span>{post.viewsCount ? (post.viewsCount >= 1000 ? `${(post.viewsCount / 1000).toFixed(1)}K` : post.viewsCount) : '1.2K'}</span>
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <MessageSquare className="w-3 h-3 text-slate-400" />
-                                <span>{post.commentCount || 12}</span>
-                              </span>
-                              <span className="flex items-center gap-1">
                                 <Clock className="w-3 h-3 text-slate-400" />
                                 <span>{post.readTime || '5 min read'}</span>
                               </span>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Camera, Eye, Share2, Flame, ArrowRight, User } from 'lucide-react';
+import { Camera, Share2, Flame, ArrowRight, User } from 'lucide-react';
 import { WpGallery, WpPost } from '../types/wordpress';
 import { mockGalleries, mockAuthors, getLocalizedAuthor } from '../data/mockWpData';
 import { getStoredPosts } from '../utils/newsStorage';

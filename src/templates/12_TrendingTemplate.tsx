@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Flame, TrendingUp, Calendar, Share2, Eye, Award } from 'lucide-react';
+import { Flame, TrendingUp, Calendar, Share2, Award } from 'lucide-react';
 import { WpPost } from '../types/wordpress';
 import { getLocalizedPost } from '../data/mockWpData';
 import { getStoredPosts, isPostPublished } from '../utils/newsStorage';
@@ -110,9 +110,6 @@ export const TrendingTemplate: React.FC<TrendingTemplateProps> = ({
               <span className="bg-secondary text-white text-xs font-extrabold px-2.5 py-0.5 rounded-sm uppercase tracking-wider flex items-center gap-1">
                 <Award className="w-3.5 h-3.5" />
                 <span>{isHindi ? 'देश में #1 सर्वाधिक पढ़ा गया समाचार' : '#1 Most Read in the Country'}</span>
-              </span>
-              <span className="text-xs text-ink-muted">
-                {isHindi ? `आज ${(top1Story.viewsCount / 1000).toFixed(1)}k पाठकों ने पढ़ा` : `${(top1Story.viewsCount / 1000).toFixed(1)}k readers today`}
               </span>
             </div>
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Video, Play, Eye, Sparkles, Filter, Clock, ChevronRight } from 'lucide-react';
+import { Video, Play, Sparkles, Filter, Clock, ChevronRight } from 'lucide-react';
 import { WpVideo } from '../types/wordpress';
 import { mockVideos } from '../data/mockWpData';
 import { VideoCard } from '../components/cards/VideoCard';

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Play, Eye, Clock, User, ShieldCheck, Flame, Share2, FileText, ArrowRight } from 'lucide-react';
+import { Play, User, ShieldCheck, Flame, Share2, FileText, ArrowRight } from 'lucide-react';
 import { WpVideo, WpPost } from '../types/wordpress';
 import { mockVideos, mockAuthors, getLocalizedVideo, getLocalizedAuthor } from '../data/mockWpData';
 import { getStoredPosts } from '../utils/newsStorage';
@@ -54,16 +54,6 @@ export const VideoDetailTemplate: React.FC<VideoDetailTemplateProps> = ({
           <article className="lg:col-span-8">
             {/* Header */}
             <header className="mb-6">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="bg-editorial-red text-white text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-sm">
-                  {localized.category}
-                </span>
-                <span className="text-xs text-ink-muted flex items-center gap-1">
-                  <Clock className="w-3 h-3" />
-                  <span>{isHindi ? `अवधि: ${localized.duration}` : `Duration: ${video.duration}`}</span>
-                </span>
-              </div>
-
               <h1 className="font-serif text-3xl sm:text-4xl font-bold text-ink leading-tight mb-4">
                 {localized.title}
               </h1>
@@ -76,11 +66,6 @@ export const VideoDetailTemplate: React.FC<VideoDetailTemplateProps> = ({
                   {author && <span>({author.role})</span>}
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="flex items-center gap-1 font-mono text-ink">
-                    <Eye className="w-3.5 h-3.5 text-primary" />
-                    <span>{localized.viewsCount}</span>
-                  </span>
-                  <span>•</span>
                   <span>{isHindi ? 'आज प्रकाशित' : 'Published Today'}</span>
                 </div>
               </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Clock, Calendar, ShieldCheck, Share2, Bookmark, Printer, MessageSquare, AlertCircle, MapPin } from 'lucide-react';
+import { Clock, Calendar, ShieldCheck, Share2, Bookmark, Printer, AlertCircle, MapPin } from 'lucide-react';
 import { WpPost } from '../../types/wordpress';
 import { mockAuthors, getLocalizedPost, getLocalizedAuthor } from '../../data/mockWpData';
 import { useLanguage } from '../../context/LanguageContext';

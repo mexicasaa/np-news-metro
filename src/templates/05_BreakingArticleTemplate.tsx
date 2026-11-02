@@ -147,7 +147,6 @@ export const BreakingArticleTemplate: React.FC<BreakingArticleTemplateProps> = (
               featuredImage={localized.featuredImage}
               summary={localized.dek}
               category={post.category}
-              commentCount={post.commentCount}
             />
 
             {/* Hero Image */}

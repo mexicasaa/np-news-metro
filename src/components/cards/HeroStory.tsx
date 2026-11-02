@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   Clock, User, Share2, Bookmark, ArrowRight, CheckCircle2, 
   Play, Pause, ChevronLeft, ChevronRight, Volume2, VolumeX, 
-  Maximize2, X, Sparkles, Flame, Headphones, Check, Eye, MessageSquare 
+  Maximize2, X, Sparkles, Flame, Headphones, Check 
 } from 'lucide-react';
 import { WpPost } from '../../types/wordpress';
 import { mockAuthors, getLocalizedPost, getLocalizedAuthor } from '../../data/mockWpData';
@@ -345,18 +345,6 @@ export const HeroStory: React.FC<HeroStoryProps> = ({
               </div>
             </button>
           )}
-
-          {/* Story Engagement Metrics */}
-          <div className="hidden md:flex items-center gap-3 text-ink-muted text-xs font-mono">
-            <span className="flex items-center gap-1" title="Total Views">
-              <Eye className="w-3.5 h-3.5 text-slate-400" />
-              <span>{(currentStory.viewsCount / 1000).toFixed(1)}k</span>
-            </span>
-            <span className="flex items-center gap-1" title="Comments">
-              <MessageSquare className="w-3.5 h-3.5 text-slate-400" />
-              <span>{currentStory.commentCount}</span>
-            </span>
-          </div>
 
           {/* Full Story CTA Button */}
           <a

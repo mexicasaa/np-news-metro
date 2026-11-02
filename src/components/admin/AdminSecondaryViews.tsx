@@ -1815,62 +1815,37 @@ export const AnalyticsDashboardView: React.FC = () => {
       </div>
 
       {/* Engagement Summary Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <div className="bg-white border border-slate-200/80 p-4 rounded-2xl shadow-xs">
           <div className="flex items-center justify-between text-slate-500">
-            <span className="text-[11px] font-semibold uppercase tracking-wider">Total Story Views</span>
-            <BarChart3 className="w-4 h-4 text-slate-900" />
-          </div>
-          <p className="font-serif text-2xl font-bold text-slate-900 mt-2">
-            {totalAggregatedViews > 0 ? totalAggregatedViews.toLocaleString() : '1,000,000+ Ready'}
-          </p>
-          <span className="text-[10px] text-emerald-700 font-semibold">Fast Realtime Delivery</span>
-        </div>
-
-        <div className="bg-white border border-slate-200/80 p-4 rounded-2xl shadow-xs">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-[11px] font-semibold uppercase tracking-wider">Reader Likes</span>
-            <Heart className="w-4 h-4 text-red-600" />
-          </div>
-          <p className="font-serif text-2xl font-bold text-red-600 mt-2">
-            {totalAggregatedLikes.toLocaleString()}
-          </p>
-          <span className="text-[10px] text-slate-500">Unique Readers</span>
-        </div>
-
-        <div className="bg-white border border-slate-200/80 p-4 rounded-2xl shadow-xs">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-[11px] font-semibold uppercase tracking-wider">Reader Comments</span>
-            <MessageSquare className="w-4 h-4 text-blue-600" />
-          </div>
-          <p className="font-serif text-2xl font-bold text-blue-800 mt-2">
-            {totalAggregatedComments.toLocaleString()}
-          </p>
-          <span className="text-[10px] font-mono text-slate-500">Pre-Moderated</span>
-        </div>
-
-        <div className="bg-surface-lowest border border-border-subtle p-4 rounded-sm shadow-subtle">
-          <div className="flex items-center justify-between text-ink-muted">
-            <span className="text-[11px] font-mono uppercase">Article Shares</span>
+            <span className="text-[11px] font-semibold uppercase tracking-wider">Article Shares</span>
             <Share2 className="w-4 h-4 text-emerald-600" />
           </div>
           <p className="font-serif text-2xl font-bold text-emerald-700 mt-2">
             {totalAggregatedShares.toLocaleString()}
           </p>
-          <span className="text-[10px] font-mono text-slate-500">Non-Blocking Queue</span>
+          <span className="text-[10px] font-mono text-slate-500">Verified Direct Amplifications</span>
+        </div>
+
+        <div className="bg-white border border-slate-200/80 p-4 rounded-2xl shadow-xs">
+          <div className="flex items-center justify-between text-slate-500">
+            <span className="text-[11px] font-semibold uppercase tracking-wider">Active Stories Tracked</span>
+            <Flame className="w-4 h-4 text-amber-600" />
+          </div>
+          <p className="font-serif text-2xl font-bold text-slate-900 mt-2">
+            {trending.length}
+          </p>
+          <span className="text-[10px] text-emerald-700 font-semibold">Realtime Leaderboard Active</span>
         </div>
       </div>
 
-      {/* Trending Decay Algorithm Banner (Rule 34) */}
+      {/* Trending Ranking Banner */}
       <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-sm text-xs text-amber-950 flex items-start gap-2.5 shadow-2xs">
         <Flame className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
         <div>
-          <span className="font-bold">Trending Decay Formula Active:</span>
-          <code className="block mt-1 font-mono text-[11px] bg-amber-100/70 px-2 py-1 rounded text-amber-900">
-            Score = (Views × 1 + Likes × 5 + Comments × 10 + Shares × 8) / (Hours + 2)^1.3
-          </code>
+          <span className="font-bold">Trending Stories Ranking:</span>
           <p className="mt-1 text-amber-800 text-[11px] leading-relaxed">
-            The decay exponent of 1.3 ensures breaking news naturally supersedes older viral stories, keeping the homepage fresh without manual editorial churn.
+            Stories are automatically ranked by audience interest and verified shares, keeping the homepage fresh and dynamic.
           </p>
         </div>
       </div>
@@ -1902,9 +1877,6 @@ export const AnalyticsDashboardView: React.FC = () => {
                   <th className="p-2.5 w-12 text-center">Rank</th>
                   <th className="p-2.5">Article Title</th>
                   <th className="p-2.5">Category</th>
-                  <th className="p-2.5 text-right">Views</th>
-                  <th className="p-2.5 text-right">Likes</th>
-                  <th className="p-2.5 text-right">Comments</th>
                   <th className="p-2.5 text-right">Shares</th>
                   <th className="p-2.5 text-right font-bold text-primary">Decay Score</th>
                 </tr>
@@ -1923,9 +1895,6 @@ export const AnalyticsDashboardView: React.FC = () => {
                         {item.category || 'General'}
                       </span>
                     </td>
-                    <td className="p-2.5 text-right font-mono text-ink-secondary">{item.views?.toLocaleString()}</td>
-                    <td className="p-2.5 text-right font-mono text-editorial-red font-semibold">{item.likes}</td>
-                    <td className="p-2.5 text-right font-mono text-blue-700">{item.comments}</td>
                     <td className="p-2.5 text-right font-mono text-emerald-700">{item.shares}</td>
                     <td className="p-2.5 text-right font-mono font-bold text-primary text-sm">
                       {item.score?.toFixed(1)}

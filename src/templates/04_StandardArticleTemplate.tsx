@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Clock, User, ShieldCheck, Flame, MessageSquare, AlertCircle, Share2, ExternalLink } from 'lucide-react';
+import React from 'react';
+import { Clock, User, ShieldCheck, Flame, AlertCircle, Share2, ExternalLink } from 'lucide-react';
 import { WpPost } from '../types/wordpress';
 import { mockAuthors, getLocalizedPost, getLocalizedAuthor } from '../data/mockWpData';
 import { ensurePostTranslated } from '../services/translationService';
@@ -9,7 +9,6 @@ import { handleImageError, getOptimizedImageUrl } from '../utils/imageFallback';
 import { ArticleHeader } from '../components/article/ArticleHeader';
 import { ArticleBody } from '../components/article/ArticleBody';
 import { ArticleShareBar } from '../components/article/ArticleShareBar';
-import { ArticleComments } from '../components/article/ArticleComments';
 import { AuthorBioBox } from '../components/article/AuthorBioBox';
 import { CorrectionNotice } from '../components/article/CorrectionNotice';
 import { RelatedStoriesBlock } from '../components/article/RelatedStoriesBlock';
@@ -40,7 +39,6 @@ export const StandardArticleTemplate: React.FC<StandardArticleTemplateProps> = (
   showAds = true,
 }) => {
   if (!post) return null;
-  const [commentsOpen, setCommentsOpen] = useState(false);
   const { language, t, isHindi } = useLanguage();
   const localized = getLocalizedPost(post, language);
 
@@ -88,7 +86,6 @@ export const StandardArticleTemplate: React.FC<StandardArticleTemplateProps> = (
               post={post}
               onSelectAuthor={onSelectAuthor}
               onSelectCategory={onSelectCategory}
-              onOpenComments={() => setCommentsOpen(!commentsOpen)}
             />
 
             {/* Social Share Bar with Featured Image */}
@@ -98,8 +95,6 @@ export const StandardArticleTemplate: React.FC<StandardArticleTemplateProps> = (
               featuredImage={localized.featuredImage}
               summary={localized.dek}
               category={post.category}
-              commentCount={post.commentCount}
-              onOpenComments={() => setCommentsOpen(!commentsOpen)}
             />
 
             {/* Google News Follow & Share Banner */}
@@ -236,14 +231,7 @@ export const StandardArticleTemplate: React.FC<StandardArticleTemplateProps> = (
               />
             )}
 
-            {/* Reader Perspectives & Comments */}
-            <ArticleComments
-              articleId={post.id}
-              isOpen={commentsOpen}
-              onToggleOpen={() => setCommentsOpen(!commentsOpen)}
-            />
-
-            {/* Mobile Ad Slot A7: Moves down below Reader Perspectives & Comments */}
+            {/* Mobile Ad Slot A7 */}
             {showAds && (
               <AdSlot zone="A7" variant="card" className="block lg:hidden my-6" />
             )}

@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Play, Pause, Volume2, VolumeX, Maximize, FileText, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, Maximize, FileText, ChevronDown, ChevronUp } from 'lucide-react';
 import { WpVideo } from '../../types/wordpress';
 import { useLanguage } from '../../context/LanguageContext';
 import { extractYouTubeVideoId } from '../../services/videoService';
@@ -97,7 +97,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ video }) => {
                 </button>
 
                 <span className="font-mono text-xs text-slate-300">
-                  {isPlaying ? (isHindi ? '???????? ?? ??? ??' : 'Playing') : '00:00'} / {video.duration}
+                  {isPlaying ? (isHindi ? 'प्ले हो रहा है' : 'Playing') : '00:00'}
                 </span>
               </div>
 
@@ -105,8 +105,8 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ video }) => {
                 <button
                   onClick={toggleFullscreen}
                   className="p-1.5 hover:bg-white/20 rounded transition-colors"
-                  title={isHindi ? '????? ???????' : 'Fullscreen'}
-                  aria-label={isHindi ? '????? ???????' : 'Fullscreen'}
+                  title={isHindi ? 'पूर्ण स्क्रीन' : 'Fullscreen'}
+                  aria-label={isHindi ? 'पूर्ण स्क्रीन' : 'Fullscreen'}
                 >
                   <Maximize className="w-4 h-4" />
                 </button>
@@ -120,7 +120,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ video }) => {
       <div className="p-4 bg-primary text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
         <div>
           <span className="text-[10px] uppercase font-bold text-secondary-gold tracking-wider block">
-            {video.category} � {isHindi ? `?????????: ${video.presenter}` : `Presented by ${video.presenter}`}
+            {isHindi ? `प्रस्तोता: ${video.presenter}` : `Presented by ${video.presenter}`}
           </span>
           <p className="text-slate-300 text-xs mt-0.5">{video.caption}</p>
         </div>
@@ -134,8 +134,8 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ video }) => {
               <FileText className="w-3.5 h-3.5 text-secondary-gold" />
               <span>
                 {showTranscript
-                  ? (isHindi ? '????????????? ??????' : 'Hide Transcript')
-                  : (isHindi ? '???? ????????????? ?????' : 'View Full Transcript')}
+                  ? (isHindi ? 'ट्रांसक्रिप्ट छिपाएं' : 'Hide Transcript')
+                  : (isHindi ? 'पूर्ण ट्रांसक्रिप्ट देखें' : 'View Full Transcript')}
               </span>
               {showTranscript ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
             </button>
@@ -147,7 +147,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ video }) => {
       {showTranscript && video.transcript && (
         <div className="p-5 bg-surface-lowest border-t border-border-subtle text-xs text-ink-secondary space-y-3 animate-fadeIn">
           <div className="font-bold text-xs uppercase tracking-wider text-primary border-b border-border-subtle pb-1">
-            {isHindi ? '???-??????? ?????? ?????????????' : 'Timestamped Video Transcript'}
+            {isHindi ? 'टाइम-स्टैम्प्ड वीडियो ट्रांसक्रिप्ट' : 'Timestamped Video Transcript'}
           </div>
           <div className="space-y-2 max-h-60 overflow-y-auto">
             {video.transcript.map((item, idx) => (

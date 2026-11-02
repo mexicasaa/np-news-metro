@@ -114,7 +114,6 @@ export const OpinionArticleTemplate: React.FC<OpinionArticleTemplateProps> = ({
               featuredImage={localized.featuredImage}
               summary={localized.dek}
               category={post.category}
-              commentCount={post.commentCount}
             />
 
             {/* Optional Lead Visual */}
