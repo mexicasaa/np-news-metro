@@ -193,6 +193,12 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
           <p className="text-[10px] text-ink-muted mt-2">
             {t.footerCopyright} {t.allRightsReserved}
           </p>
+          <p className="text-[9px] text-ink-muted mt-0.5 font-mono">
+            RNI: DEL HIN/2010/31544 • UDYAM-DL-02-0131551
+          </p>
+          <p className="text-[9px] text-ink-muted font-sans">
+            Shiv Mandir Marg, Mandawali, Delhi - 110092
+          </p>
         </div>
       </div>
     </div>

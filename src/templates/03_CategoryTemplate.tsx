@@ -114,10 +114,13 @@ export const CategoryTemplate: React.FC<CategoryTemplateProps> = ({
           </p>
 
           {(categorySlug === 'opinion' || categorySlug === 'metromat') && (
-            <div className="mt-3 inline-flex items-center gap-2 px-3 py-1 rounded-md bg-amber-50 border border-amber-200 text-xs text-ink">
+            <div className="mt-3 inline-flex flex-wrap items-center gap-2 px-3 py-1 rounded-md bg-amber-50 border border-amber-200 text-xs text-ink">
               <span className="font-bold text-amber-900">RNI Reg. No:</span>
               <span className="font-mono font-bold text-ink">DEL HIN/2010/31544</span>
               <span className="text-ink-secondary">({isHindi ? 'मैट्रो मत दिल्ली' : 'by Metromat Delhi'})</span>
+              <span className="text-amber-300">|</span>
+              <span className="font-bold text-amber-900">{isHindi ? 'उद्यम पंजी.:' : 'MSME Reg.:'}</span>
+              <span className="font-mono font-bold text-primary">UDYAM-DL-02-0131551</span>
             </div>
           )}
 

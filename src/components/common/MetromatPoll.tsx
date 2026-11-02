@@ -89,10 +89,12 @@ export const MetromatPoll: React.FC<MetromatPollProps> = ({
                 {pollData.badge}
               </span>
             </div>
-            <p className="text-[11px] text-ink-muted flex items-center gap-1.5 mt-0.5">
+            <p className="text-[11px] text-ink-muted flex flex-wrap items-center gap-1.5 mt-0.5">
               <span>{pollData.date}</span>
               <span>•</span>
               <span className="font-mono text-[10px]">RNI: DEL HIN/2010/31544</span>
+              <span>•</span>
+              <span className="font-mono text-[10px]">UDYAM-DL-02-0131551</span>
             </p>
           </div>
         </div>

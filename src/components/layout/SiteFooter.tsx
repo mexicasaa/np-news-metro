@@ -203,8 +203,8 @@ export const SiteFooter: React.FC<SiteFooterProps> = ({
             <p>{t.footerCopyright} {t.allRightsReserved}</p>
             <p className="text-[10px] text-slate-400 mt-0.5">
               {isHindi 
-                ? 'आरएनआई पंजी. सं.: DEL HIN/2010/31544 (मैट्रो मत दिल्ली) • पंजीकृत कार्यालय: कनाट प्लेस, नई दिल्ली 110001'
-                : 'RNI Reg. No.: DEL HIN/2010/31544 (by Metromat Delhi) • Registered Office: Connaught Place, New Delhi 110001'}
+                ? 'आरएनआई पंजी. सं.: DEL HIN/2010/31544 (मैट्रो मत दिल्ली) • उद्यम पंजी. सं.: UDYAM-DL-02-0131551 • आधिकारिक पता: शिव मंदिर मार्ग, मंडावली, दिल्ली - 110092'
+                : 'RNI Reg. No.: DEL HIN/2010/31544 (by Metromat Delhi) • MSME / Udyam Reg. No.: UDYAM-DL-02-0131551 • Official Address: Shiv Mandir Marg, Mandawali, Delhi - 110092'}
             </p>
           </div>
 

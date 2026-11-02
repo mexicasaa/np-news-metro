@@ -88,10 +88,26 @@ export const generateArticleStructuredData = (
         correctionsPolicy: `${siteUrl}/corrections`,
         ethicsPolicy: `${siteUrl}/ethics`,
         masthead: `${siteUrl}/editorial-team`,
+        identifier: [
+          {
+            '@type': 'PropertyValue',
+            propertyID: 'RNI',
+            name: 'RNI Title Code',
+            value: 'DEL HIN/2010/31544',
+          },
+          {
+            '@type': 'PropertyValue',
+            propertyID: 'UDYAM',
+            name: 'MSME Udyam Registration',
+            value: 'UDYAM-DL-02-0131551',
+          },
+        ],
         diversityPolicy: `${siteUrl}/about`,
         address: {
           '@type': 'PostalAddress',
-          addressLocality: 'New Delhi',
+          streetAddress: 'Shiv Mandir Marg, Mandawali',
+          addressLocality: 'Delhi',
+          postalCode: '110092',
           addressRegion: 'Delhi',
           addressCountry: 'IN',
         },
@@ -231,6 +247,20 @@ export const generateWebsiteStructuredData = (
         correctionsPolicy: `${siteUrl}/corrections`,
         ethicsPolicy: `${siteUrl}/ethics`,
         masthead: `${siteUrl}/editorial-team`,
+        identifier: [
+          {
+            '@type': 'PropertyValue',
+            propertyID: 'RNI',
+            name: 'RNI Title Code',
+            value: 'DEL HIN/2010/31544',
+          },
+          {
+            '@type': 'PropertyValue',
+            propertyID: 'UDYAM',
+            name: 'MSME Udyam Registration',
+            value: 'UDYAM-DL-02-0131551',
+          },
+        ],
         sameAs: [
           'https://twitter.com/NPNewsMetro',
           'https://www.youtube.com/@NPNewsMetro',

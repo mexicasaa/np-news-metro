@@ -135,7 +135,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
         <header className="text-center max-w-3xl mx-auto mb-16">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-red-50 text-red-700 rounded-full text-xs font-semibold uppercase tracking-wider mb-4 border border-red-100 shadow-3xs">
             <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse" />
-            {isHindi ? 'एनपी न्यूज़ मेट्रो' : 'NP News Metro'} • RNI: DEL HIN/2010/31544
+            {isHindi ? 'एनपी न्यूज़ मेट्रो' : 'NP News Metro'} • RNI: DEL HIN/2010/31544 • MSME: UDYAM-DL-02-0131551
           </div>
           
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-950 tracking-tight mb-4">
@@ -1389,7 +1389,7 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
               <div className="p-3 bg-gradient-to-br from-amber-50/70 via-slate-50 to-slate-50 border border-amber-200/70 rounded-xl text-xs text-ink-secondary space-y-2">
                 <div className="flex items-center gap-1.5 text-primary font-bold text-[11px]">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>{isHindi ? 'आरएनआई एवं कानूनी साख' : 'Statutory & RNI Credentials'}</span>
+                  <span>{isHindi ? 'वैधानिक एवं संस्थागत साख' : 'Statutory & Regulatory Credentials'}</span>
                 </div>
                 
                 <div className="bg-white p-2 rounded-lg border border-slate-200/80 text-[10px] space-y-0.5 shadow-2xs">
@@ -1401,6 +1401,18 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                   </span>
                   <span className="text-ink-secondary text-[10px] block">
                     {isHindi ? 'द्वारा: मैट्रो मत दिल्ली' : 'by Metromat Delhi'}
+                  </span>
+                </div>
+
+                <div className="bg-white p-2 rounded-lg border border-slate-200/80 text-[10px] space-y-0.5 shadow-2xs">
+                  <span className="text-ink-muted uppercase font-bold text-[9px] tracking-wider block">
+                    {isHindi ? 'एमएसएमई / उद्यम पंजीकरण:' : 'MSME / Udyam Reg. No:'}
+                  </span>
+                  <span className="font-mono text-primary font-bold block">
+                    UDYAM-DL-02-0131551
+                  </span>
+                  <span className="text-ink-secondary text-[10px] block">
+                    {isHindi ? 'सूक्ष्म, लघु एवं मध्यम उद्यम मंत्रालय' : 'Ministry of MSME, Govt. of India'}
                   </span>
                 </div>
 
@@ -1528,18 +1540,39 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                   </h3>
                   <p>
                     {isHindi
-                      ? 'एनपी न्यूज़ मेट्रो का राष्ट्रीय संपादकीय मुख्यालय कनाट प्लेस, नई दिल्ली में स्थित है। हमारे क्षेत्रीय ब्यूरो मुंबई (वित्तीय राजधानी), बेंगलुरु (प्रौद्योगिकी हब), चेन्नई, कोलकाता, हैदराबाद और चंडीगढ़ में सक्रिय हैं।'
-                      : 'Our national newsroom operates out of Connaught Place, New Delhi, supported by specialized bureaus in Mumbai (Financial Markets), Bengaluru (Technology & AI), Chennai, Kolkata, Hyderabad, and Chandigarh.'}
+                      ? 'एनपी न्यूज़ मेट्रो का आधिकारिक राष्ट्रीय मुख्यालय एवं पंजीकृत कार्यालय शिव मंदिर मार्ग, मंडावली, दिल्ली - 110092 में स्थित है। हमारे क्षेत्रीय ब्यूरो मुंबई (वित्तीय राजधानी), बेंगलुरु (प्रौद्योगिकी हब), चेन्नई, कोलकाता, हैदराबाद और चंडीगढ़ में सक्रिय हैं।'
+                      : 'NP News Metro’s official headquarters and registered office is located at Shiv Mandir Marg, Mandawali, Delhi - 110092, supported by specialized bureaus in Mumbai (Financial Markets), Bengaluru (Technology & AI), Chennai, Kolkata, Hyderabad, and Chandigarh.'}
                   </p>
 
-                  <div className="p-4 bg-amber-50/60 border border-amber-200 rounded text-xs text-ink space-y-1">
+                  <div className="p-4 bg-amber-50/60 border border-amber-200 rounded text-xs text-ink space-y-2.5">
                     <div className="flex items-center gap-1.5 font-bold text-amber-950">
                       <Building className="w-4 h-4 text-amber-700" />
-                      <span>{isHindi ? 'आरएनआई एवं संस्थागत पंजीकरण विवरण:' : 'RNI & Institutional Registration Credentials:'}</span>
+                      <span>{isHindi ? 'वैधानिक एवं संस्थागत पंजीकरण विवरण:' : 'Statutory & Institutional Registration Credentials:'}</span>
                     </div>
-                    <p className="text-[11px] text-ink-secondary">
-                      <strong>RNI Title Code / Reg. No.:</strong> <span className="font-mono font-bold text-ink">DEL HIN/2010/31544</span> (by Metromat Delhi / मैट्रो मत दिल्ली)
-                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                      <div className="bg-white p-3 rounded border border-amber-200/90 shadow-2xs space-y-0.5">
+                        <span className="text-[10px] text-ink-muted uppercase font-bold tracking-wider block">
+                          {isHindi ? 'आरएनआई पंजीकरण संख्या:' : 'RNI Title Code / Reg. No:'}
+                        </span>
+                        <span className="font-mono font-bold text-ink text-sm block">
+                          DEL HIN/2010/31544
+                        </span>
+                        <span className="text-[11px] text-ink-secondary block">
+                          {isHindi ? 'द्वारा: मैट्रो मत दिल्ली' : 'by Metromat Delhi / मैट्रो मत दिल्ली'}
+                        </span>
+                      </div>
+                      <div className="bg-white p-3 rounded border border-amber-200/90 shadow-2xs space-y-0.5">
+                        <span className="text-[10px] text-ink-muted uppercase font-bold tracking-wider block">
+                          {isHindi ? 'एमएसएमई / उद्यम पंजीकरण संख्या:' : 'MSME / Udyam Reg. No:'}
+                        </span>
+                        <span className="font-mono font-bold text-primary text-sm block">
+                          UDYAM-DL-02-0131551
+                        </span>
+                        <span className="text-[11px] text-ink-secondary block">
+                          {isHindi ? 'सूक्ष्म, लघु एवं मध्यम उद्यम मंत्रालय, भारत सरकार' : 'Ministry of Micro, Small & Medium Enterprises, Govt. of India'}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </article>
@@ -1571,15 +1604,16 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-wider">
                         <Building className="w-4 h-4 text-editorial-red" />
-                        <span>{isHindi ? 'प्रधान कार्यालय (Head Office)' : 'Head Office'}</span>
+                        <span>{isHindi ? 'आधिकारिक कार्यालय (Official Address)' : 'Official Head Office'}</span>
                       </div>
                       <p className="text-xs text-ink leading-relaxed font-medium">
-                        A-120 Shiv Mandir Marg Mandawali<br />
-                        Delhi -110092
+                        Shiv Mandir Marg, Mandawali<br />
+                        Delhi - 110092
                       </p>
                     </div>
-                    <div className="text-[11px] text-ink-muted bg-white p-2 rounded border border-border-subtle font-mono">
-                      <strong>{isHindi ? 'आरएनआई सं.:' : 'RNI No:'}</strong> DEL HIN/2010/31544 (by Metromat Delhi)
+                    <div className="text-[11px] text-ink-muted bg-white p-2.5 rounded border border-border-subtle font-mono space-y-1">
+                      <div><strong>{isHindi ? 'आरएनआई सं.:' : 'RNI No:'}</strong> DEL HIN/2010/31544 (by Metromat Delhi)</div>
+                      <div><strong>{isHindi ? 'उद्यम पंजी.:' : 'MSME Reg.:'}</strong> <span className="font-bold text-primary">UDYAM-DL-02-0131551</span></div>
                     </div>
                   </div>
 
@@ -1849,6 +1883,25 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                       ? 'हमारी वेबसाइट 13 वर्ष से कम आयु के बच्चों के लिए अभिप्रेत नहीं है और हम जानबूझकर बच्चों की व्यक्तिगत जानकारी एकत्र नहीं करते हैं।'
                       : 'NP News Metro is an adult news and current-affairs platform. We do not knowingly solicit or collect personal identifying data from children under 13.'}
                   </p>
+
+                  <div className="p-3.5 bg-surface-container/70 border border-border-subtle rounded text-xs space-y-1.5 font-sans mt-4">
+                    <strong className="text-ink block text-xs">
+                      {isHindi ? 'डेटा नियंत्रक एवं प्रकाशक संस्था विवरण:' : 'Data Controller & Registered Publisher Details:'}
+                    </strong>
+                    <div className="font-mono text-[11px] text-ink-secondary flex flex-wrap gap-x-3 gap-y-1">
+                      <span><strong>Entity:</strong> NP News Metro</span>
+                      <span>•</span>
+                      <span><strong>MSME Reg.:</strong> <span className="font-bold text-primary">UDYAM-DL-02-0131551</span></span>
+                      <span>•</span>
+                      <span><strong>RNI Reg.:</strong> DEL HIN/2010/31544</span>
+                    </div>
+                    <p className="text-[11px] font-mono text-ink-secondary">
+                      <strong>Official Address:</strong> Shiv Mandir Marg, Mandawali, Delhi - 110092
+                    </p>
+                    <p className="text-[11px] text-ink-muted">
+                      {isHindi ? 'डिजिटल व्यक्तिगत डेटा संरक्षण अधिनियम 2023 और आईटी नियमों के तहत पंजीकृत एवं अनुपालित।' : 'Registered and compliant under the Digital Personal Data Protection Act, 2023 & Information Technology Rules.'}
+                    </p>
+                  </div>
                 </div>
               </article>
             )}
@@ -1874,15 +1927,24 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                 </div>
 
                 <div className="prose text-xs sm:text-sm text-ink-secondary space-y-4 leading-relaxed">
-                  <div className="p-3.5 bg-amber-50 border border-amber-200 rounded text-xs text-amber-950">
-                    <strong className="block font-bold mb-1">
-                      {isHindi ? 'सामान्य सूचनात्मक प्रकटीकरण:' : 'General Information Disclosure:'}
-                    </strong>
-                    <p>
-                      {isHindi
-                        ? 'एनपी न्यूज़ मेट्रो (npnewsmetro.com) पर प्रकाशित सभी समाचार, विश्लेषण, लेख और मल्टीमीडिया सामग्री केवल सामान्य जन-जागरूकता, शिक्षा और निष्पक्ष सूचना के उद्देश्य से प्रस्तुत की जाती है।'
-                        : 'All news reports, investigative analyses, articles, and multimedia assets published on NP News Metro are provided for general informational, educational, and public interest purposes only.'}
-                    </p>
+                  <div className="p-3.5 bg-amber-50 border border-amber-200 rounded text-xs text-amber-950 space-y-2">
+                    <div>
+                      <strong className="block font-bold mb-1">
+                        {isHindi ? 'सामान्य सूचनात्मक प्रकटीकरण एवं वैधानिक पंजीकरण:' : 'General Information Disclosure & Statutory Registrations:'}
+                      </strong>
+                      <p>
+                        {isHindi
+                          ? 'एनपी न्यूज़ मेट्रो (npnewsmetro.com) पर प्रकाशित सभी समाचार, विश्लेषण, लेख और मल्टीमीडिया सामग्री केवल सामान्य जन-जागरूकता, शिक्षा और निष्पक्ष सूचना के उद्देश्य से प्रस्तुत की जाती है।'
+                          : 'All news reports, investigative analyses, articles, and multimedia assets published on NP News Metro are provided for general informational, educational, and public interest purposes only.'}
+                      </p>
+                    </div>
+                    <div className="pt-2 border-t border-amber-200 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[11px] text-amber-900">
+                      <span><strong>RNI Reg.:</strong> DEL HIN/2010/31544</span>
+                      <span>•</span>
+                      <span><strong>MSME / Udyam Reg.:</strong> <span className="font-bold text-primary">UDYAM-DL-02-0131551</span></span>
+                      <span>•</span>
+                      <span>Govt. of India</span>
+                    </div>
                   </div>
 
                   <h3 className="font-serif text-base sm:text-lg font-bold text-ink pt-2">
@@ -1965,8 +2027,8 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                   </h3>
                   <p>
                     {isHindi
-                      ? 'वेबसाइट पर उपलब्ध सभी समाचार रिपोर्ट, लेख, हेडलाइंस, ग्राफिक्स, लोगो, वीडियो, पॉडकास्ट और कोड एनपी न्यूज़ मेट्रो मीडिया नेटवर्क प्रा. लि. की अनन्य बौद्धिक संपदा हैं। पूर्व लिखित अनुमति के बिना किसी भी सामग्री की नकल, पुनर्प्रकाशन, सिंडिकेशन, वेब स्क्रैपिंग या एआई (AI) मॉडल प्रशिक्षण में उपयोग पूर्णतः प्रतिबंधित है।'
-                      : 'All articles, investigative reports, photographs, graphics, videos, codebases, audio assets, trademarks, and masthead branding on npnewsmetro.com are the exclusive intellectual property of NP News Metro Media Network Pvt. Ltd. and protected under Indian and international copyright treaties. Unauthorized reproduction, syndication, commercial scraping, or ingestion into Artificial Intelligence (AI) training datasets without explicit prior written license is strictly prohibited.'}
+                      ? 'वेबसाइट पर उपलब्ध सभी समाचार रिपोर्ट, लेख, हेडलाइंस, ग्राफिक्स, लोगो, वीडियो, पॉडकास्ट और कोड एनपी न्यूज़ मेट्रो मीडिया नेटवर्क प्रा. लि. (उद्यम पंजी. सं.: UDYAM-DL-02-0131551, आरएनआई पंजी. सं.: DEL HIN/2010/31544) की अनन्य बौद्धिक संपदा हैं। पूर्व लिखित अनुमति के बिना किसी भी सामग्री की नकल, पुनर्प्रकाशन, सिंडिकेशन, वेब स्क्रैपिंग या एआई (AI) मॉडल प्रशिक्षण में उपयोग पूर्णतः प्रतिबंधित है।'
+                      : 'All articles, investigative reports, photographs, graphics, videos, codebases, audio assets, trademarks, and masthead branding on npnewsmetro.com are the exclusive intellectual property of NP News Metro Media Network Pvt. Ltd. (MSME Udyam Reg. No.: UDYAM-DL-02-0131551, RNI Reg. No.: DEL HIN/2010/31544) and protected under Indian and international copyright treaties. Unauthorized reproduction, syndication, commercial scraping, or ingestion into Artificial Intelligence (AI) training datasets without explicit prior written license is strictly prohibited.'}
                   </p>
 
                   <h3 className="font-serif text-base sm:text-lg font-bold text-ink pt-2">
@@ -1997,9 +2059,10 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                         : 'In accordance with the Information Technology (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021, grievances regarding published digital content can be submitted to our designated Grievance Officer:'}
                     </p>
                     <div className="bg-white p-3 rounded border border-border-subtle space-y-1 font-mono text-[11px] text-ink">
+                      <p><strong>Publisher Entity:</strong> NP News Metro (UDYAM-DL-02-0131551 | RNI: DEL HIN/2010/31544)</p>
                       <p><strong>Grievance Officer:</strong> Mr. Anuj Sharma (Legal & Editorial Compliance)</p>
                       <p><strong>Email:</strong> grievance@npnewsmetro.com</p>
-                      <p><strong>Address:</strong> NP News Metro, 4th Floor, Statesman House, Barakhamba Road, Connaught Place, New Delhi – 110001</p>
+                      <p><strong>Official Address:</strong> NP News Metro, Shiv Mandir Marg, Mandawali, Delhi - 110092</p>
                       <p><strong>Response Timeline:</strong> Acknowledgment within 24 hours; resolution within 15 days as mandated by law.</p>
                     </div>
                   </div>
@@ -2060,6 +2123,15 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                       ? 'हमारे पत्रकार उन कंपनियों, राजनीतिक दलों या संगठनों से उपहार, यात्रा प्रायोजन या वित्तीय लाभ स्वीकार नहीं करते हैं जिन्हें वे कवर करते हैं।'
                       : 'Our reporters and editors are strictly forbidden from accepting gifts, hospitality, subsidized travel, or financial consideration from entities or political entities they cover.'}
                   </p>
+
+                  <h3 className="font-serif text-base sm:text-lg font-bold text-ink pt-1">
+                    {isHindi ? '३. संस्थागत स्वामित्व एवं वैधानिक पंजीकरण' : '3. Institutional Ownership & Regulatory Disclosures'}
+                  </h3>
+                  <p>
+                    {isHindi
+                      ? 'एनपी न्यूज़ मेट्रो भारत सरकार के सूक्ष्म, लघु एवं मध्यम उद्यम मंत्रालय के अंतर्गत पंजीकृत (उद्यम पंजीकरण संख्या: UDYAM-DL-02-0131551) तथा भारत के समाचार पत्रों के पंजीयक (आरएनआई पंजीकरण संख्या: DEL HIN/2010/31544) के तहत संचालित एक स्वतंत्र राष्ट्रीय डिजिटल समाचार पत्र है।'
+                      : 'NP News Metro is an independent digital news organization operating under official Government of India registrations: MSME Udyam Registration No. UDYAM-DL-02-0131551 (Ministry of MSME) and RNI Title Code / Reg. No. DEL HIN/2010/31544 (by Metromat Delhi).'}
+                  </p>
                 </div>
               </article>
             )}
@@ -2104,6 +2176,15 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                     {isHindi ? 'पाठक किसी भी तथ्यात्मक त्रुटि की सूचना सीधे भेज सकते हैं:' : 'Readers can notify our fact-checking desk of any discrepancy directly at:'}{' '}
                     <strong className="text-ink font-mono text-xs">corrections@npnewsmetro.com</strong>
                   </p>
+
+                  <div className="p-3 bg-surface-container/60 rounded border border-border-subtle text-xs space-y-1 font-mono">
+                    <p className="text-ink font-sans font-bold text-[11px]">
+                      {isHindi ? 'वैधानिक अनुपालन एवं पंजीकरण संदर्भ:' : 'Statutory Redressal & Institutional Reference:'}
+                    </p>
+                    <p className="text-[11px] text-ink-secondary">
+                      NP News Metro • MSME Reg: <strong className="text-primary font-bold">UDYAM-DL-02-0131551</strong> • RNI Reg: <strong>DEL HIN/2010/31544</strong>
+                    </p>
+                  </div>
                 </div>
               </article>
             )}
@@ -2161,6 +2242,21 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                     {isHindi ? 'मीडिया किट (Media Kit), दर कार्ड और कस्टमाइज़्ड प्रायोजन के लिए संपर्क करें:' : 'For our comprehensive Media Kit, rate card, and bespoke brand solutions, contact our commercial desk at:'}{' '}
                     <strong className="text-ink font-mono text-xs">advertise@npnewsmetro.com</strong>
                   </p>
+
+                  <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg text-xs space-y-1.5 font-sans mt-3">
+                    <span className="font-bold text-slate-800 uppercase tracking-wide text-[10px] block">
+                      {isHindi ? 'कॉर्पोरेट बिलिंग एवं संस्थागत साख:' : 'Corporate Billing & Institutional Credentials:'}
+                    </span>
+                    <p className="font-mono text-[11px] text-slate-700">
+                      <strong>Entity:</strong> NP News Metro • <strong>MSME / Udyam Reg.:</strong> <span className="font-bold text-primary">UDYAM-DL-02-0131551</span> • <strong>RNI Reg.:</strong> DEL HIN/2010/31544
+                    </p>
+                    <p className="font-mono text-[11px] text-slate-700">
+                      <strong>Official Address:</strong> Shiv Mandir Marg, Mandawali, Delhi - 110092
+                    </p>
+                    <p className="text-[11px] text-slate-600">
+                      {isHindi ? 'सरकारी एवं निजी निविदाओं, डीएवीपी (CBC) और ब्रांड अभियानों हेतु पूर्णतः अनुपालित।' : 'Fully accredited and compliant for public sector tenders, Central Bureau of Communication (CBC/DAVP) rosters, and enterprise brand partnerships.'}
+                    </p>
+                  </div>
                 </div>
               </article>
             )}
@@ -2218,6 +2314,10 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                       ? 'आप अपनी ब्राउज़र सेटिंग्स के माध्यम से किसी भी समय कुकीज़ को ब्लॉक या हटा सकते हैं।'
                       : 'You have the right to accept or reject cookies through your browser controls. Most web browsers allow you to manage cookie settings in their privacy preferences menu.'}
                   </p>
+
+                  <div className="p-3 bg-surface-container/60 rounded border border-border-subtle text-[11px] font-mono text-ink-muted mt-3">
+                    <span>NP News Metro • MSME Reg. UDYAM-DL-02-0131551 • RNI Reg. DEL HIN/2010/31544</span>
+                  </div>
                 </div>
               </article>
             )}
@@ -2328,6 +2428,29 @@ export const StaticInfoTemplate: React.FC<StaticInfoTemplateProps> = ({
                           <ChevronRight className="w-3.5 h-3.5 text-ink-muted" />
                         </button>
                       ))}
+                    </div>
+                  </div>
+
+                  {/* Institutional Verification & Credentials Directory */}
+                  <div className="p-4 bg-surface-container/70 rounded border border-border-subtle space-y-2 pt-3">
+                    <h3 className="font-serif text-sm font-bold text-ink">
+                      {isHindi ? 'वैधानिक एवं संस्थागत पंजीकरण विवरण:' : 'Statutory & Government Registrations:'}
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono">
+                      <div className="p-2.5 bg-white rounded border border-border-subtle">
+                        <span className="text-[10px] text-ink-muted uppercase block font-sans font-bold">RNI Registration</span>
+                        <span className="text-ink font-bold">DEL HIN/2010/31544</span>
+                        <span className="text-[10px] text-ink-muted block font-sans">{isHindi ? 'द्वारा: मैट्रो मत दिल्ली' : 'by Metromat Delhi'}</span>
+                      </div>
+                      <div className="p-2.5 bg-white rounded border border-border-subtle">
+                        <span className="text-[10px] text-ink-muted uppercase block font-sans font-bold">MSME / Udyam Registration</span>
+                        <span className="text-primary font-bold">UDYAM-DL-02-0131551</span>
+                        <span className="text-[10px] text-ink-muted block font-sans">{isHindi ? 'सूक्ष्म, लघु एवं मध्यम उद्यम मंत्रालय, भारत सरकार' : 'Ministry of MSME, Govt. of India'}</span>
+                      </div>
+                    </div>
+                    <div className="p-2.5 bg-white rounded border border-border-subtle text-xs font-mono text-ink-secondary">
+                      <span className="text-[10px] text-ink-muted uppercase block font-sans font-bold">{isHindi ? 'आधिकारिक पंजीकृत पता:' : 'Official Registered Address:'}</span>
+                      <span>Shiv Mandir Marg, Mandawali, Delhi - 110092</span>
                     </div>
                   </div>
                 </div>
