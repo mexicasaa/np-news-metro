@@ -712,15 +712,20 @@ function AppContent() {
         const shouldFetchHomepageArticles = !isDirectArticle && !isCategoryRoute && !isLatestRoute && !isSearchRoute && !isVideoRoute && !isVisitingAdminWorkspace;
 
         if (shouldFetchHomepageArticles) {
-          const publicPosts = await getPublishedArticles();
-          if (isMounted && publicPosts && publicPosts.length > 0) {
-            setPosts(publicPosts);
-            applyRouteFromUrl(publicPosts, videos);
+          const [publicPosts, liveVideos] = await Promise.all([
+            getPublishedArticles(),
+            getPublishedVideos().catch(() => []),
+          ]);
+          if (isMounted) {
+            if (publicPosts && publicPosts.length > 0) {
+              setPosts(publicPosts);
+            }
+            if (liveVideos && liveVideos.length > 0) {
+              setVideos(liveVideos);
+            }
+            applyRouteFromUrl(publicPosts || posts, liveVideos || videos);
           }
-        }
-
-        // Defer video fetching for public readers unless visiting a video route
-        if (isVideoRoute) {
+        } else if (isVideoRoute) {
           const liveVideos = await getPublishedVideos();
           if (isMounted && liveVideos && liveVideos.length > 0) {
             setVideos(liveVideos);
@@ -1150,6 +1155,9 @@ function AppContent() {
   const handleNavigateVideos = () => {
     setCurrentTemplate('video-hub');
     setViewMode('public');
+    getPublishedVideos().then((fresh) => {
+      if (fresh && fresh.length > 0) setVideos(fresh);
+    }).catch(() => {});
     if (typeof window !== 'undefined') window.history.pushState({ view: 'public' }, '', '/videos');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -2305,6 +2313,7 @@ function AppContent() {
               {currentTemplate === 'video-detail' && (
                 <VideoDetailTemplate
                   video={selectedVideo}
+                  videos={videos}
                   onSelectVideo={handleSelectVideo}
                   onSelectPost={handleSelectPost}
                   onNavigateHome={handleNavigateHome}

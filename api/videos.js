@@ -88,7 +88,7 @@ export default async function handler(req, res) {
       .select(VIDEO_PROJECTION_FIELDS)
       .eq('status', 'published')
       .order('published_at', { ascending: false })
-      .limit(20);
+      .limit(200);
 
     if (error) {
       return res.status(500).json({ error: error.message });

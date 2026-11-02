@@ -14,6 +14,7 @@ import { useLanguage } from '../context/LanguageContext';
 
 interface VideoDetailTemplateProps {
   video: WpVideo;
+  videos?: WpVideo[];
   onSelectVideo: (video: WpVideo) => void;
   onSelectPost: (post: WpPost) => void;
   onNavigateHome: () => void;
@@ -23,6 +24,7 @@ interface VideoDetailTemplateProps {
 
 export const VideoDetailTemplate: React.FC<VideoDetailTemplateProps> = ({
   video,
+  videos,
   onSelectVideo,
   onSelectPost,
   onNavigateHome,
@@ -33,7 +35,8 @@ export const VideoDetailTemplate: React.FC<VideoDetailTemplateProps> = ({
   const { language, t, isHindi } = useLanguage();
   const localized = getLocalizedVideo(video, language);
   const author = getLocalizedAuthor(mockAuthors[video.authorId], language);
-  const relatedVideos = mockVideos.filter((v) => v.id !== video.id);
+  const allAvailableVideos = videos && videos.length > 0 ? videos : mockVideos;
+  const relatedVideos = allAvailableVideos.filter((v) => v.id !== video.id);
   const storedPosts = getStoredPosts();
   const relatedPosts = storedPosts.slice(0, 3);
   const trendingRanking = [...storedPosts].sort((a, b) => (b.viewsCount || 0) - (a.viewsCount || 0)).slice(0, 5);

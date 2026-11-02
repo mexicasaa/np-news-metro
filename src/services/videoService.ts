@@ -2,6 +2,7 @@ import { ensureAuthenticatedSession } from './authService';
 import { supabase } from '../lib/supabase';
 import { WpVideo } from '../types/wordpress';
 import { mockVideos } from '../data/mockWpData';
+import { slugifyText } from '../utils/slugify';
 import { 
   cleanDescriptionHashtags, 
   getStoredVideos, 
@@ -208,7 +209,10 @@ export const getPublishedVideos = async (): Promise<WpVideo[]> => {
           const stored = getStoredVideos();
           const combined = [...liveVideos];
           for (const sv of stored) {
-            if (!combined.some(c => c.id === sv.id || c.videoUrl === sv.videoUrl)) {
+            // Do not append placeholder mock videos if real live videos exist
+            const isMock = sv.id?.startsWith('vid-') && ['vid-1', 'vid-2', 'vid-3', 'vid-4'].includes(sv.id);
+            if (isMock) continue;
+            if (!combined.some(c => c.id === sv.id || c.videoUrl === sv.videoUrl || (c.slug && sv.slug && c.slug === sv.slug))) {
               combined.push(sv);
             }
           }
@@ -226,7 +230,7 @@ export const getPublishedVideos = async (): Promise<WpVideo[]> => {
       .select(VIDEO_FIELDS)
       .eq('status', 'published')
       .order('published_at', { ascending: false })
-      .limit(50);
+      .limit(200);
 
     const stored = getStoredVideos();
     if (error || !data || data.length === 0) {
@@ -237,7 +241,10 @@ export const getPublishedVideos = async (): Promise<WpVideo[]> => {
     const liveVideos = data.map(mapDbToWpVideo);
     const combined = [...liveVideos];
     for (const sv of stored) {
-      if (!combined.some(c => c.id === sv.id || c.videoUrl === sv.videoUrl)) {
+      // Do not append placeholder mock videos if real live videos exist
+      const isMock = sv.id?.startsWith('vid-') && ['vid-1', 'vid-2', 'vid-3', 'vid-4'].includes(sv.id);
+      if (isMock) continue;
+      if (!combined.some(c => c.id === sv.id || c.videoUrl === sv.videoUrl || (c.slug && sv.slug && c.slug === sv.slug))) {
         combined.push(sv);
       }
     }
@@ -313,7 +320,15 @@ export const saveVideo = async (
 ): Promise<{ video?: WpVideo; error?: string }> => {
   const cleanTitle = videoData.title.trim();
   const cleanDesc = cleanDescriptionHashtags(videoData.description || '');
-  const cleanSlug = videoData.slug?.trim() || cleanTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 60);
+
+  // Generate unique SEO transliterated Latin slug (supports Hindi Devanagari)
+  let cleanSlug = videoData.slug?.trim();
+  if (!cleanSlug || cleanSlug === '-' || cleanSlug === 'video' || cleanSlug.startsWith('story-')) {
+    const baseSlug = slugifyText(cleanTitle, 60);
+    const suffix = videoData.youtubeVideoId ? `-${videoData.youtubeVideoId}` : `-${Date.now().toString(36)}`;
+    cleanSlug = `${baseSlug}${suffix}`;
+  }
+
   const durationSec = videoData.durationSeconds || 300;
   const mins = Math.floor(durationSec / 60);
   const secs = (durationSec % 60).toString().padStart(2, '0');
@@ -331,7 +346,6 @@ export const saveVideo = async (
     presenter: videoData.channelName || 'NP Newsroom Video Desk',
     authorId: 'author-1',
     publishedAt: new Date().toISOString(),
-    viewsCount: '1.2K',
   };
 
   const CATEGORY_NAME_TO_UUID: Record<string, string> = {
@@ -351,6 +365,20 @@ export const saveVideo = async (
 
   try {
     const authUserId = await ensureAuthenticatedSession().catch(() => null);
+
+    // Pre-check for slug uniqueness in Supabase if not editing the same row
+    try {
+      const { data: existingSlugRow } = await supabase
+        .from('videos')
+        .select('id')
+        .eq('slug', cleanSlug)
+        .maybeSingle();
+
+      if (existingSlugRow && existingSlugRow.id !== videoData.id) {
+        cleanSlug = `${cleanSlug}-${Date.now().toString(36)}`;
+        fallbackVideo.slug = cleanSlug;
+      }
+    } catch (e) {}
 
     const payload: any = {
       title: cleanTitle,
@@ -383,21 +411,43 @@ export const saveVideo = async (
 
       if (!error && data) {
         result = data;
+      } else if (error) {
+        console.warn('Supabase video update error, using fallback:', error.message);
       }
     } else {
-      const { data, error } = await supabase
+      // Check if video with this youtube_video_id already exists in Supabase
+      const { data: existingByYId } = await supabase
         .from('videos')
-        .insert(payload)
-        .select(VIDEO_FIELDS)
-        .single();
+        .select('id')
+        .eq('youtube_video_id', videoData.youtubeVideoId)
+        .maybeSingle();
 
-      if (!error && data) {
-        result = data;
+      if (existingByYId?.id) {
+        const { data, error } = await supabase
+          .from('videos')
+          .update(payload)
+          .eq('id', existingByYId.id)
+          .select(VIDEO_FIELDS)
+          .single();
+        if (!error && data) result = data;
+      } else {
+        const { data, error } = await supabase
+          .from('videos')
+          .insert(payload)
+          .select(VIDEO_FIELDS)
+          .single();
+
+        if (!error && data) {
+          result = data;
+        } else if (error) {
+          console.warn('Supabase video insert error, using fallback:', error.message);
+        }
       }
     }
 
     const finalVideo = result ? mapDbToWpVideo(result) : fallbackVideo;
     savePublishedVideo(finalVideo);
+    invalidateVideoClientCache();
 
     // Trigger edge cache invalidation
     try {
@@ -411,6 +461,7 @@ export const saveVideo = async (
     return { video: finalVideo };
   } catch (err: any) {
     savePublishedVideo(fallbackVideo);
+    invalidateVideoClientCache();
     return { video: fallbackVideo };
   }
 };
@@ -423,6 +474,7 @@ export const deleteVideo = async (id: string): Promise<{ success: boolean; error
       if (error) console.warn('Supabase video delete warning:', error.message);
     }
     deleteStoredVideo(id);
+    invalidateVideoClientCache();
 
     // Trigger edge cache invalidation
     try {
@@ -436,6 +488,7 @@ export const deleteVideo = async (id: string): Promise<{ success: boolean; error
     return { success: true };
   } catch (err: any) {
     deleteStoredVideo(id);
+    invalidateVideoClientCache();
     return { success: true };
   }
 };

@@ -365,7 +365,14 @@ export const getStoredVideos = (): WpVideo[] => {
     if (!raw) return mockVideos;
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed) && parsed.length > 0) {
-      return parsed;
+      // Clean up any corrupt entries that might have had slug '-'
+      return parsed.map((v: WpVideo) => {
+        if (!v.slug || v.slug === '-') {
+          const yId = v.videoUrl ? v.videoUrl.split('v=')[1]?.slice(0, 11) : '';
+          return { ...v, slug: `video-${yId || v.id}` };
+        }
+        return v;
+      });
     }
     return mockVideos;
   } catch (err) {
@@ -377,11 +384,18 @@ export const savePublishedVideo = (video: WpVideo): WpVideo[] => {
   if (typeof window === 'undefined') return [video, ...mockVideos];
   try {
     const current = getStoredVideos();
-    const existingIdx = current.findIndex(v => v.id === video.id || v.slug === video.slug);
+    // Do NOT match if slugs are empty or '-' to avoid accidental overwrites
+    const existingIdx = current.findIndex(v => {
+      if (video.id && v.id === video.id) return true;
+      if (video.videoUrl && v.videoUrl === video.videoUrl) return true;
+      if (video.slug && v.slug === video.slug && video.slug !== '-' && video.slug !== '') return true;
+      return false;
+    });
+
     let updated: WpVideo[];
     if (existingIdx !== -1) {
       updated = [...current];
-      updated[existingIdx] = video;
+      updated[existingIdx] = { ...current[existingIdx], ...video };
     } else {
       updated = [video, ...current];
     }

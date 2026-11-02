@@ -29,11 +29,23 @@ export const VideoHubTemplate: React.FC<VideoHubTemplateProps> = ({
     ? ['सभी', 'व्याख्यात्मक', 'ग्राउंड रिपोर्ट', 'साक्षात्कार', 'व्यापार', 'राजनीति', 'शॉर्ट्स']
     : ['All', 'Explainers', 'Field Reports', 'Interviews', 'Business', 'Politics', 'Shorts'];
 
+  const HINDI_TO_CAT_KEYWORD: Record<string, string> = {
+    'सभी': 'all',
+    'व्याख्यात्मक': 'explainer',
+    'ग्राउंड रिपोर्ट': 'ground',
+    'साक्षात्कार': 'interview',
+    'व्यापार': 'business',
+    'राजनीति': 'politi',
+    'शॉर्ट्स': 'short',
+  };
+
   const activeVideos = videos && videos.length > 0 ? videos : mockVideos;
 
   const filteredVideos = activeVideos.filter((v) => {
     if (selectedCategory === 'All' || selectedCategory === 'सभी') return true;
-    return v.category.toLowerCase() === selectedCategory.toLowerCase();
+    const catLower = (v.category || '').toLowerCase();
+    const keyword = HINDI_TO_CAT_KEYWORD[selectedCategory] || selectedCategory.toLowerCase();
+    return catLower.includes(keyword) || keyword.includes(catLower);
   });
 
   const featuredVideo = activeVideos[0];
