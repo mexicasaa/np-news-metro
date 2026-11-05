@@ -110,7 +110,7 @@ export const AdGridRow: React.FC<AdGridRowProps> = ({
       className={`w-full py-2 ${className}`}
     >
       <div
-        className={`grid gap-3 sm:gap-4 lg:gap-5 items-stretch ${
+        className={`grid gap-3 sm:gap-4 lg:gap-5 items-start ${
           adItems.length === 1
             ? 'grid-cols-1 max-w-md mx-auto'
             : adItems.length === 2
@@ -125,7 +125,7 @@ export const AdGridRow: React.FC<AdGridRowProps> = ({
             key={zone}
             zone={zone as any}
             variant="card"
-            className="h-full w-full"
+            className="w-full"
             placement={placement}
           />
         ))}
