@@ -27,29 +27,32 @@ export const AdGridRow: React.FC<AdGridRowProps> = ({
 
     const resolveActiveZones = async () => {
       const adsense = getAdSenseSettings();
-      const valid: string[] = [];
 
-      for (const zone of zones) {
-        if (!isZoneVisible(zone)) continue;
+      const results = await Promise.all(
+        zones.map(async (zone) => {
+          if (!isZoneVisible(zone)) return null;
 
-        const placement = await getAdPlacement(zone);
-        if (placement && !(placement as any).isExplicitlyDisabled) {
-          valid.push(zone);
-          continue;
-        }
+          const placement = await getAdPlacement(zone);
+          if (placement && !(placement as any).isExplicitlyDisabled) {
+            return zone;
+          }
 
-        // If explicitly disabled in database, strictly skip
-        if (placement && (placement as any).isExplicitlyDisabled) {
-          continue;
-        }
+          if (placement && (placement as any).isExplicitlyDisabled) {
+            return null;
+          }
 
-        const zoneConfig = adsense.zones[zone];
-        const isZoneAdSenseEnabled = zoneConfig ? zoneConfig.enabled : true;
-        const canShowAdSense = adsense.enabled && isZoneAdSenseEnabled && adsense.priority !== 'direct_only';
-        if (canShowAdSense) {
-          valid.push(zone);
-        }
-      }
+          const zoneConfig = adsense.zones[zone];
+          const isZoneAdSenseEnabled = zoneConfig ? zoneConfig.enabled : true;
+          const canShowAdSense = adsense.enabled && isZoneAdSenseEnabled && adsense.priority !== 'direct_only';
+          if (canShowAdSense) {
+            return zone;
+          }
+
+          return null;
+        })
+      );
+
+      const valid = results.filter((z): z is string => z !== null);
 
       if (isSubscribed) {
         setActiveZones(valid);

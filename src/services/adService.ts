@@ -461,13 +461,9 @@ const adPlacementCache = new Map<string, { data: ActiveAdPlacement | null; times
 const AD_CACHE_TTL = 5 * 60 * 1000; // 5m cache (instantly invalidated on admin update)
 
 export const getAdPlacement = async (zone: string): Promise<ActiveAdPlacement | null> => {
-  // If the zone or master is hidden by Admin, return disabled indicator immediately
-  if (!isZoneVisible(zone)) {
-    return { isExplicitlyDisabled: true } as any;
-  }
-
-  // If the zone was deleted by Admin, never show it
-  if (getClearedZones().has(zone)) {
+  // If master ads switch is OFF globally, return disabled indicator immediately
+  const visibility = getAdsVisibility();
+  if (!visibility.masterEnabled) {
     return { isExplicitlyDisabled: true } as any;
   }
 
@@ -486,11 +482,23 @@ export const getAdPlacement = async (zone: string): Promise<ActiveAdPlacement | 
         adPlacementCache.set(zone, { data: disabledObj, timestamp: Date.now() });
         return disabledObj;
       }
+      // If live in database, clear any stale local cleared flag
+      unmarkZoneCleared(zone);
       adPlacementCache.set(zone, { data: repoPlacement, timestamp: Date.now() });
       return repoPlacement;
     }
   } catch (err) {
     console.warn('Repository placement fetch warning:', err);
+  }
+
+  // If the zone or master is hidden by Admin locally, return disabled indicator
+  if (!isZoneVisible(zone)) {
+    return { isExplicitlyDisabled: true } as any;
+  }
+
+  // If the zone was deleted by Admin locally, never show it
+  if (getClearedZones().has(zone)) {
+    return { isExplicitlyDisabled: true } as any;
   }
 
   // 2. Check local admin direct ad configuration as authoritative fallback
