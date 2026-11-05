@@ -249,20 +249,20 @@ export const AdSlot: React.FC<AdSlotProps> = ({
           </div>
 
           {/* Dynamic Creative Container: Sizes dynamically to the image's aspect ratio without oversized frames */}
-          <div className="w-full flex items-center justify-center overflow-hidden rounded-xs mb-2.5 group/media">
+          <div className="w-full h-44 sm:h-52 flex items-center justify-center overflow-hidden rounded-xs mb-2.5 group/media bg-slate-50/60 dark:bg-slate-900/30">
             {mediaUrl ? (
               <a
                 href={ctaUrl}
                 target={isExternalLink ? '_blank' : undefined}
                 rel={isExternalLink ? 'noopener noreferrer' : undefined}
                 onClick={handleClick}
-                className="w-full flex items-center justify-center"
+                className="w-full h-full flex items-center justify-center p-1"
                 title={advertiserName}
               >
                 <img
                   src={mediaUrl}
                   alt={altText}
-                  className="w-full h-auto max-h-[460px] sm:max-h-[500px] object-contain rounded-xs block mx-auto transition-transform duration-300 group-hover/media:scale-[1.01]"
+                  className="max-h-full max-w-full object-contain rounded-xs block mx-auto transition-transform duration-300 group-hover/media:scale-[1.01]"
                   loading="lazy"
                   onError={(e) => {
                     const target = e.currentTarget;

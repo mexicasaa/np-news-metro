@@ -15,7 +15,9 @@ import {
   LayoutGrid,
   Settings2,
   Filter,
-  ArrowUpRight
+  ArrowUpRight,
+  Layers,
+  Sparkles
 } from 'lucide-react';
 import { 
   DirectAd, 
@@ -42,68 +44,307 @@ export interface PositionInfo {
   name: string;
   description: string;
   dimensions: string;
+  sectionTitle?: string;
+  slotNumber?: number;
+  totalSlots?: number;
 }
+
+export interface AdSlotDef {
+  zone: string;
+  slotNumber: number;
+  totalSlots: number;
+  name: string;
+  sectionTitle: string;
+  description: string;
+  dimensions: string;
+  aspectHint: string;
+}
+
+export interface AdSectionDef {
+  id: string;
+  name: string;
+  badge: string;
+  description: string;
+  slots: AdSlotDef[];
+}
+
+export const AD_SECTIONS: AdSectionDef[] = [
+  {
+    id: 'homepage-row1',
+    name: 'Homepage Upper Ad Strip (Row 2)',
+    badge: '4-Ad Strip (Grid)',
+    description: 'Displays up to 4 commercial ads in a row directly below the Hero Lead Story and Editor’s Picks (Row 2 in layout)',
+    slots: [
+      {
+        zone: 'A2',
+        slotNumber: 1,
+        totalSlots: 4,
+        name: 'Slot 1: Row 1 Left Banner',
+        sectionTitle: 'Homepage Upper Strip (Row 2)',
+        description: 'First ad card in upper strip',
+        dimensions: '300×250 or Responsive Card',
+        aspectHint: 'Standard Card',
+      },
+      {
+        zone: 'H1_2',
+        slotNumber: 2,
+        totalSlots: 4,
+        name: 'Slot 2: Row 1 Middle-Left Banner',
+        sectionTitle: 'Homepage Upper Strip (Row 2)',
+        description: 'Second ad card in upper strip',
+        dimensions: '300×250 or Responsive Card',
+        aspectHint: 'Standard Card',
+      },
+      {
+        zone: 'H1_3',
+        slotNumber: 3,
+        totalSlots: 4,
+        name: 'Slot 3: Row 1 Middle-Right Banner',
+        sectionTitle: 'Homepage Upper Strip (Row 2)',
+        description: 'Third ad card in upper strip',
+        dimensions: '300×250 or Responsive Card',
+        aspectHint: 'Standard Card',
+      },
+      {
+        zone: 'H1_4',
+        slotNumber: 4,
+        totalSlots: 4,
+        name: 'Slot 4: Row 1 Right Banner',
+        sectionTitle: 'Homepage Upper Strip (Row 2)',
+        description: 'Fourth ad card in upper strip',
+        dimensions: '300×250 or Responsive Card',
+        aspectHint: 'Standard Card',
+      },
+    ],
+  },
+  {
+    id: 'homepage-row2',
+    name: 'Homepage Lower Ad Strip (Row 7)',
+    badge: '4-Ad Strip (Grid)',
+    description: 'Displays up to 4 commercial ads in a row below the Multimedia Video Theater & before Technology/Opinion (Row 7 in layout)',
+    slots: [
+      {
+        zone: 'A5',
+        slotNumber: 1,
+        totalSlots: 4,
+        name: 'Slot 1: Row 2 Left Banner',
+        sectionTitle: 'Homepage Lower Strip (Row 7)',
+        description: 'First ad card in lower strip',
+        dimensions: '300×250 or Responsive Card',
+        aspectHint: 'Standard Card',
+      },
+      {
+        zone: 'A6',
+        slotNumber: 2,
+        totalSlots: 4,
+        name: 'Slot 2: Row 2 Middle-Left Banner',
+        sectionTitle: 'Homepage Lower Strip (Row 7)',
+        description: 'Second ad card in lower strip',
+        dimensions: '300×250 or Responsive Card',
+        aspectHint: 'Standard Card',
+      },
+      {
+        zone: 'H2_3',
+        slotNumber: 3,
+        totalSlots: 4,
+        name: 'Slot 3: Row 2 Middle-Right Banner',
+        sectionTitle: 'Homepage Lower Strip (Row 7)',
+        description: 'Third ad card in lower strip',
+        dimensions: '300×250 or Responsive Card',
+        aspectHint: 'Standard Card',
+      },
+      {
+        zone: 'A8',
+        slotNumber: 4,
+        totalSlots: 4,
+        name: 'Slot 4: Row 2 Right Banner',
+        sectionTitle: 'Homepage Lower Strip (Row 7)',
+        description: 'Fourth ad card in lower strip',
+        dimensions: '300×250 or Responsive Card',
+        aspectHint: 'Standard Card',
+      },
+    ],
+  },
+  {
+    id: 'global-header',
+    name: 'Global Header Top Banner',
+    badge: 'Leaderboard Banner',
+    description: 'Top banner displayed across all pages above main site navigation',
+    slots: [
+      {
+        zone: 'A1',
+        slotNumber: 1,
+        totalSlots: 1,
+        name: 'Top Header Banner (All Pages)',
+        sectionTitle: 'Global Header Banner',
+        description: 'Top leaderboard banner above header',
+        dimensions: '728×90 or 970×90 Leaderboard',
+        aspectHint: 'Wide Horizontal Banner',
+      },
+    ],
+  },
+  {
+    id: 'article-placements',
+    name: 'Article Detail & Sidebar Ads',
+    badge: 'Article Pages',
+    description: 'Commercial ad units displayed when readers open standard, breaking, or opinion articles',
+    slots: [
+      {
+        zone: 'A4',
+        slotNumber: 1,
+        totalSlots: 3,
+        name: 'Inside Article Story Flow',
+        sectionTitle: 'Article Detail Placements',
+        description: 'Native card inserted between paragraphs in article body',
+        dimensions: '300×250 Native Card',
+        aspectHint: 'In-article native flow',
+      },
+      {
+        zone: 'A3',
+        slotNumber: 2,
+        totalSlots: 3,
+        name: 'Article Top Sidebar',
+        sectionTitle: 'Article Detail Placements',
+        description: 'Top right sidebar next to article headline & summary',
+        dimensions: '300×250 or 300×600 Vertical Poster',
+        aspectHint: 'Sidebar high-visibility',
+      },
+      {
+        zone: 'A7',
+        slotNumber: 3,
+        totalSlots: 3,
+        name: 'Article Lower Sidebar',
+        sectionTitle: 'Article Detail Placements',
+        description: 'Lower sidebar next to reader comments & related stories',
+        dimensions: '300×250 Card',
+        aspectHint: 'Sidebar mid-scroll',
+      },
+    ],
+  },
+];
 
 export const POSITION_MAP: Record<string, PositionInfo> = {
   A1: {
     zone: 'A1',
     positionNumber: 1,
-    name: 'Header Top Banner',
+    name: 'Top Header Banner',
+    sectionTitle: 'Global Header Banner',
     description: 'Top banner on all pages',
-    dimensions: '728×90 or Responsive Card',
+    dimensions: '728×90 or Responsive Banner',
+    slotNumber: 1,
+    totalSlots: 1,
   },
   A2: {
     zone: 'A2',
     positionNumber: 2,
-    name: "Below Editor's Picks",
-    description: 'Homepage main stories feed',
-    dimensions: '728×90 or Responsive Card',
+    name: 'Homepage Upper Strip - Slot 1',
+    sectionTitle: 'Homepage Upper Strip (Row 2)',
+    description: 'Row 1 Left Banner',
+    dimensions: '300×250 or Responsive Card',
+    slotNumber: 1,
+    totalSlots: 4,
   },
-  A3: {
-    zone: 'A3',
+  H1_2: {
+    zone: 'H1_2',
     positionNumber: 3,
-    name: 'Article Top Sidebar',
-    description: 'Top right sidebar next to headline',
-    dimensions: '300×250 or 300×600 Poster',
+    name: 'Homepage Upper Strip - Slot 2',
+    sectionTitle: 'Homepage Upper Strip (Row 2)',
+    description: 'Row 1 Middle-Left Banner',
+    dimensions: '300×250 or Responsive Card',
+    slotNumber: 2,
+    totalSlots: 4,
   },
-  A4: {
-    zone: 'A4',
+  H1_3: {
+    zone: 'H1_3',
     positionNumber: 4,
-    name: 'Inside Article Story',
-    description: 'Native card inside article reading flow',
-    dimensions: '300×250 Native Card',
+    name: 'Homepage Upper Strip - Slot 3',
+    sectionTitle: 'Homepage Upper Strip (Row 2)',
+    description: 'Row 1 Middle-Right Banner',
+    dimensions: '300×250 or Responsive Card',
+    slotNumber: 3,
+    totalSlots: 4,
+  },
+  H1_4: {
+    zone: 'H1_4',
+    positionNumber: 5,
+    name: 'Homepage Upper Strip - Slot 4',
+    sectionTitle: 'Homepage Upper Strip (Row 2)',
+    description: 'Row 1 Right Banner',
+    dimensions: '300×250 or Responsive Card',
+    slotNumber: 4,
+    totalSlots: 4,
   },
   A5: {
     zone: 'A5',
-    positionNumber: 5,
-    name: 'Tech News Section',
-    description: 'Below Technology news cards',
-    dimensions: '300×250 Card',
+    positionNumber: 6,
+    name: 'Homepage Lower Strip - Slot 1',
+    sectionTitle: 'Homepage Lower Strip (Row 7)',
+    description: 'Row 2 Left Banner',
+    dimensions: '300×250 or Responsive Card',
+    slotNumber: 1,
+    totalSlots: 4,
   },
   A6: {
     zone: 'A6',
-    positionNumber: 6,
-    name: 'World News Section',
-    description: 'Below International news cards',
-    dimensions: '300×250 Card',
-  },
-  A7: {
-    zone: 'A7',
     positionNumber: 7,
-    name: 'Article Lower Sidebar',
-    description: 'Lower sidebar next to reader comments',
-    dimensions: '300×250 Card',
+    name: 'Homepage Lower Strip - Slot 2',
+    sectionTitle: 'Homepage Lower Strip (Row 7)',
+    description: 'Row 2 Middle-Left Banner',
+    dimensions: '300×250 or Responsive Card',
+    slotNumber: 2,
+    totalSlots: 4,
+  },
+  H2_3: {
+    zone: 'H2_3',
+    positionNumber: 8,
+    name: 'Homepage Lower Strip - Slot 3',
+    sectionTitle: 'Homepage Lower Strip (Row 7)',
+    description: 'Row 2 Middle-Right Banner',
+    dimensions: '300×250 or Responsive Card',
+    slotNumber: 3,
+    totalSlots: 4,
   },
   A8: {
     zone: 'A8',
-    positionNumber: 8,
-    name: 'Opinion & Poll Section',
-    description: 'Above editorial opinion & poll',
+    positionNumber: 9,
+    name: 'Homepage Lower Strip - Slot 4',
+    sectionTitle: 'Homepage Lower Strip (Row 7)',
+    description: 'Row 2 Right Banner',
+    dimensions: '300×250 or Responsive Card',
+    slotNumber: 4,
+    totalSlots: 4,
+  },
+  A4: {
+    zone: 'A4',
+    positionNumber: 10,
+    name: 'Inside Article Story Flow',
+    sectionTitle: 'Article Detail Placements',
+    description: 'Native card inside story body',
+    dimensions: '300×250 Native Card',
+    slotNumber: 1,
+    totalSlots: 3,
+  },
+  A3: {
+    zone: 'A3',
+    positionNumber: 11,
+    name: 'Article Top Sidebar',
+    sectionTitle: 'Article Detail Placements',
+    description: 'Top right sidebar next to headline',
+    dimensions: '300×250 or 300×600 Poster',
+    slotNumber: 2,
+    totalSlots: 3,
+  },
+  A7: {
+    zone: 'A7',
+    positionNumber: 12,
+    name: 'Article Lower Sidebar',
+    sectionTitle: 'Article Detail Placements',
+    description: 'Lower sidebar next to comments',
     dimensions: '300×250 Card',
+    slotNumber: 3,
+    totalSlots: 3,
   },
 };
-
-const ZONES_LIST = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8'];
 
 export const AdManagerView: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'slots' | 'adsense'>('slots');
@@ -124,7 +365,7 @@ export const AdManagerView: React.FC = () => {
   const [showUrlInput, setShowUrlInput] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Body Scroll Lock when modal is open to completely eliminate background sliders
+  // Body Scroll Lock when modal is open
   useEffect(() => {
     if (isModalOpen) {
       const prevOverflow = document.body.style.overflow;
@@ -194,8 +435,8 @@ export const AdManagerView: React.FC = () => {
       await loadAllData();
       showNotice(
         next 
-          ? `${info?.name || 'Position'} is now LIVE on the website.` 
-          : `${info?.name || 'Position'} is now PAUSED (hidden).`
+          ? `${info?.name || 'Slot'} is now LIVE on the website.` 
+          : `${info?.name || 'Slot'} is now PAUSED (hidden).`
       );
     } catch (err: any) {
       showNotice(`Error updating ad: ${err?.message || 'Failed'}`, 'error');
@@ -205,24 +446,24 @@ export const AdManagerView: React.FC = () => {
   // Delete ad permanently from Supabase & site
   const handleDeleteAd = async (id: string, zone: string) => {
     const info = POSITION_MAP[zone];
-    if (confirm(`Remove advertisement from ${info?.name || 'this position'}? This will delete it from both the website and database.`)) {
+    if (confirm(`Remove advertisement from ${info?.name || 'this slot'}? This will delete it from both the website and database.`)) {
       try {
         await deleteDirectAd(id, zone);
         await loadAllData();
-        showNotice(`Advertisement for ${info?.name || 'Position'} has been deleted.`);
+        showNotice(`Advertisement for ${info?.name || 'Slot'} has been deleted.`);
       } catch (err: any) {
         showNotice(`Delete error: ${err?.message || 'Failed'}`, 'error');
       }
     }
   };
 
-  // Open modal to add ad to a specific position
-  const handleOpenAddModal = (zone: string = 'A1') => {
+  // Open modal to add ad to a specific slot or next available slot in a section
+  const handleOpenAddModal = (targetZone: string = 'A2') => {
     setUploadError(null);
     setShowUrlInput(false);
     setEditingAd({
       id: '',
-      zone,
+      zone: targetZone,
       advertiserName: '',
       creativeText: '',
       destinationUrl: '',
@@ -234,6 +475,13 @@ export const AdManagerView: React.FC = () => {
       updatedAt: new Date().toISOString(),
     });
     setIsModalOpen(true);
+  };
+
+  // Open modal for a section by picking its first empty slot, or slot 1 if all full
+  const handleOpenAddForSection = (section: AdSectionDef) => {
+    const emptySlot = section.slots.find((s) => !directAds.some((a) => a.zone === s.zone));
+    const chosenZone = emptySlot ? emptySlot.zone : section.slots[0].zone;
+    handleOpenAddModal(chosenZone);
   };
 
   // Open modal to edit existing ad
@@ -350,37 +598,38 @@ export const AdManagerView: React.FC = () => {
     showNotice('Google AdSense configuration saved successfully!');
   };
 
-  const filteredZones = ZONES_LIST.filter((zone) => {
+  const isSlotLive = (zone: string): boolean => {
     const ad = directAds.find((a) => a.zone === zone);
-    const isShowing = visibilityConfig.masterEnabled && visibilityConfig.zones[zone] !== false && Boolean(ad && ad.isActive);
-    if (filterMode === 'live') return isShowing;
-    if (filterMode === 'empty') return !ad;
-    return true;
-  });
+    return Boolean(
+      visibilityConfig.masterEnabled && 
+      visibilityConfig.zones[zone] !== false && 
+      ad && 
+      ad.isActive
+    );
+  };
 
-  const liveSlotsCount = ZONES_LIST.filter((zone) => {
-    const ad = directAds.find((a) => a.zone === zone);
-    return visibilityConfig.masterEnabled && visibilityConfig.zones[zone] !== false && Boolean(ad && ad.isActive);
-  }).length;
+  const allSlotsCount = Object.keys(POSITION_MAP).length;
+  const liveSlotsCount = Object.keys(POSITION_MAP).filter((z) => isSlotLive(z)).length;
+  const occupiedSlotsCount = directAds.length;
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-8">
+    <div className="space-y-6 max-w-7xl mx-auto pb-12">
       {/* ======================================================================
           1. HEADER (SHORT & CLEAR)
           ====================================================================== */}
       <div className="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2.5 flex-wrap">
             <h1 className="font-serif text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-              Website Ad Placements
+              Website Ad Placements & Sections
             </h1>
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              {isDbSynced ? 'Database Synced' : 'Offline Cache'}
+              {isDbSynced ? 'Database Connected & Live' : 'Offline Cache'}
             </span>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Manage banner images, links, and commercial availability across all 8 website positions.
+          <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-2xl">
+            Manage multi-slot ad strips (4 ads in Row 2 & Row 7), header banner, and article placements. Each slot functions independently without overwriting.
           </p>
         </div>
 
@@ -411,7 +660,7 @@ export const AdManagerView: React.FC = () => {
 
           {/* New Ad Button */}
           <button
-            onClick={() => handleOpenAddModal('A1')}
+            onClick={() => handleOpenAddModal('A2')}
             className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition-all cursor-pointer shadow-sm hover:shadow active:scale-98"
           >
             <Plus className="w-4 h-4 text-amber-400" />
@@ -458,7 +707,7 @@ export const AdManagerView: React.FC = () => {
             }`}
           >
             <LayoutGrid className="w-3.5 h-3.5" />
-            <span>Website Positions (8)</span>
+            <span>Ad Sections & Strips ({allSlotsCount} Slots)</span>
             <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
               activeTab === 'slots' ? 'bg-slate-700 text-white' : 'bg-slate-200 text-slate-700'
             }`}>
@@ -492,7 +741,7 @@ export const AdManagerView: React.FC = () => {
                 filterMode === 'all' ? 'bg-slate-200 text-slate-900 font-bold' : 'text-slate-500 hover:text-slate-800'
               }`}
             >
-              All (8)
+              All ({allSlotsCount})
             </button>
             <button
               onClick={() => setFilterMode('live')}
@@ -508,167 +757,225 @@ export const AdManagerView: React.FC = () => {
                 filterMode === 'empty' ? 'bg-slate-200 text-slate-900 font-bold' : 'text-slate-500 hover:text-slate-800'
               }`}
             >
-              Empty ({8 - directAds.length})
+              Available ({allSlotsCount - occupiedSlotsCount})
             </button>
           </div>
         )}
       </div>
 
       {/* ======================================================================
-          3. TAB 1: ALL 8 POSITIONS (CLEAN CARDS WITH CLEAR POSITION NAMES)
+          3. TAB 1: VISUAL SECTIONS WITH MULTI-SLOT STRIPS (MATCHING LAYOUT DIAGRAM)
           ====================================================================== */}
       {activeTab === 'slots' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {filteredZones.map((zone) => {
-            const info = POSITION_MAP[zone];
-            const ad = directAds.find((a) => a.zone === zone);
-            const isLive = 
-              visibilityConfig.masterEnabled && 
-              visibilityConfig.zones[zone] !== false && 
-              Boolean(ad && ad.isActive);
+        <div className="space-y-8">
+          {AD_SECTIONS.map((section) => {
+            // Filter slots inside this section based on filterMode
+            const visibleSlots = section.slots.filter((slot) => {
+              const ad = directAds.find((a) => a.zone === slot.zone);
+              const live = isSlotLive(slot.zone);
+              if (filterMode === 'live') return live;
+              if (filterMode === 'empty') return !ad;
+              return true;
+            });
+
+            if (visibleSlots.length === 0) return null;
+
+            const sectionActiveCount = section.slots.filter((s) => isSlotLive(s.zone)).length;
+            const sectionTotalCount = section.slots.length;
 
             return (
-              <div
-                key={zone}
-                className={`bg-white rounded-2xl border transition-all duration-200 flex flex-col justify-between overflow-hidden ${
-                  isLive 
-                    ? 'border-emerald-300/80 shadow-xs hover:shadow-md' 
-                    : ad 
-                    ? 'border-slate-200 hover:border-slate-300 opacity-85' 
-                    : 'border-dashed border-slate-300 hover:border-slate-400 bg-slate-50/40'
-                }`}
+              <div 
+                key={section.id}
+                className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-xs space-y-4"
               >
-                {/* Card Top: Position Number, Plain Name & Live Switch */}
-                <div className="p-4 pb-3 border-b border-slate-100">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-800 text-[11px] font-bold tracking-tight">
-                      Position {info.positionNumber}
+                {/* Section Header */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="px-2.5 py-0.5 rounded-md bg-slate-900 text-white font-mono text-[10px] font-bold uppercase tracking-wider">
+                        {section.badge}
+                      </span>
+                      <h2 className="font-serif text-base sm:text-lg font-bold text-slate-900">
+                        {section.name}
+                      </h2>
+                    </div>
+                    <p className="text-xs text-slate-500 mt-1">
+                      {section.description}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs font-semibold text-slate-500 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200">
+                      <span className="text-slate-900 font-bold">{sectionActiveCount}</span> of {sectionTotalCount} Slots Active
                     </span>
 
-                    {/* Smooth Toggle Switch (if ad exists) */}
-                    {ad ? (
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          onClick={() => handleToggleZone(zone, ad.id)}
-                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors cursor-pointer focus:outline-none ${
-                            isLive ? 'bg-emerald-600' : 'bg-slate-300'
-                          }`}
-                          title={isLive ? 'Ad is currently LIVE. Click to hide.' : 'Ad is currently PAUSED. Click to show.'}
-                        >
-                          <span
-                            className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform shadow-xs ${
-                              isLive ? 'translate-x-4.5' : 'translate-x-0.5'
-                            }`}
-                          />
-                        </button>
-                        <span className={`text-[10px] font-bold uppercase tracking-wider ${isLive ? 'text-emerald-700' : 'text-slate-400'}`}>
-                          {isLive ? 'Live' : 'Off'}
-                        </span>
-                      </div>
-                    ) : (
-                      <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
-                        Available
-                      </span>
-                    )}
+                    <button
+                      onClick={() => handleOpenAddForSection(section)}
+                      className="px-3 py-1.5 bg-slate-100 hover:bg-slate-900 hover:text-white text-slate-800 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Add Ad to this Section</span>
+                    </button>
                   </div>
-
-                  <h3 className="font-serif font-bold text-sm text-slate-900 truncate" title={info.name}>
-                    {info.name}
-                  </h3>
-                  <p className="text-[11px] text-slate-500 truncate mt-0.5" title={info.description}>
-                    {info.description}
-                  </p>
                 </div>
 
-                {/* Card Middle: Creative Image or Clean Add Box */}
-                <div className="p-4 flex-1 flex flex-col justify-center">
-                  {ad ? (
-                    <div className="space-y-3">
-                      {/* Banner Image Preview */}
-                      <div 
-                        onClick={() => handleOpenEditModal(ad)}
-                        className="w-full h-32 bg-slate-50 rounded-xl border border-slate-200 overflow-hidden flex items-center justify-center relative group cursor-pointer"
+                {/* Slots Grid */}
+                <div className={`grid gap-4 ${
+                  section.slots.length === 1 
+                    ? 'grid-cols-1' 
+                    : section.slots.length === 3 
+                    ? 'grid-cols-1 md:grid-cols-3' 
+                    : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'
+                }`}>
+                  {visibleSlots.map((slot) => {
+                    const ad = directAds.find((a) => a.zone === slot.zone);
+                    const isLive = isSlotLive(slot.zone);
+
+                    return (
+                      <div
+                        key={slot.zone}
+                        className={`bg-white rounded-2xl border transition-all duration-200 flex flex-col justify-between overflow-hidden ${
+                          isLive 
+                            ? 'border-emerald-300 shadow-xs hover:shadow-md' 
+                            : ad 
+                            ? 'border-slate-200 hover:border-slate-300 opacity-90' 
+                            : 'border-dashed border-slate-300 hover:border-slate-400 bg-slate-50/40'
+                        }`}
                       >
-                        {ad.mediaUrl ? (
-                          <img
-                            src={ad.mediaUrl}
-                            alt={ad.altText || ad.advertiserName}
-                            className="max-h-full max-w-full object-contain block mx-auto transition-transform duration-300 group-hover:scale-105"
-                          />
-                        ) : (
-                          <div className="flex flex-col items-center justify-center text-slate-400 text-xs">
-                            <ImageIcon className="w-6 h-6 mb-1 text-slate-300" />
-                            <span>No banner image</span>
+                        {/* Slot Header */}
+                        <div className="p-3.5 pb-2.5 border-b border-slate-100">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-800 text-[10px] font-bold">
+                              {slot.totalSlots > 1 ? `Slot ${slot.slotNumber} of ${slot.totalSlots}` : 'Single Slot'}
+                            </span>
+
+                            {ad ? (
+                              <div className="flex items-center gap-1.5">
+                                <button
+                                  onClick={() => handleToggleZone(slot.zone, ad.id)}
+                                  className={`relative inline-flex h-4.5 w-8 items-center rounded-full transition-colors cursor-pointer focus:outline-none ${
+                                    isLive ? 'bg-emerald-600' : 'bg-slate-300'
+                                  }`}
+                                  title={isLive ? 'Ad is currently LIVE. Click to hide.' : 'Ad is currently PAUSED. Click to show.'}
+                                >
+                                  <span
+                                    className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform shadow-xs ${
+                                      isLive ? 'translate-x-4' : 'translate-x-0.5'
+                                    }`}
+                                  />
+                                </button>
+                                <span className={`text-[10px] font-bold uppercase ${isLive ? 'text-emerald-700' : 'text-slate-400'}`}>
+                                  {isLive ? 'Live' : 'Off'}
+                                </span>
+                              </div>
+                            ) : (
+                              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                                Available
+                              </span>
+                            )}
+                          </div>
+
+                          <h3 className="font-serif font-bold text-xs sm:text-sm text-slate-900 truncate" title={slot.name}>
+                            {slot.name}
+                          </h3>
+                          <p className="text-[10px] text-slate-500 truncate" title={slot.description}>
+                            {slot.description}
+                          </p>
+                        </div>
+
+                        {/* Slot Body: Creative Image or Upload Prompt */}
+                        <div className="p-3.5 flex-1 flex flex-col justify-center">
+                          {ad ? (
+                            <div className="space-y-2.5">
+                              {/* Preview Frame */}
+                              <div 
+                                onClick={() => handleOpenEditModal(ad)}
+                                className="w-full h-28 bg-slate-50 rounded-xl border border-slate-200 overflow-hidden flex items-center justify-center relative group cursor-pointer"
+                              >
+                                {ad.mediaUrl ? (
+                                  <img
+                                    src={ad.mediaUrl}
+                                    alt={ad.altText || ad.advertiserName}
+                                    className="max-h-full max-w-full object-contain block mx-auto transition-transform duration-200 group-hover:scale-105"
+                                  />
+                                ) : (
+                                  <div className="flex flex-col items-center justify-center text-slate-400 text-xs">
+                                    <ImageIcon className="w-5 h-5 mb-1 text-slate-300" />
+                                    <span>No banner image</span>
+                                  </div>
+                                )}
+
+                                <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                  <span className="px-2.5 py-1 bg-white text-slate-900 text-xs font-bold rounded-lg flex items-center gap-1 shadow-sm">
+                                    <Edit3 className="w-3 h-3" />
+                                    <span>Edit Ad</span>
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* Brand & Link */}
+                              <div>
+                                <div className="font-bold text-xs text-slate-900 truncate" title={ad.advertiserName}>
+                                  {ad.advertiserName || 'Sponsored Partner'}
+                                </div>
+                                {ad.destinationUrl && ad.destinationUrl !== '#' && (
+                                  <a
+                                    href={ad.destinationUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-[10px] text-slate-500 hover:text-slate-800 font-mono flex items-center gap-1 truncate hover:underline"
+                                    title={ad.destinationUrl}
+                                  >
+                                    <Link2 className="w-3 h-3 shrink-0 text-slate-400" />
+                                    <span className="truncate">{ad.destinationUrl.replace(/^https?:\/\//, '')}</span>
+                                    <ArrowUpRight className="w-2.5 h-2.5 shrink-0" />
+                                  </a>
+                                )}
+                              </div>
+                            </div>
+                          ) : (
+                            /* Empty Upload Area */
+                            <div
+                              onClick={() => handleOpenAddModal(slot.zone)}
+                              className="w-full h-32 rounded-xl border border-dashed border-slate-300 hover:border-slate-800 hover:bg-slate-50 transition-all flex flex-col items-center justify-center p-3 text-center cursor-pointer group"
+                            >
+                              <div className="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-slate-200 flex items-center justify-center mb-1.5 transition-colors">
+                                <Upload className="w-3.5 h-3.5 text-slate-500 group-hover:text-slate-800" />
+                              </div>
+                              <span className="text-xs font-bold text-slate-700 group-hover:text-slate-900 transition-colors">
+                                Upload Ad Banner
+                              </span>
+                              <span className="text-[10px] text-slate-400 mt-0.5">
+                                {slot.dimensions}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Slot Footer */}
+                        {ad && (
+                          <div className="px-3.5 py-2 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between text-xs">
+                            <button
+                              onClick={() => handleOpenEditModal(ad)}
+                              className="text-slate-600 hover:text-slate-900 font-semibold flex items-center gap-1 cursor-pointer"
+                            >
+                              <Edit3 className="w-3 h-3" />
+                              <span>Edit Details</span>
+                            </button>
+
+                            <button
+                              onClick={() => handleDeleteAd(ad.id, slot.zone)}
+                              className="text-slate-400 hover:text-rose-600 transition-colors cursor-pointer p-1"
+                              title="Delete ad from database & site"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
                           </div>
                         )}
-
-                        <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                          <span className="px-2.5 py-1 bg-white text-slate-900 text-xs font-bold rounded-lg flex items-center gap-1 shadow-sm">
-                            <Edit3 className="w-3 h-3" />
-                            <span>Edit Banner</span>
-                          </span>
-                        </div>
                       </div>
-
-                      {/* Brand Info */}
-                      <div>
-                        <div className="font-bold text-xs text-slate-900 truncate" title={ad.advertiserName}>
-                          {ad.advertiserName}
-                        </div>
-                        {ad.destinationUrl && ad.destinationUrl !== '#' && (
-                          <a
-                            href={ad.destinationUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[11px] text-slate-500 hover:text-slate-800 font-mono flex items-center gap-1 mt-0.5 truncate hover:underline"
-                            title={ad.destinationUrl}
-                          >
-                            <Link2 className="w-3 h-3 shrink-0 text-slate-400" />
-                            <span className="truncate">{ad.destinationUrl.replace(/^https?:\/\//, '')}</span>
-                            <ArrowUpRight className="w-2.5 h-2.5 shrink-0" />
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  ) : (
-                    /* Clean Empty State Upload Area */
-                    <div
-                      onClick={() => handleOpenAddModal(zone)}
-                      className="w-full h-36 rounded-xl border border-dashed border-slate-300 hover:border-slate-800 hover:bg-slate-50 transition-all flex flex-col items-center justify-center p-4 text-center cursor-pointer group"
-                    >
-                      <div className="w-9 h-9 rounded-full bg-slate-100 group-hover:bg-slate-200 flex items-center justify-center mb-2 transition-colors">
-                        <Upload className="w-4 h-4 text-slate-500 group-hover:text-slate-800" />
-                      </div>
-                      <span className="text-xs font-bold text-slate-700 group-hover:text-slate-900 transition-colors">
-                        Upload Ad Banner
-                      </span>
-                      <span className="text-[10px] text-slate-400 mt-0.5">
-                        {info.dimensions}
-                      </span>
-                    </div>
-                  )}
+                    );
+                  })}
                 </div>
-
-                {/* Card Bottom: Quick Actions */}
-                {ad && (
-                  <div className="px-4 py-2.5 bg-slate-50/70 border-t border-slate-100 flex items-center justify-between text-xs">
-                    <button
-                      onClick={() => handleOpenEditModal(ad)}
-                      className="text-slate-600 hover:text-slate-900 font-semibold flex items-center gap-1 cursor-pointer"
-                    >
-                      <Edit3 className="w-3.5 h-3.5" />
-                      <span>Edit Details</span>
-                    </button>
-
-                    <button
-                      onClick={() => handleDeleteAd(ad.id, zone)}
-                      className="text-slate-400 hover:text-rose-600 transition-colors cursor-pointer p-1"
-                      title="Delete ad from database & site"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                )}
               </div>
             );
           })}
@@ -765,9 +1072,6 @@ export const AdManagerView: React.FC = () => {
 
       {/* ======================================================================
           5. PERFECTLY CENTERED, COMPACT MODAL (PORTAL TO DOCUMENT.BODY)
-          - Fixed size (no sliding, no left-docking, no ugly slider)
-          - Rock-solid centered with React Portal
-          - Scrollbar hidden
           ====================================================================== */}
       {isModalOpen && editingAd && createPortal(
         <div 
@@ -787,7 +1091,7 @@ export const AdManagerView: React.FC = () => {
                   {editingAd.id ? 'Edit Advertisement' : 'Upload Advertisement'}
                 </h3>
                 <p className="text-[11px] text-slate-500 mt-0.5">
-                  Position {POSITION_MAP[editingAd.zone]?.positionNumber} • {POSITION_MAP[editingAd.zone]?.name}
+                  {POSITION_MAP[editingAd.zone]?.sectionTitle || 'Website Placement'} • {POSITION_MAP[editingAd.zone]?.name}
                 </p>
               </div>
               <button
@@ -799,31 +1103,32 @@ export const AdManagerView: React.FC = () => {
               </button>
             </div>
 
-            {/* Modal Form Body (Scrollbar completely hidden, tight clean padding) */}
+            {/* Modal Form Body */}
             <form onSubmit={handleSaveAd} className="flex-1 overflow-y-auto hide-scrollbar p-5 space-y-3.5 text-xs">
               
-              {/* 1. Target Position Selector */}
+              {/* 1. Target Slot Selector (Grouped by Section) */}
               <div>
                 <label className="block font-bold text-slate-700 mb-1">
-                  Ad Position on Website
+                  Ad Section & Slot Position
                 </label>
                 <select
                   value={editingAd.zone}
                   onChange={(e) => setEditingAd({ ...editingAd, zone: e.target.value })}
                   className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900 text-xs"
                 >
-                  {ZONES_LIST.map((z) => {
-                    const item = POSITION_MAP[z];
-                    return (
-                      <option key={z} value={z}>
-                        Position {item.positionNumber}: {item.name} ({item.description})
-                      </option>
-                    );
-                  })}
+                  {AD_SECTIONS.map((section) => (
+                    <optgroup key={section.id} label={section.name.toUpperCase()}>
+                      {section.slots.map((s) => (
+                        <option key={s.zone} value={s.zone}>
+                          {s.name} ({s.dimensions})
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))}
                 </select>
               </div>
 
-              {/* 2. Visual Image Upload Box (Compact & Clean) */}
+              {/* 2. Visual Image Upload Box */}
               <div>
                 <label className="block font-bold text-slate-700 mb-1">
                   Banner Image
@@ -873,7 +1178,7 @@ export const AdManagerView: React.FC = () => {
                     </div>
                   </div>
                 ) : (
-                  /* Compact Drag & Drop Area */
+                  /* Drag & Drop Area */
                   <div
                     onClick={() => fileInputRef.current?.click()}
                     className="w-full border-2 border-dashed border-slate-200 hover:border-slate-800 rounded-xl p-3.5 text-center cursor-pointer transition-colors bg-slate-50/50 hover:bg-slate-50 flex flex-col items-center justify-center group"
@@ -965,11 +1270,11 @@ export const AdManagerView: React.FC = () => {
                     type="text"
                     value={editingAd.ctaText ?? ''}
                     onChange={(e) => setEditingAd({ ...editingAd, ctaText: e.target.value })}
-                    placeholder="e.g. Learn More / Call Now (or leave empty for no button)"
+                    placeholder="e.g. Learn More / Call Now"
                     className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900 text-xs"
                   />
                   <div className="text-[10px] text-slate-500 mt-1">
-                    Clear this field completely to remove the button.
+                    Leave empty to show banner without a button.
                   </div>
                 </div>
               </div>

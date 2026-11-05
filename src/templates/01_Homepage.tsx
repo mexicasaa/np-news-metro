@@ -184,19 +184,17 @@ export const Homepage: React.FC<HomepageProps> = ({
                 </div>
               ))}
             </div>
-
-            {/* Position 3: Article / Top Right Sidebar next to headline */}
-            {showAds && (
-              <AdSlot zone="A3" variant="card" className="mt-2" />
-            )}
-
           </div>
         </div>
       </section>
 
-      {/* Position 2: Placed below Feature Section and Editor’s Picks */}
+      {/* Row 2 in Wireframe: Homepage Upper Ad Strip (4 Ads Grid below Hero & Editor's Picks) */}
       {showAds && (
-        <AdSlot zone="A2" variant="card" className="my-6 max-w-4xl mx-auto px-2" />
+        <AdGridRow
+          zones={['A2', 'H1_2', 'H1_3', 'H1_4']}
+          id="homepage-upper-ad-strip"
+          className="my-4 sm:my-6"
+        />
       )}
 
       {/* 3. Latest News Chronological Stream & Editorial Wire */}
@@ -277,11 +275,6 @@ export const Homepage: React.FC<HomepageProps> = ({
           </div>
         </div>
       </section>
-
-      {/* Position 4: Stories Reading Flow Ad */}
-      {showAds && (
-        <AdSlot zone="A4" variant="card" className="my-6 max-w-4xl mx-auto px-2" />
-      )}
 
       {/* 4. Section Module: National Affairs & Politics */}
       <section aria-label="National & Politics Section" className="pt-2 sm:pt-4">
@@ -381,6 +374,15 @@ export const Homepage: React.FC<HomepageProps> = ({
         </div>
       </section>
 
+      {/* Row 7 in Wireframe: Homepage Lower Ad Strip (4 Ads Grid below Multimedia Video Theater) */}
+      {showAds && (
+        <AdGridRow
+          zones={['A5', 'A6', 'H2_3', 'A8']}
+          id="homepage-lower-ad-strip"
+          className="my-6 sm:my-8"
+        />
+      )}
+
       {/* 8. Split 2-Column: Technology & World Affairs */}
       <section aria-label="Technology and World News" className="pt-2 sm:pt-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -443,19 +445,6 @@ export const Homepage: React.FC<HomepageProps> = ({
           </div>
         </div>
       </section>
-
-      {/* Positions 5 & 6: Technology & World News Section Ads */}
-      {showAds && (
-        <AdGridRow
-          zones={['A5', 'A6']}
-          id="ads-tech-world-strip"
-        />
-      )}
-
-      {/* Position 8: Above Metromat Editorial & Public Poll */}
-      {showAds && (
-        <AdSlot zone="A8" variant="card" className="my-6 max-w-4xl mx-auto px-2" />
-      )}
 
       {/* 9. Metromat: Editorial Voice & Today's Public Poll */}
       <section aria-label="Metromat Section" className="pt-2 sm:pt-4">

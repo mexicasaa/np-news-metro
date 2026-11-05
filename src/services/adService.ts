@@ -106,14 +106,22 @@ export const unmarkZoneCleared = (zone: string): void => {
 export const DEFAULT_ADS_VISIBILITY: AdsVisibilityConfig = {
   masterEnabled: true,
   zones: {
+    // Header Banner
     A1: true,
+    // Homepage Upper Strip (Row 2 - 4 slots)
     A2: true,
-    A3: true,
-    A4: true,
+    H1_2: true,
+    H1_3: true,
+    H1_4: true,
+    // Homepage Lower Strip (Row 7 - 4 slots)
     A5: true,
     A6: true,
-    A7: true,
+    H2_3: true,
     A8: true,
+    // Article Detail Placements
+    A4: true,
+    A3: true,
+    A7: true,
   },
 };
 
@@ -126,10 +134,14 @@ export const DEFAULT_ADSENSE_SETTINGS: AdSenseSettings = {
   zones: {
     A1: { enabled: true, slotId: '1029384756', format: 'rectangle' },
     A2: { enabled: true, slotId: '2938475610', format: 'rectangle' },
+    H1_2: { enabled: true, slotId: '2938475612', format: 'rectangle' },
+    H1_3: { enabled: true, slotId: '2938475613', format: 'rectangle' },
+    H1_4: { enabled: true, slotId: '2938475614', format: 'rectangle' },
     A3: { enabled: true, slotId: '3847561029', format: 'vertical' },
     A4: { enabled: true, slotId: '4756102938', format: 'rectangle' },
     A5: { enabled: true, slotId: '5610293847', format: 'rectangle' },
     A6: { enabled: true, slotId: '6102938475', format: 'rectangle' },
+    H2_3: { enabled: true, slotId: '6102938477', format: 'rectangle' },
     A7: { enabled: true, slotId: '7029384756', format: 'rectangle' },
     A8: { enabled: true, slotId: '8029384756', format: 'rectangle' },
   },
@@ -293,7 +305,9 @@ export const getDirectAdForZone = (zone: string): DirectAd | null => {
 
 export const saveDirectAd = (ad: DirectAd): DirectAd => {
   const ads = getDirectAds();
-  const existingIdx = ads.findIndex((a) => a.id === ad.id || a.zone === ad.zone);
+  const existingIdx = ad.id && !ad.id.startsWith('ad-')
+    ? ads.findIndex((a) => a.id === ad.id)
+    : ads.findIndex((a) => a.zone === ad.zone);
   const now = new Date().toISOString();
 
   let updatedAd = { ...ad, updatedAt: now };
@@ -329,8 +343,9 @@ export const deleteDirectAd = async (id: string, zone?: string): Promise<void> =
   const targetZone = zone || matched?.zone;
 
   const filtered = ads.filter((a) => {
-    if (targetZone) return a.zone !== targetZone;
-    return a.id !== id;
+    if (id && a.id === id) return false;
+    if (targetZone && a.zone === targetZone) return false;
+    return true;
   });
   if (typeof window !== 'undefined') {
     localStorage.setItem(DIRECT_ADS_KEY, JSON.stringify(filtered));
@@ -339,6 +354,9 @@ export const deleteDirectAd = async (id: string, zone?: string): Promise<void> =
   if (targetZone) {
     markZoneCleared(targetZone);
     toggleZoneVisibility(targetZone, false);
+    adPlacementCache.delete(targetZone);
+  } else {
+    adPlacementCache.clear();
   }
 
   // Purge from Supabase Database for targetZone only
@@ -348,11 +366,6 @@ export const deleteDirectAd = async (id: string, zone?: string): Promise<void> =
     console.warn('Failed to delete ad from Supabase DB:', err);
   }
 
-  if (targetZone) {
-    adPlacementCache.delete(targetZone);
-  } else {
-    adPlacementCache.clear();
-  }
   notifyAdUpdate();
 };
 
@@ -381,8 +394,8 @@ export const toggleAdOpenClose = async (
 ): Promise<boolean> => {
   const currentVisibility = isZoneVisible(zone);
   const ads = getDirectAds();
-  // Strictly isolate matching to the requested zone
-  const matchedAd = ads.find((a) => a.zone === zone);
+  // Strictly isolate matching to the requested zone/id
+  const matchedAd = ads.find((a) => (id ? a.id === id : a.zone === zone));
 
   // Determine next state
   const nextState = forceState !== undefined 
@@ -395,7 +408,7 @@ export const toggleAdOpenClose = async (
   // 2. Update direct ads in localStorage for THIS zone only
   let updatedAny = false;
   ads.forEach((a) => {
-    if (a.zone === zone) {
+    if (id ? a.id === id : a.zone === zone) {
       a.isActive = nextState;
       a.updatedAt = new Date().toISOString();
       updatedAny = true;

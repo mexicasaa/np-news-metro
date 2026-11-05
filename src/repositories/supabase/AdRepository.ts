@@ -247,12 +247,12 @@ export class AdRepository {
         }
       }
 
-      // 2. Delete analytics for this placement only
+      // 2. Unlink placement and delete analytics for this placement only
       if (targetPlacementId) {
         await supabase.from('ad_analytics_daily').delete().eq('placement_id', targetPlacementId);
-        await supabase.from('ad_placements').delete().eq('id', targetPlacementId);
+        await supabase.from('ad_placements').update({ campaign_id: null, is_active: false }).eq('id', targetPlacementId);
       } else if (zone) {
-        await supabase.from('ad_placements').delete().eq('zone', zone);
+        await supabase.from('ad_placements').update({ campaign_id: null, is_active: false }).eq('zone', zone);
       }
 
       // 3. Check if any OTHER zone is still using this campaign before removing campaign
