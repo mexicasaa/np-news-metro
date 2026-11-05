@@ -475,15 +475,12 @@ export const getAdPlacement = async (zone: string): Promise<ActiveAdPlacement | 
       }
       adPlacementCache.set(zone, { data: repoPlacement, timestamp: Date.now() });
       return repoPlacement;
-    } else {
-      // Supabase answered authoritatively: NO active ad campaign exists in DB for this zone!
-      // Do NOT resurrect from old cached localStorage!
-      adPlacementCache.set(zone, { data: null, timestamp: Date.now() });
-      return null;
     }
-  } catch {}
+  } catch (err) {
+    console.warn('Repository placement fetch warning:', err);
+  }
 
-  // 2. Check local admin direct ad configuration
+  // 2. Check local admin direct ad configuration as authoritative fallback
   const localDirect = getDirectAdForZone(zone);
   if (localDirect && localDirect.isActive) {
     const placement: ActiveAdPlacement = {
@@ -509,7 +506,6 @@ export const getAdPlacement = async (zone: string): Promise<ActiveAdPlacement | 
     return disabledObj;
   }
 
-  // Strictly return null if not in Supabase DB and not in active local direct ads.
   adPlacementCache.set(zone, { data: null, timestamp: Date.now() });
   return null;
 };

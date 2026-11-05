@@ -129,8 +129,8 @@ export const ArticleBody: React.FC<ArticleBodyProps> = ({
   // Insert Inside Article Story ad (Zone A4) natively in reading flow between paragraphs
   let finalBlocks = activeBlocks;
   const hasExplicitAd = activeBlocks.some((b) => b.type === 'ad_slot');
-  if (showAds && !hasExplicitAd && activeBlocks.length >= 2) {
-    const insertIdx = Math.min(2, activeBlocks.length - 1);
+  if (showAds && !hasExplicitAd && activeBlocks.length >= 1) {
+    const insertIdx = Math.min(2, activeBlocks.length);
     finalBlocks = [
       ...activeBlocks.slice(0, insertIdx),
       {

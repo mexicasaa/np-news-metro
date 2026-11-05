@@ -61,6 +61,7 @@ export type Database = {
           alt_text: string | null
           campaign_id: string | null
           created_at: string | null
+          cta_text: string | null
           destination_url: string
           headline: string | null
           id: string
@@ -71,6 +72,7 @@ export type Database = {
           alt_text?: string | null
           campaign_id?: string | null
           created_at?: string | null
+          cta_text?: string | null
           destination_url: string
           headline?: string | null
           id?: string
@@ -81,6 +83,7 @@ export type Database = {
           alt_text?: string | null
           campaign_id?: string | null
           created_at?: string | null
+          cta_text?: string | null
           destination_url?: string
           headline?: string | null
           id?: string

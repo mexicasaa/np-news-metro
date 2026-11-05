@@ -185,6 +185,11 @@ export const Homepage: React.FC<HomepageProps> = ({
               ))}
             </div>
 
+            {/* Position 3: Article / Top Right Sidebar next to headline */}
+            {showAds && (
+              <AdSlot zone="A3" variant="card" className="mt-2" />
+            )}
+
           </div>
         </div>
       </section>
@@ -272,6 +277,11 @@ export const Homepage: React.FC<HomepageProps> = ({
           </div>
         </div>
       </section>
+
+      {/* Position 4: Stories Reading Flow Ad */}
+      {showAds && (
+        <AdSlot zone="A4" variant="card" className="my-6 max-w-4xl mx-auto px-2" />
+      )}
 
       {/* 4. Section Module: National Affairs & Politics */}
       <section aria-label="National & Politics Section" className="pt-2 sm:pt-4">

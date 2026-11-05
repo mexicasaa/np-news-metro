@@ -143,6 +143,7 @@ export const AdSlot: React.FC<AdSlotProps> = ({
   const ctaUrl = directAd ? directAd.destinationUrl : '#';
   const mediaUrl = directAd?.mediaUrl;
   const altText = directAd?.altText || advertiserName;
+  const ctaText = directAd?.ctaText;
 
   // Check if creativeText is distinct and not just repeating the advertiser/brand name
   const isDuplicateBrand = (): boolean => {
@@ -166,6 +167,14 @@ export const AdSlot: React.FC<AdSlotProps> = ({
 
   const isPhoneCta = typeof ctaUrl === 'string' && ctaUrl.startsWith('tel:');
   const isExternalLink = typeof ctaUrl === 'string' && ctaUrl.startsWith('http');
+  const hasCtaUrl = Boolean(ctaUrl && ctaUrl !== '#' && ctaUrl.trim() !== '');
+  const hasCustomLabel = Boolean(ctaText && ctaText.trim() !== '');
+
+  // Only show CTA button if user explicitly configured button text and there is a destination link or phone
+  const shouldShowButton = Boolean(hasCustomLabel && hasCtaUrl);
+  const resolvedButtonLabel = hasCustomLabel 
+    ? ctaText!.trim() 
+    : (isPhoneCta ? (isHindi ? 'कॉल करें' : 'Call Now') : (isHindi ? 'और जानें' : 'Learn More'));
 
   const handleClick = (e: React.MouseEvent) => {
     if (directAd) {
@@ -276,22 +285,24 @@ export const AdSlot: React.FC<AdSlotProps> = ({
             )}
           </div>
 
-          {/* Content Details: Cleanly positioned without artificial min-height blank gaps */}
-          <div className="space-y-1 mb-2.5">
-            <h4 className="font-sans font-bold text-xs sm:text-sm lg:text-[15px] text-ink block leading-snug hover:text-primary transition-colors">
-              {advertiserName}
-            </h4>
-            {hasDistinctDescription && (
-              <p className="font-serif text-[11px] sm:text-xs text-ink-secondary leading-relaxed line-clamp-2 mt-0.5">
-                {creativeText}
-              </p>
-            )}
-          </div>
+          {/* Content Details: Only shown for text-only ads (no banner image) */}
+          {!mediaUrl && (
+            <div className="space-y-1 mb-2.5">
+              <h4 className="font-sans font-bold text-xs sm:text-sm lg:text-[15px] text-ink block leading-snug hover:text-primary transition-colors">
+                {advertiserName}
+              </h4>
+              {hasDistinctDescription && (
+                <p className="font-serif text-[11px] sm:text-xs text-ink-secondary leading-relaxed line-clamp-2 mt-0.5">
+                  {creativeText}
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
-        {/* Action Button Area: Bottom-pinned for clean baseline alignment across cards */}
-        <div className="mt-auto pt-2 border-t border-border-subtle/50 flex-shrink-0">
-          {ctaUrl && ctaUrl !== '#' ? (
+        {/* Action Button Area: Displayed only if custom label or valid CTA url is set */}
+        {shouldShowButton && (
+          <div className="mt-auto pt-2 border-t border-border-subtle/50 flex-shrink-0">
             <a
               href={ctaUrl}
               target={isExternalLink ? '_blank' : undefined}
@@ -302,21 +313,17 @@ export const AdSlot: React.FC<AdSlotProps> = ({
               {isPhoneCta ? (
                 <>
                   <Phone className="w-3.5 h-3.5 text-secondary-gold" />
-                  <span>{isHindi ? 'कॉल करें' : 'Call to Order'}</span>
+                  <span>{resolvedButtonLabel}</span>
                 </>
               ) : (
                 <>
-                  <span>{isHindi ? 'और जानें' : (directAd?.ctaText || 'Learn More')}</span>
+                  <span>{resolvedButtonLabel}</span>
                   <ExternalLink className="w-3.5 h-3.5" />
                 </>
               )}
             </a>
-          ) : (
-            <div className="py-1 text-center text-[10px] sm:text-xs font-semibold text-ink-muted/60 uppercase tracking-wider select-none">
-              {isHindi ? 'प्रायोजित संदेश' : 'Official Notice'}
-            </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -367,38 +374,40 @@ export const AdSlot: React.FC<AdSlotProps> = ({
             </a>
           )}
 
-          <div className="space-y-1">
-            <h4 className="font-sans font-bold text-sm sm:text-base text-ink block leading-snug">
-              {advertiserName}
-            </h4>
-            {hasDistinctDescription && (
-              <p className="font-serif text-xs sm:text-[13px] text-ink-secondary leading-relaxed">
-                {creativeText}
-              </p>
-            )}
+          {!mediaUrl && (
+            <div className="space-y-1">
+              <h4 className="font-sans font-bold text-sm sm:text-base text-ink block leading-snug">
+                {advertiserName}
+              </h4>
+              {hasDistinctDescription && (
+                <p className="font-serif text-xs sm:text-[13px] text-ink-secondary leading-relaxed">
+                  {creativeText}
+                </p>
+              )}
+            </div>
+          )}
 
-            {ctaUrl && ctaUrl !== '#' && (
-              <a
-                href={ctaUrl}
-                target={isExternalLink ? '_blank' : undefined}
-                rel={isExternalLink ? 'noopener noreferrer' : undefined}
-                onClick={handleClick}
-                className="inline-flex items-center justify-center gap-1.5 w-full mt-2.5 py-2 px-3.5 bg-primary hover:bg-primary-container text-white text-xs font-bold uppercase tracking-wider rounded-xs shadow-2xs transition-colors cursor-pointer"
-              >
-                {isPhoneCta ? (
-                  <>
-                    <Phone className="w-3.5 h-3.5 text-secondary-gold" />
-                    <span>{isHindi ? 'कॉल / ऑर्डर करें (9871937299)' : 'Call to Order (9871937299)'}</span>
-                  </>
-                ) : (
-                  <>
-                    <span>{isHindi ? 'साझेदार पहल देखें' : (directAd?.ctaText || 'Explore Partner Initiative')}</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </>
-                )}
-              </a>
-            )}
-          </div>
+          {shouldShowButton && (
+            <a
+              href={ctaUrl}
+              target={isExternalLink ? '_blank' : undefined}
+              rel={isExternalLink ? 'noopener noreferrer' : undefined}
+              onClick={handleClick}
+              className="inline-flex items-center justify-center gap-1.5 w-full mt-2.5 py-2 px-3.5 bg-primary hover:bg-primary-container text-white text-xs font-bold uppercase tracking-wider rounded-xs shadow-2xs transition-colors cursor-pointer"
+            >
+              {isPhoneCta ? (
+                <>
+                  <Phone className="w-3.5 h-3.5 text-secondary-gold" />
+                  <span>{resolvedButtonLabel}</span>
+                </>
+              ) : (
+                <>
+                  <span>{resolvedButtonLabel}</span>
+                  <ExternalLink className="w-3 h-3" />
+                </>
+              )}
+            </a>
+          )}
         </div>
       </aside>
     );
@@ -424,64 +433,88 @@ export const AdSlot: React.FC<AdSlotProps> = ({
           </span>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
-          <a
-            href={ctaUrl}
-            target={isExternalLink ? '_blank' : undefined}
-            rel={isExternalLink ? 'noopener noreferrer' : undefined}
-            onClick={handleClick}
-            className="w-full sm:w-60 flex-shrink-0 group overflow-hidden rounded-xs bg-white border border-border-subtle/80 hover:border-primary/50 transition-all shadow-2xs"
-            title={advertiserName}
-          >
-            <img
-              src={mediaUrl}
-              alt={altText}
-              className="w-full h-auto max-h-[300px] sm:max-h-[360px] object-contain block mx-auto transition-transform duration-300 group-hover:scale-[1.01]"
-              loading="lazy"
-              onError={(e) => {
-                const target = e.currentTarget;
-                if (target.src !== DEFAULT_FALLBACK_IMAGE) {
-                  target.src = DEFAULT_FALLBACK_IMAGE;
-                }
-              }}
-            />
-          </a>
+        {mediaUrl ? (
+          <div className="w-full flex flex-col items-center justify-center">
+            <a
+              href={ctaUrl}
+              target={isExternalLink ? '_blank' : undefined}
+              rel={isExternalLink ? 'noopener noreferrer' : undefined}
+              onClick={handleClick}
+              className="w-full max-w-[640px] flex items-center justify-center overflow-hidden rounded-xs group"
+              title={advertiserName}
+            >
+              <img
+                src={mediaUrl}
+                alt={altText}
+                className="w-full h-auto max-h-[380px] sm:max-h-[440px] object-contain block mx-auto transition-transform duration-300 group-hover:scale-[1.01]"
+                loading="lazy"
+                onError={(e) => {
+                  const target = e.currentTarget;
+                  if (target.src !== DEFAULT_FALLBACK_IMAGE) {
+                    target.src = DEFAULT_FALLBACK_IMAGE;
+                  }
+                }}
+              />
+            </a>
 
-          <div className="flex-1 min-w-0 flex flex-col justify-between h-full space-y-2 text-center sm:text-left">
-            <div>
-              <h4 className="font-sans font-bold text-sm sm:text-base text-ink block mb-1">
-                {advertiserName}
-              </h4>
-              {hasDistinctDescription && (
-                <p className="font-serif text-xs sm:text-sm font-semibold text-ink leading-relaxed">
-                  {creativeText}
-                </p>
-              )}
-            </div>
-
-            {ctaUrl && ctaUrl !== '#' && (
+            {shouldShowButton && (
               <a
                 href={ctaUrl}
                 target={isExternalLink ? '_blank' : undefined}
                 rel={isExternalLink ? 'noopener noreferrer' : undefined}
                 onClick={handleClick}
-                className="inline-flex items-center justify-center gap-1.5 self-center sm:self-start mt-2 py-2 px-4 bg-primary hover:bg-primary-container text-white text-xs font-bold uppercase tracking-wider rounded-xs shadow-2xs transition-colors cursor-pointer"
+                className="inline-flex items-center justify-center gap-1.5 mt-3 py-2 px-5 bg-primary hover:bg-primary-container text-white text-xs font-bold uppercase tracking-wider rounded-xs shadow-2xs transition-colors cursor-pointer"
               >
                 {isPhoneCta ? (
                   <>
                     <Phone className="w-3.5 h-3.5 text-secondary-gold" />
-                    <span>{isHindi ? 'कॉल करें: 9871937299' : 'Call: 9871937299'}</span>
+                    <span>{resolvedButtonLabel}</span>
                   </>
                 ) : (
                   <>
-                    <span>{isHindi ? 'और जानें' : (directAd?.ctaText || 'Learn More')}</span>
+                    <span>{resolvedButtonLabel}</span>
                     <ExternalLink className="w-3 h-3" />
                   </>
                 )}
               </a>
             )}
           </div>
-        </div>
+        ) : (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 w-full">
+            <div className="space-y-1 text-center sm:text-left">
+              <h4 className="font-sans font-bold text-sm sm:text-base text-ink block">
+                {advertiserName}
+              </h4>
+              {hasDistinctDescription && (
+                <p className="font-serif text-xs sm:text-sm text-ink-secondary leading-relaxed">
+                  {creativeText}
+                </p>
+              )}
+            </div>
+
+            {shouldShowButton && (
+              <a
+                href={ctaUrl}
+                target={isExternalLink ? '_blank' : undefined}
+                rel={isExternalLink ? 'noopener noreferrer' : undefined}
+                onClick={handleClick}
+                className="inline-flex items-center justify-center gap-1.5 py-2 px-4 bg-primary hover:bg-primary-container text-white text-xs font-bold uppercase tracking-wider rounded-xs shadow-2xs transition-colors cursor-pointer shrink-0"
+              >
+                {isPhoneCta ? (
+                  <>
+                    <Phone className="w-3.5 h-3.5 text-secondary-gold" />
+                    <span>{resolvedButtonLabel}</span>
+                  </>
+                ) : (
+                  <>
+                    <span>{resolvedButtonLabel}</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </>
+                )}
+              </a>
+            )}
+          </div>
+        )}
       </div>
     );
   }
@@ -530,6 +563,27 @@ export const AdSlot: React.FC<AdSlotProps> = ({
                 }}
               />
             </a>
+            {shouldShowButton && (
+              <a
+                href={ctaUrl}
+                target={isExternalLink ? '_blank' : undefined}
+                rel={isExternalLink ? 'noopener noreferrer' : undefined}
+                onClick={handleClick}
+                className="mt-2 bg-primary hover:bg-primary-container text-white px-3 py-1.5 rounded-xs text-xs font-bold uppercase tracking-wider flex items-center gap-1 transition-colors"
+              >
+                {isPhoneCta ? (
+                  <>
+                    <Phone className="w-3 h-3" />
+                    <span>{resolvedButtonLabel}</span>
+                  </>
+                ) : (
+                  <>
+                    <span>{resolvedButtonLabel}</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </>
+                )}
+              </a>
+            )}
           </div>
         ) : (
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 w-full">
@@ -549,25 +603,27 @@ export const AdSlot: React.FC<AdSlotProps> = ({
               </div>
             </div>
 
-            <a
-              href={ctaUrl}
-              target={isExternalLink ? '_blank' : undefined}
-              rel={isExternalLink ? 'noopener noreferrer' : undefined}
-              onClick={handleClick}
-              className="bg-primary hover:bg-primary-container text-white px-3 py-1.5 rounded-xs text-xs font-bold uppercase tracking-wider flex-shrink-0 flex items-center gap-1 transition-colors"
-            >
-              {isPhoneCta ? (
-                <>
-                  <Phone className="w-3 h-3" />
-                  <span>{isHindi ? 'कॉल करें' : 'Call Now'}</span>
-                </>
-              ) : (
-                <>
-                  <span>{isHindi ? 'और जानें' : (directAd?.ctaText || 'Learn More')}</span>
-                  <ExternalLink className="w-3 h-3" />
-                </>
-              )}
-            </a>
+            {shouldShowButton && (
+              <a
+                href={ctaUrl}
+                target={isExternalLink ? '_blank' : undefined}
+                rel={isExternalLink ? 'noopener noreferrer' : undefined}
+                onClick={handleClick}
+                className="bg-primary hover:bg-primary-container text-white px-3 py-1.5 rounded-xs text-xs font-bold uppercase tracking-wider flex-shrink-0 flex items-center gap-1 transition-colors"
+              >
+                {isPhoneCta ? (
+                  <>
+                    <Phone className="w-3 h-3" />
+                    <span>{resolvedButtonLabel}</span>
+                  </>
+                ) : (
+                  <>
+                    <span>{resolvedButtonLabel}</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </>
+                )}
+              </a>
+            )}
           </div>
         )}
       </div>

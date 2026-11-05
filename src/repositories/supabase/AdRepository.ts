@@ -29,6 +29,7 @@ export class AdRepository {
     destinationUrl: string;
     mediaUrl?: string;
     altText?: string;
+    ctaText?: string;
     isExplicitlyDisabled?: boolean;
   } | null> {
     const cached = this.placementCache.get(zone);
@@ -44,7 +45,7 @@ export class AdRepository {
           campaigns (
             id, name, start_at, end_at, status,
             advertisers (name),
-            ad_creatives (id, type, headline, destination_url, alt_text, media_id, media(public_url))
+            ad_creatives (id, type, headline, destination_url, alt_text, cta_text, media_id, media(public_url))
           )
         `)
         .eq('zone', zone)
@@ -82,11 +83,12 @@ export class AdRepository {
       const activePlacement = {
         campaignId: campaign.id,
         placementId: data.id,
-        advertiserName: campaign.advertisers?.name || 'Sponsored Partner',
-        creativeText: creative.headline || campaign.name,
+        advertiserName: campaign.advertisers?.name || '',
+        creativeText: creative.headline || '',
         destinationUrl: creative.destination_url || '#',
         mediaUrl: creative.media?.public_url,
         altText: creative.alt_text || 'Sponsored advertisement',
+        ctaText: creative.cta_text || undefined,
       };
       this.placementCache.set(zone, { data: activePlacement, timestamp: Date.now() });
       return activePlacement;
@@ -186,7 +188,7 @@ export class AdRepository {
           campaigns (
             id, name, start_at, end_at, status, created_at,
             advertisers (id, name),
-            ad_creatives (id, headline, destination_url, alt_text, media_id, media (public_url))
+            ad_creatives (id, headline, destination_url, alt_text, cta_text, media_id, media (public_url))
           )
         `);
 
@@ -202,11 +204,11 @@ export class AdRepository {
           id: c.id,
           zone: item.zone,
           advertiserName: c.advertisers?.name || c.name || `Partner ${item.zone}`,
-          creativeText: cr?.headline || c.name,
+          creativeText: cr?.headline || '',
           destinationUrl: cr?.destination_url || '#',
           mediaUrl: cr?.media?.public_url || '',
           altText: cr?.alt_text || c.name,
-          ctaText: cr?.destination_url?.startsWith('tel:') ? 'Call Now' : 'Learn More',
+          ctaText: cr?.cta_text !== undefined && cr?.cta_text !== null ? cr.cta_text : (cr?.destination_url?.startsWith('tel:') ? 'Call Now' : ''),
           isActive: Boolean(item.is_active !== false && c.status !== 'archived'),
           createdAt: c.created_at || item.created_at,
           updatedAt: c.created_at || item.created_at,
@@ -290,6 +292,7 @@ export class AdRepository {
     destinationUrl: string;
     mediaUrl?: string;
     altText?: string;
+    ctaText?: string;
     isActive: boolean;
   }): Promise<{ success: boolean; campaignId?: string; error?: string }> {
     try {
@@ -325,9 +328,9 @@ export class AdRepository {
         }
       }
 
-      // 2. Link or create media record in Supabase
+      // 2. Link or create media record in Supabase (skip blob: URLs)
       let mediaId: string | null = null;
-      if (ad.mediaUrl && ad.mediaUrl.trim()) {
+      if (ad.mediaUrl && ad.mediaUrl.trim() && !ad.mediaUrl.startsWith('blob:')) {
         try {
           const { data: existingMedia } = await supabase
             .from('media')
@@ -346,7 +349,7 @@ export class AdRepository {
                 file_name: `ad-${ad.zone.toLowerCase()}-${Date.now()}.png`,
                 mime_type: 'image/png',
                 content_hash: `hash-${ad.zone}-${Date.now()}`,
-                alt_text: ad.altText || ad.advertiserName,
+                alt_text: ad.altText || ad.advertiserName || 'Ad Banner',
               } as any)
               .select('id')
               .single();
@@ -388,10 +391,11 @@ export class AdRepository {
           .limit(1);
 
         const creativePayload: any = {
-          headline: ad.creativeText,
+          headline: ad.creativeText || '',
           destination_url: ad.destinationUrl || '#',
-          alt_text: ad.altText || ad.advertiserName,
+          alt_text: ad.altText || ad.advertiserName || 'Ad creative',
           media_id: mediaId || null,
+          cta_text: ad.ctaText !== undefined ? ad.ctaText : null,
         };
 
         if (existingCreatives && existingCreatives.length > 0) {
@@ -441,10 +445,11 @@ export class AdRepository {
         await supabase.from('ad_creatives').insert({
           campaign_id: campaignId,
           type: 'banner',
-          headline: ad.creativeText,
+          headline: ad.creativeText || '',
           destination_url: ad.destinationUrl || '#',
-          alt_text: ad.altText || ad.advertiserName,
+          alt_text: ad.altText || ad.advertiserName || 'Ad creative',
           media_id: mediaId || null,
+          cta_text: ad.ctaText !== undefined ? ad.ctaText : null,
         });
 
         // Insert or update placement

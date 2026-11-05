@@ -228,7 +228,7 @@ export const AdManagerView: React.FC = () => {
       destinationUrl: '',
       mediaUrl: '',
       altText: '',
-      ctaText: 'Learn More',
+      ctaText: '', // Clean empty default so user is not forced to have a button
       isActive: true,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -240,7 +240,10 @@ export const AdManagerView: React.FC = () => {
   const handleOpenEditModal = (ad: DirectAd) => {
     setUploadError(null);
     setShowUrlInput(Boolean(ad.mediaUrl && ad.mediaUrl.startsWith('http')));
-    setEditingAd({ ...ad });
+    setEditingAd({
+      ...ad,
+      ctaText: ad.ctaText ?? '',
+    });
     setIsModalOpen(true);
   };
 
@@ -274,6 +277,8 @@ export const AdManagerView: React.FC = () => {
 
       if (res.asset?.url) {
         setEditingAd((prev) => prev ? { ...prev, mediaUrl: res.asset!.url } : null);
+      } else {
+        setUploadError('Upload did not return a public URL. You can paste an image URL instead.');
       }
     } catch {
       setUploadError('Upload failed. You can paste an image URL instead.');
@@ -287,31 +292,42 @@ export const AdManagerView: React.FC = () => {
     e.preventDefault();
     if (!editingAd) return;
 
-    if (!editingAd.advertiserName.trim()) {
-      alert('Please enter a Brand or Advertiser name.');
+    if (isUploading) {
+      alert('Image banner is currently uploading. Please wait a moment for it to complete.');
+      return;
+    }
+
+    if (editingAd.mediaUrl && editingAd.mediaUrl.startsWith('blob:')) {
+      alert('Image upload has not finished yet. Please wait a moment or paste an image URL.');
       return;
     }
 
     setIsSaving(true);
     try {
+      const cleanAdvName = editingAd.advertiserName?.trim() || '';
+      const fallbackAdvName = cleanAdvName || POSITION_MAP[editingAd.zone]?.name || `Zone ${editingAd.zone} Banner`;
+      const cleanCtaText = editingAd.ctaText !== undefined ? editingAd.ctaText.trim() : '';
+
       const dbResult = await AdRepository.getInstance().saveCampaignAndPlacement({
         id: editingAd.id || undefined,
         zone: editingAd.zone,
-        advertiserName: editingAd.advertiserName.trim(),
-        creativeText: editingAd.creativeText.trim(),
-        destinationUrl: editingAd.destinationUrl.trim() || '#',
+        advertiserName: fallbackAdvName,
+        creativeText: editingAd.creativeText?.trim() || '',
+        destinationUrl: editingAd.destinationUrl?.trim() || '#',
         mediaUrl: editingAd.mediaUrl?.trim() || '',
-        altText: editingAd.altText?.trim() || editingAd.advertiserName.trim(),
+        altText: editingAd.altText?.trim() || fallbackAdvName,
+        ctaText: cleanCtaText,
         isActive: editingAd.isActive,
       });
 
       saveDirectAd({
         ...editingAd,
         id: dbResult.campaignId || editingAd.id,
-        advertiserName: editingAd.advertiserName.trim(),
-        creativeText: editingAd.creativeText.trim(),
-        destinationUrl: editingAd.destinationUrl.trim() || '#',
+        advertiserName: cleanAdvName,
+        creativeText: editingAd.creativeText?.trim() || '',
+        destinationUrl: editingAd.destinationUrl?.trim() || '#',
         mediaUrl: editingAd.mediaUrl?.trim() || '',
+        ctaText: cleanCtaText,
       });
 
       toggleZoneVisibility(editingAd.zone, editingAd.isActive);
@@ -912,17 +928,16 @@ export const AdManagerView: React.FC = () => {
                 )}
               </div>
 
-              {/* 3. Brand Name */}
+              {/* 3. Brand Name (Optional) */}
               <div>
                 <label className="block font-bold text-slate-700 mb-1">
-                  Brand / Advertiser Name *
+                  Brand / Advertiser Name <span className="text-slate-400 font-normal text-[11px]">(Optional)</span>
                 </label>
                 <input
                   type="text"
-                  required
-                  value={editingAd.advertiserName}
+                  value={editingAd.advertiserName || ''}
                   onChange={(e) => setEditingAd({ ...editingAd, advertiserName: e.target.value })}
-                  placeholder="e.g. Reserve Bank of India, Tata Motors, etc."
+                  placeholder="e.g. Reserve Bank of India, Tata Motors, or leave empty"
                   className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-slate-900 font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900 text-xs"
                 />
               </div>
@@ -944,15 +959,18 @@ export const AdManagerView: React.FC = () => {
 
                 <div>
                   <label className="block font-bold text-slate-700 mb-1">
-                    Button Label
+                    Button Label <span className="text-slate-400 font-normal text-[11px]">(Optional)</span>
                   </label>
                   <input
                     type="text"
-                    value={editingAd.ctaText || 'Learn More'}
+                    value={editingAd.ctaText ?? ''}
                     onChange={(e) => setEditingAd({ ...editingAd, ctaText: e.target.value })}
-                    placeholder="Learn More / Call Now"
+                    placeholder="e.g. Learn More / Call Now (or leave empty for no button)"
                     className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900 text-xs"
                   />
+                  <div className="text-[10px] text-slate-500 mt-1">
+                    Clear this field completely to remove the button.
+                  </div>
                 </div>
               </div>
 
@@ -990,10 +1008,15 @@ export const AdManagerView: React.FC = () => {
 
                 <button
                   type="submit"
-                  disabled={isSaving}
+                  disabled={isSaving || isUploading}
                   className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl flex items-center gap-2 cursor-pointer shadow-md disabled:opacity-50 transition-all active:scale-98 text-xs"
                 >
-                  {isSaving ? (
+                  {isUploading ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-400" />
+                      <span>Uploading Banner...</span>
+                    </>
+                  ) : isSaving ? (
                     <>
                       <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-400" />
                       <span>Saving to Database...</span>
