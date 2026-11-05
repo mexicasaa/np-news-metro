@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { AdSlot } from './AdSlot';
-import { isZoneVisible, getAdPlacement, getAdSenseSettings } from '../../services/adService';
+import { isZoneVisible, getAdPlacement, getAdSenseSettings, ActiveAdPlacement } from '../../services/adService';
 
 interface AdGridRowProps {
   zones: string[];
@@ -8,18 +8,23 @@ interface AdGridRowProps {
   id?: string;
 }
 
+interface ResolvedAdItem {
+  zone: string;
+  placement: ActiveAdPlacement;
+}
+
 /**
  * AdGridRow Component
  * Renders a row of commercial ad cards in a responsive grid,
  * dynamically adapting column count to ONLY active ads that exist.
- * If an ad is deleted or closed, its column collapses seamlessly.
+ * Directly preloads placements to eliminate async race conditions and flickering.
  */
 export const AdGridRow: React.FC<AdGridRowProps> = ({
   zones,
   className = '',
   id,
 }) => {
-  const [activeZones, setActiveZones] = useState<string[]>([]);
+  const [adItems, setAdItems] = useState<ResolvedAdItem[]>([]);
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
@@ -34,7 +39,7 @@ export const AdGridRow: React.FC<AdGridRowProps> = ({
 
           const placement = await getAdPlacement(zone);
           if (placement && !(placement as any).isExplicitlyDisabled) {
-            return zone;
+            return { zone, placement };
           }
 
           if (placement && (placement as any).isExplicitlyDisabled) {
@@ -45,17 +50,27 @@ export const AdGridRow: React.FC<AdGridRowProps> = ({
           const isZoneAdSenseEnabled = zoneConfig ? zoneConfig.enabled : true;
           const canShowAdSense = adsense.enabled && isZoneAdSenseEnabled && adsense.priority !== 'direct_only';
           if (canShowAdSense) {
-            return zone;
+            return {
+              zone,
+              placement: {
+                campaignId: `adsense-${zone}`,
+                placementId: `adsense-${zone}`,
+                advertiserName: 'Sponsored Partner',
+                creativeText: '',
+                destinationUrl: '#',
+                isAdSense: true,
+              },
+            };
           }
 
           return null;
         })
       );
 
-      const valid = results.filter((z): z is string => z !== null);
+      const valid = results.filter((item): item is ResolvedAdItem => item !== null);
 
       if (isSubscribed) {
-        setActiveZones(valid);
+        setAdItems(valid);
         setIsReady(true);
       }
     };
@@ -67,26 +82,24 @@ export const AdGridRow: React.FC<AdGridRowProps> = ({
     };
 
     window.addEventListener('np_ads_updated', handleUpdate);
+    window.addEventListener('storage', handleUpdate);
 
-    // Periodic 45-second live sync across devices/readers without full reload
+    // Periodic 30-second live sync across devices/readers
     const pollInterval = setInterval(() => {
       if (typeof document !== 'undefined' && !document.hidden) {
         resolveActiveZones();
       }
-    }, 45000);
+    }, 30000);
 
     return () => {
       isSubscribed = false;
       clearInterval(pollInterval);
       window.removeEventListener('np_ads_updated', handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
     };
   }, [zones.join(',')]);
 
-  const handleUnavailableZone = (zone: string) => {
-    setActiveZones((prev) => prev.filter((z) => z !== zone));
-  };
-
-  if (!isReady || activeZones.length === 0) {
+  if (!isReady || adItems.length === 0) {
     return null;
   }
 
@@ -98,22 +111,22 @@ export const AdGridRow: React.FC<AdGridRowProps> = ({
     >
       <div
         className={`grid gap-3 sm:gap-4 lg:gap-5 items-stretch ${
-          activeZones.length === 1
+          adItems.length === 1
             ? 'grid-cols-1 max-w-md mx-auto'
-            : activeZones.length === 2
+            : adItems.length === 2
             ? 'grid-cols-1 sm:grid-cols-2 max-w-3xl mx-auto'
-            : activeZones.length === 3
+            : adItems.length === 3
             ? 'grid-cols-1 sm:grid-cols-3 max-w-5xl mx-auto'
             : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 max-w-7xl mx-auto'
         }`}
       >
-        {activeZones.map((zone) => (
+        {adItems.map(({ zone, placement }) => (
           <AdSlot
             key={zone}
             zone={zone as any}
             variant="card"
             className="h-full w-full"
-            onUnavailable={() => handleUnavailableZone(zone)}
+            placement={placement}
           />
         ))}
       </div>

@@ -11,6 +11,7 @@ import { SearchModal } from './components/layout/SearchModal';
 import { SiteFooter } from './components/layout/SiteFooter';
 import { NewsletterModule } from './components/common/NewsletterModule';
 import { AdSlot } from './components/commercial/AdSlot';
+import { getAdsVisibility } from './services/adService';
 import { SkeletonCard } from './components/common/SkeletonCard';
 import { AdminLoginModal } from './components/admin/AdminLoginModal';
 
@@ -1015,12 +1016,20 @@ function AppContent() {
   // Editorial Flags
   const [isEmergencyBreaking, setIsEmergencyBreaking] = useState(false);
   const [showAds, setShowAds] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('np_editorial_ads');
-      if (saved !== null) return saved === 'true';
-    }
-    return true;
+    return getAdsVisibility().masterEnabled;
   });
+
+  useEffect(() => {
+    const handleAdsSync = () => {
+      setShowAds(getAdsVisibility().masterEnabled);
+    };
+    window.addEventListener('np_ads_updated', handleAdsSync);
+    window.addEventListener('storage', handleAdsSync);
+    return () => {
+      window.removeEventListener('np_ads_updated', handleAdsSync);
+      window.removeEventListener('storage', handleAdsSync);
+    };
+  }, []);
   const [showCorrections, setShowCorrections] = useState(true);
   const [isLoadingSkeleton, setIsLoadingSkeleton] = useState(false);
 

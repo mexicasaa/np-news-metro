@@ -17,6 +17,7 @@ export interface AdSlotProps {
   className?: string;
   variant?: 'banner' | 'card' | 'sidebar' | 'inline';
   onUnavailable?: () => void;
+  placement?: ActiveAdPlacement | null;
 }
 
 export const AdSlot: React.FC<AdSlotProps> = ({
@@ -24,27 +25,47 @@ export const AdSlot: React.FC<AdSlotProps> = ({
   className = '',
   variant,
   onUnavailable,
+  placement: preloadedPlacement,
 }) => {
   const { isHindi } = useLanguage();
-  const [directAd, setDirectAd] = useState<ActiveAdPlacement | null>(null);
+  const [directAd, setDirectAd] = useState<ActiveAdPlacement | null>(preloadedPlacement || null);
+  const [isLoading, setIsLoading] = useState<boolean>(!preloadedPlacement);
   const [adSenseSettings, setAdSenseSettings] = useState<AdSenseSettings>(getAdSenseSettings());
   const [adSenseFailed, setAdSenseFailed] = useState<boolean>(false);
   const insRef = useRef<HTMLModElement | null>(null);
 
+  // Sync preloaded placement if passed or updated
+  useEffect(() => {
+    if (preloadedPlacement) {
+      setDirectAd(preloadedPlacement);
+      setIsLoading(false);
+    }
+  }, [preloadedPlacement]);
+
   const fetchPlacement = () => {
+    if (!preloadedPlacement) {
+      setIsLoading(true);
+    }
     getAdPlacement(zone)
       .then((placement) => {
         setDirectAd(placement);
-        if (placement) {
+        setIsLoading(false);
+        if (placement && !(placement as any).isExplicitlyDisabled) {
           trackAdImpression(placement.campaignId, placement.placementId);
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        setIsLoading(false);
+      });
     setAdSenseSettings(getAdSenseSettings());
   };
 
   useEffect(() => {
-    fetchPlacement();
+    if (!preloadedPlacement) {
+      fetchPlacement();
+    } else {
+      setIsLoading(false);
+    }
 
     // Listen for real-time ad updates from Admin panel or other tabs
     const handleUpdate = () => {
@@ -69,7 +90,7 @@ export const AdSlot: React.FC<AdSlotProps> = ({
       if (pollInterval) clearInterval(pollInterval);
       window.removeEventListener('np_ads_updated', handleUpdate);
     };
-  }, [zone]);
+  }, [zone, Boolean(preloadedPlacement)]);
 
   // Check if slot was explicitly closed/disabled in database or admin
   const isExplicitlyDisabled = Boolean((directAd as any)?.isExplicitlyDisabled) || !isZoneVisible(zone);
@@ -121,12 +142,19 @@ export const AdSlot: React.FC<AdSlotProps> = ({
     }
   }, [shouldShowAdSense, zone]);
 
-  // Notify parent grid/layout if zone has no active ad to eliminate phantom blanks
+  // Notify parent grid/layout ONLY when loading has completed and no active ad exists
   useEffect(() => {
-    if (isExplicitlyDisabled || (!shouldShowAdSense && !directAd)) {
-      onUnavailable?.();
+    if (!isLoading) {
+      if (isExplicitlyDisabled || (!shouldShowAdSense && (!directAd || (directAd as any)?.isExplicitlyDisabled))) {
+        onUnavailable?.();
+      }
     }
-  }, [isExplicitlyDisabled, shouldShowAdSense, directAd, onUnavailable]);
+  }, [isLoading, isExplicitlyDisabled, shouldShowAdSense, directAd, onUnavailable]);
+
+  // While loading initial ad data, return null
+  if (isLoading) {
+    return null;
+  }
 
   // Strictly enforce: if slot is explicitly disabled or no active ad exists, collapse completely!
   if (isExplicitlyDisabled) {
