@@ -16,16 +16,22 @@ interface ArticleBodyProps {
 
 /**
  * Safely parses inline markdown syntax (bold, italic, links) into React elements.
+ * Supports standard markdown **bold**, *italic*, [text](url), as well as
+ * HTML elements like <b>, <strong>, <em>, <i>, and bold spans with classes or inline styles.
+ * Recursively parses children so nested formatting (e.g. bold with link, link with bold) renders seamlessly.
  */
 export const renderInlineMarkdown = (text?: string): React.ReactNode => {
   if (!text) return '';
 
-  // Pattern matches:
-  // 1. Links: [anchor text](url)
-  // 2. Bold: **bold text**
-  // 3. Italic: *italic text*
-  const pattern = /(\[[^\]]+\]\([^)]+\)|<a\s+[^>]*href=["'][^"']+["'][^>]*>[\s\S]*?<\/a>|\*\*[^*]+?\*\*|<strong>[\s\S]*?<\/strong>|<b>[\s\S]*?<\/b>|\*[^*]+?\*|<em>[\s\S]*?<\/em>|<i>[\s\S]*?<\/i>)/gi;
-  const parts = text.split(pattern);
+  // Clean runaway duplicate asterisks
+  const normalized = text.replace(/\*{4,}/g, '**');
+
+  // Match:
+  // 1. Links: [anchor text](url) or <a href="...">text</a>
+  // 2. Bold: **text**, <strong>...</strong>, <b>...</b>, <span style/class bold>...</span>
+  // 3. Italic: *text*, <em>...</em>, <i>...</i>
+  const pattern = /(\[[^\]]+\]\([^)]+\)|<a\s+[^>]*href=["'][^"']+["'][^>]*>[\s\S]*?<\/a>|\*\*[^\*\n]+?\*\*|<strong(?:\s+[^>]*)?>[\s\S]*?<\/strong>|<b(?:\s+[^>]*)?>[\s\S]*?<\/b>|<span\s+[^>]*(?:font-weight\s*:\s*(?:bold|[6-9]00)|font-bold)[^>]*>[\s\S]*?<\/span>|(?<!\*)\*(?!\*)[^\*\n]+?(?<!\*)\*(?!\*)|<em(?:\s+[^>]*)?>[\s\S]*?<\/em>|<i(?:\s+[^>]*)?>[\s\S]*?<\/i>)/gi;
+  const parts = normalized.split(pattern);
 
   return parts.map((part, index) => {
     if (!part) return null;
@@ -45,31 +51,38 @@ export const renderInlineMarkdown = (text?: string): React.ReactNode => {
           rel={isInternal ? undefined : 'noopener noreferrer'}
           className="text-primary underline hover:text-primary-dark font-medium transition-colors cursor-pointer"
         >
-          {linkText}
+          {renderInlineMarkdown(linkText)}
         </a>
       );
     }
 
-    // Bold: **text** or <strong>text</strong> or <b>text</b>
-    const boldMatch = part.match(/^\*\*([^*]+)\*\*$/) ||
-                      part.match(/^<strong>([\s\S]*?)<\/strong>$/i) ||
-                      part.match(/^<b>([\s\S]*?)<\/b>$/i);
-    if (boldMatch) {
+    // Bold: **text** or <strong>text</strong> or <b>text</b> or bold span
+    const mdBoldMatch = part.match(/^\*\*([^\*\n]+?)\*\*$/);
+    const strongMatch = part.match(/^<strong(?:\s+[^>]*)?>([\s\S]*?)<\/strong>$/i);
+    const bMatch = part.match(/^<b(?:\s+[^>]*)?>([\s\S]*?)<\/b>$/i);
+    const spanBoldMatch = part.match(/^<span\s+[^>]*(?:font-weight\s*:\s*(?:bold|[6-9]00)|font-bold)[^>]*>([\s\S]*?)<\/span>$/i);
+
+    const boldContent = mdBoldMatch ? mdBoldMatch[1] : strongMatch ? strongMatch[1] : bMatch ? bMatch[1] : spanBoldMatch ? spanBoldMatch[1] : null;
+
+    if (boldContent !== null) {
       return (
         <strong key={index} className="font-bold text-ink">
-          {boldMatch[1]}
+          {renderInlineMarkdown(boldContent)}
         </strong>
       );
     }
 
     // Italic: *text* or <em>text</em> or <i>text</i>
-    const italicMatch = part.match(/^\*([^*]+)\*$/) ||
-                        part.match(/^<em>([\s\S]*?)<\/em>$/i) ||
-                        part.match(/^<i>([\s\S]*?)<\/i>$/i);
-    if (italicMatch) {
+    const mdItalicMatch = part.match(/^\*([^\*\n]+?)\*$/);
+    const emMatch = part.match(/^<em(?:\s+[^>]*)?>([\s\S]*?)<\/em>$/i);
+    const iMatch = part.match(/^<i(?:\s+[^>]*)?>([\s\S]*?)<\/i>$/i);
+
+    const italicContent = mdItalicMatch ? mdItalicMatch[1] : emMatch ? emMatch[1] : iMatch ? iMatch[1] : null;
+
+    if (italicContent !== null) {
       return (
         <em key={index} className="italic">
-          {italicMatch[1]}
+          {renderInlineMarkdown(italicContent)}
         </em>
       );
     }

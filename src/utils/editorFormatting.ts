@@ -57,16 +57,31 @@ export const convertHtmlToEditorMarkdown = (html: string): string => {
       const el = node as HTMLElement;
       const tag = el.tagName.toLowerCase();
 
-      // Bold detection (b, strong, or style fontWeight)
-      const fontWeight = el.style?.fontWeight;
-      const isBoldSpan = tag === 'span' && (fontWeight === 'bold' || fontWeight === '700' || parseInt(fontWeight, 10) >= 600);
-      if (tag === 'strong' || tag === 'b' || isBoldSpan) {
+      // Bold detection (b, strong, style fontWeight, or font-bold class)
+      const rawFontWeight = (el.style?.fontWeight || '').toLowerCase().trim();
+      const hasBoldClass = el.classList?.contains('font-bold') || el.classList?.contains('font-semibold');
+      const isBoldTag = tag === 'b' || tag === 'strong';
+      const isExplicitNormal = rawFontWeight === 'normal' || rawFontWeight === '400' || rawFontWeight === 'lighter';
+      const isExplicitBold = rawFontWeight === 'bold' || rawFontWeight === '700' || rawFontWeight === '800' || rawFontWeight === '900' || parseInt(rawFontWeight, 10) >= 600 || hasBoldClass;
+      
+      const isBold = (isBoldTag || isExplicitBold) && !isExplicitNormal;
+      if (isBold) {
         const text = Array.from(el.childNodes).map(serializeInline).join('');
         const trimmed = text.trim();
         if (!trimmed) return text;
+
+        // Clean out any nested or redundant duplicate asterisks (e.g. if text already has **word**)
+        let cleanText = trimmed;
+        // Strip duplicate wrapping if already surrounded by asterisks
+        while (cleanText.startsWith('**') && cleanText.endsWith('**') && cleanText.length >= 4) {
+          cleanText = cleanText.slice(2, -2).trim();
+        }
+        // Collapse any runaway asterisks
+        cleanText = cleanText.replace(/\*{3,}/g, '**');
+
         const leading = text.match(/^\s*/)?.[0] || '';
         const trailing = text.match(/\s*$/)?.[0] || '';
-        return `${leading}**${trimmed}**${trailing}`;
+        return `${leading}**${cleanText}**${trailing}`;
       }
 
       // Italic detection (em, i, or style fontStyle)
@@ -238,16 +253,31 @@ export const formatPastedContent = (html?: string, plain?: string): string => {
 /**
  * Converts inline markdown syntax (bold, italic, links) into clean HTML tags
  * for presentation inside the rich editor.
+ * Uses <b class="font-bold"> instead of <strong> because contentEditable's native
+ * execCommand('bold') can reliably inspect, toggle, and unbold <b> elements,
+ * whereas <strong> elements frequently get stuck or fail to unbold when updating articles.
  */
 export const formatInlineToEditorHtml = (text: string): string => {
   if (!text) return '';
   let res = text;
-  // Convert markdown bold **text** to <strong>text</strong>
-  res = res.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+
+  // Clean out any runaway consecutive asterisks
+  res = res.replace(/\*{4,}/g, '**');
+
+  // Normalize existing <strong> tags to <b class="font-bold"> for seamless contentEditable toggle
+  res = res.replace(/<strong(?:\s+[^>]*)?>([\s\S]*?)<\/strong>/gi, '<b class="font-bold">$1</b>');
+  res = res.replace(/<b(?:\s+class=["'][^"']*["'])?>([\s\S]*?)<\/b>/gi, '<b class="font-bold">$1</b>');
+
+  // Convert markdown bold **text** to <b class="font-bold">text</b>
+  // Non-greedy match that supports Hindi/Unicode, punctuation, and inner content
+  res = res.replace(/\*\*([^\*\n]+?)\*\*/g, '<b class="font-bold">$1</b>');
+
   // Convert markdown italic *text* to <em>$1</em> (excluding cases like bullets or wildcards)
-  res = res.replace(/(^|[^*])\*([^*]+)\*([^*]|$)/g, '$1<em>$2</em>$3');
+  res = res.replace(/(^|[^*])\*([^*\n]+?)\*([^*]|$)/g, '$1<em>$2</em>$3');
+
   // Convert markdown links [text](url) to <a href="url">text</a>
   res = res.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-primary underline font-medium">$1</a>');
+
   return res;
 };
 
@@ -317,4 +347,34 @@ export const markdownToEditorHtml = (markdown: string): string => {
 export const htmlToEditorMarkdown = (html: string): string => {
   if (!html || !html.trim()) return '';
   return convertHtmlToEditorMarkdown(html);
+};
+
+/**
+ * Reconstructs clean markdown from structured Gutenberg blocks or fallback content string.
+ * Accurately extracts headings, bullet lists, pullquotes, inline images, and paragraphs
+ * with all bold/italic formatting preserved without corruption.
+ */
+export const reconstructMarkdownFromBlocks = (
+  blocks?: Array<{ type?: string; content?: string; level?: number; items?: string[]; imageCaption?: string; imageUrl?: string }>,
+  fallbackContent?: string
+): string => {
+  if (blocks && blocks.length > 0) {
+    const pieces = blocks.map(b => {
+      if (b.type === 'image') return `![${b.imageCaption || 'Image'}](${b.imageUrl || ''})`;
+      if (b.type === 'heading') return b.level === 3 ? `### ${b.content || ''}` : `## ${b.content || ''}`;
+      if (b.type === 'pullquote') return `> "${(b.content || '').replace(/^["']|["']$/g, '')}"`;
+      if (b.type === 'list') {
+        if (b.items && b.items.length > 0) {
+          return b.items.map(it => `- ${it}`).join('\n');
+        }
+        return b.content || '';
+      }
+      return b.content || '';
+    }).filter(p => typeof p === 'string' && p.trim().length > 0);
+
+    if (pieces.length > 0) {
+      return pieces.join('\n\n');
+    }
+  }
+  return fallbackContent || '';
 };

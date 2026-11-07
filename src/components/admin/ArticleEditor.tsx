@@ -21,7 +21,7 @@ import { slugifyText } from '../../utils/slugify';
 import { getAuthorAvatarUrl, DEFAULT_AUTHOR_AVATAR, handleAvatarError } from '../../utils/imageFallback';
 import { saveAutoSaveSession, clearAutoSaveSession, saveDraftPost, setRefreshSession, isPostPublished } from '../../utils/newsStorage';
 import { getNewsroomAuthors } from '../../services/authService';
-import { formatArticleText, formatPastedContent, markdownToEditorHtml, htmlToEditorMarkdown } from '../../utils/editorFormatting';
+import { formatArticleText, formatPastedContent, markdownToEditorHtml, htmlToEditorMarkdown, reconstructMarkdownFromBlocks } from '../../utils/editorFormatting';
 import { EDITORIAL_DESKS, EditorialDesk, getDeskByIdOrCategory, getSubcategoriesForDeskOrCategory } from '../../data/editorialTaxonomy';
 
 export interface EditorBlock {
@@ -120,6 +120,8 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
   const editorRef = useRef<HTMLDivElement>(null);
   const dekTextareaRef = useRef<HTMLTextAreaElement>(null);
   const isUserTypingRef = useRef(false);
+  const lastEditorRangeRef = useRef<Range | null>(null);
+  const lastFocusedZoneRef = useRef<'editor' | 'dek'>('editor');
 
   const [title, setTitle] = useState(initialPost?.title || '');
   const [dek, setDek] = useState(initialPost?.dek || '');
@@ -139,8 +141,22 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
   const [isItalicActive, setIsItalicActive] = useState(false);
 
   const updateToolbarActiveStates = useCallback(() => {
-    if (!editorRef.current) return;
     if (typeof window === 'undefined' || typeof document === 'undefined') return;
+
+    // Check if user is currently working inside the Dek textarea
+    if (lastFocusedZoneRef.current === 'dek' && dekTextareaRef.current && document.activeElement === dekTextareaRef.current) {
+      const textarea = dekTextareaRef.current;
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const selText = dek.substring(start, end);
+      const isDekBold = (selText.startsWith('**') && selText.endsWith('**') && selText.length >= 4) ||
+        (start >= 2 && dek.substring(start - 2, start) === '**' && end + 2 <= dek.length && dek.substring(end, end + 2) === '**');
+      setIsBoldActive(isDekBold);
+      setIsItalicActive(false);
+      return;
+    }
+
+    if (!editorRef.current) return;
 
     const selection = window.getSelection();
     if (!selection || selection.rangeCount === 0) {
@@ -152,6 +168,8 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     const range = selection.getRangeAt(0);
     // Check if selection / caret is within our contentEditable editor
     if (editorRef.current.contains(range.commonAncestorContainer) || editorRef.current.contains(range.startContainer)) {
+      lastEditorRangeRef.current = range.cloneRange();
+      lastFocusedZoneRef.current = 'editor';
       let isBold = false;
       let isItalic = false;
 
@@ -160,7 +178,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
         isItalic = Boolean(document.queryCommandState('italic'));
       } catch {}
 
-      // Fallback DOM walk if queryCommandState is inconclusive
+      // Fallback DOM walk if queryCommandState is inconclusive or for custom b/strong/font-bold tags
       if (!isBold && range.startContainer) {
         let node: Node | null = range.startContainer.nodeType === Node.TEXT_NODE
           ? range.startContainer.parentElement
@@ -168,8 +186,10 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
         while (node && node !== editorRef.current) {
           if (node instanceof HTMLElement) {
             const tag = node.tagName.toLowerCase();
-            const fw = window.getComputedStyle(node).fontWeight;
-            if (tag === 'b' || tag === 'strong' || fw === 'bold' || parseInt(fw, 10) >= 600) {
+            const fw = (node.style.fontWeight || window.getComputedStyle(node).fontWeight || '').toLowerCase();
+            const isTagBold = tag === 'b' || tag === 'strong';
+            const isStyleBold = fw === 'bold' || fw === '700' || fw === '800' || fw === '900' || parseInt(fw, 10) >= 600 || node.classList.contains('font-bold');
+            if ((isTagBold || isStyleBold) && fw !== 'normal' && fw !== '400') {
               isBold = true;
               break;
             }
@@ -201,10 +221,18 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       setIsBoldActive(false);
       setIsItalicActive(false);
     }
-  }, []);
+  }, [dek]);
 
   useEffect(() => {
     const onSelectionChange = () => {
+      const sel = window.getSelection();
+      if (sel && sel.rangeCount > 0 && editorRef.current) {
+        const range = sel.getRangeAt(0);
+        if (editorRef.current.contains(range.commonAncestorContainer) || editorRef.current.contains(range.startContainer)) {
+          lastEditorRangeRef.current = range.cloneRange();
+          lastFocusedZoneRef.current = 'editor';
+        }
+      }
       updateToolbarActiveStates();
     };
     document.addEventListener('selectionchange', onSelectionChange);
@@ -226,9 +254,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
 
     if (editorRef.current) {
       if (!editorRef.current.innerHTML || editorRef.current.innerHTML.trim() === '') {
-        const initialBody = (initialPost?.blocks && initialPost.blocks.length > 0)
-          ? initialPost.blocks.map(b => b.content || '').join('\n\n')
-          : (initialPost?.content || '');
+        const initialBody = reconstructMarkdownFromBlocks(initialPost?.blocks, initialPost?.content || '');
         if (initialBody.trim()) {
           editorRef.current.innerHTML = markdownToEditorHtml(initialBody);
           setIsEditorEmpty(false);
@@ -241,15 +267,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
   }, []);
   
   const [content, setContent] = useState(() => {
-    if (initialPost?.blocks && initialPost.blocks.length > 0) {
-      return initialPost.blocks.map(b => {
-        if (b.type === 'image') return `![${b.imageCaption || 'Image'}](${b.imageUrl || ''})`;
-        if (b.type === 'heading') return `## ${b.content}`;
-        if (b.type === 'pullquote') return `> "${b.content}"`;
-        return b.content;
-      }).join('\n\n');
-    }
-    return '';
+    return reconstructMarkdownFromBlocks(initialPost?.blocks, initialPost?.content || '');
   });
 
   const [deskId, setDeskId] = useState<string>(() => {
@@ -458,14 +476,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       setIsEditMode(true);
       setTitle(initialPost.title || '');
       setDek(initialPost.dek || '');
-      const targetContent = (initialPost.blocks && initialPost.blocks.length > 0)
-        ? initialPost.blocks.map(b => {
-            if (b.type === 'image') return `![${b.imageCaption || 'Image'}](${b.imageUrl || ''})`;
-            if (b.type === 'heading') return `## ${b.content}`;
-            if (b.type === 'pullquote') return `> "${b.content}"`;
-            return b.content;
-          }).join('\n\n')
-        : (initialPost.content || initialPost.dek || '');
+      const targetContent = reconstructMarkdownFromBlocks(initialPost.blocks, initialPost.content || initialPost.dek || '');
       setContent(targetContent);
       setIsEditorEmpty(!targetContent.trim());
       if (editorRef.current && document.activeElement !== editorRef.current) {
@@ -573,6 +584,239 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     }, 150);
   }, []);
 
+  const handleDekBold = useCallback(() => {
+    const textarea = dekTextareaRef.current;
+    if (!textarea) return;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selected = dek.substring(start, end);
+
+    if (selected.length > 0) {
+      // Check if selected is already bold: **text**
+      if (selected.startsWith('**') && selected.endsWith('**') && selected.length >= 4) {
+        const unbolded = selected.slice(2, -2);
+        const newDek = dek.substring(0, start) + unbolded + dek.substring(end);
+        setDek(newDek);
+        setTimeout(() => {
+          textarea.focus();
+          textarea.setSelectionRange(start, start + unbolded.length);
+          adjustDekHeight();
+        }, 10);
+      } else if (start >= 2 && dek.substring(start - 2, start) === '**' && end + 2 <= dek.length && dek.substring(end, end + 2) === '**') {
+        const newDek = dek.substring(0, start - 2) + selected + dek.substring(end + 2);
+        setDek(newDek);
+        setTimeout(() => {
+          textarea.focus();
+          textarea.setSelectionRange(start - 2, start - 2 + selected.length);
+          adjustDekHeight();
+        }, 10);
+      } else {
+        const bolded = `**${selected}**`;
+        const newDek = dek.substring(0, start) + bolded + dek.substring(end);
+        setDek(newDek);
+        setTimeout(() => {
+          textarea.focus();
+          textarea.setSelectionRange(start, start + bolded.length);
+          adjustDekHeight();
+        }, 10);
+      }
+    } else {
+      const boldToken = '****';
+      const newDek = dek.substring(0, start) + boldToken + dek.substring(end);
+      setDek(newDek);
+      setTimeout(() => {
+        textarea.focus();
+        textarea.setSelectionRange(start + 2, start + 2);
+        adjustDekHeight();
+      }, 10);
+    }
+  }, [dek, adjustDekHeight]);
+
+  const handleToolbarBold = useCallback(() => {
+    if (lastFocusedZoneRef.current === 'dek' && dekTextareaRef.current && document.activeElement === dekTextareaRef.current) {
+      handleDekBold();
+      return;
+    }
+
+    const editor = editorRef.current;
+    if (!editor) return;
+    editor.focus();
+
+    const sel = window.getSelection();
+    if (!sel) return;
+
+    let range: Range | null = null;
+    if (sel.rangeCount > 0 && (editor.contains(sel.anchorNode) || editor.contains(sel.focusNode))) {
+      range = sel.getRangeAt(0);
+    } else if (lastEditorRangeRef.current && editor.contains(lastEditorRangeRef.current.commonAncestorContainer)) {
+      range = lastEditorRangeRef.current.cloneRange();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+
+    if (!range) {
+      range = document.createRange();
+      range.selectNodeContents(editor);
+      range.collapse(false);
+      sel?.removeAllRanges();
+      sel?.addRange(range);
+    }
+
+    // 1. If range is collapsed, check if cursor is on/inside a word to expand selection
+    if (range.collapsed) {
+      const container = range.startContainer;
+      if (container.nodeType === Node.TEXT_NODE && container.textContent) {
+        const text = container.textContent;
+        const offset = range.startOffset;
+
+        // Unicode-aware word character regex (supports English letters, digits, and Hindi/Devanagari letters)
+        const isWordChar = (char?: string) => Boolean(char && /[\p{L}\p{N}_]/u.test(char));
+
+        if (
+          (offset > 0 && isWordChar(text[offset - 1])) ||
+          (offset < text.length && isWordChar(text[offset]))
+        ) {
+          let start = offset;
+          while (start > 0 && isWordChar(text[start - 1])) {
+            start--;
+          }
+          let end = offset;
+          while (end < text.length && isWordChar(text[end])) {
+            end++;
+          }
+          if (end > start) {
+            range.setStart(container, start);
+            range.setEnd(container, end);
+            sel.removeAllRanges();
+            sel.addRange(range);
+          }
+        }
+      }
+    }
+
+    // 2. Detect if current selection or container is already bold
+    let isCurrentlyBold = false;
+    try {
+      isCurrentlyBold = Boolean(document.queryCommandState('bold'));
+    } catch {}
+
+    let boldAncestor: HTMLElement | null = null;
+    let node: Node | null = range.startContainer.nodeType === Node.TEXT_NODE
+      ? range.startContainer.parentElement
+      : (range.startContainer as HTMLElement);
+
+    while (node && node !== editor) {
+      if (node instanceof HTMLElement) {
+        const tag = node.tagName.toLowerCase();
+        const fw = (node.style.fontWeight || window.getComputedStyle(node).fontWeight || '').toLowerCase();
+        const isTagBold = tag === 'b' || tag === 'strong';
+        const isStyleBold = fw === 'bold' || fw === '700' || fw === '800' || fw === '900' || parseInt(fw, 10) >= 600 || node.classList.contains('font-bold');
+        if ((isTagBold || isStyleBold) && fw !== 'normal' && fw !== '400') {
+          isCurrentlyBold = true;
+          boldAncestor = node;
+          break;
+        }
+      }
+      node = node.parentElement;
+    }
+
+    if (!isCurrentlyBold && !range.collapsed) {
+      const clone = range.cloneContents();
+      const boldInside = clone.querySelector('b, strong, .font-bold, [style*="font-weight"]');
+      if (boldInside) {
+        isCurrentlyBold = true;
+      }
+    }
+
+    // 3. Smart Bold / Unbold execution
+    if (isCurrentlyBold) {
+      // User wants to UNBOLD (remove bold)
+      if (boldAncestor) {
+        const selText = range.toString().trim();
+        const ancestorText = (boldAncestor.textContent || '').trim();
+
+        if (range.collapsed || selText === ancestorText || (range.commonAncestorContainer === boldAncestor && selText.length >= ancestorText.length)) {
+          const parent = boldAncestor.parentNode;
+          if (parent) {
+            while (boldAncestor.firstChild) {
+              parent.insertBefore(boldAncestor.firstChild, boldAncestor);
+            }
+            parent.removeChild(boldAncestor);
+          }
+        } else {
+          // Normalize strong to b and use execCommand to cleanly unbold selection
+          if (boldAncestor.tagName.toLowerCase() === 'strong') {
+            const b = document.createElement('b');
+            b.className = 'font-bold';
+            while (boldAncestor.firstChild) b.appendChild(boldAncestor.firstChild);
+            boldAncestor.parentNode?.replaceChild(b, boldAncestor);
+          }
+          try {
+            document.execCommand('bold', false);
+          } catch {}
+        }
+      } else {
+        try {
+          document.execCommand('bold', false);
+        } catch {}
+      }
+
+      // Also unwrap any b/strong tags directly inside the selection
+      if (!range.collapsed) {
+        const parentCommon = range.commonAncestorContainer.nodeType === Node.TEXT_NODE
+          ? range.commonAncestorContainer.parentElement
+          : (range.commonAncestorContainer as HTMLElement);
+        if (parentCommon) {
+          parentCommon.querySelectorAll('strong, b').forEach(el => {
+            if (sel.containsNode(el, true)) {
+              const p = el.parentNode;
+              if (p) {
+                while (el.firstChild) p.insertBefore(el.firstChild, el);
+                p.removeChild(el);
+              }
+            }
+          });
+        }
+      }
+    } else {
+      // User wants to BOLD (make bold)
+      if (!range.collapsed) {
+        try {
+          document.execCommand('bold', false);
+        } catch {
+          const b = document.createElement('b');
+          b.className = 'font-bold';
+          try {
+            range.surroundContents(b);
+          } catch {
+            const contents = range.extractContents();
+            b.appendChild(contents);
+            range.insertNode(b);
+          }
+        }
+      } else {
+        try {
+          document.execCommand('bold', false);
+        } catch {}
+      }
+    }
+
+    // Clean up empty b/strong elements
+    editor.querySelectorAll('b, strong').forEach(el => {
+      if (!el.textContent?.trim() && !el.querySelector('img')) {
+        el.remove();
+      }
+    });
+
+    if (sel.rangeCount > 0) {
+      lastEditorRangeRef.current = sel.getRangeAt(0).cloneRange();
+    }
+
+    syncContentFromDom();
+    updateToolbarActiveStates();
+    setTimeout(updateToolbarActiveStates, 20);
+  }, [handleDekBold, syncContentFromDom, updateToolbarActiveStates]);
+
   const handleEditorKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     // If typing a printable character into empty editor, hide placeholder immediately
     if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
@@ -582,10 +826,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     // Bold: Ctrl+B or Cmd+B
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
       e.preventDefault();
-      document.execCommand('bold', false);
-      syncContentFromDom();
-      updateToolbarActiveStates();
-      setTimeout(updateToolbarActiveStates, 10);
+      handleToolbarBold();
       return;
     }
     // Italic: Ctrl+I or Cmd+I
@@ -597,26 +838,6 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       setTimeout(updateToolbarActiveStates, 10);
       return;
     }
-  };
-
-  const handleToolbarBold = () => {
-    if (!editorRef.current) return;
-    editorRef.current.focus();
-
-    // Ensure selection/range is inside editor
-    const sel = window.getSelection();
-    if (!sel || sel.rangeCount === 0 || !editorRef.current.contains(sel.anchorNode)) {
-      const range = document.createRange();
-      range.selectNodeContents(editorRef.current);
-      range.collapse(false);
-      sel?.removeAllRanges();
-      sel?.addRange(range);
-    }
-
-    document.execCommand('bold', false);
-    syncContentFromDom();
-    updateToolbarActiveStates();
-    setTimeout(updateToolbarActiveStates, 10);
   };
 
   const handleToolbarItalic = () => {
@@ -1528,7 +1749,20 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                       setDek(e.target.value);
                       adjustDekHeight();
                     }}
+                    onFocus={() => {
+                      lastFocusedZoneRef.current = 'dek';
+                      updateToolbarActiveStates();
+                    }}
+                    onSelect={() => {
+                      lastFocusedZoneRef.current = 'dek';
+                      updateToolbarActiveStates();
+                    }}
                     onKeyDown={(e) => {
+                      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+                        e.preventDefault();
+                        handleDekBold();
+                        return;
+                      }
                       if (e.key === 'Enter') {
                         e.stopPropagation();
                       }
@@ -1593,18 +1827,24 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                       e.preventDefault();
                       handleToolbarBold();
                     }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleToolbarBold();
+                    }}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
                         handleToolbarBold();
                       }
                     }}
+                    aria-label="Toggle bold text (Ctrl+B / Cmd+B)"
+                    aria-pressed={isBoldActive}
                     className={`p-1.5 rounded-md transition-all cursor-pointer flex items-center justify-center ${
                       isBoldActive
                         ? 'bg-slate-900 text-white shadow-xs ring-1 ring-slate-900 font-bold scale-[1.05]'
                         : 'text-slate-700 hover:bg-slate-900 hover:text-white'
                     }`}
-                    title={isBoldActive ? 'Bold is ON (Click or Ctrl+B to turn off)' : 'Bold (Ctrl+B / Cmd+B)'}
+                    title={isBoldActive ? 'Bold is ON (Click or Ctrl+B to remove bold)' : 'Bold (Ctrl+B / Cmd+B)'}
                   >
                     <Bold className="w-3.5 h-3.5 stroke-[2.5]" />
                   </button>
@@ -1701,8 +1941,14 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                   onKeyDown={handleEditorKeyDown}
                   onKeyUp={updateToolbarActiveStates}
                   onMouseUp={updateToolbarActiveStates}
-                  onFocus={updateToolbarActiveStates}
-                  onSelect={updateToolbarActiveStates}
+                  onFocus={() => {
+                    lastFocusedZoneRef.current = 'editor';
+                    updateToolbarActiveStates();
+                  }}
+                  onSelect={() => {
+                    lastFocusedZoneRef.current = 'editor';
+                    updateToolbarActiveStates();
+                  }}
                   onPaste={handlePaste}
                   style={{ outline: 'none', border: 'none', boxShadow: 'none' }}
                   className="w-full text-base sm:text-lg leading-relaxed text-slate-800 font-serif border-none outline-none focus:outline-none focus:ring-0 ring-0 focus-visible:outline-none min-h-[460px] bg-transparent selection:bg-blue-600 selection:text-white [&_b]:font-bold [&_b]:text-slate-950 [&_strong]:font-bold [&_strong]:text-slate-950 [&_em]:italic [&_i]:italic [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mt-6 [&_h2]:mb-2 [&_h2]:text-slate-900 [&_h3]:text-xl [&_h3]:font-bold [&_h3]:mt-4 [&_h3]:mb-2 [&_h3]:text-slate-900 [&_blockquote]:border-l-4 [&_blockquote]:border-slate-300 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-slate-600 [&_blockquote]:my-3 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-1 [&_ul]:my-3 [&_p]:mb-4"

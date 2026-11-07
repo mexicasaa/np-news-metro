@@ -1,6 +1,7 @@
 import React from 'react';
 import { CheckCircle2, BookmarkCheck } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import { renderInlineMarkdown } from './ArticleBody';
 
 interface KeyPointsBlockProps {
   title?: string;
@@ -28,7 +29,7 @@ export const KeyPointsBlock: React.FC<KeyPointsBlockProps> = ({
         {points.map((pt, index) => (
           <li key={index} className="flex items-start gap-2.5">
             <span className="w-1.5 h-1.5 rounded-full bg-secondary-gold mt-2 flex-shrink-0"></span>
-            <span>{pt}</span>
+            <span>{renderInlineMarkdown(pt)}</span>
           </li>
         ))}
       </ul>
