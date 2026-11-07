@@ -758,16 +758,12 @@ function AppContent() {
         feedChannel = new BroadcastChannel('np_news_feed_channel');
         feedChannel.onmessage = async (event) => {
           if (event.data?.type === 'NEWS_PUBLISHED') {
-            const targetId = event.data?.articleId;
-            setPosts(prev => {
-              if (targetId && prev.some(p => p.id === targetId && p.status === 'published')) {
-                return prev;
+            try {
+              const fresh = await (isAdmin ? getEditorialArticles('all') : getPublishedArticles(true));
+              if (fresh && fresh.length > 0) {
+                setPosts(fresh);
               }
-              (isAdmin ? getEditorialArticles('all') : getPublishedArticles()).then(fresh => {
-                if (fresh && fresh.length > 0) setPosts(fresh);
-              });
-              return prev;
-            });
+            } catch (e) {}
           } else if (event.data?.type === 'VIDEOS_UPDATED') {
             const freshVideos = await getPublishedVideos();
             setVideos(freshVideos);
@@ -861,7 +857,7 @@ function AppContent() {
             const hasChange = freshAdmin.length !== currentPosts.length ||
               freshAdmin.some((f, idx) => {
                 const c = currentPosts[idx];
-                return !c || c.id !== f.id || c.updatedAt !== f.updatedAt || c.status !== f.status;
+                return !c || c.id !== f.id || c.updatedAt !== f.updatedAt || c.status !== f.status || c.title !== f.title;
               });
             return hasChange ? freshAdmin : currentPosts;
           });
@@ -877,7 +873,7 @@ function AppContent() {
             const hasCountChange = fresh.length !== currentPublished.length;
             const hasNewLead = fresh[0]?.id !== currentPublished[0]?.id;
             const hasModified = fresh.some((f) => {
-              const match = currentPublished.find((c) => c.id === f.id);
+              const match = currentPublished.find((c) => c.id === f.id || (f.slug && c.slug === f.slug));
               return !match || match.updatedAt !== f.updatedAt || match.title !== f.title;
             });
 
@@ -1314,12 +1310,13 @@ function AppContent() {
     clearAutoSaveSession();
 
     let fullPost = post;
-    const hasOnlyPlaceholderBlocks = !post.blocks || post.blocks.length === 0 || (post.blocks.length === 1 && post.blocks[0].id === 'b-default-1');
-    if (post.slug && hasOnlyPlaceholderBlocks) {
+    const hasOnlyPlaceholderBlocks = !post.blocks || post.blocks.length === 0 || (post.blocks.length === 1 && post.blocks[0].id === 'b-default-1') || !(post as any).content;
+    const lookupKey = post.slug || post.id;
+    if (lookupKey && hasOnlyPlaceholderBlocks) {
       try {
-        const detail = await getArticleBySlug(post.slug, true);
-        if (detail && detail.blocks && detail.blocks.length > 0) {
-          fullPost = detail;
+        const detail = await getArticleBySlug(lookupKey, true, true);
+        if (detail && (detail.blocks?.length || detail.content)) {
+          fullPost = { ...post, ...detail };
         }
       } catch (err) {
         console.warn('Could not fetch full article detail on edit, using listing data:', err);
@@ -1455,12 +1452,14 @@ function AppContent() {
     setPublishOrchestratorOpen(true);
 
     const newOpId = `PUB-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.floor(1000 + Math.random() * 9000)}`;
-    const newPostId = postData.id || activeEditingPost?.id || `post-${Date.now()}`;
+    const targetOldId = activeEditingPost?.id;
+    const targetOldSlug = activeEditingPost?.slug;
+    const newPostId = postData.id || targetOldId || `post-${Date.now()}`;
 
     const operation: PublishingOperation = {
       operationId: newOpId,
       articleId: newPostId,
-      articleTitle: postData.title || 'Untitled News Story',
+      articleTitle: postData.title || activeEditingPost?.title || 'Untitled News Story',
       initiatedBy: currentUser.name,
       userRole: currentUserRole,
       startedAt: new Date().toLocaleTimeString() + ' IST',
@@ -1486,41 +1485,62 @@ function AppContent() {
 
     setCurrentOperation(operation);
 
+    const mergedContent = postData.content || activeEditingPost?.content || '';
+    const mergedBlocks = (postData.blocks && postData.blocks.length > 0)
+      ? postData.blocks
+      : (activeEditingPost?.blocks && activeEditingPost.blocks.length > 0)
+        ? activeEditingPost.blocks
+        : [
+            { id: 'b1', type: 'paragraph' as const, content: mergedContent || postData.dek || 'Latest dispatch from newsroom.' }
+          ];
+
     const fullPost: WpPost = {
+      ...(activeEditingPost || {}),
+      ...postData,
       id: newPostId,
-      title: postData.title || 'Untitled News Story',
-      titleHi: postData.titleHi || postData.title || '',
-      dek: postData.dek || '',
-      category: (postData.category as any) || 'india',
-      authorId: postData.authorId || '04ad79d9-d871-4099-a633-bcb7a1e35055',
-      customAuthor: postData.customAuthor,
-      featuredImage: postData.featuredImage || '',
-      imageAlt: postData.imageAlt || postData.title || '',
-      imageCredit: postData.imageCredit || 'NP News Metro Photo Desk',
-      imageCaption: postData.imageCaption || '',
-      publishedAt: postData.publishedAt || new Date().toISOString(),
-      readTime: postData.readTime || '3 min read',
-      viewsCount: 140,
-      commentCount: 0,
-      sharesCount: 12,
-      isLead: true,
-      isFeatured: true,
-      isBreaking: postData.isBreaking || false,
-      slug: postData.slug || 'live-story',
-      tags: postData.tags || ['National', 'Policy'],
+      title: postData.title || activeEditingPost?.title || 'Untitled News Story',
+      titleHi: postData.titleHi || activeEditingPost?.titleHi || postData.title || '',
+      dek: postData.dek || activeEditingPost?.dek || '',
+      content: mergedContent,
+      blocks: mergedBlocks,
+      category: (postData.category || activeEditingPost?.category || 'india') as any,
+      desk: (postData.desk || activeEditingPost?.desk || 'india') as any,
+      subcategory: postData.subcategory || activeEditingPost?.subcategory,
+      authorId: postData.authorId || activeEditingPost?.authorId || '04ad79d9-d871-4099-a633-bcb7a1e35055',
+      customAuthor: postData.customAuthor ? {
+        ...postData.customAuthor,
+        avatar: postData.customAuthor.avatar || (postData as any).customAuthorAvatar || activeEditingPost?.customAuthor?.avatar,
+      } : activeEditingPost?.customAuthor,
+      featuredImage: postData.featuredImage || activeEditingPost?.featuredImage || '',
+      imageAlt: postData.imageAlt || activeEditingPost?.imageAlt || postData.title || '',
+      imageCredit: postData.imageCredit || activeEditingPost?.imageCredit || 'NP News Metro Photo Desk',
+      imageCaption: postData.imageCaption || activeEditingPost?.imageCaption || '',
+      publishedAt: postData.publishedAt || activeEditingPost?.publishedAt || new Date().toISOString(),
+      readTime: postData.readTime || activeEditingPost?.readTime || '3 min read',
+      viewsCount: postData.viewsCount ?? activeEditingPost?.viewsCount ?? 140,
+      commentCount: postData.commentCount ?? activeEditingPost?.commentCount ?? 0,
+      sharesCount: postData.sharesCount ?? activeEditingPost?.sharesCount ?? 12,
+      isLead: postData.isLead !== undefined ? postData.isLead : (activeEditingPost?.isLead ?? true),
+      isFeatured: postData.isFeatured !== undefined ? postData.isFeatured : (activeEditingPost?.isFeatured ?? true),
+      isBreaking: postData.isBreaking !== undefined ? postData.isBreaking : (activeEditingPost?.isBreaking ?? false),
+      isOpinion: postData.isOpinion !== undefined ? postData.isOpinion : (activeEditingPost?.isOpinion ?? false),
+      slug: postData.slug || activeEditingPost?.slug || 'live-story',
+      tags: postData.tags || activeEditingPost?.tags || ['National', 'Policy'],
       editorialStatus: 'published',
       status: 'published',
-      blocks: postData.blocks || [
-        { id: 'b1', type: 'paragraph', content: postData.dek || 'Latest dispatch from newsroom.' }
-      ],
+      location: postData.location || activeEditingPost?.location,
+      sourceAgency: postData.sourceAgency || activeEditingPost?.sourceAgency,
+      seoTitle: postData.seoTitle || activeEditingPost?.seoTitle,
+      seoDescription: postData.seoDescription || activeEditingPost?.seoDescription,
     };
 
     try {
       const isUUID = (id?: string) => Boolean(id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id));
       const isEditingExisting = (postData as any)?.isEdit ?? (
+        Boolean(targetOldId) ||
         isUUID(newPostId) || 
-        isUUID(activeEditingPost?.id) || 
-        posts.some(p => p.id === newPostId)
+        isUUID(targetOldId) || 
+        posts.some(p => p.id === newPostId || (targetOldSlug && p.slug === targetOldSlug))
       );
       const { post: savedDbPost, error: dbError } = await saveArticle({ ...fullPost, isEdit: isEditingExisting }, 'published');
 
@@ -1538,17 +1558,20 @@ function AppContent() {
       savePublishedPost(savedDbPost);
       removeStoredDraft(savedDbPost.id, savedDbPost.title);
       if (savedDbPost.slug) removeStoredDraft(savedDbPost.slug, savedDbPost.title);
+      if (targetOldId) removeStoredDraft(targetOldId, targetOldSlug || '');
       clearAutoSaveSession();
       editorDraftSaverRef.current = null;
       setActiveEditingPost(undefined);
       setAdminSection('publishing');
       setPublishingTab('published');
       setPosts(prev => {
-        // Clean out any old draft versions with the same title or ID or slug so they never linger in drafts
+        // Clean out any old draft/stale versions with the same ID, old ID, slug, or title so they never duplicate
         const cleaned = prev.filter(p => 
           p.id !== savedDbPost.id && 
           p.id !== newPostId && 
+          (!targetOldId || p.id !== targetOldId) &&
           (!savedDbPost.slug || p.slug !== savedDbPost.slug) &&
+          (!targetOldSlug || p.slug !== targetOldSlug) &&
           (!savedDbPost.title || p.title.trim().toLowerCase() !== savedDbPost.title.trim().toLowerCase())
         );
         return [savedDbPost, ...cleaned];
@@ -1561,6 +1584,8 @@ function AppContent() {
 
       setCurrentOperation(prev => prev ? {
         ...prev,
+        articleId: savedDbPost.id,
+        articleTitle: savedDbPost.title,
         status: 'published_healthy',
         completedAt: new Date().toLocaleTimeString() + ' IST',
         steps: prev.steps.map(s => ({ ...s, status: 'success' as const, durationMs: Math.floor(40 + Math.random() * 80) })),
@@ -1994,35 +2019,47 @@ function AppContent() {
                   return activeEditingPost;
                 }
 
-                const isEditingExisting = (postData as any)?.isEdit ?? (!!activeEditingPost?.id && activeEditingPost.id === postData.id);
-                const postId = postData.id || activeEditingPost?.id || `post-${Date.now()}`;
+                const targetOldId = activeEditingPost?.id;
+                const isEditingExisting = (postData as any)?.isEdit ?? (Boolean(targetOldId) && (targetOldId === postData.id || !postData.id));
+                const postId = postData.id || targetOldId || `post-${Date.now()}`;
+                const mergedContent = postData.content || activeEditingPost?.content || '';
                 const fullPost: WpPost = {
+                  ...(activeEditingPost || {}),
+                  ...postData,
                   id: postId,
-                  title: postData.title || 'Untitled News Story',
-                  titleHi: postData.titleHi || postData.title || '',
-                  dek: postData.dek || '',
-                  category: (postData.category as any) || 'india',
-                  authorId: postData.authorId || currentUser.id || '04ad79d9-d871-4099-a633-bcb7a1e35055',
-                  customAuthor: postData.customAuthor,
-                  featuredImage: postData.featuredImage || '',
-                  imageAlt: postData.imageAlt || postData.title || '',
-                  imageCredit: postData.imageCredit || 'NP News Metro Photo Desk',
-                  imageCaption: postData.imageCaption || '',
-                  publishedAt: postData.publishedAt || new Date().toISOString(),
-                  readTime: postData.readTime || '3 min read',
+                  title: postData.title || activeEditingPost?.title || 'Untitled News Story',
+                  titleHi: postData.titleHi || activeEditingPost?.titleHi || postData.title || '',
+                  dek: postData.dek || activeEditingPost?.dek || '',
+                  content: mergedContent,
+                  category: (postData.category || activeEditingPost?.category || 'india') as any,
+                  desk: (postData.desk || activeEditingPost?.desk || 'india') as any,
+                  subcategory: postData.subcategory || activeEditingPost?.subcategory,
+                  authorId: postData.authorId || activeEditingPost?.authorId || currentUser.id || '04ad79d9-d871-4099-a633-bcb7a1e35055',
+                  customAuthor: postData.customAuthor || activeEditingPost?.customAuthor,
+                  featuredImage: postData.featuredImage || activeEditingPost?.featuredImage || '',
+                  imageAlt: postData.imageAlt || activeEditingPost?.imageAlt || postData.title || '',
+                  imageCredit: postData.imageCredit || activeEditingPost?.imageCredit || 'NP News Metro Photo Desk',
+                  imageCaption: postData.imageCaption || activeEditingPost?.imageCaption || '',
+                  publishedAt: postData.publishedAt || activeEditingPost?.publishedAt || new Date().toISOString(),
+                  readTime: postData.readTime || activeEditingPost?.readTime || '3 min read',
                   viewsCount: activeEditingPost?.viewsCount || 0,
                   commentCount: activeEditingPost?.commentCount || 0,
                   sharesCount: activeEditingPost?.sharesCount || 0,
                   isLead: false,
                   isFeatured: true,
-                  isBreaking: postData.isBreaking || false,
-                  slug: postData.slug || 'story',
-                  tags: postData.tags || ['National', 'Policy'],
+                  isBreaking: postData.isBreaking !== undefined ? postData.isBreaking : (activeEditingPost?.isBreaking ?? false),
+                  isOpinion: postData.isOpinion !== undefined ? postData.isOpinion : (activeEditingPost?.isOpinion ?? false),
+                  slug: postData.slug || activeEditingPost?.slug || 'story',
+                  tags: postData.tags || activeEditingPost?.tags || ['National', 'Policy'],
                   editorialStatus: 'draft',
                   status: 'draft',
-                  blocks: postData.blocks || [
-                    { id: 'b1', type: 'paragraph', content: postData.dek || 'Draft content.' }
-                  ],
+                  blocks: (postData.blocks && postData.blocks.length > 0)
+                    ? postData.blocks
+                    : (activeEditingPost?.blocks && activeEditingPost.blocks.length > 0)
+                      ? activeEditingPost.blocks
+                      : [
+                          { id: 'b1', type: 'paragraph', content: mergedContent || postData.dek || 'Draft content.' }
+                        ],
                 };
 
                 const isAuto = Boolean(options?.isAutoSave ?? options?.silent);
@@ -2052,8 +2089,10 @@ function AppContent() {
                 return finalDraftPost;
               }}
               onSubmitForReview={async (postData) => {
-                const isEditingExisting = (postData as any)?.isEdit ?? (!!activeEditingPost?.id);
-                const { post, error } = await saveArticle({ ...postData, isEdit: isEditingExisting }, 'review');
+                const targetOldId = activeEditingPost?.id;
+                const isEditingExisting = (postData as any)?.isEdit ?? (Boolean(targetOldId) || posts.some(p => p.id === postData.id));
+                const mergedPost = { ...(activeEditingPost || {}), ...postData, isEdit: isEditingExisting };
+                const { post, error } = await saveArticle(mergedPost, 'review');
                 if (error || !post) {
                   alert(`Failed to submit article for review: ${error || 'Database write error'}`);
                   return;
@@ -2072,8 +2111,10 @@ function AppContent() {
                 setPublishingTab('review');
               }}
               onApproveCopy={async (postData) => {
-                const isEditingExisting = (postData as any)?.isEdit ?? (!!activeEditingPost?.id);
-                const { post, error } = await saveArticle({ ...postData, isEdit: isEditingExisting }, 'approved');
+                const targetOldId = activeEditingPost?.id;
+                const isEditingExisting = (postData as any)?.isEdit ?? (Boolean(targetOldId) || posts.some(p => p.id === postData.id));
+                const mergedPost = { ...(activeEditingPost || {}), ...postData, isEdit: isEditingExisting };
+                const { post, error } = await saveArticle(mergedPost, 'approved');
                 if (error || !post) {
                   alert(`Failed to approve copy: ${error || 'Database write error'}`);
                   return;
@@ -2092,8 +2133,10 @@ function AppContent() {
                 setPublishingTab('approved');
               }}
               onSchedulePost={async (postData, scheduleTime) => {
-                const isEditingExisting = (postData as any)?.isEdit ?? (!!activeEditingPost?.id);
-                const { post, error } = await saveArticle({ ...postData, isEdit: isEditingExisting }, 'scheduled');
+                const targetOldId = activeEditingPost?.id;
+                const isEditingExisting = (postData as any)?.isEdit ?? (Boolean(targetOldId) || posts.some(p => p.id === postData.id));
+                const mergedPost = { ...(activeEditingPost || {}), ...postData, isEdit: isEditingExisting };
+                const { post, error } = await saveArticle(mergedPost, 'scheduled');
                 if (error || !post) {
                   alert(`Failed to schedule article: ${error || 'Database write error'}`);
                   return;
@@ -2479,8 +2522,14 @@ function AppContent() {
             onViewLiveStory={(id) => {
               setPublishOrchestratorOpen(false);
               const freshPosts = getStoredPosts();
-              const found = freshPosts.find((p: WpPost) => p.id === id) || posts.find((p: WpPost) => p.id === id) || freshPosts[0];
-              handleSelectPost(found);
+              const found = freshPosts.find((p: WpPost) => p.id === id || p.slug === id) || 
+                            posts.find((p: WpPost) => p.id === id || p.slug === id) || 
+                            (selectedPost && (selectedPost.id === id || selectedPost.slug === id) ? selectedPost : null) ||
+                            selectedPost || 
+                            freshPosts[0];
+              if (found) {
+                handleSelectPost(found);
+              }
             }}
             onViewHomepage={() => {
               setPublishOrchestratorOpen(false);

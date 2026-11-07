@@ -4,7 +4,7 @@ import { EditorialStatus } from '../types/admin';
 import { ensureAuthenticatedSession } from './authService';
 import { slugifyText } from '../utils/slugify';
 import { getAuthorAvatarUrl, DEFAULT_AUTHOR_AVATAR } from '../utils/imageFallback';
-import { isPostPublished, removeStoredDraft, getStoredPosts, saveLiveArticlesCache } from '../utils/newsStorage';
+import { isPostPublished, removeStoredDraft, getStoredPosts, saveLiveArticlesCache, savePublishedPost } from '../utils/newsStorage';
 
 // Category mapping helper
 const CATEGORY_SLUG_TO_ID: Record<string, string> = {
@@ -269,13 +269,7 @@ export const getPublishedArticles = async (forceRefresh: boolean = false): Promi
     console.warn('Edge API fetch note:', apiErr);
   }
 
-  // Return existing memory cache or stored live cache (Never call Supabase DB directly from public browser unless empty)
-  const stored = getStoredPosts();
-  if (stored && stored.length > 0) {
-    return stored;
-  }
-
-  // Fallback to Supabase database directly if Edge API was unavailable and no stored cache exists
+  // 2. Fetch directly from Supabase database
   try {
     const { data: dbData } = await supabase
       .from('articles')
@@ -296,6 +290,12 @@ export const getPublishedArticles = async (forceRefresh: boolean = false): Promi
     }
   } catch (dbErr) {
     console.warn('Direct Supabase articles query note:', dbErr);
+  }
+
+  // 3. Fallback to stored live cache only if API and Supabase are both offline
+  const stored = getStoredPosts();
+  if (stored && stored.length > 0) {
+    return stored;
   }
 
   return [];
@@ -515,9 +515,34 @@ export const getArticleBySlug = async (
       }
     } catch (apiErr) {}
 
-    // Fallback to client stored posts if offline or edge cache warming
+    // 2. Direct Supabase query if edge API was unavailable or when forced fresh
+    try {
+      let query = supabase
+        .from('articles')
+        .select(ARTICLE_DETAIL_SELECT);
+
+      if (isValidUUID(slug)) {
+        query = query.or(`id.eq.${slug},slug.eq.${slug}`);
+      } else {
+        query = query.eq('slug', slug);
+      }
+      query = query.eq('status', 'published');
+
+      const { data, error } = await query.maybeSingle();
+
+      if (!error && data) {
+        const mapped = mapDbToWpPost(data);
+        if (isPostPublished(mapped)) {
+          cachedArticleBySlug.set(slug, { data: mapped, timestamp: Date.now() });
+          savePublishedPost(mapped);
+          return mapped;
+        }
+      }
+    } catch (dbErr) {}
+
+    // 3. Fallback to client stored posts only if offline or Supabase was unreachable
     const stored = getStoredPosts();
-    const foundInStored = stored.find(p => p.slug === slug);
+    const foundInStored = stored.find(p => p.slug === slug || p.id === slug);
     if (foundInStored) {
       const hasFullContent = (Array.isArray(foundInStored.blocks) && foundInStored.blocks.length > 0 && foundInStored.blocks[0].id !== 'b-default-1') ||
         (typeof foundInStored.content === 'string' && foundInStored.content.trim().length > 0);
@@ -526,34 +551,22 @@ export const getArticleBySlug = async (
       }
     }
 
-    // Direct Supabase fallback if edge API was temporarily warming or unavailable
-    try {
-      const { data, error } = await supabase
-        .from('articles')
-        .select(ARTICLE_DETAIL_SELECT)
-        .eq('slug', slug)
-        .eq('status', 'published')
-        .maybeSingle();
-
-      if (!error && data) {
-        const mapped = mapDbToWpPost(data);
-        if (isPostPublished(mapped)) {
-          cachedArticleBySlug.set(slug, { data: mapped, timestamp: Date.now() });
-          return mapped;
-        }
-      }
-    } catch (dbErr) {}
-
     return foundInStored || null;
   }
 
   // 2. Draft preview for authenticated editors ONLY (from /admin preview)
   try {
-    const { data, error } = await supabase
+    let query = supabase
       .from('articles')
-      .select(ARTICLE_DETAIL_SELECT)
-      .eq('slug', slug)
-      .maybeSingle();
+      .select(ARTICLE_DETAIL_SELECT);
+
+    if (isValidUUID(slug)) {
+      query = query.or(`id.eq.${slug},slug.eq.${slug}`);
+    } else {
+      query = query.eq('slug', slug);
+    }
+
+    const { data, error } = await query.maybeSingle();
 
     if (error || !data) {
       return null;
@@ -701,23 +714,42 @@ export const saveArticle = async (
       ? parseInt(postData.readTime.replace(/[^\d]/g, ''), 10) || 3 
       : 3;
 
-    // STRICT CHECK: An UPDATE occurs if:
-    // 1. postData.id is a valid UUID (meaning the record already exists in Supabase as draft or published)
-    // 2. OR when targetStatus is 'published', check if an existing draft exists for this title or ID
+    // Check if an existing article exists for update (by UUID, slug, ID, or title)
     let existingId: string | null = null;
     if (postData.id && isValidUUID(postData.id)) {
       existingId = postData.id;
-    } else if (targetStatus === 'published') {
+    } else {
       try {
-        const { data: draftMatches } = await supabase
-          .from('articles')
-          .select('id')
-          .eq('title', title)
-          .eq('status', 'draft')
-          .order('created_at', { ascending: false })
-          .limit(1);
-        if (draftMatches && draftMatches.length > 0) {
-          existingId = draftMatches[0].id;
+        if (postData.slug && postData.slug !== 'auto-draft') {
+          const { data: slugMatches } = await supabase
+            .from('articles')
+            .select('id')
+            .eq('slug', postData.slug.trim())
+            .limit(1);
+          if (slugMatches && slugMatches.length > 0) {
+            existingId = slugMatches[0].id;
+          }
+        }
+        if (!existingId && postData.id) {
+          const { data: idMatches } = await supabase
+            .from('articles')
+            .select('id')
+            .eq('id', postData.id)
+            .limit(1);
+          if (idMatches && idMatches.length > 0) {
+            existingId = idMatches[0].id;
+          }
+        }
+        if (!existingId && title) {
+          const { data: titleMatches } = await supabase
+            .from('articles')
+            .select('id')
+            .eq('title', title)
+            .order('created_at', { ascending: false })
+            .limit(1);
+          if (titleMatches && titleMatches.length > 0) {
+            existingId = titleMatches[0].id;
+          }
         }
       } catch (e) {}
     }
@@ -768,12 +800,15 @@ export const saveArticle = async (
 
     let resultArticle: any = null;
 
-    // Egress optimization: Do NOT return content, blocks, and key_takeaways back down the wire
+    // Full confirmation select to guarantee complete updated payload
     const SAVE_CONFIRMATION_SELECT = `
-      id, slug, title, title_hi, excerpt, dek_hi, category_id,
+      id, slug, title, title_hi, excerpt, dek_hi, content, blocks, key_takeaways, category_id,
       categories (id, name, slug),
       author_id, author_name, author_role, author_avatar,
       status, updated_at, published_at, featured_image_url,
+      is_breaking_news, is_lead, is_featured, is_opinion, is_sponsored, sponsor_name,
+      reading_time_minutes, view_count, location, image_credit, featured_image_alt, featured_image_caption,
+      custom_author, seo_title, meta_description,
       article_tags (
         tags (id, name, slug)
       )
@@ -884,9 +919,15 @@ export const saveArticle = async (
     const finalPost: WpPost = {
       ...mapped,
       blocks: postData.blocks && postData.blocks.length > 0 ? postData.blocks : mapped.blocks,
+      content: contentText || mapped.content,
       editorialStatus: (resultArticle.status || targetStatus) as EditorialStatus,
       status: resultArticle.status || targetStatus,
     };
+    if (targetStatus === 'published') {
+      try {
+        savePublishedPost(finalPost);
+      } catch (e) {}
+    }
     return { post: finalPost };
   } catch (err: any) {
     console.error('Unexpected error in saveArticle:', err);

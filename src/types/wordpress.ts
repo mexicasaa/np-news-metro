@@ -77,6 +77,7 @@ export interface WpPost {
   desk?: string;
   subcategory?: string;
   location?: string;
+  sourceAgency?: string;
   tags: string[];
   authorId: string;
   customAuthor?: {

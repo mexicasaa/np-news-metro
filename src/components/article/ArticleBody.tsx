@@ -164,6 +164,25 @@ export const ArticleBody: React.FC<ArticleBodyProps> = ({
             const isFirstParagraph = index === 0;
             const rawContent = block.content || '';
 
+            // Check if chunk is actually an HTML heading tag (e.g. <h2 class="text-justify">...</h2>)
+            const hTagMatch = rawContent.match(/^<h([1-6])\s+[^>]*class=["']([^"']*text-(center|right|justify|left)[^"']*)["'][^>]*>([\s\S]*?)<\/h\1>$/i) ||
+              rawContent.match(/^<h([1-6])(?:\s+[^>]*)?>([\s\S]*?)<\/h\1>$/i);
+            if (hTagMatch) {
+              const level = parseInt(hTagMatch[1], 10);
+              const alignMatch = hTagMatch[0].match(/text-(center|right|justify|left)/i);
+              const alignClass = alignMatch ? `text-${alignMatch[1].toLowerCase()}` : '';
+              const innerText = hTagMatch[3] || hTagMatch[2];
+              return level === 3 ? (
+                <h3 key={block.id} className={`font-serif text-xl sm:text-2xl font-bold text-ink mt-8 mb-3 ${alignClass}`}>
+                  {renderInlineMarkdown(cleanParagraphFlow(innerText))}
+                </h3>
+              ) : (
+                <h2 key={block.id} className={`font-serif text-2xl sm:text-3xl font-bold text-ink mt-10 mb-4 ${alignClass}`}>
+                  {renderInlineMarkdown(cleanParagraphFlow(innerText))}
+                </h2>
+              );
+            }
+
             // Check if paragraph has text alignment wrapper (e.g. <p class="text-center">...</p>)
             let alignClass = '';
             let content = rawContent;

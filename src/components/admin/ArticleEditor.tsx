@@ -340,8 +340,8 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     }
   };
   const [articleType, setArticleType] = useState('Standard News Report');
-  const [location, setLocation] = useState('New Delhi');
-  const [sourceAgency, setSourceAgency] = useState('NP News Metro Special Bureau');
+  const [location, setLocation] = useState(initialPost?.location || 'New Delhi');
+  const [sourceAgency, setSourceAgency] = useState(initialPost?.sourceAgency || 'NP News Metro Special Bureau');
   const [tags, setTags] = useState<string[]>(initialPost?.tags || ['National News', 'Policy', 'Breaking']);
   const [tagInput, setTagInput] = useState('');
 
@@ -523,6 +523,8 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       setCustomAuthorName(initialPost.customAuthor?.name || '');
       setCustomAuthorRole(initialPost.customAuthor?.role || 'Newsroom');
       setCustomAuthorAvatar(initialPost.customAuthor?.avatar || '');
+      setLocation(initialPost.location || 'New Delhi');
+      setSourceAgency(initialPost.sourceAgency || 'NP News Metro Special Bureau');
       setIsBreaking(initialPost.isBreaking || false);
       setIsOpinion(initialPost.isOpinion || false);
       setFeaturedImage(initialPost.featuredImage || '');
@@ -548,6 +550,8 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       setCategory('india');
       setSubcategory('National Policy & Governance');
       setIsCustomSubcategory(false);
+      setLocation('New Delhi');
+      setSourceAgency('NP News Metro Special Bureau');
       setTags(['National News', 'Policy', 'Breaking']);
       setFeaturedImage('');
       setImageCaption('');
@@ -1078,22 +1082,24 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       }
       
       const h2Match = chunk.match(/^##\s+([\s\S]*)$/);
-      if (h2Match) {
+      const htmlH2Match = chunk.match(/^<h2(?:\s+[^>]*)?>([\s\S]*?)<\/h2>$/i);
+      if (h2Match || htmlH2Match) {
         return {
           id: `h2-${i}`,
           type: 'heading',
           level: 2,
-          content: h2Match[1].trim(),
+          content: htmlH2Match ? chunk : h2Match![1].trim(),
         } as GutenbergBlock;
       }
 
       const h3Match = chunk.match(/^###\s+([\s\S]*)$/);
-      if (h3Match) {
+      const htmlH3Match = chunk.match(/^<h3(?:\s+[^>]*)?>([\s\S]*?)<\/h3>$/i);
+      if (h3Match || htmlH3Match) {
         return {
           id: `h3-${i}`,
           type: 'heading',
           level: 3,
-          content: h3Match[1].trim(),
+          content: htmlH3Match ? chunk : h3Match![1].trim(),
         } as GutenbergBlock;
       }
 
@@ -1301,7 +1307,8 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
   };
 
   const getPostData = (overrideStatus?: EditorialStatus): Partial<WpPost> & { isEdit?: boolean } => {
-    const blocks = parseBlocks(content);
+    const liveContent = editorRef.current ? htmlToEditorMarkdown(editorRef.current.innerHTML) : content;
+    const blocks = parseBlocks(liveContent);
     const effectiveSlug = slug && slug !== 'auto-draft' ? slug : slugifyText(title || 'story');
     const effectiveId = persistedDraftId || initialPost?.id || `post-${Date.now()}`;
     const effectiveIsEdit = isEditMode || Boolean(initialPost?.id) || Boolean(persistedDraftId);
@@ -1313,14 +1320,17 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       title: title || 'Untitled News Story',
       titleHi: title || 'Untitled News Story',
       slug: effectiveSlug,
+      content: liveContent,
       desk: deskId,
       category,
       subcategory,
+      location,
+      sourceAgency,
       authorId: authorId,
       customAuthor: {
         name: customAuthorName.trim() || selectedAuthor.name,
         role: customAuthorRole.trim() || 'Newsroom',
-        avatar: DEFAULT_AUTHOR_AVATAR,
+        avatar: customAuthorAvatar || DEFAULT_AUTHOR_AVATAR,
         bio: (selectedAuthor as any)?.bio || '',
         isGuest: true,
       },
