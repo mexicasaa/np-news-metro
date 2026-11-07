@@ -7,6 +7,7 @@ import { handleImageError, getOptimizedImageUrl } from '../../utils/imageFallbac
 import { useLanguage } from '../../context/LanguageContext';
 import { getLocalizedPost } from '../../data/mockWpData';
 import { isHindiText, getCachedTranslation } from '../../services/translationService';
+import { cleanParagraphFlow } from '../../utils/editorFormatting';
 
 interface ArticleBodyProps {
   post: WpPost;
@@ -161,7 +162,20 @@ export const ArticleBody: React.FC<ArticleBodyProps> = ({
         switch (block.type) {
           case 'paragraph': {
             const isFirstParagraph = index === 0;
-            const content = block.content || '';
+            const rawContent = block.content || '';
+
+            // Check if paragraph has text alignment wrapper (e.g. <p class="text-center">...</p>)
+            let alignClass = '';
+            let content = rawContent;
+            const pAlignMatch = rawContent.match(/^<p\s+[^>]*class=["']([^"']*text-(center|right|justify|left)[^"']*)["'][^>]*>([\s\S]*?)<\/p>$/i);
+            if (pAlignMatch) {
+              const align = pAlignMatch[2];
+              if (align === 'center') alignClass = 'text-center';
+              else if (align === 'right') alignClass = 'text-right';
+              else if (align === 'justify') alignClass = 'text-justify';
+              else if (align === 'left') alignClass = 'text-left';
+              content = pAlignMatch[3];
+            }
 
             // If a paragraph contains bullet items (e.g. lines starting with '- ' or '* ')
             const lines = content.split('\n').map(l => l.trim()).filter(Boolean);
@@ -179,32 +193,45 @@ export const ArticleBody: React.FC<ArticleBodyProps> = ({
               );
             }
 
+            const cleanContent = cleanParagraphFlow(content);
+
             return (
               <p
                 key={block.id}
-                className={`text-base sm:text-lg text-ink-secondary mb-6 leading-relaxed whitespace-pre-line ${
-                  isFirstParagraph
+                className={`text-base sm:text-lg text-ink-secondary mb-6 leading-relaxed ${alignClass} ${
+                  isFirstParagraph && !alignClass
                     ? 'first-letter:font-serif first-letter:text-4xl sm:first-letter:text-5xl first-letter:font-bold first-letter:text-primary first-letter:mr-2 sm:first-letter:mr-3 first-letter:float-left first-letter:leading-none'
                     : ''
                 }`}
               >
-                {renderInlineMarkdown(content)}
+                {renderInlineMarkdown(cleanContent)}
               </p>
             );
           }
 
           case 'heading': {
-            const headingContent = renderInlineMarkdown(block.content);
+            let headingContent = block.content || '';
+            let alignClass = '';
+            const hAlignMatch = headingContent.match(/^<h[1-6]\s+[^>]*class=["']([^"']*text-(center|right|justify|left)[^"']*)["'][^>]*>([\s\S]*?)<\/h[1-6]>$/i);
+            if (hAlignMatch) {
+              const align = hAlignMatch[2];
+              if (align === 'center') alignClass = 'text-center';
+              else if (align === 'right') alignClass = 'text-right';
+              else if (align === 'justify') alignClass = 'text-justify';
+              headingContent = hAlignMatch[3];
+            }
+
+            const parsedHeading = renderInlineMarkdown(headingContent);
             if (block.level === 3) {
               return (
-                <h3 key={block.id} className="font-serif text-xl sm:text-2xl font-bold text-ink mt-8 mb-3">
-                  {headingContent}
+                <h3 key={block.id} className={`font-serif text-xl sm:text-2xl font-bold text-ink mt-8 mb-3 ${alignClass}`}>
+                  {parsedHeading}
                 </h3>
               );
             }
             return (
-              <h2 key={block.id} className="font-serif text-2xl sm:text-3xl font-bold text-ink mt-10 mb-4 border-b border-border-subtle pb-2">
-                {headingContent}
+              <h2 key={block.id} className={`font-serif text-2xl sm:text-3xl font-bold text-ink mt-10 mb-4 border-b border-border-subtle pb-2 ${alignClass}`}>
+                {parsedHeading}
               </h2>
             );
           }

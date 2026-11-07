@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
-  Camera, Link2, Quote, List, AlignLeft, AlignCenter, AlignRight, 
+  Camera, Link2, Quote, List, AlignLeft, AlignCenter, AlignRight, AlignJustify,
   Bold, Italic, Settings, X, ChevronDown, ChevronUp, Eye, FileText, Search,
   ImagePlus, ExternalLink, RefreshCw, ArrowLeft, CheckCircle2,
   HelpCircle, Globe, Clock, ShieldCheck, Tag, Layout, Type, AlertCircle,
@@ -21,7 +21,7 @@ import { slugifyText } from '../../utils/slugify';
 import { getAuthorAvatarUrl, DEFAULT_AUTHOR_AVATAR, handleAvatarError } from '../../utils/imageFallback';
 import { saveAutoSaveSession, clearAutoSaveSession, saveDraftPost, setRefreshSession, isPostPublished } from '../../utils/newsStorage';
 import { getNewsroomAuthors } from '../../services/authService';
-import { formatArticleText, formatPastedContent, markdownToEditorHtml, htmlToEditorMarkdown, reconstructMarkdownFromBlocks } from '../../utils/editorFormatting';
+import { formatArticleText, formatPastedContent, markdownToEditorHtml, htmlToEditorMarkdown, reconstructMarkdownFromBlocks, cleanParagraphFlow } from '../../utils/editorFormatting';
 import { EDITORIAL_DESKS, EditorialDesk, getDeskByIdOrCategory, getSubcategoriesForDeskOrCategory } from '../../data/editorialTaxonomy';
 
 export interface EditorBlock {
@@ -139,6 +139,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
 
   const [isBoldActive, setIsBoldActive] = useState(false);
   const [isItalicActive, setIsItalicActive] = useState(false);
+  const [currentAlignment, setCurrentAlignment] = useState<'left' | 'center' | 'right' | 'justify'>('left');
 
   const updateToolbarActiveStates = useCallback(() => {
     if (typeof window === 'undefined' || typeof document === 'undefined') return;
@@ -153,6 +154,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
         (start >= 2 && dek.substring(start - 2, start) === '**' && end + 2 <= dek.length && dek.substring(end, end + 2) === '**');
       setIsBoldActive(isDekBold);
       setIsItalicActive(false);
+      setCurrentAlignment('left');
       return;
     }
 
@@ -162,6 +164,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     if (!selection || selection.rangeCount === 0) {
       setIsBoldActive(false);
       setIsItalicActive(false);
+      setCurrentAlignment('left');
       return;
     }
 
@@ -215,11 +218,38 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
         }
       }
 
+      // Detect current block's text alignment (like MS Word)
+      let align: 'left' | 'center' | 'right' | 'justify' = 'left';
+      try {
+        if (document.queryCommandState('justifyCenter')) align = 'center';
+        else if (document.queryCommandState('justifyRight')) align = 'right';
+        else if (document.queryCommandState('justifyFull')) align = 'justify';
+        else if (document.queryCommandState('justifyLeft')) align = 'left';
+      } catch {}
+
+      if (range.startContainer) {
+        let node: Node | null = range.startContainer.nodeType === Node.TEXT_NODE
+          ? range.startContainer.parentElement
+          : (range.startContainer as HTMLElement);
+        while (node && node !== editorRef.current) {
+          if (node instanceof HTMLElement) {
+            const ta = (node.style.textAlign || window.getComputedStyle(node).textAlign || '').toLowerCase();
+            if (ta === 'center' || node.classList.contains('text-center')) { align = 'center'; break; }
+            if (ta === 'right' || node.classList.contains('text-right')) { align = 'right'; break; }
+            if (ta === 'justify' || node.classList.contains('text-justify')) { align = 'justify'; break; }
+            if (ta === 'left' || ta === 'start' || node.classList.contains('text-left')) { align = 'left'; break; }
+          }
+          node = node.parentElement;
+        }
+      }
+
       setIsBoldActive(isBold);
       setIsItalicActive(isItalic);
+      setCurrentAlignment(align);
     } else {
       setIsBoldActive(false);
       setIsItalicActive(false);
+      setCurrentAlignment('left');
     }
   }, [dek]);
 
@@ -632,6 +662,54 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     }
   }, [dek, adjustDekHeight]);
 
+  const handleToolbarAlign = useCallback((alignment: 'left' | 'center' | 'right' | 'justify') => {
+    const editor = editorRef.current;
+    if (!editor) return;
+    editor.focus();
+
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0 || !editor.contains(sel.anchorNode)) {
+      if (lastEditorRangeRef.current && editor.contains(lastEditorRangeRef.current.commonAncestorContainer)) {
+        sel?.removeAllRanges();
+        sel?.addRange(lastEditorRangeRef.current.cloneRange());
+      }
+    }
+
+    const cmdMap = {
+      left: 'justifyLeft',
+      center: 'justifyCenter',
+      right: 'justifyRight',
+      justify: 'justifyFull'
+    };
+
+    try {
+      document.execCommand(cmdMap[alignment], false);
+    } catch {}
+
+    // Find the enclosing block element (p, h2, h3, blockquote, div, li) and apply class and style
+    const currentSel = window.getSelection();
+    if (currentSel && currentSel.rangeCount > 0) {
+      const range = currentSel.getRangeAt(0);
+      let node: Node | null = range.startContainer.nodeType === Node.TEXT_NODE
+        ? range.startContainer.parentElement
+        : (range.startContainer as HTMLElement);
+      while (node && node !== editor) {
+        if (node instanceof HTMLElement && /^(P|H[1-6]|BLOCKQUOTE|DIV|LI)$/i.test(node.tagName)) {
+          node.style.textAlign = alignment;
+          node.classList.remove('text-left', 'text-center', 'text-right', 'text-justify');
+          node.classList.add(`text-${alignment}`);
+          break;
+        }
+        node = node.parentElement;
+      }
+      lastEditorRangeRef.current = range.cloneRange();
+    }
+
+    setCurrentAlignment(alignment);
+    syncContentFromDom();
+    updateToolbarActiveStates();
+  }, [syncContentFromDom, updateToolbarActiveStates]);
+
   const handleToolbarBold = useCallback(() => {
     if (lastFocusedZoneRef.current === 'dek' && dekTextareaRef.current && document.activeElement === dekTextareaRef.current) {
       handleDekBold();
@@ -662,15 +740,15 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       sel?.addRange(range);
     }
 
-    // 1. If range is collapsed, check if cursor is on/inside a word to expand selection
+    // 1. If range is collapsed, expand selection to surrounding word (including Hindi/Devanagari marks \p{M})
     if (range.collapsed) {
       const container = range.startContainer;
       if (container.nodeType === Node.TEXT_NODE && container.textContent) {
         const text = container.textContent;
         const offset = range.startOffset;
 
-        // Unicode-aware word character regex (supports English letters, digits, and Hindi/Devanagari letters)
-        const isWordChar = (char?: string) => Boolean(char && /[\p{L}\p{N}_]/u.test(char));
+        // Unicode-aware word character regex (supports English letters, digits, and Hindi/Devanagari letters + marks/matras)
+        const isWordChar = (char?: string) => Boolean(char && /[\p{L}\p{M}\p{N}_]/u.test(char));
 
         if (
           (offset > 0 && isWordChar(text[offset - 1])) ||
@@ -728,76 +806,25 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       }
     }
 
-    // 3. Smart Bold / Unbold execution
-    if (isCurrentlyBold) {
-      // User wants to UNBOLD (remove bold)
-      if (boldAncestor) {
-        const selText = range.toString().trim();
-        const ancestorText = (boldAncestor.textContent || '').trim();
+    // 3. Execute standard bold command
+    try {
+      document.execCommand('bold', false);
+    } catch {}
 
-        if (range.collapsed || selText === ancestorText || (range.commonAncestorContainer === boldAncestor && selText.length >= ancestorText.length)) {
-          const parent = boldAncestor.parentNode;
-          if (parent) {
-            while (boldAncestor.firstChild) {
-              parent.insertBefore(boldAncestor.firstChild, boldAncestor);
-            }
-            parent.removeChild(boldAncestor);
-          }
-        } else {
-          // Normalize strong to b and use execCommand to cleanly unbold selection
-          if (boldAncestor.tagName.toLowerCase() === 'strong') {
-            const b = document.createElement('b');
-            b.className = 'font-bold';
-            while (boldAncestor.firstChild) b.appendChild(boldAncestor.firstChild);
-            boldAncestor.parentNode?.replaceChild(b, boldAncestor);
-          }
-          try {
-            document.execCommand('bold', false);
-          } catch {}
-        }
-      } else {
-        try {
-          document.execCommand('bold', false);
-        } catch {}
-      }
+    // Verify if unbold was intended and whether execCommand unbolded it
+    let stillBold = false;
+    try {
+      stillBold = Boolean(document.queryCommandState('bold'));
+    } catch {}
 
-      // Also unwrap any b/strong tags directly inside the selection
-      if (!range.collapsed) {
-        const parentCommon = range.commonAncestorContainer.nodeType === Node.TEXT_NODE
-          ? range.commonAncestorContainer.parentElement
-          : (range.commonAncestorContainer as HTMLElement);
-        if (parentCommon) {
-          parentCommon.querySelectorAll('strong, b').forEach(el => {
-            if (sel.containsNode(el, true)) {
-              const p = el.parentNode;
-              if (p) {
-                while (el.firstChild) p.insertBefore(el.firstChild, el);
-                p.removeChild(el);
-              }
-            }
-          });
+    // If it was bold and user clicked to unbold, but execCommand didn't remove it (e.g. from an ancestor strong tag), unwrap cleanly
+    if (isCurrentlyBold && stillBold && boldAncestor && editor.contains(boldAncestor)) {
+      const parent = boldAncestor.parentNode;
+      if (parent) {
+        while (boldAncestor.firstChild) {
+          parent.insertBefore(boldAncestor.firstChild, boldAncestor);
         }
-      }
-    } else {
-      // User wants to BOLD (make bold)
-      if (!range.collapsed) {
-        try {
-          document.execCommand('bold', false);
-        } catch {
-          const b = document.createElement('b');
-          b.className = 'font-bold';
-          try {
-            range.surroundContents(b);
-          } catch {
-            const contents = range.extractContents();
-            b.appendChild(contents);
-            range.insertNode(b);
-          }
-        }
-      } else {
-        try {
-          document.execCommand('bold', false);
-        } catch {}
+        parent.removeChild(boldAncestor);
       }
     }
 
@@ -832,10 +859,31 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     // Italic: Ctrl+I or Cmd+I
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'i') {
       e.preventDefault();
-      document.execCommand('italic', false);
-      syncContentFromDom();
-      updateToolbarActiveStates();
-      setTimeout(updateToolbarActiveStates, 10);
+      handleToolbarItalic();
+      return;
+    }
+    // Align Left: Ctrl+L or Cmd+L
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'l') {
+      e.preventDefault();
+      handleToolbarAlign('left');
+      return;
+    }
+    // Align Center: Ctrl+E or Cmd+E (MS Word standard)
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'e') {
+      e.preventDefault();
+      handleToolbarAlign('center');
+      return;
+    }
+    // Align Right: Ctrl+R or Cmd+R (MS Word standard)
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'r') {
+      e.preventDefault();
+      handleToolbarAlign('right');
+      return;
+    }
+    // Justify: Ctrl+J or Cmd+J (MS Word standard)
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'j') {
+      e.preventDefault();
+      handleToolbarAlign('justify');
       return;
     }
   };
@@ -1115,21 +1163,23 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       if (htmlData && htmlData.trim()) {
         e.preventDefault();
         const markdown = htmlToEditorMarkdown(htmlData);
-        const cleanHtml = markdownToEditorHtml(markdown);
+        const cleanFlow = cleanParagraphFlow(markdown);
+        const cleanHtml = markdownToEditorHtml(cleanFlow);
         document.execCommand('insertHTML', false, cleanHtml);
         syncContentFromDom();
         return;
       }
       if (plainData) {
         e.preventDefault();
-        const cleanHtml = markdownToEditorHtml(plainData);
+        const cleanFlow = cleanParagraphFlow(plainData);
+        const cleanHtml = markdownToEditorHtml(cleanFlow);
         document.execCommand('insertHTML', false, cleanHtml);
         syncContentFromDom();
         return;
       }
     }
 
-    const formatted = formatPastedContent(htmlData, plainData);
+    const formatted = cleanParagraphFlow(formatPastedContent(htmlData, plainData));
     if (!formatted) return;
 
     e.preventDefault();
@@ -1156,15 +1206,16 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
   const handleFormatParagraphSpacing = () => {
     if (editorRef.current) {
       const currentMarkdown = htmlToEditorMarkdown(editorRef.current.innerHTML);
-      const formatted = formatArticleText(currentMarkdown);
+      const formatted = cleanParagraphFlow(currentMarkdown);
       editorRef.current.innerHTML = markdownToEditorHtml(formatted);
       setContent(formatted);
+      syncContentFromDom();
       return;
     }
 
     const textarea = textareaRef.current;
     if (!textarea) {
-      setContent(prev => formatArticleText(prev));
+      setContent(prev => cleanParagraphFlow(prev));
       return;
     }
 
@@ -1173,7 +1224,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
 
     if (start !== end) {
       const selected = content.substring(start, end);
-      const formatted = formatArticleText(selected);
+      const formatted = cleanParagraphFlow(selected);
       const updated = content.substring(0, start) + formatted + content.substring(end);
       setContent(updated);
       setTimeout(() => {
@@ -1181,7 +1232,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
         textarea.setSelectionRange(start, start + formatted.length);
       }, 50);
     } else {
-      const formatted = formatArticleText(content);
+      const formatted = cleanParagraphFlow(content);
       setContent(formatted);
       setTimeout(() => {
         textarea.focus();
@@ -1869,6 +1920,79 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                   >
                     <Italic className="w-3.5 h-3.5" />
                   </button>
+
+                  <div className="w-px h-4 bg-slate-200/80 mx-1"></div>
+
+                  {/* Alignment buttons (MS Word style) */}
+                  <div className="flex items-center gap-0.5 bg-slate-100/80 p-0.5 rounded-lg border border-slate-200/70">
+                    <button
+                      type="button"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        handleToolbarAlign('left');
+                      }}
+                      className={`p-1.5 rounded-md transition-all cursor-pointer flex items-center justify-center ${
+                        currentAlignment === 'left'
+                          ? 'bg-slate-900 text-white shadow-xs ring-1 ring-slate-900 scale-[1.05]'
+                          : 'text-slate-600 hover:bg-slate-200 hover:text-slate-900'
+                      }`}
+                      title="Align Left (Ctrl+L)"
+                      aria-label="Align Left"
+                    >
+                      <AlignLeft className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        handleToolbarAlign('center');
+                      }}
+                      className={`p-1.5 rounded-md transition-all cursor-pointer flex items-center justify-center ${
+                        currentAlignment === 'center'
+                          ? 'bg-slate-900 text-white shadow-xs ring-1 ring-slate-900 scale-[1.05]'
+                          : 'text-slate-600 hover:bg-slate-200 hover:text-slate-900'
+                      }`}
+                      title="Align Center (Ctrl+E)"
+                      aria-label="Align Center"
+                    >
+                      <AlignCenter className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        handleToolbarAlign('right');
+                      }}
+                      className={`p-1.5 rounded-md transition-all cursor-pointer flex items-center justify-center ${
+                        currentAlignment === 'right'
+                          ? 'bg-slate-900 text-white shadow-xs ring-1 ring-slate-900 scale-[1.05]'
+                          : 'text-slate-600 hover:bg-slate-200 hover:text-slate-900'
+                      }`}
+                      title="Align Right (Ctrl+R)"
+                      aria-label="Align Right"
+                    >
+                      <AlignRight className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        handleToolbarAlign('justify');
+                      }}
+                      className={`p-1.5 rounded-md transition-all cursor-pointer flex items-center justify-center ${
+                        currentAlignment === 'justify'
+                          ? 'bg-slate-900 text-white shadow-xs ring-1 ring-slate-900 scale-[1.05]'
+                          : 'text-slate-600 hover:bg-slate-200 hover:text-slate-900'
+                      }`}
+                      title="Justify (Ctrl+J)"
+                      aria-label="Justify text"
+                    >
+                      <AlignJustify className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+
+                  <div className="w-px h-4 bg-slate-200/80 mx-1"></div>
+
                   <button
                     type="button"
                     onMouseDown={(e) => {
@@ -1951,7 +2075,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                   }}
                   onPaste={handlePaste}
                   style={{ outline: 'none', border: 'none', boxShadow: 'none' }}
-                  className="w-full text-base sm:text-lg leading-relaxed text-slate-800 font-serif border-none outline-none focus:outline-none focus:ring-0 ring-0 focus-visible:outline-none min-h-[460px] bg-transparent selection:bg-blue-600 selection:text-white [&_b]:font-bold [&_b]:text-slate-950 [&_strong]:font-bold [&_strong]:text-slate-950 [&_em]:italic [&_i]:italic [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mt-6 [&_h2]:mb-2 [&_h2]:text-slate-900 [&_h3]:text-xl [&_h3]:font-bold [&_h3]:mt-4 [&_h3]:mb-2 [&_h3]:text-slate-900 [&_blockquote]:border-l-4 [&_blockquote]:border-slate-300 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-slate-600 [&_blockquote]:my-3 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-1 [&_ul]:my-3 [&_p]:mb-4"
+                  className="w-full text-base sm:text-lg leading-relaxed text-slate-800 font-serif border-none outline-none focus:outline-none focus:ring-0 ring-0 focus-visible:outline-none min-h-[460px] bg-transparent selection:bg-blue-600 selection:text-white [&_b]:font-bold [&_b]:text-slate-950 [&_strong]:font-bold [&_strong]:text-slate-950 [&_em]:italic [&_i]:italic [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mt-6 [&_h2]:mb-2 [&_h2]:text-slate-900 [&_h3]:text-xl [&_h3]:font-bold [&_h3]:mt-4 [&_h3]:mb-2 [&_h3]:text-slate-900 [&_blockquote]:border-l-4 [&_blockquote]:border-slate-300 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-slate-600 [&_blockquote]:my-3 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-1 [&_ul]:my-3 [&_p]:mb-4 [&_.text-center]:text-center [&_.text-right]:text-right [&_.text-justify]:text-justify [&_.text-left]:text-left"
                 />
               </div>
 

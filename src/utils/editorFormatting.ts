@@ -5,24 +5,64 @@
  */
 
 /**
- * Formats article text for clean paragraph presentation:
- * - Normalizes Windows CRLF to standard Unix LF (\n).
- * - Preserves single newlines within paragraphs so multi-line sentences stay together.
- * - Preserves double newlines (\n\n) between distinct paragraphs.
- * - Collapses excessive blank lines (3 or more newlines become \n\n).
- * - Trims trailing whitespace from each line while maintaining indentation and structure.
+ * Cleans paragraph flow by merging broken single-line-breaks within paragraphs
+ * into natural continuous sentences with proper spacing, while strictly preserving
+ * paragraph boundaries (double newlines \n\n), bullet lists (- or *), headings (##),
+ * pullquotes (>), and image tags.
  */
-export const formatArticleText = (text: string): string => {
+export const cleanParagraphFlow = (text: string): string => {
   if (!text) return '';
   const normalized = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
   if (!normalized.trim()) return '';
 
-  // Trim trailing whitespace from each line without destroying leading indent/spacing
-  const lines = normalized.split('\n');
-  const cleanedLines = lines.map(line => line.trimEnd());
-  
-  // Collapse 3+ consecutive newlines to standard double newlines (\n\n)
-  return cleanedLines.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+  // Split into distinct blocks by 2 or more newlines
+  const blocks = normalized.split(/\n\s*\n+/);
+
+  const cleaned = blocks.map(block => {
+    const trimmed = block.trim();
+    if (!trimmed) return '';
+
+    // Handle HTML block tags (like <p class="text-center">...</p>)
+    const htmlBlockMatch = trimmed.match(/^<([a-z0-9]+)(\s+[^>]*)?>([\s\S]*)<\/\1>$/i);
+    if (htmlBlockMatch) {
+      const tag = htmlBlockMatch[1].toLowerCase();
+      const attrs = htmlBlockMatch[2] || '';
+      const inner = htmlBlockMatch[3];
+      if (['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote'].includes(tag)) {
+        const innerMerged = inner.split('\n').map(l => l.trim()).filter(Boolean).join(' ');
+        return `<${tag}${attrs}>${innerMerged}</${tag}>`;
+      }
+      return trimmed;
+    }
+
+    // Preserve markdown lists, headings, pullquotes, and images
+    if (
+      /^[-*]\s+/m.test(trimmed) ||
+      /^#{1,6}\s+/m.test(trimmed) ||
+      /^>/m.test(trimmed) ||
+      /^!\[/m.test(trimmed)
+    ) {
+      return trimmed;
+    }
+
+    // Merge single line breaks inside the paragraph with a single space
+    const lines = trimmed.split('\n').map(l => l.trim()).filter(Boolean);
+    return lines.join(' ');
+  });
+
+  return cleaned.filter(Boolean).join('\n\n');
+};
+
+/**
+ * Formats article text for clean paragraph presentation:
+ * - Normalizes Windows CRLF to standard Unix LF (\n).
+ * - Cleans jagged single-line-breaks into continuous flowing paragraphs.
+ * - Preserves double newlines (\n\n) between distinct paragraphs.
+ * - Collapses excessive blank lines.
+ */
+export const formatArticleText = (text: string): string => {
+  if (!text) return '';
+  return cleanParagraphFlow(text);
 };
 
 /**
@@ -148,19 +188,42 @@ export const convertHtmlToEditorMarkdown = (html: string): string => {
       const el = node as HTMLElement;
       const tag = el.tagName.toLowerCase();
 
+      const getBlockAlignment = (element: HTMLElement): string => {
+        const styleAlign = (element.style?.textAlign || element.getAttribute('align') || '').toLowerCase().trim();
+        if (styleAlign === 'center' || styleAlign === 'right' || styleAlign === 'justify') return styleAlign;
+        if (element.classList?.contains('text-center')) return 'center';
+        if (element.classList?.contains('text-right')) return 'right';
+        if (element.classList?.contains('text-justify')) return 'justify';
+        return '';
+      };
+
       // Heading 1 / 2
       if (tag === 'h1' || tag === 'h2') {
         flushInlineBuffer();
+        const align = getBlockAlignment(el);
         const text = Array.from(el.childNodes).map(serializeInline).join('').trim();
-        if (text) blocks.push(`## ${text}`);
+        if (text) {
+          if (align) {
+            blocks.push(`<h2 class="text-${align}">${text}</h2>`);
+          } else {
+            blocks.push(`## ${text}`);
+          }
+        }
         return;
       }
 
       // Heading 3-6
       if (tag === 'h3' || tag === 'h4' || tag === 'h5' || tag === 'h6') {
         flushInlineBuffer();
+        const align = getBlockAlignment(el);
         const text = Array.from(el.childNodes).map(serializeInline).join('').trim();
-        if (text) blocks.push(`### ${text}`);
+        if (text) {
+          if (align) {
+            blocks.push(`<h3 class="text-${align}">${text}</h3>`);
+          } else {
+            blocks.push(`### ${text}`);
+          }
+        }
         return;
       }
 
@@ -189,8 +252,15 @@ export const convertHtmlToEditorMarkdown = (html: string): string => {
       // Paragraph
       if (tag === 'p') {
         flushInlineBuffer();
+        const align = getBlockAlignment(el);
         const text = Array.from(el.childNodes).map(serializeInline).join('').trim();
-        if (text) blocks.push(text);
+        if (text) {
+          if (align) {
+            blocks.push(`<p class="text-${align}">${text}</p>`);
+          } else {
+            blocks.push(text);
+          }
+        }
         return;
       }
 
@@ -264,13 +334,13 @@ export const formatInlineToEditorHtml = (text: string): string => {
   // Clean out any runaway consecutive asterisks
   res = res.replace(/\*{4,}/g, '**');
 
-  // Normalize existing <strong> tags to <b class="font-bold"> for seamless contentEditable toggle
-  res = res.replace(/<strong(?:\s+[^>]*)?>([\s\S]*?)<\/strong>/gi, '<b class="font-bold">$1</b>');
-  res = res.replace(/<b(?:\s+class=["'][^"']*["'])?>([\s\S]*?)<\/b>/gi, '<b class="font-bold">$1</b>');
+  // Normalize existing <strong> tags to standard <b> for seamless contentEditable toggle
+  res = res.replace(/<strong(?:\s+[^>]*)?>([\s\S]*?)<\/strong>/gi, '<b>$1</b>');
+  res = res.replace(/<b(?:\s+class=["'][^"']*["'])?>([\s\S]*?)<\/b>/gi, '<b>$1</b>');
 
-  // Convert markdown bold **text** to <b class="font-bold">text</b>
+  // Convert markdown bold **text** to <b>text</b>
   // Non-greedy match that supports Hindi/Unicode, punctuation, and inner content
-  res = res.replace(/\*\*([^\*\n]+?)\*\*/g, '<b class="font-bold">$1</b>');
+  res = res.replace(/\*\*([^\*\n]+?)\*\*/g, '<b>$1</b>');
 
   // Convert markdown italic *text* to <em>$1</em> (excluding cases like bullets or wildcards)
   res = res.replace(/(^|[^*])\*([^*\n]+?)\*([^*]|$)/g, '$1<em>$2</em>$3');
@@ -298,7 +368,13 @@ export const markdownToEditorHtml = (markdown: string): string => {
 
     // If block is already HTML block tag, do not wrap in extra <p>
     if (/^<(p|div|h[1-6]|ul|ol|blockquote)[\s>]/i.test(trimmed)) {
-      return formatInlineToEditorHtml(trimmed);
+      let formatted = formatInlineToEditorHtml(trimmed);
+      const alignMatch = formatted.match(/class=["'][^"']*text-(center|right|justify|left)[^"']*["']/i);
+      if (alignMatch && !formatted.includes('style=')) {
+        const align = alignMatch[1];
+        formatted = formatted.replace(/<([a-z0-9]+)\s+([^>]*class=["'][^"']*text-[^"']*["'][^>]*)>/i, `<$1 $2 style="text-align: ${align};">`);
+      }
+      return formatted;
     }
 
     // Check heading 2: ## ...
