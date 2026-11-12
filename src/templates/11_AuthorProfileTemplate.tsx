@@ -79,29 +79,55 @@ export const AuthorProfileTemplate: React.FC<AuthorProfileTemplateProps> = ({
   const displayRole = author.role;
   const displayBio = author.bio;
 
-  const [authorPosts, setAuthorPosts] = useState<WpPost[]>(() => {
+  const isEditorialDesk = author.slug === 'editorial' || author.id === 'author-editorial';
+
+  const getInitialAuthorPosts = (): WpPost[] => {
     const stored = getStoredPosts();
-    return stored.filter(
-      (p) =>
+    const matched = stored.filter((p) => {
+      if (isEditorialDesk) {
+        const aName = (p.customAuthor?.name || (p as any).authorName || '').toLowerCase();
+        return (
+          p.authorId === 'author-editorial' ||
+          aName.includes('editorial') ||
+          aName.includes('bureau') ||
+          aName.includes('desk') ||
+          aName.includes('संपादकीय') ||
+          aName.includes('ब्यूरो')
+        );
+      }
+      return (
         p.authorId === author.id ||
         p.customAuthor?.name === author.name ||
         p.customAuthor?.name === author.nameHi ||
         (p as any).authorName === author.name ||
         (p as any).authorName === author.nameHi
-    );
-  });
+      );
+    });
+    if (isEditorialDesk && matched.length === 0) {
+      return stored.slice(0, 12);
+    }
+    return matched;
+  };
+
+  const [authorPosts, setAuthorPosts] = useState<WpPost[]>(getInitialAuthorPosts);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     let isMounted = true;
     setIsLoading(true);
+    setAuthorPosts(getInitialAuthorPosts());
 
-    const queryKey = author.nameHi || author.name || author.slug || author.id;
+    const queryKey = isEditorialDesk
+      ? 'editorial'
+      : (author.nameHi || author.name || author.slug || author.id);
     getAuthorArticles(queryKey)
       .then((fetched) => {
         if (isMounted) {
           if (fetched && fetched.length > 0) {
             setAuthorPosts(fetched);
+          } else if (isEditorialDesk) {
+            const fallback = getStoredPosts().slice(0, 12);
+            if (fallback.length > 0) setAuthorPosts(fallback);
           }
           setIsLoading(false);
         }
@@ -113,7 +139,7 @@ export const AuthorProfileTemplate: React.FC<AuthorProfileTemplateProps> = ({
     return () => {
       isMounted = false;
     };
-  }, [author.id, author.slug, author.name, author.nameHi]);
+  }, [author.id, author.slug, author.name, author.nameHi, isEditorialDesk]);
 
   const displayPosts = authorPosts;
   const popularPosts = [...displayPosts].sort((a, b) => (b.viewsCount || 0) - (a.viewsCount || 0));

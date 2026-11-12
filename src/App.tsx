@@ -66,8 +66,10 @@ import { SeoHead } from './components/common/SeoHead';
 import { 
   generateArticleStructuredData, 
   generateVideoStructuredData, 
-  generateWebsiteStructuredData 
+  generateWebsiteStructuredData,
+  generateAuthorStructuredData 
 } from './services/seoService';
+import { matchEditorialAuthor } from './services/translationService';
 import { 
   UserRole, UserProfile, PublishingOperation, ReadinessCheckResult, 
   DuplicateMatch, ArticleRevision, EditorialStatus
@@ -1826,6 +1828,33 @@ function AppContent() {
           canonicalUrl: `https://www.npnewsmetro.com/${staticPage}`,
         },
         structuredData: generateWebsiteStructuredData('NP News Metro', 'https://www.npnewsmetro.com'),
+      };
+    }
+
+    if (currentTemplate === 'author') {
+      const matched = matchEditorialAuthor(selectedAuthorId);
+      const fallbackName = selectedAuthorId.replace(/^author-/, '').replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+      const authorName = matched ? (isHindi && matched.nameHi ? matched.nameHi : matched.name) : fallbackName;
+      const authorRole = matched ? (isHindi && matched.roleHi ? matched.roleHi : matched.role) : 'Staff Correspondent';
+      const authorBio = matched ? (isHindi && matched.bioHi ? matched.bioHi : matched.bio) : '';
+      const authorSlug = matched?.slug || selectedAuthorId.replace(/^author-/, '');
+      const authorAvatar = matched?.avatar || '/logo-circle.png';
+      return {
+        metadata: {
+          title: `${authorName} — Editorial Profile & Dispatches`,
+          description: `Read investigative reports, ground dispatches, and news analysis from ${authorName} at NP News Metro.`,
+          canonicalUrl: `https://www.npnewsmetro.com/author/${authorSlug}`,
+          ogType: 'profile' as const,
+          ogImage: authorAvatar,
+        },
+        structuredData: generateAuthorStructuredData(
+          authorName,
+          authorRole,
+          authorSlug,
+          authorBio,
+          authorAvatar,
+          'https://www.npnewsmetro.com'
+        ),
       };
     }
 

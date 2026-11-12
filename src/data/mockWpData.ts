@@ -320,6 +320,23 @@ export const mockAuthors: Record<string, WpAuthor> = {
       email: 'dr.deepakgoswami@npnewsmetro.com',
     },
   },
+  'author-editorial': {
+    id: 'author-editorial',
+    name: 'NP News Metro Editorial Desk',
+    nameHi: 'एनपी न्यूज़ मेट्रो संपादकीय डेस्क',
+    slug: 'editorial',
+    role: 'Official Newsroom Bureau & Editorial Desk',
+    roleHi: 'आधिकारिक न्यूज़रूम ब्यूरो एवं संपादकीय डेस्क',
+    avatar: '/logo-circle.png',
+    bio: 'The NP News Metro Editorial Desk is our central newsroom collective of editors, bureau chiefs, policy analysts, and ground correspondents delivering fact-verified breaking news, governance analysis, and investigative journalism across India.',
+    bioHi: 'एनपी न्यूज़ मेट्रो संपादकीय डेस्क हमारे वरिष्ठ संपादकों, ब्यूरो प्रमुखों, नीति विश्लेषकों और ज़मीनी संवाददाताओं का मुख्य न्यूज़रूम समूह है, जो देशभर से तथ्य-सत्यापित ब्रेकिंग न्यूज़, शासन विश्लेषण और खोजी पत्रकारिता प्रस्तुत करता है।',
+    verified: true,
+    beats: ['National Affairs', 'Policy & Governance', 'Breaking Dispatches', 'Editorial Standards'],
+    social: {
+      twitter: 'NPNewsMetro',
+      email: 'editor@npnewsmetro.com',
+    },
+  },
 };
 
 export const mockCategories: WpCategory[] = [

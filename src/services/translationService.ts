@@ -482,6 +482,27 @@ export function matchEditorialAuthor(nameOrId: string | null | undefined): WpAut
   // 1. Direct key match in mockAuthors
   if (mockAuthors[raw]) return mockAuthors[raw];
 
+  // 1b. Editorial Desk & Newsroom Bureau aliases
+  if (
+    lower === 'editorial' ||
+    lower === 'author-editorial' ||
+    lower === 'editorial-desk' ||
+    lower === 'editorial-board' ||
+    lower === 'np-news-metro-bureau' ||
+    lower === 'np-news-desk' ||
+    lower === 'np-bureau' ||
+    lower === 'bureau' ||
+    lower === 'staff-reporter' ||
+    lower === 'staff-correspondent' ||
+    lower === 'news-desk' ||
+    lower.includes('editorial') ||
+    lower.includes('bureau') ||
+    raw.includes('संपादकीय') ||
+    raw.includes('ब्यूरो')
+  ) {
+    return mockAuthors['author-editorial'];
+  }
+
   // 2. Neeraj Pandey aliases & Supabase Admin UUID
   if (
     lower === 'author-1' ||

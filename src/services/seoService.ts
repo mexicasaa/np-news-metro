@@ -6,7 +6,7 @@ export interface SeoMetadataOptions {
   description?: string;
   keywords?: string[];
   canonicalUrl?: string;
-  ogType?: 'website' | 'article' | 'video.other';
+  ogType?: 'website' | 'article' | 'video.other' | 'profile';
   ogImage?: string;
   publishedTime?: string;
   modifiedTime?: string;
@@ -63,6 +63,24 @@ export const generateArticleStructuredData = (
     authorSlug = 'cl-tripathi';
   } else if (authorNameLower.includes('siddharth') || authorName.includes('सिद्धार्थ')) {
     authorSlug = 'siddharth-varma';
+  } else if (authorNameLower.includes('neelima') || authorName.includes('नीलिमा')) {
+    authorSlug = 'dr-neelima-pandey';
+  } else if (authorNameLower.includes('diwan') || authorName.includes('दीवान')) {
+    authorSlug = 'diwan-chand-arya';
+  } else if (authorNameLower.includes('raj kumar') || authorName.includes('राज कुमार')) {
+    authorSlug = 'raj-kumar-agarwal';
+  } else if (authorNameLower.includes('krishna nand') || authorName.includes('कृष्ण नंद')) {
+    authorSlug = 'krishna-nand-shastri';
+  } else if (
+    authorNameLower.includes('editorial') ||
+    authorNameLower.includes('bureau') ||
+    authorNameLower.includes('desk') ||
+    authorNameLower.includes('staff') ||
+    authorName.includes('संपादकीय') ||
+    authorName.includes('ब्यूरो') ||
+    authorName.includes('डेस्क')
+  ) {
+    authorSlug = 'editorial';
   } else {
     authorSlug = (authorName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')) || 'editorial';
   }
@@ -277,6 +295,56 @@ export const generateWebsiteStructuredData = (
           target: `${siteUrl}/search?q={search_term_string}`,
           'query-input': 'required name=search_term_string',
         },
+      },
+    ],
+  };
+};
+
+export const generateAuthorStructuredData = (
+  authorName: string,
+  authorRole: string,
+  authorSlug: string,
+  authorBio: string = '',
+  authorAvatar: string = '/logo-circle.png',
+  siteUrl: string = SITE_ORIGIN
+) => {
+  const canonicalUrl = `${siteUrl}/author/${authorSlug}`;
+  const isEditorialDesk = authorSlug === 'editorial';
+  const absoluteAvatar = getAbsoluteImageUrl(authorAvatar, siteUrl);
+
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: siteUrl },
+          { '@type': 'ListItem', position: 2, name: 'Editorial Team', item: `${siteUrl}/editorial-team` },
+          { '@type': 'ListItem', position: 3, name: authorName, item: canonicalUrl },
+        ],
+      },
+      {
+        '@type': 'ProfilePage',
+        name: `${authorName} | NP News Metro`,
+        url: canonicalUrl,
+        mainEntity: isEditorialDesk
+          ? {
+              '@type': 'Organization',
+              name: authorName,
+              url: canonicalUrl,
+              logo: absoluteAvatar,
+              description: authorBio,
+              parentOrganization: { '@type': 'NewsMediaOrganization', name: 'NP News Metro', url: siteUrl },
+            }
+          : {
+              '@type': 'Person',
+              name: authorName,
+              url: canonicalUrl,
+              image: absoluteAvatar,
+              jobTitle: authorRole,
+              description: authorBio,
+              worksFor: { '@type': 'NewsMediaOrganization', name: 'NP News Metro', url: siteUrl },
+            },
       },
     ],
   };

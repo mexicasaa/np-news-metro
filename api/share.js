@@ -42,11 +42,208 @@ async function getRelatedArticlesPool() {
 }
 
 function setShareCache(key, html) {
+  const htmlStr = typeof html === "string" ? html : html?.html;
+  if (!htmlStr) return;
   if (shareWarmCache.size > 500) {
     const oldestKey = shareWarmCache.keys().next().value;
     if (oldestKey) shareWarmCache.delete(oldestKey);
   }
-  shareWarmCache.set(key, { html, timestamp: Date.now() });
+  shareWarmCache.set(key, { html: htmlStr, timestamp: Date.now() });
+}
+
+const KNOWN_AUTHOR_PROFILES = [
+  {
+    slug: "editorial",
+    isEditorialDesk: true,
+    matchSlugs: [
+      "editorial", "author-editorial", "editorial-desk", "editorial-board",
+      "np-news-metro-bureau", "np-news-desk", "np-bureau", "bureau",
+      "staff-reporter", "staff-correspondent", "news-desk", "contributor"
+    ],
+    matchTokens: ["editorial", "bureau", "desk", "np news", "staff", "संपादकीय", "ब्यूरो", "डेस्क", "रिपोर्टर"],
+    name: "NP News Metro Editorial Desk",
+    nameHi: "एनपी न्यूज़ मेट्रो संपादकीय डेस्क",
+    role: "Official Newsroom Bureau & Editorial Desk • NP News Metro",
+    avatar: DEFAULT_OG_IMAGE,
+    bio: "The NP News Metro Editorial Desk is our central newsroom collective of editors, bureau chiefs, policy analysts, and ground correspondents delivering fact-verified breaking news, governance analysis, and investigative journalism across India in Hindi and English.",
+    orFilter: "author_name.ilike.%Editorial%,author_name.ilike.%Bureau%,author_name.ilike.%Desk%,author_name.ilike.%NP News%,author_name.ilike.%Staff%,author_name.ilike.%संपादकीय%,author_name.ilike.%ब्यूरो%,author_name.ilike.%डेस्क%,author_name.ilike.%रिपोर्टर%"
+  },
+  {
+    slug: "neeraj-kumar-pandey",
+    matchSlugs: ["author-1", "author-neeraj-pandey", "neeraj-kumar-pandey", "neeraj-pandey", "04ad79d9-d871-4099-a633-bcb7a1e35055"],
+    matchTokens: ["neeraj", "नीरज"],
+    name: "Neeraj Kumar Pandey",
+    nameHi: "नीरज पाण्डेय",
+    role: "Editor-in-Chief & Senior Correspondent • NP News Metro",
+    avatar: "https://www.npnewsmetro.com/uploads/neeraj-pandey.jpg",
+    bio: "Editor-in-Chief at NP News Metro, leading national reporting, field investigations, parliamentary coverage, and newsroom editorial standards.",
+    orFilter: "author_name.ilike.%नीरज%,author_name.ilike.%Neeraj%"
+  },
+  {
+    slug: "dr-deepak-goswami",
+    matchSlugs: ["author-2", "author-deepak-goswami", "dr-deepak-goswami"],
+    matchTokens: ["deepak", "दीपक"],
+    name: "Dr. Deepak Goswami",
+    nameHi: "डॉ. दीपक गोस्वामी",
+    role: "मानवीय व्यवहार वैज्ञानिक व लेखक • NP News Metro",
+    avatar: "https://www.npnewsmetro.com/uploads/dr-deepak-goswami.jpg",
+    bio: "डॉ. दीपक गोस्वामी मानवीय व्यवहार वैज्ञानिक तथा आदर्श संस्कार शाला (भारत) के राष्ट्रीय समन्वयक हैं। वे कृषि अर्थशास्त्र, ऊर्जा नीति, जन-संस्कृति और सामाजिक-आर्थिक संतुलन पर विचारोत्तेजक शोध व लेखन करते हैं।",
+    orFilter: "author_name.ilike.%दीपक गोस्वामी%,author_name.ilike.%Deepak Goswami%,author_name.ilike.%दीपक%"
+  },
+  {
+    slug: "bholeshwar-upmanyu",
+    matchSlugs: ["author-bholeshwar-upmanyu", "bholeshwar-upmanyu"],
+    matchTokens: ["bholeshwar", "भोलेश्वर"],
+    name: "Bholeshwar Upmanyu",
+    nameHi: "भोलेश्वर उपमन्यु",
+    role: "Advisory Board Member & Veteran Journalist • NP News Metro",
+    avatar: "https://www.npnewsmetro.com/uploads/bholeshwar-upmanyu.jpg",
+    bio: "Advisory Board Member at NP News Metro and veteran journalist, guiding grassroots reporting, regional investigative journalism, and journalistic integrity across Braj & NCR.",
+    orFilter: "author_name.ilike.%भोलेश्वर%,author_name.ilike.%Bholeshwar%"
+  },
+  {
+    slug: "chetan-sharma",
+    matchSlugs: ["author-chetan-sharma", "chetan-sharma"],
+    matchTokens: ["chetan", "चेतन"],
+    name: "Chetan Sharma",
+    nameHi: "चेतन शर्मा",
+    role: "Editor-in-Chief • NP News Metro",
+    avatar: "https://www.npnewsmetro.com/uploads/chetan-sharma.jpg",
+    bio: "Editor-in-Chief at NP News Metro, directing newsroom policy, strategic investigations, breaking coverage, and editorial integrity.",
+    orFilter: "author_name.ilike.%चेतन%,author_name.ilike.%Chetan%"
+  },
+  {
+    slug: "umang-pandey",
+    matchSlugs: ["author-umang-pandey", "umang-pandey"],
+    matchTokens: ["umang", "उमंग"],
+    name: "Umang Pandey",
+    nameHi: "उमंग पाण्डेय",
+    role: "Founder & Chief Technology Officer • NP News Metro",
+    avatar: "https://www.npnewsmetro.com/uploads/umang-pandey.jpg",
+    bio: "Founder & Chief Technology Officer (CTO) of NP News Metro, architecting high-performance digital publishing infrastructure, platform engineering, and editorial integrity frameworks.",
+    orFilter: "author_name.ilike.%उमंग%,author_name.ilike.%Umang%"
+  },
+  {
+    slug: "dr-neelima-pandey",
+    matchSlugs: ["author-dr-neelima-pandey", "dr-neelima-pandey"],
+    matchTokens: ["neelima", "नीलिमा"],
+    name: "Dr. Neelima Pandey",
+    nameHi: "डॉ. नीलिमा पाण्डेय",
+    role: "Chief Mentor & Advisor • NP News Metro",
+    avatar: "https://www.npnewsmetro.com/uploads/dr-neelima-pandey.jpg",
+    bio: "Chief Mentor and Advisory Patron at NP News Metro; distinguished educator, accomplished litterateur, and celebrated poet guiding our ethical, educational, and cultural vision.",
+    orFilter: "author_name.ilike.%नीलिमा%,author_name.ilike.%Neelima%"
+  },
+  {
+    slug: "diwan-chand-arya",
+    matchSlugs: ["author-diwan-chand-arya", "diwan-chand-arya"],
+    matchTokens: ["diwan", "dc arya", "दीवान"],
+    name: "Diwan Chand Arya (D. C. Arya)",
+    nameHi: "दीवान चंद आर्य (डी. सी. आर्य)",
+    role: "Advisory Board Member • NP News Metro",
+    avatar: "https://www.npnewsmetro.com/uploads/diwan-chand-arya.jpg",
+    bio: "Advisory Board Member at NP News Metro, providing strategic guidance on institutional governance, community affairs, and public integrity.",
+    orFilter: "author_name.ilike.%दीवान%,author_name.ilike.%Diwan%"
+  },
+  {
+    slug: "raj-kumar-agarwal",
+    matchSlugs: ["author-raj-kumar-agarwal", "raj-kumar-agarwal"],
+    matchTokens: ["raj kumar", "agarwal", "राज कुमार"],
+    name: "Raj Kumar Agarwal",
+    nameHi: "राज कुमार अग्रवाल",
+    role: "Advisory Board Member • NP News Metro",
+    avatar: "https://www.npnewsmetro.com/uploads/raj-kumar-agarwal.png",
+    bio: "Advisory Board Member at NP News Metro, advising on economic policy, enterprise sustainability, media ethics, and societal development.",
+    orFilter: "author_name.ilike.%राज कुमार%,author_name.ilike.%Raj Kumar%"
+  },
+  {
+    slug: "krishna-nand-shastri",
+    matchSlugs: ["author-krishna-nand-shastri", "krishna-nand-shastri"],
+    matchTokens: ["krishna nand", "shastri", "कृष्ण नंद"],
+    name: "Pt. Krishna Nand Shastri (Advocate)",
+    nameHi: "पं. कृष्ण नंद शास्त्री (अधिवक्ता)",
+    role: "Financial and Law Advisory Board Member • NP News Metro",
+    avatar: "https://www.npnewsmetro.com/uploads/krishna-nand-shastri.jpg",
+    bio: "Financial and Law Advisory Board Member at NP News Metro, providing strategic legal guidance, regulatory compliance, financial governance, and statutory oversight.",
+    orFilter: "author_name.ilike.%कृष्ण नंद%,author_name.ilike.%Krishna Nand%"
+  },
+  {
+    slug: "bhawana-pandey",
+    matchSlugs: ["author-bhawana-pandey", "bhawana-pandey"],
+    matchTokens: ["bhawana", "भावना"],
+    name: "Bhawana Pandey",
+    nameHi: "भावना पाण्डेय",
+    role: "Social Media Manager • NP News Metro",
+    avatar: DEFAULT_OG_IMAGE,
+    bio: "Social Media Manager at NP News Metro, spearheading digital audience growth, multimedia engagement, and multi-channel content distribution.",
+    orFilter: "author_name.ilike.%भावना%,author_name.ilike.%Bhawana%"
+  },
+  {
+    slug: "purnima-mishra",
+    matchSlugs: ["author-purnima-mishra", "purnima-mishra"],
+    matchTokens: ["purnima", "पूर्णिमा", "पुर्णिमा"],
+    name: "Purnima Mishra",
+    nameHi: "पूर्णिमा मिश्रा",
+    role: "Senior Reporter • NP News Metro",
+    avatar: DEFAULT_OG_IMAGE,
+    bio: "Senior Reporter at NP News Metro, covering public policy, socio-economic developments, civic issues, and grassroots investigative journalism.",
+    orFilter: "author_name.ilike.%पूर्णिमा%,author_name.ilike.%पुर्णिमा%,author_name.ilike.%Purnima%"
+  },
+  {
+    slug: "laxmi-kant-mishra",
+    matchSlugs: ["author-laxmi-kant-mishra", "laxmi-kant-mishra"],
+    matchTokens: ["laxmi", "लक्ष्मी"],
+    name: "Laxmi Kant Mishra",
+    nameHi: "लक्ष्मी कांत मिश्रा",
+    role: "Reporter • NP News Metro",
+    avatar: "https://www.npnewsmetro.com/uploads/laxmi-kant-mishra.jpg",
+    bio: "Reporter at NP News Metro, reporting on regional politics, civic infrastructure, law & justice, and local community updates.",
+    orFilter: "author_name.ilike.%लक्ष्मी%,author_name.ilike.%Laxmi%"
+  },
+  {
+    slug: "cl-tripathi",
+    matchSlugs: ["author-cl-tripathi", "cl-tripathi"],
+    matchTokens: ["tripathi", "त्रिपाठी"],
+    name: "CL Tripathi",
+    nameHi: "सी. एल. त्रिपाठी",
+    role: "Senior Reporter • NP News Metro",
+    avatar: DEFAULT_OG_IMAGE,
+    bio: "Senior Reporter at NP News Metro, specializing in ground-level political investigations, legislative developments, civic affairs, and grassroots reporting.",
+    orFilter: "author_name.ilike.%त्रिपाठी%,author_name.ilike.%Tripathi%"
+  },
+  {
+    slug: "siddharth-varma",
+    matchSlugs: ["author-siddharth-varma", "siddharth-varma"],
+    matchTokens: ["siddharth", "सिद्धार्थ"],
+    name: "Siddharth Varma",
+    nameHi: "सिद्धार्थ वर्मा",
+    role: "Senior National Affairs Editor • NP News Metro",
+    avatar: DEFAULT_OG_IMAGE,
+    bio: "Senior National Affairs Editor covering Indian politics, parliamentary policy, and national security.",
+    orFilter: "author_name.ilike.%सिद्धार्थ%,author_name.ilike.%Siddharth%"
+  }
+];
+
+function resolveKnownAuthorBySlug(slug) {
+  if (!slug) return null;
+  const lower = String(slug).toLowerCase().trim();
+  return KNOWN_AUTHOR_PROFILES.find(
+    (p) =>
+      p.matchSlugs.includes(lower) ||
+      p.slug === lower ||
+      p.matchTokens.some((tok) => lower.includes(tok))
+  ) || null;
+}
+
+function resolveAuthorSlugFromName(authorName) {
+  if (!authorName) return "editorial";
+  const raw = String(authorName);
+  const lower = raw.toLowerCase().trim();
+  const matched = KNOWN_AUTHOR_PROFILES.find((p) =>
+    p.matchTokens.some((tok) => lower.includes(tok) || raw.includes(tok))
+  );
+  if (matched) return matched.slug;
+  return lower.replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "editorial";
 }
 
 function getAbsoluteUrl(img, slug) {
@@ -888,7 +1085,7 @@ export default async function handler(req, res) {
         bodyHtml: homeBodyHtml
       });
 
-      setShareCache(homeCacheKey, { html: homeHtml, timestamp: Date.now() });
+      setShareCache(homeCacheKey, homeHtml);
       return sendResponse(res, 200, "text/html; charset=utf-8", homeHtml);
     }
 
@@ -958,7 +1155,7 @@ export default async function handler(req, res) {
         bodyHtml: staticBodyHtml
       });
 
-      setShareCache(pageCacheKey, { html: staticHtml, timestamp: Date.now() });
+      setShareCache(pageCacheKey, staticHtml);
       return sendResponse(res, 200, "text/html; charset=utf-8", staticHtml);
     }
 
@@ -1031,7 +1228,7 @@ export default async function handler(req, res) {
         bodyHtml: vidBodyHtml
       });
 
-      setShareCache(vidHubCacheKey, { html: vidHtml, timestamp: Date.now() });
+      setShareCache(vidHubCacheKey, vidHtml);
       return sendResponse(res, 200, "text/html; charset=utf-8", vidHtml);
     }
 
@@ -1114,144 +1311,216 @@ export default async function handler(req, res) {
         bodyHtml: photoBodyHtml
       });
 
-      setShareCache(photoHubKey, { html: photoHtml, timestamp: Date.now() });
+      setShareCache(photoHubKey, photoHtml);
       return sendResponse(res, 200, "text/html; charset=utf-8", photoHtml);
     }
 
     // 3C. AUTHOR PROFILE PRE-RENDERER (/author/:id)
     if (cleanCategory === "author" && cleanSlug) {
-      const authorCacheKey = `author:${cleanSlug.toLowerCase()}`;
+      const slugLower = cleanSlug.toLowerCase();
+      const authorCacheKey = `author:${slugLower}`;
       const cachedAuthor = shareWarmCache.get(authorCacheKey);
       if (cachedAuthor && Date.now() - cachedAuthor.timestamp < SHARE_CACHE_TTL) {
         return sendResponse(res, 200, "text/html; charset=utf-8", cachedAuthor.html);
       }
 
-      const slugLower = cleanSlug.toLowerCase();
+      const knownProfile = resolveKnownAuthorBySlug(cleanSlug);
+      const isUuidSlug = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(cleanSlug);
       let authorArticles = [];
-      let authorName = "NP News Metro Correspondent";
-      let authorNameHi = "संवाददाता";
-      let authorRole = "Staff Correspondent • NP News Metro";
-      let authorAvatar = DEFAULT_OG_IMAGE;
-      let authorBio = "Journalist and contributor for NP News Metro.";
+      let authorName = knownProfile?.name || decodeURIComponent(cleanSlug).replace(/^author-/, "").replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase());
+      let authorNameHi = knownProfile?.nameHi || authorName;
+      let authorRole = knownProfile?.role || "Staff Correspondent • NP News Metro";
+      let authorAvatar = knownProfile?.avatar || DEFAULT_OG_IMAGE;
+      let authorBio = knownProfile?.bio || `${authorName} is a journalist and contributor at NP News Metro covering national news, public policy, and regional dispatches.`;
+      const isEditorialDesk = !!knownProfile?.isEditorialDesk;
 
       try {
         let query = supabase
           .from("articles")
-          .select("title, title_hi, slug, excerpt, dek_hi, featured_image_url, published_at, categories(slug, name)")
+          .select("title, title_hi, slug, excerpt, dek_hi, featured_image_url, published_at, author_name, categories(slug, name)")
           .eq("status", "published")
           .not("published_at", "is", null);
 
-        if (
-          slugLower.includes("neeraj") || 
-          slugLower.includes("नीरज") || 
-          slugLower === "author-1" || 
-          slugLower === "author-neeraj-pandey" || 
-          slugLower === "neeraj-kumar-pandey" || 
-          slugLower === "neeraj-pandey" || 
-          slugLower === "04ad79d9-d871-4099-a633-bcb7a1e35055"
-        ) {
-          authorName = "Neeraj Kumar Pandey";
-          authorNameHi = "नीरज पाण्डेय";
-          authorRole = "Editor-in-Chief & Senior Correspondent • NP News Metro";
-          authorAvatar = "https://www.npnewsmetro.com/uploads/neeraj-pandey.jpg";
-          authorBio = "Editor-in-Chief at NP News Metro, leading national reporting, field investigations, parliamentary coverage, and newsroom editorial standards.";
-          query = query.or("author_name.ilike.%नीरज%,author_name.ilike.%Neeraj%");
-        } else if (
-          slugLower.includes("deepak") || 
-          slugLower.includes("दीपक") || 
-          slugLower === "author-2" || 
-          slugLower === "author-deepak-goswami" || 
-          slugLower === "dr-deepak-goswami"
-        ) {
-          authorName = "Dr. Deepak Goswami";
-          authorNameHi = "डॉ. दीपक गोस्वामी";
-          authorRole = "मानवीय व्यवहार वैज्ञानिक व लेखक • NP News Metro";
-          authorAvatar = "https://www.npnewsmetro.com/uploads/dr-deepak-goswami.jpg";
-          authorBio = "डॉ. दीपक गोस्वामी मानवीय व्यवहार वैज्ञानिक तथा आदर्श संस्कार शाला (भारत) के राष्ट्रीय समन्वयक हैं।";
-          query = query.or("author_name.ilike.%दीपक गोस्वामी%,author_name.ilike.%Deepak Goswami%,author_name.ilike.%दीपक%");
-        } else if (slugLower.includes("bholeshwar") || slugLower.includes("भोलेश्वर")) {
-          authorName = "Bholeshwar Upmanyu";
-          authorNameHi = "भोलेश्वर उपमन्यु";
-          authorRole = "Advisory Board Member • NP News Metro";
-          authorAvatar = "https://www.npnewsmetro.com/uploads/bholeshwar-upmanyu.jpg";
-          query = query.or("author_name.ilike.%भोलेश्वर%,author_name.ilike.%Bholeshwar%");
-        } else if (slugLower.includes("chetan") || slugLower.includes("चेतन")) {
-          authorName = "Chetan Sharma";
-          authorNameHi = "चेतन शर्मा";
-          authorRole = "Editor-in-Chief • NP News Metro";
-          authorAvatar = "https://www.npnewsmetro.com/uploads/chetan-sharma.jpg";
-          query = query.or("author_name.ilike.%चेतन%,author_name.ilike.%Chetan%");
-        } else if (slugLower.includes("umang") || slugLower.includes("उमंग")) {
-          authorName = "Umang Pandey";
-          authorNameHi = "उमंग पाण्डेय";
-          authorRole = "Founder & Chief Technology Officer • NP News Metro";
-          authorAvatar = "https://www.npnewsmetro.com/uploads/umang-pandey.jpg";
-          query = query.or("author_name.ilike.%उमंग%,author_name.ilike.%Umang%");
+        if (knownProfile?.orFilter) {
+          query = query.or(knownProfile.orFilter);
+        } else if (isUuidSlug) {
+          query = query.eq("author_id", cleanSlug);
         } else {
-          authorName = decodeURIComponent(cleanSlug).replace(/^author-/, "").replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase());
-          query = query.or(`author_name.ilike.%${authorName}%`);
+          const safePattern = authorName.replace(/[%_]/g, "").trim();
+          query = query.or(`author_name.ilike.%${safePattern}%`);
         }
 
         const { data: aList } = await query
           .order("published_at", { ascending: false, nullsFirst: false })
           .limit(20);
 
-        if (aList && aList.length > 0) authorArticles = aList;
+        if (aList && aList.length > 0) {
+          authorArticles = aList.filter(a => a.slug && !a.slug.includes("unauthorized") && a.title !== "Unauthorized Article Attempt");
+        }
       } catch (e) {}
 
-      const authorCanonical = `${SITE_ORIGIN}/author/${cleanSlug}`;
+      // For Editorial Desk (or known masthead members with no direct bylines), populate latest verified newsroom dispatches so the profile is never thin/empty (prevents Soft 404)
+      let isDeskFallbackFeed = false;
+      if (isEditorialDesk && authorArticles.length < 6) {
+        try {
+          const { data: latestDesk } = await supabase
+            .from("articles")
+            .select("title, title_hi, slug, excerpt, dek_hi, featured_image_url, published_at, author_name, categories(slug, name)")
+            .eq("status", "published")
+            .not("published_at", "is", null)
+            .order("published_at", { ascending: false, nullsFirst: false })
+            .limit(18);
+          if (latestDesk && latestDesk.length > 0) {
+            const seen = new Set(authorArticles.map(a => a.slug));
+            for (const item of latestDesk) {
+              if (item.slug && !seen.has(item.slug) && !item.slug.includes("unauthorized") && item.title !== "Unauthorized Article Attempt") {
+                authorArticles.push(item);
+                seen.add(item.slug);
+              }
+            }
+            isDeskFallbackFeed = true;
+          }
+        } catch (e) {}
+
+        if (authorArticles.length === 0) {
+          authorArticles = FALLBACK_ARTICLES.slice(0, 12).map(a => ({
+            title: a.title,
+            slug: a.slug,
+            excerpt: a.caption || a.title,
+            featured_image_url: a.featuredImage,
+            published_at: a.publishedAt,
+            author_name: "NP News Metro Editorial Desk",
+            categories: { slug: a.category, name: CATEGORY_NAMES[a.category] || a.category.toUpperCase() }
+          }));
+          isDeskFallbackFeed = true;
+        }
+      } else if (!knownProfile && !isUuidSlug && authorArticles.length === 0) {
+        // Unknown author with zero articles -> return real HTTP 404 instead of a Soft 404
+        return sendResponse(res, 404, "text/html; charset=utf-8", `<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>404 - Author Not Found | NP News Metro</title>
+</head>
+<body style="font-family: sans-serif; text-align: center; padding: 60px 20px;">
+  <h1 style="color: #990000;">404 — Journalist Profile Not Found</h1>
+  <p>The requested author profile could not be found on NP News Metro.</p>
+  <p><a href="${SITE_ORIGIN}/editorial-team" style="color: #990000; font-weight: bold;">View Editorial Team &amp; Masthead &rarr;</a></p>
+</body>
+</html>`);
+      }
+
+      let supplementalDispatches = [];
+      if (!isEditorialDesk && authorArticles.length === 0) {
+        try {
+          const pool = await getRelatedArticlesPool();
+          if (pool && pool.length > 0) supplementalDispatches = pool.slice(0, 6);
+        } catch (e) {}
+      }
+
+      const canonicalAuthorSlug = knownProfile ? knownProfile.slug : cleanSlug;
+      const authorCanonical = `${SITE_ORIGIN}/author/${canonicalAuthorSlug}`;
+      const sectionHeading = isEditorialDesk
+        ? `Editorial Desk &amp; Newsroom Dispatches (${authorArticles.length})`
+        : `Published Dispatches &amp; Articles (${authorArticles.length})`;
+
+      const storiesList = authorArticles.length > 0 ? authorArticles : supplementalDispatches;
+      const renderStoryCards = (items) => items.map(a => {
+        const aCat = a.categories?.slug || "india";
+        const aTitle = a.title_hi || a.title;
+        const aDate = new Date(a.published_at || Date.now()).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
+        const bylineText = a.author_name ? ` &bull; By ${escapeHtml(a.author_name)}` : "";
+        return `
+          <article class="story-card">
+            <span class="meta" style="color: var(--primary);">${escapeHtml(CATEGORY_NAMES[aCat] || aCat.toUpperCase())}</span>
+            <h3><a href="${SITE_ORIGIN}/${aCat}/${escapeHtml(a.slug)}">${escapeHtml(aTitle)}</a></h3>
+            <p>${escapeHtml(a.dek_hi || a.excerpt || a.title)}</p>
+            <div class="meta">Published: ${aDate}${bylineText}</div>
+          </article>
+        `;
+      }).join("\n");
 
       const authorBodyHtml = `
         <div class="breadcrumbs">
-          <a href="${SITE_ORIGIN}/">Home</a> &rsaquo; <span>Journalist Profile</span>
+          <a href="${SITE_ORIGIN}/">Home</a> &rsaquo; <a href="${SITE_ORIGIN}/editorial-team">Editorial Team</a> &rsaquo; <span>${escapeHtml(authorName)}</span>
         </div>
         <div style="margin-bottom: 24px; background: #fff; padding: 24px; border: 1px solid var(--border); border-radius: 4px; display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
           <img src="${escapeHtml(authorAvatar)}" alt="${escapeHtml(authorName)}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary);" onerror="this.src='${DEFAULT_OG_IMAGE}'" />
           <div style="flex: 1; min-width: 250px;">
             <h1 style="margin: 0 0 6px 0; font-size: 26px;">${escapeHtml(authorName)} ${authorNameHi && authorNameHi !== authorName ? `<span style="font-size: 20px; color: var(--ink-muted); font-weight: normal;">(${escapeHtml(authorNameHi)})</span>` : ""}</h1>
             <p class="dek" style="margin: 0 0 8px 0; color: var(--secondary); font-weight: 600;">${escapeHtml(authorRole)}</p>
-            <p style="margin: 0; font-size: 14px; color: var(--ink-secondary); line-height: 1.5;">${escapeHtml(authorBio)}</p>
+            <p style="margin: 0; font-size: 14px; color: var(--ink-secondary); line-height: 1.6;">${escapeHtml(authorBio)}</p>
           </div>
         </div>
-        <h2>Published Dispatches &amp; Articles (${authorArticles.length})</h2>
+        <h2>${authorArticles.length > 0 ? sectionHeading : "Recent Newsroom Dispatches &amp; Masthead Coverage"}</h2>
+        ${isDeskFallbackFeed ? `<p style="font-size: 14px; color: var(--ink-muted); margin-top: -4px; margin-bottom: 18px;">Fact-verified dispatches edited, reviewed, and published by the NP News Metro Editorial Desk across national, regional, and policy beats.</p>` : ""}
         <div class="stories-grid">
-          ${authorArticles.length === 0 ? `
-            <div style="padding: 30px; text-align: center; color: var(--ink-muted); background: #fff; border: 1px solid var(--border); border-radius: 4px;">
-              No published dispatches found for this journalist at present.
+          ${storiesList.length > 0 ? renderStoryCards(storiesList) : `
+            <div class="story-card">
+              <h3><a href="${SITE_ORIGIN}/editorial-team">NP News Metro Editorial Masthead &amp; Standards</a></h3>
+              <p>Learn about our editorial leadership, Press Council code of ethics, and multi-bureau reporting network across India.</p>
+              <div class="meta"><a href="${SITE_ORIGIN}/editorial-team" style="color: var(--primary);">Read Editorial Masthead &rarr;</a></div>
             </div>
-          ` : authorArticles.map(a => {
-            const aCat = a.categories?.slug || "india";
-            const aTitle = a.title_hi || a.title;
-            const aDate = new Date(a.published_at || Date.now()).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
-            return `
-              <article class="story-card">
-                <span class="meta" style="color: var(--primary);">${escapeHtml(CATEGORY_NAMES[aCat] || aCat.toUpperCase())}</span>
-                <h3><a href="${SITE_ORIGIN}/${aCat}/${escapeHtml(a.slug)}">${escapeHtml(aTitle)}</a></h3>
-                <p>${escapeHtml(a.dek_hi || a.excerpt || a.title)}</p>
-                <div class="meta">Published: ${aDate}</div>
-              </article>
-            `;
-          }).join("\n")}
+          `}
+        </div>
+        <div style="margin-top: 32px; padding: 20px; background: #ffffff; border: 1px solid var(--border); border-radius: 4px;">
+          <h3 style="font-family: Georgia, serif; font-size: 18px; margin-top: 0; color: var(--primary);">Editorial Standards &amp; Fact Verification</h3>
+          <p style="font-size: 14px; color: #475569; line-height: 1.6; margin-bottom: 10px;">Every report published by ${escapeHtml(authorName)} at NP News Metro adheres to the Journalistic Code of Ethics of the Press Council of India, multi-source verification, and our transparent <a href="${SITE_ORIGIN}/corrections" style="color: var(--primary);">Corrections Policy</a>.</p>
+          <p style="font-size: 13px; color: #64748b; margin: 0;">Explore our <a href="${SITE_ORIGIN}/editorial-team" style="color: var(--primary);">Full Editorial Masthead</a> &bull; <a href="${SITE_ORIGIN}/ethics" style="color: var(--primary);">Code of Ethics</a> &bull; <a href="${SITE_ORIGIN}/contact" style="color: var(--primary);">Contact Newsroom</a></p>
         </div>
       `;
 
       const authorJsonLd = {
         "@context": "https://schema.org",
-        "@type": "ProfilePage",
-        "name": `${authorName} | NP News Metro`,
-        "url": authorCanonical,
-        "mainEntity": {
-          "@type": "Person",
-          "name": authorName,
-          "image": authorAvatar,
-          "jobTitle": authorRole,
-          "worksFor": { "@type": "NewsMediaOrganization", "name": "NP News Metro", "url": SITE_ORIGIN }
-        }
+        "@graph": [
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              { "@type": "ListItem", "position": 1, "name": "Home", "item": SITE_ORIGIN },
+              { "@type": "ListItem", "position": 2, "name": "Editorial Team", "item": `${SITE_ORIGIN}/editorial-team` },
+              { "@type": "ListItem", "position": 3, "name": authorName, "item": authorCanonical }
+            ]
+          },
+          {
+            "@type": "ProfilePage",
+            "name": `${authorName} | NP News Metro`,
+            "url": authorCanonical,
+            "mainEntity": isEditorialDesk ? {
+              "@type": "Organization",
+              "name": authorName,
+              "alternateName": authorNameHi,
+              "url": authorCanonical,
+              "logo": authorAvatar,
+              "description": authorBio,
+              "parentOrganization": { "@type": "NewsMediaOrganization", "name": "NP News Metro", "url": SITE_ORIGIN }
+            } : {
+              "@type": "Person",
+              "name": authorName,
+              "alternateName": authorNameHi,
+              "url": authorCanonical,
+              "image": authorAvatar,
+              "jobTitle": authorRole,
+              "description": authorBio,
+              "worksFor": { "@type": "NewsMediaOrganization", "name": "NP News Metro", "url": SITE_ORIGIN }
+            }
+          },
+          ...(storiesList.length > 0 ? [{
+            "@type": "ItemList",
+            "name": `Dispatches by ${authorName}`,
+            "itemListElement": storiesList.slice(0, 10).map((a, idx) => ({
+              "@type": "ListItem",
+              "position": idx + 1,
+              "url": `${SITE_ORIGIN}/${a.categories?.slug || "india"}/${a.slug}`,
+              "name": a.title_hi || a.title
+            }))
+          }] : [])
+        ]
       };
 
       const authorHtml = buildCrawlerHtml({
-        title: `${authorName} — Editorial Profile | NP News Metro`,
-        description: `Read investigative reports, ground dispatches, and analysis authored by ${authorName} at NP News Metro.`,
+        title: `${authorName} — Editorial Profile & Dispatches`,
+        description: `Read investigative reports, ground dispatches, and news analysis from ${authorName} at NP News Metro.`,
         canonicalUrl: authorCanonical,
         ogType: "profile",
         ogImage: authorAvatar || DEFAULT_OG_IMAGE,
@@ -1259,7 +1528,7 @@ export default async function handler(req, res) {
         bodyHtml: authorBodyHtml
       });
 
-      setShareCache(authorCacheKey, { html: authorHtml, timestamp: Date.now() });
+      setShareCache(authorCacheKey, authorHtml);
       return sendResponse(res, 200, "text/html; charset=utf-8", authorHtml);
     }
 
@@ -1400,7 +1669,7 @@ export default async function handler(req, res) {
         bodyHtml: catBodyHtml
       });
 
-      setShareCache(catCacheKey, { html: catHtml, timestamp: Date.now() });
+      setShareCache(catCacheKey, catHtml);
       return sendResponse(res, 200, "text/html; charset=utf-8", catHtml);
     }
 
@@ -1610,31 +1879,7 @@ export default async function handler(req, res) {
       }));
     }
 
-    let authorSlug = "editorial";
-    const authorNameLower = authorName.toLowerCase();
-    if (authorNameLower.includes("neeraj") || authorName.includes("नीरज")) {
-      authorSlug = "neeraj-kumar-pandey";
-    } else if (authorNameLower.includes("deepak") || authorName.includes("दीपक")) {
-      authorSlug = "dr-deepak-goswami";
-    } else if (authorNameLower.includes("bholeshwar") || authorName.includes("भोलेश्वर")) {
-      authorSlug = "bholeshwar-upmanyu";
-    } else if (authorNameLower.includes("chetan") || authorName.includes("चेतन")) {
-      authorSlug = "chetan-sharma";
-    } else if (authorNameLower.includes("umang") || authorName.includes("उमंग")) {
-      authorSlug = "umang-pandey";
-    } else if (authorNameLower.includes("bhawana") || authorName.includes("भावना")) {
-      authorSlug = "bhawana-pandey";
-    } else if (authorNameLower.includes("purnima") || authorName.includes("पूर्णिमा") || authorName.includes("पुर्णिमा")) {
-      authorSlug = "purnima-mishra";
-    } else if (authorNameLower.includes("laxmi") || authorName.includes("लक्ष्मी")) {
-      authorSlug = "laxmi-kant-mishra";
-    } else if (authorNameLower.includes("tripathi") || authorName.includes("त्रिपाठी")) {
-      authorSlug = "cl-tripathi";
-    } else if (authorNameLower.includes("siddharth") || authorName.includes("सिद्धार्थ")) {
-      authorSlug = "siddharth-varma";
-    } else {
-      authorSlug = (authorName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")) || "editorial";
-    }
+    const authorSlug = resolveAuthorSlugFromName(authorName);
     const categoryName = CATEGORY_NAMES[category] || category.toUpperCase();
     const isHindiArticle = !!(mediaItem.title_hi || /[\u0900-\u097F]/.test(title));
     const langCode = isHindiArticle ? "hi-IN" : "en-IN";
@@ -1865,7 +2110,7 @@ export default async function handler(req, res) {
       bodyHtml: articleBodyHtml
     });
 
-    setShareCache(articleCacheKey, { html: articleHtml, timestamp: Date.now() });
+    setShareCache(articleCacheKey, articleHtml);
     return sendResponse(res, 200, "text/html; charset=utf-8", articleHtml);
   } catch (err) {
     console.error("Crawler share pre-renderer error:", err);

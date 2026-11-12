@@ -506,8 +506,27 @@ export default async function handler(req, res) {
 
       const authorLower = author.toLowerCase().trim();
 
+      let isEditorialDeskQuery = false;
+
       // Check known author mapping or query terms
       if (
+        authorLower === 'editorial' ||
+        authorLower === 'author-editorial' ||
+        authorLower === 'editorial-desk' ||
+        authorLower === 'editorial-board' ||
+        authorLower === 'np-news-metro-bureau' ||
+        authorLower === 'np-news-desk' ||
+        authorLower === 'np-bureau' ||
+        authorLower === 'bureau' ||
+        authorLower === 'staff-reporter' ||
+        authorLower.includes('editorial') ||
+        authorLower.includes('bureau') ||
+        authorLower.includes('संपादकीय') ||
+        authorLower.includes('ब्यूरो')
+      ) {
+        isEditorialDeskQuery = true;
+        query = query.or('author_name.ilike.%Editorial%,author_name.ilike.%Bureau%,author_name.ilike.%Desk%,author_name.ilike.%NP News%,author_name.ilike.%Staff%,author_name.ilike.%संपादकीय%,author_name.ilike.%ब्यूरो%,author_name.ilike.%डेस्क%,author_name.ilike.%रिपोर्टर%');
+      } else if (
         authorLower.includes('neeraj') || 
         authorLower.includes('नीरज') || 
         authorLower === 'author-1' || 
@@ -597,7 +616,21 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: error.message });
       }
 
-      const responsePayload = { posts: sanitizeCardPosts(data || []), page, limit };
+      let finalPosts = data || [];
+      if (isEditorialDeskQuery && finalPosts.length === 0) {
+        const { data: fallbackLatest } = await supabase
+          .from('articles')
+          .select(CARD_PROJECTION_FIELDS)
+          .eq('status', 'published')
+          .not('published_at', 'is', null)
+          .order('published_at', { ascending: false, nullsFirst: false })
+          .range(offset, offset + limit - 1);
+        if (fallbackLatest && fallbackLatest.length > 0) {
+          finalPosts = fallbackLatest;
+        }
+      }
+
+      const responsePayload = { posts: sanitizeCardPosts(finalPosts), page, limit };
       setInWarmCache(cacheKey, responsePayload);
 
       res.setHeader('Content-Type', 'application/json; charset=utf-8');
