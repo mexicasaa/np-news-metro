@@ -44,6 +44,21 @@ const isValidUUID = (str?: string): boolean => {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
 };
 
+const getAuthHeaders = async (includeJsonContentType = true): Promise<Record<string, string>> => {
+  const headers: Record<string, string> = includeJsonContentType
+    ? { 'Content-Type': 'application/json' }
+    : {};
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.access_token) {
+      headers['Authorization'] = `Bearer ${session.access_token}`;
+    }
+  } catch {
+    // Fall through cleanly; server endpoint will enforce auth
+  }
+  return headers;
+};
+
 export const mapDbToWpPost = (row: any, joinedTags?: string[]): WpPost => {
   const categorySlug = row.categories?.slug || CATEGORY_ID_TO_SLUG[row.category_id] || (row.category_id as string) || 'india';
   
@@ -654,9 +669,10 @@ export const saveArticle = async (
   // 1. Serverless Edge API first (Zero direct DB connection from browser, automatic warm cache & Cloudflare purge)
   try {
     if (typeof window !== 'undefined') {
+      const headers = await getAuthHeaders(true);
       const apiRes = await fetch('/api/articles', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ postData, targetStatus }),
       });
       if (apiRes.ok) {
@@ -956,8 +972,10 @@ export const deleteArticleWithRecovery = async (
   // 1. Try serverless Edge API first (Zero direct DB connection from browser)
   try {
     if (typeof window !== 'undefined') {
+      const headers = await getAuthHeaders(false);
       const apiRes = await fetch(`/api/articles?id=${encodeURIComponent(idOrSlug)}`, {
         method: 'DELETE',
+        headers,
       });
       if (apiRes.ok) {
         invalidateArticleClientCache();

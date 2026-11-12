@@ -160,6 +160,32 @@ async function purgeCloudflareEdge(slug, category) {
   } catch (e) {}
 }
 
+async function authenticateWriteRequest(req) {
+  const authHeader = req.headers?.authorization || req.headers?.Authorization || '';
+  const token = typeof authHeader === 'string' && authHeader.startsWith('Bearer ')
+    ? authHeader.slice(7).trim()
+    : '';
+  if (!token) {
+    return { error: 'Unauthorized: Bearer token is required for editorial write operations.' };
+  }
+
+  const authSupabase = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: { persistSession: false },
+    realtime: { createClient: () => null },
+    global: { headers: { Authorization: `Bearer ${token}` } },
+  });
+
+  try {
+    const { data, error } = await authSupabase.auth.getUser(token);
+    if (error || !data?.user) {
+      return { error: 'Unauthorized: Invalid or expired session token.' };
+    }
+    return { authSupabase, user: data.user };
+  } catch {
+    return { error: 'Unauthorized: Unable to verify session token.' };
+  }
+}
+
 export default async function handler(req, res) {
   // CORS Preflight
   if (req.method === 'OPTIONS') {
@@ -169,186 +195,191 @@ export default async function handler(req, res) {
   }
 
   // -----------------------------------------------------------------
-  // WRITE OPERATIONS: POST / PUT (Save or Publish Article)
+  // AUTHENTICATED WRITE / DELETE OPERATIONS
   // -----------------------------------------------------------------
-  if (req.method === 'POST' || req.method === 'PUT') {
-    let body = {};
-    if (typeof req.body === 'string') {
-      try { body = JSON.parse(req.body); } catch {}
-    } else {
-      body = req.body || {};
+  if (req.method === 'POST' || req.method === 'PUT' || req.method === 'DELETE') {
+    const authResult = await authenticateWriteRequest(req);
+    if (authResult.error || !authResult.authSupabase) {
+      return res.status(401).json({ error: authResult.error || 'Unauthorized' });
     }
+    const writeDb = authResult.authSupabase;
 
-    const { postData, targetStatus = 'draft' } = body;
-    if (!postData) {
-      return res.status(400).json({ error: 'postData payload is required' });
-    }
-
-    try {
-      const title = postData.title?.trim() || 'Untitled News Story';
-      const categoryId = postData.categoryId || postData.category_id || (postData.category && CATEGORY_SLUG_TO_ID[postData.category]) || '11111111-1111-1111-1111-111111110001';
-      const contentText = Array.isArray(postData.blocks) && postData.blocks.length > 0
-        ? postData.blocks.map(b => b.content || '').join('\n\n')
-        : postData.dek || '';
-
-      const readTimeMinutes = postData.readTime 
-        ? parseInt(String(postData.readTime).replace(/[^\d]/g, ''), 10) || 3 
-        : 3;
-
-      let existingId = null;
-      if (postData.id && isValidUUID(postData.id)) {
-        existingId = postData.id;
-      } else if (targetStatus === 'published') {
-        const { data: draftMatches } = await supabase
-          .from('articles')
-          .select('id')
-          .eq('title', title)
-          .eq('status', 'draft')
-          .order('created_at', { ascending: false })
-          .limit(1);
-        if (draftMatches && draftMatches.length > 0) {
-          existingId = draftMatches[0].id;
-        }
-      }
-
-      // Generate unique slug
-      const rawSlugCandidate = postData.slug && postData.slug !== 'auto-draft' && postData.slug.trim().length > 1
-        ? postData.slug.trim()
-        : title;
-      const baseSlug = slugify(rawSlugCandidate, 65);
-      let candidateSlug = baseSlug;
-      let counter = 1;
-      let isUnique = false;
-      while (!isUnique && counter <= 20) {
-        let q = supabase.from('articles').select('id').eq('slug', candidateSlug);
-        if (existingId) q = q.neq('id', existingId);
-        const { data: existingSlugs } = await q;
-        if (!existingSlugs || existingSlugs.length === 0) {
-          isUnique = true;
-        } else {
-          candidateSlug = `${baseSlug}-${counter}`;
-          counter++;
-        }
-      }
-
-      const authorName = postData.customAuthor?.name || postData.authorName || 'NP News Metro Bureau';
-      const authorRole = postData.customAuthor?.role || postData.authorRole || 'Staff Reporter';
-      const authorAvatar = postData.customAuthor?.avatar || postData.authorAvatar || null;
-      const authorBio = postData.customAuthor?.bio || postData.authorBio || null;
-
-      const dbPayload = {
-        title,
-        title_hi: postData.titleHi || title,
-        slug: candidateSlug,
-        excerpt: postData.dek || null,
-        dek_hi: postData.dekHi || null,
-        content: contentText,
-        category_id: categoryId,
-        status: targetStatus,
-        featured_image_url: postData.featuredImage || postData.featured_image_url || null,
-        featured_image_alt: postData.imageAlt || postData.featured_image_alt || title,
-        featured_image_caption: postData.imageCaption || postData.featured_image_caption || null,
-        image_credit: postData.imageCredit || postData.image_credit || 'NP News Metro Photo Desk',
-        is_breaking_news: !!postData.isBreaking,
-        is_lead: postData.isLead !== undefined ? !!postData.isLead : true,
-        is_featured: postData.isFeatured !== undefined ? !!postData.isFeatured : true,
-        is_opinion: !!postData.isOpinion,
-        is_sponsored: !!postData.isSponsored,
-        sponsor_name: postData.sponsorName || null,
-        location: postData.location || 'New Delhi',
-        author_id: postData.authorId || '04ad79d9-d871-4099-a633-bcb7a1e35055',
-        author_name: authorName,
-        author_role: authorRole,
-        author_avatar: authorAvatar,
-        author_bio: authorBio,
-        custom_author: postData.customAuthor || null,
-        blocks: postData.blocks || [],
-        key_takeaways: postData.keyTakeaways || [],
-        seo_title: postData.seoTitle || null,
-        meta_description: postData.seoDescription || null,
-        reading_time_minutes: readTimeMinutes,
-        published_at: targetStatus === 'published' 
-          ? (postData.publishedAt || new Date().toISOString()) 
-          : (postData.publishedAt || null),
-        updated_at: new Date().toISOString(),
-      };
-
-      const SAVE_RETURN_FIELDS = `
-        id, slug, title, title_hi, excerpt, dek_hi, category_id,
-        categories (id, name, slug),
-        status, updated_at, published_at, featured_image_url,
-        article_tags (
-          tags (id, name, slug)
-        )
-      `;
-
-      let resultArticle = null;
-      if (existingId) {
-        const { data, error } = await supabase
-          .from('articles')
-          .update(dbPayload)
-          .eq('id', existingId)
-          .select(SAVE_RETURN_FIELDS)
-          .single();
-        if (error) return res.status(500).json({ error: `Update error: ${error.message}` });
-        resultArticle = data;
+    // WRITE OPERATIONS: POST / PUT (Save or Publish Article)
+    if (req.method === 'POST' || req.method === 'PUT') {
+      let body = {};
+      if (typeof req.body === 'string') {
+        try { body = JSON.parse(req.body); } catch {}
       } else {
-        const { data, error } = await supabase
-          .from('articles')
-          .insert(dbPayload)
-          .select(SAVE_RETURN_FIELDS)
-          .single();
-        if (error) return res.status(500).json({ error: `Insert error: ${error.message}` });
-        resultArticle = data;
+        body = req.body || {};
       }
 
-      // Record revision ONLY when published or manual edit, never on background auto-save
-      const isAutoSave = Boolean(body.isAutoSave || postData.isAutoSave);
-      const shouldRecordRevision = !isAutoSave && (targetStatus === 'published' || !existingId);
-      if (resultArticle?.id && shouldRecordRevision) {
-        try {
-          await supabase.from('article_revisions').insert({
-            article_id: resultArticle.id,
-            title: resultArticle.title || title,
-            excerpt: resultArticle.excerpt || postData.dek,
-            content: contentText,
-            status: targetStatus,
-          });
-        } catch (e) {}
+      const { postData, targetStatus = 'draft' } = body;
+      if (!postData) {
+        return res.status(400).json({ error: 'postData payload is required' });
       }
 
-      // Purge drafts with same title if published
-      if (targetStatus === 'published' && resultArticle?.id) {
-        try {
-          await supabase.from('articles').delete().eq('status', 'draft').eq('title', title).neq('id', resultArticle.id);
-        } catch (e) {}
+      try {
+        const title = postData.title?.trim() || 'Untitled News Story';
+        const categoryId = postData.categoryId || postData.category_id || (postData.category && CATEGORY_SLUG_TO_ID[postData.category]) || '11111111-1111-1111-1111-111111110001';
+        const contentText = Array.isArray(postData.blocks) && postData.blocks.length > 0
+          ? postData.blocks.map(b => b.content || '').join('\n\n')
+          : postData.dek || '';
+
+        const readTimeMinutes = postData.readTime 
+          ? parseInt(String(postData.readTime).replace(/[^\d]/g, ''), 10) || 3 
+          : 3;
+
+        let existingId = null;
+        if (postData.id && isValidUUID(postData.id)) {
+          existingId = postData.id;
+        } else if (targetStatus === 'published') {
+          const { data: draftMatches } = await writeDb
+            .from('articles')
+            .select('id')
+            .eq('title', title)
+            .eq('status', 'draft')
+            .order('created_at', { ascending: false })
+            .limit(1);
+          if (draftMatches && draftMatches.length > 0) {
+            existingId = draftMatches[0].id;
+          }
+        }
+
+        // Generate unique slug
+        const rawSlugCandidate = postData.slug && postData.slug !== 'auto-draft' && postData.slug.trim().length > 1
+          ? postData.slug.trim()
+          : title;
+        const baseSlug = slugify(rawSlugCandidate, 65);
+        let candidateSlug = baseSlug;
+        let counter = 1;
+        let isUnique = false;
+        while (!isUnique && counter <= 20) {
+          let q = writeDb.from('articles').select('id').eq('slug', candidateSlug);
+          if (existingId) q = q.neq('id', existingId);
+          const { data: existingSlugs } = await q;
+          if (!existingSlugs || existingSlugs.length === 0) {
+            isUnique = true;
+          } else {
+            candidateSlug = `${baseSlug}-${counter}`;
+            counter++;
+          }
+        }
+
+        const authorName = postData.customAuthor?.name || postData.authorName || 'NP News Metro Bureau';
+        const authorRole = postData.customAuthor?.role || postData.authorRole || 'Staff Reporter';
+        const authorAvatar = postData.customAuthor?.avatar || postData.authorAvatar || null;
+        const authorBio = postData.customAuthor?.bio || postData.authorBio || null;
+
+        const dbPayload = {
+          title,
+          title_hi: postData.titleHi || title,
+          slug: candidateSlug,
+          excerpt: postData.dek || null,
+          dek_hi: postData.dekHi || null,
+          content: contentText,
+          category_id: categoryId,
+          status: targetStatus,
+          featured_image_url: postData.featuredImage || postData.featured_image_url || null,
+          featured_image_alt: postData.imageAlt || postData.featured_image_alt || title,
+          featured_image_caption: postData.imageCaption || postData.featured_image_caption || null,
+          image_credit: postData.imageCredit || postData.image_credit || 'NP News Metro Photo Desk',
+          is_breaking_news: !!postData.isBreaking,
+          is_lead: postData.isLead !== undefined ? !!postData.isLead : true,
+          is_featured: postData.isFeatured !== undefined ? !!postData.isFeatured : true,
+          is_opinion: !!postData.isOpinion,
+          is_sponsored: !!postData.isSponsored,
+          sponsor_name: postData.sponsorName || null,
+          location: postData.location || 'New Delhi',
+          author_id: postData.authorId || '04ad79d9-d871-4099-a633-bcb7a1e35055',
+          author_name: authorName,
+          author_role: authorRole,
+          author_avatar: authorAvatar,
+          author_bio: authorBio,
+          custom_author: postData.customAuthor || null,
+          blocks: postData.blocks || [],
+          key_takeaways: postData.keyTakeaways || [],
+          seo_title: postData.seoTitle || null,
+          meta_description: postData.seoDescription || null,
+          reading_time_minutes: readTimeMinutes,
+          published_at: targetStatus === 'published' 
+            ? (postData.publishedAt || new Date().toISOString()) 
+            : (postData.publishedAt || null),
+          updated_at: new Date().toISOString(),
+        };
+
+        const SAVE_RETURN_FIELDS = `
+          id, slug, title, title_hi, excerpt, dek_hi, category_id,
+          categories (id, name, slug),
+          status, updated_at, published_at, featured_image_url,
+          article_tags (
+            tags (id, name, slug)
+          )
+        `;
+
+        let resultArticle = null;
+        if (existingId) {
+          const { data, error } = await writeDb
+            .from('articles')
+            .update(dbPayload)
+            .eq('id', existingId)
+            .select(SAVE_RETURN_FIELDS)
+            .single();
+          if (error) return res.status(500).json({ error: `Update error: ${error.message}` });
+          resultArticle = data;
+        } else {
+          const { data, error } = await writeDb
+            .from('articles')
+            .insert(dbPayload)
+            .select(SAVE_RETURN_FIELDS)
+            .single();
+          if (error) return res.status(500).json({ error: `Insert error: ${error.message}` });
+          resultArticle = data;
+        }
+
+        // Record revision ONLY when published or manual edit, never on background auto-save
+        const isAutoSave = Boolean(body.isAutoSave || postData.isAutoSave);
+        const shouldRecordRevision = !isAutoSave && (targetStatus === 'published' || !existingId);
+        if (resultArticle?.id && shouldRecordRevision) {
+          try {
+            await writeDb.from('article_revisions').insert({
+              article_id: resultArticle.id,
+              title: resultArticle.title || title,
+              excerpt: resultArticle.excerpt || postData.dek,
+              content: contentText,
+              status: targetStatus,
+            });
+          } catch (e) {}
+        }
+
+        // Purge drafts with same title if published
+        if (targetStatus === 'published' && resultArticle?.id) {
+          try {
+            await writeDb.from('articles').delete().eq('status', 'draft').eq('title', title).neq('id', resultArticle.id);
+          } catch (e) {}
+        }
+
+        // Invalidate warm cache & Cloudflare Edge
+        invalidateWarmCache();
+        purgeCloudflareEdge(resultArticle.slug, postData.category);
+
+        const fullPostResult = {
+          ...dbPayload,
+          ...resultArticle,
+          blocks: postData.blocks || [],
+        };
+
+        return res.status(200).json({ post: fullPostResult, success: true });
+      } catch (err) {
+        return res.status(500).json({ error: err.message || 'Error processing article' });
       }
-
-      // Invalidate warm cache & Cloudflare Edge
-      invalidateWarmCache();
-      purgeCloudflareEdge(resultArticle.slug, postData.category);
-
-      const fullPostResult = {
-        ...dbPayload,
-        ...resultArticle,
-        blocks: postData.blocks || [],
-      };
-
-      return res.status(200).json({ post: fullPostResult, success: true });
-    } catch (err) {
-      return res.status(500).json({ error: err.message || 'Error processing article' });
     }
-  }
 
-  // -----------------------------------------------------------------
-  // DELETE OPERATION: Archive to deleted_articles & Remove from articles
-  // -----------------------------------------------------------------
-  if (req.method === 'DELETE') {
+    // DELETE OPERATION: Archive to deleted_articles & Remove from articles
     const idOrSlug = req.query?.id || req.query?.slug;
     if (!idOrSlug) return res.status(400).json({ error: 'id or slug is required' });
 
     try {
-      let q = supabase.from('articles').select('*');
+      let q = writeDb.from('articles').select('*');
       if (isValidUUID(idOrSlug)) q = q.eq('id', idOrSlug);
       else q = q.eq('slug', idOrSlug);
 
@@ -361,7 +392,7 @@ export default async function handler(req, res) {
 
       // Archive to deleted_articles
       try {
-        await supabase.from('deleted_articles').insert({
+        await writeDb.from('deleted_articles').insert({
           original_article_id: article.id,
           title: article.title,
           slug: article.slug,
@@ -376,7 +407,7 @@ export default async function handler(req, res) {
       } catch (e) {}
 
       // Delete from articles
-      await supabase.from('articles').delete().eq('id', article.id);
+      await writeDb.from('articles').delete().eq('id', article.id);
 
       invalidateWarmCache();
       purgeCloudflareEdge(article.slug, article.category_slug);

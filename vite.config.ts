@@ -76,7 +76,7 @@ export default defineConfig(({ mode }) => {
               req.on('end', async () => {
                 try {
                   const body = JSON.parse(bodyStr || '{}');
-                  const result = await processR2Upload(body, env);
+                  const result = await processR2Upload(body, env, req.headers?.authorization);
                   res.statusCode = result.status || 200;
                   res.setHeader('Content-Type', 'application/json');
                   res.end(JSON.stringify(result.data));

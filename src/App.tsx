@@ -1879,7 +1879,7 @@ function AppContent() {
     // Default: Homepage
     return {
       metadata: {
-        title: 'NP NEWS METRO — Real News. Real Impact. | Indian Digital Newspaper',
+        title: 'NP News Metro – Latest India, Politics & Business News',
         description: 'Fast, verified, and in-depth national news coverage, policy analysis, investigative journalism, and live market updates.',
         canonicalUrl: 'https://www.npnewsmetro.com/',
         ogType: 'website' as const,

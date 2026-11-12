@@ -18,6 +18,19 @@ export class R2MediaRepository {
     return R2MediaRepository.instance;
   }
 
+  private async getAuthHeaders(): Promise<Record<string, string>> {
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`;
+      }
+    } catch {
+      // Fall through cleanly; server endpoint will enforce auth
+    }
+    return headers;
+  }
+
   /**
    * Compute stable SHA-256 content hash for deduplication
    */
@@ -138,10 +151,11 @@ export class R2MediaRepository {
 
     // 2. Primary Upload Path: Direct-to-R2 via Presigned PUT URL
     // (Bypasses Vercel's 4.5MB serverless payload limit entirely)
+    const authHeaders = await this.getAuthHeaders();
     try {
       const presignResp = await fetch('/api/r2-upload', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders,
         body: JSON.stringify({
           action: 'get-upload-url',
           fileName: meta.fileName,
@@ -172,7 +186,7 @@ export class R2MediaRepository {
             // Register uploaded media asset in Supabase
             const regResp = await fetch('/api/r2-upload', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: authHeaders,
               body: JSON.stringify({
                 action: 'register-media',
                 r2Key: presignData.r2Key || r2Key,
@@ -215,7 +229,7 @@ export class R2MediaRepository {
 
     const r2Resp = await fetch('/api/r2-upload', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: authHeaders,
       body: JSON.stringify({
         base64Data,
         fileName: meta.fileName,

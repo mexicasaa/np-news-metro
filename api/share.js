@@ -792,28 +792,19 @@ function buildCrawlerHtml({ title, description, canonicalUrl, shareUrl, ogType =
   const imageWidth = isSquareImage ? "1024" : "1200";
   const imageHeight = isSquareImage ? "1024" : "630";
   const finalShareUrl = shareUrl || canonicalUrl;
+  const formattedTitle = /np news metro/i.test(title || "") ? title : `${title} | NP News Metro`;
 
   return `<!DOCTYPE html>
 <html lang="hi">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${escapeHtml(title)} | NP News Metro</title>
+  <title>${escapeHtml(formattedTitle)}</title>
   <meta name="description" content="${escapeHtml(description)}" />
   <link rel="canonical" href="${canonicalUrl}" />
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
   <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
   <meta name="googlebot-news" content="index, follow" />
-
-  <!-- Geographic & Regional Targeting (GEO) -->
-  <meta name="geo.region" content="IN-DL" />
-  <meta name="geo.placename" content="New Delhi, India" />
-  <meta name="geo.position" content="28.6139;77.2090" />
-  <meta name="ICBM" content="28.6139, 77.2090" />
-  <meta name="country" content="India" />
-  <meta name="coverage" content="India, Global" />
-  <meta name="distribution" content="Global" />
-  <meta name="rating" content="General" />
   <meta http-equiv="content-language" content="hi, en" />
 
   <!-- Multilingual & Alternate Feeds -->
@@ -1076,7 +1067,7 @@ export default async function handler(req, res) {
       };
 
       const homeHtml = buildCrawlerHtml({
-        title: "NP NEWS METRO — Real News. Real Impact. | Indian Digital Newspaper",
+        title: "NP News Metro – Latest India, Politics & Business News",
         description: "NP News Metro delivers real news, hard-hitting investigative journalism, politics, economy, technology, sports, and culture across India.",
         canonicalUrl: `${SITE_ORIGIN}/`,
         ogType: "website",
