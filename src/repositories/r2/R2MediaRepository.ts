@@ -21,12 +21,17 @@ export class R2MediaRepository {
   private async getAuthHeaders(): Promise<Record<string, string>> {
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      let { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        // Silently attempt refresh without requiring signout
+        const { data: refreshData } = await supabase.auth.refreshSession();
+        session = refreshData?.session || null;
+      }
       if (session?.access_token) {
         headers['Authorization'] = `Bearer ${session.access_token}`;
       }
     } catch {
-      // Fall through cleanly; server endpoint will enforce auth
+      // Fall through cleanly; server endpoint will use resilient fallback
     }
     return headers;
   }
