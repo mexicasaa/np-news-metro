@@ -118,6 +118,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
   const authorAvatarInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const editorRef = useRef<HTMLDivElement>(null);
+  const titleTextareaRef = useRef<HTMLTextAreaElement>(null);
   const dekTextareaRef = useRef<HTMLTextAreaElement>(null);
   const isUserTypingRef = useRef(false);
   const lastEditorRangeRef = useRef<Range | null>(null);
@@ -125,6 +126,17 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
 
   const [title, setTitle] = useState(initialPost?.title || '');
   const [dek, setDek] = useState(initialPost?.dek || '');
+
+  const adjustTitleHeight = useCallback(() => {
+    const el = titleTextareaRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${Math.max(el.scrollHeight, 44)}px`;
+  }, []);
+
+  useEffect(() => {
+    adjustTitleHeight();
+  }, [title, adjustTitleHeight]);
 
   const adjustDekHeight = useCallback(() => {
     const el = dekTextareaRef.current;
@@ -1672,7 +1684,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       <input type="file" ref={authorAvatarInputRef} onChange={handleAuthorAvatarUpload} accept="image/*" className="hidden" />
 
       <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-white/80 shadow-xs">
-        <div className="max-w-[1340px] mx-auto px-3 sm:px-6 min-h-14 sm:h-16 py-2 sm:py-0 flex items-center justify-between gap-2 sm:gap-4 flex-wrap sm:flex-nowrap">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-14 sm:h-16 py-2 sm:py-0 flex items-center justify-between gap-2 sm:gap-4 flex-wrap sm:flex-nowrap">
           
           <div className="flex items-center gap-3">
             {onBack && (
@@ -1764,7 +1776,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
         </div>
       )}
 
-      <main className="max-w-[1340px] mx-auto px-3 sm:px-6 pt-3 sm:pt-6 pb-12">
+      <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-12">
         {/* Mobile Segmented Switcher (Visible on <lg screens) */}
         <div className="lg:hidden mb-4 bg-slate-200/80 p-1 rounded-full flex items-center gap-1 text-xs font-semibold shadow-inner">
           <button
@@ -1787,18 +1799,28 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
 
         <div className="flex flex-col lg:flex-row gap-6 items-start">
           
-          <div className={"flex-1 w-full space-y-6 " + (mobileTab === 'content' ? "block" : "hidden lg:block")}>
+          <div className={"flex-1 w-full min-w-0 space-y-6 " + (mobileTab === 'content' ? "block" : "hidden lg:block")}>
             
             <div className="bg-white/90 backdrop-blur-md rounded-3xl shadow-xs border border-white/80 overflow-hidden transition-all">
               
               <div className="pt-6 sm:pt-8 px-6 sm:px-10 pb-4">
-                <input
-                  type="text"
+                <textarea
+                  ref={titleTextareaRef}
+                  rows={1}
                   value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+                  onChange={(e) => {
+                    setTitle(e.target.value);
+                    adjustTitleHeight();
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      dekTextareaRef.current?.focus();
+                    }
+                  }}
                   placeholder="Title"
                   style={{ outline: 'none', border: 'none', boxShadow: 'none' }}
-                  className="w-full text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-slate-900 placeholder:text-slate-300/80 border-none outline-none focus:outline-none focus:ring-0 ring-0 focus-visible:outline-none bg-transparent leading-tight tracking-tight selection:bg-blue-600 selection:text-white"
+                  className="w-full text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-slate-900 placeholder:text-slate-300/80 border-none outline-none focus:outline-none focus:ring-0 ring-0 focus-visible:outline-none bg-transparent resize-none leading-tight tracking-tight selection:bg-blue-600 selection:text-white overflow-hidden block"
                 />
 
                 <div className="mt-3">

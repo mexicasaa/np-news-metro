@@ -199,7 +199,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
       <div className="flex-1 h-full min-w-0 flex flex-col gap-3 lg:gap-3.5 overflow-hidden z-10">
         
         {/* Top Floating Glass Header (Matching horizontal height & alignment) */}
-        <header className="h-10 shrink-0 flex items-center justify-between gap-3">
+        <header className="h-10 shrink-0 w-full max-w-7xl mx-auto flex items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
           
           {/* Left: Mobile Menu Trigger + Global Search Bar */}
           <div className="flex items-center gap-2.5 flex-1 max-w-md">
